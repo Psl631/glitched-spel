@@ -1,0 +1,2439 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Station 24 - Math Mayhem ULTRA</title>
+    <!-- Google Fonts för retro arkadkänsla -->
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=VT323&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script>
+    // --- KAMEK BROWSER PURGE: MULTI-SPRÅKLIGT ANTI-FOSSIL PROTOKOLL (ES5) ---
+    (function() {
+        var ua = navigator.userAgent.toLowerCase();
+        var reason = "";
+        var mockery = "";
+
+        // Ta reda på webbläsarens språk för tidig blockering
+        var userLang = navigator.language || navigator.userLanguage || "en";
+        var langCode = userLang.slice(0, 2);
+        if (["sv", "da", "no", "en"].indexOf(langCode) === -1) {
+            langCode = "en";
+        }
+
+        var browserBlockMessages = {
+            sv: {
+                ie_title: "MJUKVARU-FOSSIL DETEKTERAD",
+                ie_msg: "Internet Explorer? Museet ringde och vill ha tillbaka sin programvara! Operatör PSL631 kan praktiskt taget höra ditt 56k-modem skrika av smärta. Uppgradera eller försvinn, din mänskliga fossil!",
+                edge_title: "LEGACY EDGE SKROTAD",
+                edge_msg: "Kör du gamla Edge? Den där webbläsaren dog snabbare än en Goomba under en känga! Installera en webbläsare med en riktig motor (Chromium) innan Kamek förvandlar din dator till ett askfat.",
+                safari_title: "STENÅLDERS-SAFARI UPPTÄCKT",
+                safari_msg: "Din Safari-version är så gammal att den fortfarande tror att Steve Jobs är vid liv. Safari 16+ krävs för att ens nudda Station 24-protokollet. Din frukt har ruttnat - hämta en ny!"
+            },
+            da: {
+                ie_title: "SOFTWARE-FOSSIL DETEKTERET",
+                ie_msg: "Internet Explorer? Museet ringede og vil have deres software tilbage! Operatør PSL631 kan praktisk talt høre dit 56k-modem skrige af smerte. Opgrader eller forsvind, dit menneskelige fossil!",
+                edge_title: "LEGACY EDGE SKROTTET",
+                edge_msg: "Kører du den gamle Edge? Den browser døde hurtigere end en Goomba under en støvle! Installer en browser med en rigtig motor (Chromium), før Kamek forvandler din computer til et askebæger.",
+                safari_title: "STENALDER-SAFARI OPDAGET",
+                safari_msg: "Din Safari-version er så gammel, at den stadig tror, Steve Jobs er i live. Safari 16+ kræves for overhovedet at røre Station 24-protokollen. Din frugt er rådden - hent en ny!"
+            },
+            no: {
+                ie_title: "PROGRAMVARE-FOSSIL DETEKTERT",
+                ie_msg: "Internet Explorer? Museet ringte og vil ha programvaren sin tilbake! Operatør PSL631 kan praktiskt talt høre 56k-modemet ditt skrike av smerte. Oppgrader eller forsvinn, ditt menneskelige fossil!",
+                edge_title: "LEGACY EDGE SKROTTET",
+                edge_msg: "Kjører du gamle Edge? Den nettleseren døde raskere enn en Goomba under en støvel! Installer en nettleser med en skikkelig motor (Chromium) før Kamek forvandler maskinen din til et askebeger.",
+                safari_title: "STEINalder-SAFARI OPPDAGET",
+                safari_msg: "Din Safari-versjon er så gammel at den still tror Steve Jobs er i live. Safari 16+ kreves for å i det hele tatt røre Sektor 24-protokollen. Frukten din har råtnet - hent en ny!"
+            },
+            en: {
+                ie_title: "SOFTWARE FOSSIL DETECTED",
+                ie_msg: "Internet Explorer? The museum called and wants its software back! Operator PSL631 can practically hear your 56k modem screaming in pain. Upgrade or disappear, you human fossil!",
+                edge_title: "LEGACY EDGE SCRAPPED",
+                edge_msg: "Running old Edge? That browser died faster than a Goomba under a boot! Install a browser with a real engine (Chromium) before Kamek turns your computer into an ashtray.",
+                safari_title: "STONE AGE SAFARI DETECTED",
+                safari_msg: "Your Safari version is so old it still thinks Steve Jobs is alive. Safari 16+ is required to even touch the Station 24 protocol. Your fruit has rotted - get a new one!"
+            }
+        };
+
+        // 1. INTERNET EXPLORER (Alla versioner)
+        var isIE = !!document.documentMode || ua.indexOf("msie") > -1 || ua.indexOf("trident") > -1;
+        
+        // 2. GAMLA MS EDGE (EdgeHTML - versioner innan Chromium-bytet)
+        var isOldEdge = ua.indexOf("edge/") > -1;
+
+        // 3. GAMLA SAFARI (Versioner äldre än 16.0)
+        var isSafari = ua.indexOf("safari") > -1 && ua.indexOf("chrome") === -1;
+        var isOldSafari = false;
+        if (isSafari) {
+            var safariVerMatch = ua.match(/version\/(\d+)/);
+            if (safariVerMatch && parseInt(safariVerMatch[1]) < 16) {
+                isOldSafari = true;
+            }
+        }
+
+        var selectedBlock = null;
+        if (isIE) {
+            reason = "INTERNET_EXPLORER_ARKIVERAD";
+            selectedBlock = { title: browserBlockMessages[langCode].ie_title, msg: browserBlockMessages[langCode].ie_msg };
+        } 
+        else if (isOldEdge) {
+            reason = "LEGACY_EDGE_SKROTAD";
+            selectedBlock = { title: browserBlockMessages[langCode].edge_title, msg: browserBlockMessages[langCode].edge_msg };
+        } 
+        else if (isOldSafari) {
+            reason = "STENÅLDERS_SAFARI_UPPTÄCKT";
+            selectedBlock = { title: browserBlockMessages[langCode].safari_title, msg: browserBlockMessages[langCode].safari_msg };
+        }
+
+        if (selectedBlock) {
+            var h = "";
+            h += '<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#2e0000;color:#fff;z-index:30000000;display:block;text-align:center;padding:40px;font-family:Arial, sans-serif;border:15px double #ff0000;box-sizing:border-box; overflow-y:auto;">';
+            h += '<h1 style="font-size:42px;color:#ff0000;margin:10px 0;font-weight:900;text-transform:uppercase;letter-spacing:-2px;">[ ' + selectedBlock.title + ' ]</h1>';
+            h += '<div style="background:#ff0000;display:inline-block;padding:10px 30px;border-radius:15px;font-weight:bold;margin-bottom:30px;font-size:20px;box-shadow:0 0 20px rgba(255,0,0,0.5);">STATUS: ÅTKOMST NEKAD</div>';
+            h += '<div style="background:rgba(0,0,0,0.4);padding:40px;border-radius:30px;max-width:800px;margin:0 auto;border:2px solid #ffcc00;">';
+            h += '<p style="font-size:26px;color:#ffcc00;margin-bottom:20px;font-weight:bold;">Kamek hånar din antika mjukvara:</p>';
+            h += '<p style="font-size:32px;line-height:1.4;font-style:italic;color:#fff;">"' + selectedBlock.msg + '"</p>';
+            h += '<hr style="border:0;border-top:3px dashed #ff0000;margin:30px 0;">';
+            h += '<p style="font-size:22px;text-align:left;"><span style="color:#ff0000;font-weight:bold;">SYSTEM_ERROR:</span> <span style="font-family:monospace;background:#111;padding:4px 10px;border:1px solid #444;">' + reason + '</span></p>';
+            h += '</div>';
+            h += '<p style="margin-top:50px;opacity:0.5;font-size:16px;letter-spacing:2px;font-weight:bold;">OPERATOR PSL631 // BROWSER_INTEGRITY_CHECK_FAILED // SEKTOR_24</p>';
+            h += '</div>';
+
+            document.write(h);
+            if (window.stop) window.stop();
+            document.execCommand("Stop");
+            throw new Error("Lockdown: Outdated browser engine.");
+        }
+    })();
+
+    // --- KAMEK ULTRA-SENSITIVE HARDWARE PURGE (ES5) ---
+    (function() {
+        var ua = navigator.userAgent.toLowerCase();
+        var isMobile = /iphone|ipod|android|blackberry|iemobile/i.test(ua);
+        var isTablet = /ipad|playbook|silk/i.test(ua) || (navigator.maxTouchPoints > 0 && ua.indexOf("macintosh") > -1);
+        
+        var reason = "";
+        var mockery = "";
+
+        // Ta reda på språkkod för tidig blockering
+        var userLang = navigator.language || navigator.userLanguage || "en";
+        var langCode = userLang.slice(0, 2);
+        if (["sv", "da", "no", "en"].indexOf(langCode) === -1) {
+            langCode = "en";
+        }
+
+        // Fyll i hårdvarumeddelanden för alla 4 språk
+        var hardwareBlockMessages = {
+            sv: {
+                purge_title: "HÅRDVARU-RENSNING AKTIV",
+                status_terminated: "STATUS: TERMINERAD",
+                operator_footer: "OPERATOR PSL631 // HARDWARE_INTEGRITY_CHECK_FAILED // STATION_24",
+                kamek_mock: "Kamek hånar din usla utrustning:",
+                err_code: "FELKOD:",
+                tesla: { reason: "RULLANDE_TRAFIKFARA_DETEKTERAD", mock: "SLÅ AV MOTORN! Din Tesla är inte en matte-stuga. Händerna på ratten innan du krockar in i stordatormatrisen! Operatör PSL631 stöder inte rullande hårdvara." },
+                tv: { reason: "SOFFPOTATIS_ANOMALI", mock: "Soffan är inte en godkänd kommandocentral! Att räkna matte med en fjärrkontroll är som att äta soppa med gaffel. Gå upp ur soffan och hämta en riktig terminal!" },
+                console: { reason: "KONSOL_BONDE_I_SEKTORN", mock: "Gå tillbaka till din handkontroll och din auto-aim, din lilla konsol-bonde! Station 24 kräver mekanisk precision, inte knappar gjorda för småbarn." },
+                mac: { reason: "RUTTEN_FRUKT_FOSSIL", mock: "macOS är för gammalt! Sequoia (15.0) är minimum för att exekvera dessa algoritmer. Uppdatera eller bli raderad!" },
+                win: { reason: "WINDOWS_FRÅN_KRITAPERIODEN", mock: "Gammalt Windows upptäckt! Jag kan praktiskt taget höra ditt 56k-modem skrika av smärta. Din dator hör hemma på ett museum, inte i Station 24!" },
+                chrome: { reason: "GLORIFIERAD_WEBBLÄSARE", mock: "En Chromebook? Det är som att försöka vinna ett Formel 1-lopp med en trampbil. Kamek accepterar endast riktiga operativsystem!" },
+                tablet: { reason: "KLADDIGA_FINGRAR_PÅ_GLASET", mock: "Sluta kladda på skärmen! En padda är en leksak för barn som vill se på tecknat. Station 24 Protocol kräver en riktig mus!" },
+                mobile: { reason: "MOBIL_TERMINAL_UPPTÄCKT", mock: "Din skärm är för liten för den här nevån av intelligens. Math Mayhem är inte ett mobilspel för Goombas!" }
+            },
+            da: {
+                purge_title: "HARDWARE-RENSNING AKTIV",
+                status_terminated: "STATUS: TERMINERET",
+                operator_footer: "OPERATOR PSL631 // HARDWARE_INTEGRITY_CHECK_FAILED // STATION_24",
+                kamek_mock: "Kamek spotter dit elendige udstyr:",
+                err_code: "FEJLKODE:",
+                tesla: { reason: "RULLENDE_TRAFIKFARE_DETEKTERET", mock: "SLUK MOTOREN! Din Tesla er ikke en matematik-hytte. Hænderne på rattet før du crasher ind i hoveddatamatricen! Operatør PSL631 understøtter ikke rullende hardware." },
+                tv: { reason: "SOFAPOTAT_ANOMALI", mock: "Sofaen er ikke en godkendt kommandocentral! At regne matematik med en fjernbetjening er som at spise suppe med en gaffel. Rejs dig fra sofaen og hent en rigtig terminal!" },
+                console: { reason: "KONSOL_BONDE_I_SEKTOREN", mock: "Gå tilbage til din controller og din auto-aim, din lille konsol-bonde! Station 24 kræver mekanisk præcision, ikke knapper lavet til småbørn." },
+                mac: { reason: "RÅDDEN_FRUGT_FOSSIL", mock: "macOS er for gammelt! Sequoia (15.0) er minimum for at køre disse algoritmer. Opdater eller bliv slettet!" },
+                win: { reason: "WINDOWS_FRA_KRIDTTIDEN", mock: "Gammelt Windows opdaget! Jeg kan praktisk talt høre dit 56k-modem skrige af smerte. Din computer hører til på et museum, ikke i Station 24!" },
+                chrome: { reason: "GLORIFICERET_WEBBLÆSER", mock: "En Chromebook? Det er som at prøve at vinde et Formel 1-løb med en sæbekassebil. Kamek accepterer kun rigtige operativsystemer!" },
+                tablet: { reason: "FEDTEDE_FINGRE_PÅ_GLASSET", mock: "Stop med at røre ved skærmen! En tablet er legetøj til børn, der vil se tegnefilm. Station 24-protokollen kræver en rigtig mus!" },
+                mobile: { reason: "MOBIL_TERMINAL_OPDAGET", mock: "Din skærm er for lille til dette intelligensniveau. Math Mayhem er ikke et mobilspil for Goombas!" }
+            },
+            no: {
+                purge_title: "MASKINVARE-RENSNING AKTIV",
+                status_terminated: "STATUS: TERMINERT",
+                operator_footer: "OPERATOR PSL631 // HARDWARE_INTEGRITY_CHECK_FAILED // STATION_24",
+                kamek_mock: "Kamek håner det usle utstyret ditt:",
+                err_code: "FEILKODE:",
+                tesla: { reason: "RULLENDE_TRAFIKKFARE_DETEKTERT", mock: "SLÅ AV MOTOREN! Din Tesla er ikke en mattestue. Hendene på rattet før du krasjer inn i stordatormatrisen! Operatør PSL631 støtter ikke rullende maskinvare." },
+                tv: { reason: "SOFAPOTET_ANOMALI", mock: "Sofaen er ikke en godkjent kommandosentral! Å regne matte med en fjernkontroll er som å spise oppe med gaffel. Reis deg fra sofaen og hent en skikkelig terminal!" },
+                console: { reason: "KONSOL_BONDE_I_SEKTOREN", mock: "Gå tilbake til håndkontrollen og auto-aimen din, din lille konsoll-bonde! Station 24 krever mekanisk presisjon, ikke knapper laget for småbarn." },
+                mac: { reason: "RÅTTEN_FRUKT_FOSSIL", mock: "macOS er for gammelt! Sequoia (15.0) er minimum for å kjøre disse algoritmene. Oppdater eller bli slettet!" },
+                win: { reason: "WINDOWS_FRA_KRITTIDEN", mock: "Gammelt Windows oppdaget! Jeg kan praktiskt talt høre 56k-modemet ditt skrike av smerte. Datamaskinen din hører hjemme på et museum, ikke i Sektor 24!" },
+                chrome: { reason: "GLORIFISERT_NETTLESER", mock: "En Chromebook? Det er som å prøve å vinne et Formel 1-løb med en tråbil. Kamek aksepterer bare ekte operativsystemer!" },
+                tablet: { reason: "KLASSISKE_FINGRE_PÅ_GLASS", mock: "Slutt å klusse på skjermen! Et nettbrett er leketøy for barn som vil se på tegnefilm. Station 24-protokollen krever en ekte mus!" },
+                mobile: { reason: "MOBIL_TERMINAL_DETEKTERT", mock: "Skjermen din er for liten for dette intelligensnivået. Math Mayhem er ikke et mobilspil for Goombas!" }
+            },
+            en: {
+                purge_title: "HARDWARE PURGE ACTIVE",
+                status_terminated: "STATUS: TERMINATED",
+                operator_footer: "OPERATOR PSL631 // HARDWARE_INTEGRITY_CHECK_FAILED // STATION_24",
+                kamek_mock: "Kamek mocks your lousy equipment:",
+                err_code: "ERROR CODE:",
+                tesla: { reason: "ROLLING_TRAFFIC_HAZARD_DETECTED", mock: "TURN OFF THE ENGINE! Your Tesla is not a math class. Hands on the wheel before you crash into the mainframe! Operator PSL631 does not support rolling hardware." },
+                tv: { reason: "COUCH_POTATO_ANOMALY", mock: "The couch is not an approved command center! Calculating math with a remote control is like eating soup with a fork. Get off the couch and get a real terminal!" },
+                console: { reason: "CONSOLE_PEASANT_IN_THE_SECTOR", mock: "Go back to your gamepad and your auto-aim, you little console peasant! Station 24 requires mechanical precision, not buttons made for toddlers." },
+                mac: { reason: "ROTTEN_FRUIT_FOSSIL", mock: "macOS is too old! Sequoia (15.0) is the minimum to execute these algorithms. Update or be erased!" },
+                win: { reason: "WINDOWS_FROM_THE_CRETACEOUS_PERIOD", mock: "Outdated Windows version detected! I can practically hear your 56k modem screaming in pain. Your computer belongs in a museum, not in Station 24!" },
+                chrome: { reason: "GLORIFIED_BROWSER", mock: "A Chromebook? It's like trying to win a Formula 1 race with a pedal car. Kamek only accepts real operating systems!" },
+                tablet: { reason: "STICKY_FINGERS_ON_GLASS", mock: "Stop smudging the screen! A tablet is a toy for kids who want to watch cartoons. The Station 24 Protocol requires a real mouse!" },
+                mobile: { reason: "MOBILE_TERMINAL_DETECTED", mock: "Your screen is too small for this level of intelligence. Math Mayhem is not a mobile game for Goombas!" }
+            }
+        };
+
+        var activeMsgSet = hardwareBlockMessages[langCode];
+        var item = null;
+
+        if (ua.indexOf("tesla") > -1 || ua.indexOf("carbrowser") > -1) {
+            item = activeMsgSet.tesla;
+        }
+        else if (ua.indexOf("smarttv") > -1 || ua.indexOf("tizen") > -1 || ua.indexOf("web0s") > -1 || ua.indexOf("googletv") > -1 || ua.indexOf("appletv") > -1) {
+            item = activeMsgSet.tv;
+        }
+        else if (ua.indexOf("playstation") > -1 || ua.indexOf("xbox") > -1 || ua.indexOf("nintendo") > -1) {
+            item = activeMsgSet.console;
+        }
+        else if (ua.indexOf("mac os x") > -1 && !isTablet) {
+            var macVerMatch = ua.match(/mac os x (\d+)[_.](\d+)/);
+            if (macVerMatch) {
+                var major = parseInt(macVerMatch[1]);
+                if (major < 15) {
+                    item = activeMsgSet.mac;
+                }
+            }
+        }
+        else if (ua.indexOf("windows nt") > -1) {
+            var winVer = parseFloat(ua.split("windows nt ")[1]);
+            if (winVer < 10.0) {
+                item = activeMsgSet.win;
+            }
+        }
+        else if (ua.indexOf("cros") > -1) {
+            item = activeMsgSet.chrome;
+        }
+        else if (isTablet) {
+            item = activeMsgSet.tablet;
+        }
+        else if (isMobile) {
+            item = activeMsgSet.mobile;
+        }
+
+        if (item) {
+            var h = "";
+            h += '<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#140028;color:#fff;z-index:20000000;display:block;text-align:center;padding:40px;font-family:Arial, sans-serif;border:12px solid #ff0000;box-sizing:border-box; overflow-y:auto;">';
+            h += '<h1 style="font-size:38px;color:#ff0000;margin:10px 0;font-weight:900;text-transform:uppercase;">[ ' + activeMsgSet.purge_title + ' ]</h1>';
+            h += '<div style="background:#ff0000;display:inline-block;padding:8px 25px;border-radius:12px;font-weight:bold;margin-bottom:25px;letter-spacing:2px;">' + activeMsgSet.status_terminated + '</div>';
+            h += '<div style="background:rgba(255,255,255,0.05);padding:35px;border-radius:25px;max-width:750px;margin:0 auto;border:3px dashed #ff0000;">';
+            h += '<p style="font-size:24px;color:#ffcc00;margin-bottom:15px;font-weight:bold;">' + activeMsgSet.kamek_mock + '</p>';
+            h += '<p style="font-size:30px;line-height:1.5;font-style:italic;color:#fff;">"' + item.mock + '"</p>';
+            h += '<hr style="border:0;border-top:2px solid #ff0000;margin:25px 0;">';
+            h += '<p style="font-size:20px;text-align:left;"><span style="color:#ff0000;font-weight:bold;">' + activeMsgSet.err_code + '</span> <span style="font-family:monospace;background:#333;padding:2px 8px;">' + item.reason + '</span></p>';
+            h += '</div>';
+            h += '<p style="margin-top:50px;opacity:0.4;font-size:14px;letter-spacing:1px;">' + activeMsgSet.operator_footer + '</p>';
+            h += '</div>';
+
+            document.write(h);
+            if (window.stop) window.stop();
+            document.execCommand("Stop");
+            throw new Error("Lockdown: Hardware violation.");
+        }
+    })();
+    </script>
+
+    <style>
+        html, body {
+            margin: 0; padding: 0; min-height: 100vh;
+            background-color: #05000a;
+            font-family: 'Luckiest Guy', cursive; color: white;
+            display: flex; flex-direction: column; align-items: center;
+            overflow-y: auto;
+            overflow-x: hidden;
+            transition: background-color 0.2s;
+        }
+
+        /* --- HOW TO PLAY: STATION 24 EDITION --- */
+        .modal { 
+            display: none; position: fixed; z-index: 100001; 
+            left: 0; top: 0; width: 100%; height: 100%; 
+            background-color: rgba(0,0,0,0.95); 
+        }
+        .modal-content { 
+            background-color: #140028; color: #eee; margin: 2% auto; 
+            padding: 40px; border: 6px solid #ffcc00; width: 90%; 
+            max-width: 800px; border-radius: 30px; font-family: Arial, sans-serif; 
+            line-height: 1.5; max-height: 90vh; overflow-y: auto; 
+            box-shadow: 0 0 50px rgba(255, 204, 0, 0.2);
+            position: relative;
+        }
+        .modal-content h2 { 
+            font-family: 'Luckiest Guy', cursive; color: #ffcc00; 
+            font-size: 50px; text-align: center; margin-bottom: 20px;
+            -webkit-text-stroke: 1.5px black; 
+        }
+        .modal-content h3 { 
+            font-family: 'Luckiest Guy', cursive; color: #00ccff; 
+            border-bottom: 2px solid #333; padding-bottom: 5px; margin-top: 25px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            color: #ff0000;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .toxic-toast {
+            background: linear-gradient(to right, #ff0000, #990000);
+            color: white; border: 2px solid gold; font-family: 'Luckiest Guy';
+            padding: 10px; border-radius: 10px; animation: shake 0.5s;
+        }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+            100% { transform: translateX(0); }
+        }
+
+        .warning-box { 
+            background: rgba(255, 0, 0, 0.15); border-left: 5px solid #ff0000; 
+            padding: 15px; margin: 15px 0; border-radius: 5px;
+        }
+        .rule-list { list-style-type: none; padding: 0; }
+        .rule-list li { margin-bottom: 10px; padding-left: 25px; position: relative; }
+        .rule-list li::before { content: "▶"; position: absolute; left: 0; color: #ffcc00; }
+        
+        #toast-container { 
+            position: fixed; top: 20px; right: 20px; z-index: 99999; 
+            display: flex; flex-direction: column; align-items: flex-end; 
+            pointer-events: none; 
+        }
+        
+        @keyframes vibrate { 
+            0% { transform: translate(0); } 
+            20% { transform: translate(-5px, 5px) rotate(-5deg); } 
+            40% { transform: translate(-5px, -5px) rotate(5deg); } 
+            60% { transform: translate(5px, 5px) rotate(-5deg); } 
+            80% { transform: translate(5px, -5px) rotate(5deg); } 
+            100% { transform: translate(0); } 
+        }
+        .vibrate-clock { width: 150px; animation: vibrate 0.1s infinite; margin-bottom: 20px; }
+
+        #camera-container::after {
+            content: "● REC";
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            color: red;
+            font-family: monospace;
+            font-size: 12px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+
+        /* Media Setup Panel */
+        .media-setup {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 20px;
+            border: 2px solid #ffcc00;
+            margin: 20px 0;
+        }
+        .media-btn {
+            font-family: 'Luckiest Guy', cursive;
+            padding: 12px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .media-btn:hover { transform: scale(1.05); }
+
+        /* Mic Visualizer i hörnet */
+        #mic-visualizer-container {
+            display: none; position: fixed; bottom: 20px; right: 20px; 
+            width: 100px; height: 100px; z-index: 10001; 
+            background: rgba(20, 0, 40, 0.9); border: 2px solid #00ccff; 
+            border-radius: 50%; flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 0 15px #00ccff;
+        }
+        .bar { width: 4px; background: #00ccff; border-radius: 2px; transition: height 0.05s; }
+
+        @keyframes timerBlink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+        .timer-panic { color: #ff0000 !important; text-shadow: 0 0 20px #ff0000; animation: timerBlink 0.2s infinite; font-size: 40px; }
+        .bg-panic { background-color: #440000 !important; transition: background-color 0.1s; }
+        .toast { background: rgba(0, 0, 0, 0.95); color: white; padding: 15px 25px; border-radius: 15px; margin-bottom: 10px; border: 4px solid #ffcc00; font-size: 22px; box-shadow: 0 5px 15px rgba(0,0,0,0.8); min-width: 250px; text-align: center; animation: toastIn 0.3s forwards; }
+        @keyframes toastIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        #lockdown-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(20, 0, 40, 0.98); z-index: 10000000; 
+            display: flex; justify-content: center; align-items: center; 
+            font-family: 'Luckiest Guy', cursive; overflow-y: auto; 
+            overflow-x: hidden; 
+        }
+        .lockdown-content { background: #000; border: 8px solid #ffcc00; box-shadow: 0 0 70px #ff0000; width: 90%; max-width: 600px; max-height: 85vh; padding: 30px; display: flex; flex-direction: column; align-items: center; text-align: center; border-radius: 30px; }
+        .scroll-box { overflow-y: auto; width: 100%; margin: 15px 0; padding-right: 10px; color: white; font-size: 1.2rem; }
+        .kamek-avatar { width: 130px; border: 4px solid #ffcc00; border-radius: 20px; }
+        .lockdown-title { color: #ff0000; font-size: 2.5rem; -webkit-text-stroke: 1.5px black; margin: 10px 0; }
+        .violation-badge { background: #ff0000; color: #fff; padding: 5px 15px; border-radius: 10px; font-size: 0.8rem; }
+        .reason-container { margin-top: 20px; }
+        .restart-btn { background: #00ff00; color: #000; border: 4px solid black; padding: 15px 40px; font-family: 'Luckiest Guy'; font-size: 1.5rem; cursor: pointer; margin-top: 20px; border-radius: 15px; }
+        .restart-btn:hover { background: #fff; transform: scale(1.05); }
+        .lockdown-footer { margin-top: 20px; opacity: 0.3; font-size: 0.8rem; color: #fff; font-family: Arial; }
+        
+        #alarm-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(139, 0, 0, 0.95); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
+        #start-screen, #end-screen, #leaderboard-screen { background: rgba(0, 0, 0, 0.9); padding: 30px; border-radius: 30px; margin: 20px auto; text-align: center; border: 8px solid #ffcc00; max-width: 600px; z-index: 200; }
+        #end-screen, #leaderboard-screen { display: none; }
+        .btn-start { background-color: #00ff00; color: black; cursor: pointer; width: 80%; font-size: 28px; border-radius: 15px; padding: 15px; border: 4px solid black; }
+        #game-container { display: none; width: 95%; max-width: 800px; text-align: center; margin-top: 20px; }
+        #math-card { background: rgba(0, 0, 0, 0.85); padding: 40px; border-radius: 30px; border: 8px solid #00ccff; }
+        #question { font-size: 100px; margin: 10px 0; color: #ffcc00; text-shadow: 5px 5px #000; }
+        .answer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .answer-btn { background: #fff; color: #333; padding: 25px; font-size: 40px; cursor: pointer; border-radius: 20px; font-family: 'Luckiest Guy'; border: 4px solid black; }
+        #snooze-input { font-size: 35px; text-align: center; border: 5px solid #ffcc00; font-family: 'Luckiest Guy'; }
+
+        /* Språkvals-grid */
+        .language-selector-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin: 15px 0 25px 0;
+        }
+
+        .flag-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            background: #120024;
+            border: 3px solid #8200ff;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #ffcc00;
+            font-size: 13px;
+            font-weight: bold;
+            font-family: 'Luckiest Guy', sans-serif;
+        }
+
+        .flag-button:hover {
+            background: #250044;
+            border-color: #00ffcc;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+        }
+
+        .flag-button svg {
+            width: 45px;
+            height: 30px;
+            border-radius: 4px;
+            margin-bottom: 6px;
+            border: 2px solid #ffcc00;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        #audio-interface {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 99999;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+
+        #boombox-container {
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+
+        #boombox-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            border: 3px solid #ffcc00;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            opacity: 0.5;
+            transform: scale(0.9);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #audio-interface.active #boombox-img {
+            opacity: 1;
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(255, 204, 0, 0.4);
+        }
+
+        #status-cross {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.4);
+            border-radius: 12px;
+            pointer-events: none;
+        }
+
+        #status-cross span {
+            color: #ff0000;
+            font-size: 60px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px #000;
+        }
+
+        #track-info {
+            position: absolute;
+            bottom: 90px;
+            right: 0;
+            background: rgba(0,0,0,0.9);
+            color: #ffcc00;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-family: 'Luckiest Guy', cursive, sans-serif;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            display: none;
+            border: 1px solid #ffcc00;
+            pointer-events: none;
+        }
+
+        #diagnostic-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #05000a;
+            z-index: 2000000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #00ffcc;
+            font-family: 'VT323', monospace;
+            box-sizing: border-box;
+            padding: 40px;
+            border: 10px solid #8200ff;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+<div id="toast-container"></div>
+
+<!-- ==========================================================================
+   0.5 CYBER DIAGNOSTIK-SKÄRM (MÖTER SPELAREN DIREKT)
+   ========================================================================== -->
+<div id="diagnostic-screen">
+    <h1 style="font-size: 48px; color: #ffcc00; margin-bottom: 30px; text-shadow: 0 0 10px #ffcc00; text-align: center;">STATION 24 - HARDWARE CHECK v4.2</h1>
+    <div id="diag-log" style="width: 100%; max-width: 550px; font-size: 26px; text-align: left; line-height: 1.8; font-family: monospace;">
+        <p id="diag-ram">Checking physical memory (RAM)...</p>
+        <p id="diag-cpu" style="display:none;">Checking CPU core counts...</p>
+        <p id="diag-os" style="display:none;">Verifying OS architecture security...</p>
+        <p id="diag-disk" style="display:none;">Scanning local HDD sector capacity...</p>
+    </div>
+</div>
+
+<!-- ==========================================================================
+   F. KAMEK KATASTROF-LÅSNING OVERLAY (ANTI-CHEAT)
+   ========================================================================== -->
+<div id="lockdown-overlay" style="display:none;">
+    <div class="lockdown-content">
+        <!-- Vektorritad Kamek -->
+        <svg viewBox="0 0 100 100" style="width: 130px; height: 130px; border: 4px solid #ffcc00; background: #110022; border-radius: 20px;">
+            <circle cx="50" cy="50" r="40" fill="#2d0052"/>
+            <polygon points="20,40 50,5 80,40" fill="#8200ff" stroke="#fff" stroke-width="2"/>
+            <ellipse cx="50" cy="40" rx="30" ry="6" fill="#00ffcc"/>
+            <polygon points="35,55 45,60 35,62" fill="yellow"/>
+            <polygon points="65,55 55,60 65,62" fill="yellow"/>
+            <circle cx="40" cy="58" r="2" fill="red"/>
+            <circle cx="60" cy="58" r="2" fill="red"/>
+            <path d="M 40,75 Q 50,65 60,75" stroke="#ff0033" stroke-width="4" fill="none"/>
+        </svg>
+        <h1 class="lockdown-title" id="lockdown-header">FUSK DETEKTERAT!</h1>
+        <div class="violation-badge">TERMINAL_STATUS: LÅST</div>
+        <div class="scroll-box">
+            <p id="lockdown-mockery">Nyehehehe! Tror du att du kan lura Kamek?</p>
+            <div class="reason-container">
+                <span style="font-family: 'Luckiest Guy'; color: #ff0000; font-size: 1.2rem;" id="lockdown-error-label">DETEKTERAT FEL:</span><br>
+                <p id="lockdown-reason-text" style="font-family: Arial, sans-serif; font-weight: bold; color: #333; background: #eee; padding: 10px; border-radius: 5px; margin-top: 10px;">INGEN_SPECIFIK_ANLEDNING</p>
+            </div>
+        </div>
+        <button onclick="location.reload()" class="restart-btn" id="lockdown-restart-btn">STARTA OM</button>
+        <div class="lockdown-footer">ERR_LOG_V4.6 // STATION_24_CORE</div>
+    </div>
+</div>
+
+<!-- ==========================================================================
+   B. STARTSKÄRM / LOBBYMEDLEM
+   ========================================================================== -->
+<div id="start-screen">
+    <h1>MATH MAYHEM ULTRA</h1>
+    <div style="background:rgba(255,0,0,0.2); padding:15px; border-radius:15px; margin-bottom:15px; font-size: 18px;" id="kamek-warn-box">
+        <strong style="color:#ffcc00;">KAMEK LOCKDOWN:</strong> Flikbyte eller DevTools låser spelet! Spelet går vidare vid både rätt och fel svar.
+    </div>
+
+    <!-- Språkval med inbäddade vektorflaggor (SVG) -->
+    <div class="language-selector-grid">
+        <button class="flag-button" onclick="window.setLanguage('sv')" title="Svenska">
+            <svg viewBox="0 0 16 10">
+                <rect width="16" height="10" fill="#006aa7"/>
+                <rect width="2" height="10" x="5" fill="#fecc00"/>
+                <rect width="16" height="2" y="4" fill="#fecc00"/>
+            </svg>
+            <span>Svenska</span>
+        </button>
+        <button class="flag-button" onclick="window.setLanguage('en')" title="English">
+            <svg viewBox="0 0 50 30">
+                <clipPath id="t">
+                    <path d="M0,0 v30 h50 v-30 z"/>
+                </clipPath>
+                <path d="M0,0 L50,30 M50,0 L0,30" stroke="#fff" stroke-width="6" clip-path="url(#t)"/>
+                <path d="M0,0 L50,30 M50,0 L0,30" stroke="#c8102e" stroke-width="4" clip-path="url(#t)"/>
+                <path d="M25,0 v30 M0,15 h50" stroke="#fff" stroke-width="10"/>
+                <path d="M25,0 v30 M0,15 h50" stroke="#c8102e" stroke-width="6"/>
+            </svg>
+            <span>English</span>
+        </button>
+        <button class="flag-button" onclick="window.setLanguage('da')" title="Dansk">
+            <svg viewBox="0 0 37 28">
+                <rect width="37" height="28" fill="#c8102e"/>
+                <rect width="4" height="28" x="12" fill="#fff"/>
+                <rect width="37" height="4" y="12" fill="#fff"/>
+            </svg>
+            <span>Dansk</span>
+        </button>
+        <button class="flag-button" onclick="window.setLanguage('no')" title="Norsk">
+            <svg viewBox="0 0 22 16">
+                <rect width="22" height="16" fill="#ba0c2f"/>
+                <rect width="4" height="16" x="6" fill="#fff"/>
+                <rect width="22" height="4" y="6" fill="#fff"/>
+                <rect width="2" height="16" x="7" fill="#00205b"/>
+                <rect width="22" height="2" y="7" fill="#00205b"/>
+            </svg>
+            <span>Norsk</span>
+        </button>
+    </div>
+
+    <input type="text" id="player-name" placeholder="DITT NAMN, DIN GOOMBA?" style="font-size:25px; padding:10px; width:80%; text-align:center; border-radius: 10px; border: 4px solid #8200ff; background: #120024; color: white; font-family: 'Luckiest Guy'; margin-bottom: 15px;">
+    <br>
+    <button class="btn-start" onclick="startGame()" id="start-btn-text">STARTA TURNERING</button>
+    <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: center;">
+        <button style="background:#ffcc00; font-family:'Luckiest Guy'; padding:12px; border-radius:10px; cursor:pointer; border: 2px solid black;" onclick="toggleInstructions(true)" id="instructions-btn-text">HUR SPELAR JAG?</button> 
+        <button style="background:#00ccff; font-family:'Luckiest Guy'; padding:12px; border-radius:10px; cursor:pointer; border: 2px solid black;" onclick="showLeaderboard()" id="leaderboard-btn-text">TOPPLISTA</button>
+    </div>
+    <div class="media-setup">
+        <p style="color: #ffcc00; margin-bottom: 10px;" id="sensor-setup-title">TURNERINGS-MODULER (VALFRITT)</p>
+        <button class="media-btn" style="background:#00ff00; border: 2px solid black;" onclick="requestMediaAccess(true, true)" id="sensor-all-btn">🎤+📸 AKTIVERA ALLT</button>
+        <button class="media-btn" style="background:#00ccff; border: 2px solid black;" onclick="requestMediaAccess(false, true)" id="sensor-mic-btn">🎤 ENDAST MIC</button>
+    </div>
+</div>
+
+<!-- ==========================================================================
+   G. SPELPLAN & ALARMSYSTEM
+   ========================================================================== -->
+<div id="game-container">
+    <div style="font-size: 28px; margin-bottom: 10px;">
+        <span id="hud-player">SPELARE</span>: <span id="display-name"></span> | <span id="hud-score">POÄNG</span>: <span id="display-score">0</span> | <span id="hud-time">TID</span>: <span id="timer">60</span>s
+    </div>
+    <div id="math-card">
+        <div id="question">?</div>
+        <div class="answer-grid" id="answer-options"></div>
+    </div>
+</div>
+
+<div id="alarm-overlay">
+    <!-- SVG Vektorritat Alarm för lokal LAN tillförlitlighet -->
+    <svg id="alarm-img" class="vibrate-clock" viewBox="0 0 100 100" style="width: 150px; height: 150px; filter: drop-shadow(0 0 15px #ff0000);">
+        <circle cx="50" cy="55" r="35" fill="#fff" stroke="#ff0000" stroke-width="6"/>
+        <path d="M15,25 A15,15 0 0,1 40,15 L35,25 Z" fill="#ff0000" stroke="#000" stroke-width="2"/>
+        <path d="M85,25 A15,15 0 0,0 60,15 L65,25 Z" fill="#ff0000" stroke="#000" stroke-width="2"/>
+        <line x1="50" y1="55" x2="50" y2="35" stroke="#000" stroke-width="5" stroke-linecap="round"/>
+        <line x1="50" y1="55" x2="68" y2="55" stroke="#000" stroke-width="5" stroke-linecap="round"/>
+        <circle cx="50" cy="55" r="5" fill="#000"/>
+    </svg>
+    <h1 id="alarm-msg" style="font-size: 70px; margin-bottom:10px; text-align: center;">VAKNA!!!</h1>
+    <div id="alarm-task-area" style="text-align: center;"></div>
+    <button id="main-snooze" onclick="snooze()" style="display:none; background:#ffcc00; font-size:40px; padding:20px 40px; font-family:'Luckiest Guy'; border-radius: 15px; border: 5px solid white; cursor: pointer;">SNOOZE!</button>
+</div>
+
+<div id="leaderboard-screen">
+    <h1 id="leaderboard-title-header">TOPPLISTA - STATION 24</h1>
+    <div id="high-score-content"></div>
+    <button style="background:#ffcc00; font-family:'Luckiest Guy'; padding:15px; border-radius:10px; margin-top: 20px;" onclick="location.reload()" id="leaderboard-back-btn">TILLBAKA</button>
+</div>
+
+<div id="end-screen">
+    <h1 id="end-title"></h1>
+    <p id="end-message" style="font-size: 30px;"></p>
+    <button style="background:#ffcc00; font-family:'Luckiest Guy'; font-size:25px; padding:15px; border-radius:10px;" onclick="location.reload()" id="end-menu-btn">MENY</button>
+</div>
+
+<!-- ==========================================================================
+   E. OPERATÖRS-MANUAL (INSTRUKTIONER MODAL)
+   ========================================================================== -->
+<div id="instructions-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="toggleInstructions(false)" id="instructions-close-text">STÄNG [X]</span>
+        <h2 id="inst-manual-title">PROTOKOLL: STATION 24</h2>
+        
+        <div style="text-align: left;">
+            <p style="background: #ffcc00; color: #000; padding: 10px; border-radius: 10px; text-align: center; font-weight: bold; font-family: 'Luckiest Guy';" id="inst-welcome-text">
+                VÄLKOMMEN OPERATÖR. LÄS NOGA - DITT SYSTEM BEROR PÅ DET.
+            </p>
+
+            <div style="background: rgba(255, 204, 0, 0.1); border: 2px solid #ffcc00; padding: 15px; border-radius: 10px; margin-bottom: 15px;" id="inst-sensory-warning-box">
+                <strong>⚠️ SENSORISK VARNING:</strong> Hög auditiv stress. Innehåller skarpa varningssignaler och larm som ökar i volym tills ekvationen är löst.
+            </div>
+            <ul style="text-align: left; line-height: 1.4;" id="inst-basics-list">
+                <!-- Fylls i dynamiskt -->
+            </ul>
+            <p style="font-style: italic; color: #ffcc00; text-align: center;" id="inst-kamek-quote">"Nyehehehe! Kan du räkna medan jag skriker i dina öron?"</p>
+
+            <h3 id="inst-math-title">🧠 MATEMATISK ELITTRÄNING</h3>
+            <ul class="rule-list" id="inst-math-list">
+                <!-- Fylls i dynamiskt -->
+            </ul>
+
+            <h3 id="inst-cam-title">🎥 DELTAGAR-KAMERA (FRIVILLIGT)</h3>
+            <p id="inst-cam-desc">Inför YouTube-inspelningen väljer du själv din sekretessnivå:</p>
+            <ul class="rule-list" id="inst-cam-list">
+                <!-- Fylls i dynamiskt -->
+            </ul>
+
+            <h3 id="inst-alarm-title">🚨 ALARMSYSTEMET (SNOOZE-MODULER)</h3>
+            <p id="inst-alarm-desc">När larmet går pausas spelet. Du MÅSTE utföra en uppgift för att fortsätta:</p>
+            <ul class="rule-list" id="inst-alarm-list">
+                <!-- Fylls i dynamiskt -->
+            </ul>
+
+            <h3 id="inst-lockdown-title">🔒 KAMEK LOCKDOWN (DIREKT UTKASTNING)</h3>
+            <div class="warning-box">
+                <p style="color: #ff0000; font-weight: bold; margin-top: 0;" id="inst-lockdown-warning-header">Följande handlingar låser terminalen omedelbart:</p>
+                <ul class="rule-list" id="inst-lockdown-list">
+                    <!-- Fylls i dynamiskt -->
+                </ul>
+            </div>
+
+            <h3 id="inst-hardware-title">💻 HÅRDVARUKRAV</h3>
+            <p id="inst-hardware-desc">Station 24 accepterar endast Elit-PC. Följande enheter hånar Kamek och blockerar direkt:</p>
+            <ul class="rule-list" id="inst-hardware-list">
+                <!-- Fylls i dynamiskt -->
+            </ul>
+        </div>
+
+        <button onclick="toggleInstructions(false)" style="background:#00ff00; color: black; padding: 20px; font-family:'Luckiest Guy'; border-radius:20px; cursor:pointer; margin-top: 30px; border: 5px solid black; font-size: 30px; width: 100%;" id="inst-confirm-btn">FÖRSTÅTT. STARTA SYSTEMET!</button>
+    </div>
+</div>
+
+<!-- ==========================================================================
+   G. MIKROFON & KAMERA WIDGETS
+   ========================================================================== -->
+<div id="mic-visualizer-container">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#00ccff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+        <line x1="12" y1="19" x2="12" y2="23"></line>
+        <line x1="8" y1="23" x2="16" y2="23"></line>
+    </svg>
+    <div id="mic-bars" style="display: flex; align-items: flex-end; gap: 3px; height: 30px; margin-top: 10px;">
+        <div class="bar" style="width: 4px; height: 5px; background: #00ccff; transition: height 0.05s;"></div>
+        <div class="bar" style="width: 4px; height: 5px; background: #00ccff; transition: height 0.05s;"></div>
+        <div class="bar" style="width: 4px; height: 5px; background: #00ccff; transition: height 0.05s;"></div>
+        <div class="bar" style="width: 4px; height: 5px; background: #00ccff; transition: height 0.05s;"></div>
+        <div class="bar" style="width: 4px; height: 5px; background: #00ccff; transition: height 0.05s;"></div>
+    </div>
+</div>
+
+<div id="camera-container" style="position: fixed; bottom: 20px; left: 20px; width: 200px; height: 150px; border: 4px solid #ffcc00; z-index: 500; background: #000;">
+    <video id="webcam-feed" autoplay playsinline muted style="position:fixed; bottom:20px; left:20px; width:150px; border:2px solid #ffcc00; border-radius:10px; display:none; z-index:10001;"></video>
+    <div id="camera-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #140028; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border: 2px solid #ff0000;">
+        <!-- Vektorritat hänglås -->
+        <svg viewBox="0 0 24 24" width="40" height="40" stroke="#ff0000" stroke-width="2" fill="none">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        <p style="font-family: Arial; font-size: 12px; color: #ff0000; font-weight: bold; margin: 5px 0 0 0;" id="camera-overlay-text">CLASSIFIED<br>OPERATOR</p>
+    </div>
+</div>
+
+<!-- ==========================================================================
+   D. BOOMBOX / JUKEBOX
+   ========================================================================== -->
+<div id="audio-interface" style="position: fixed; bottom: 20px; right: 20px; z-index: 99999; cursor: pointer; user-select: none;">
+    <div id="boombox-container" style="position: relative; width: 80px; height: 80px;">
+        <!-- Vektorritad radio för LAN-tillförlitlighet -->
+        <svg id="boombox-img" viewBox="0 0 100 60" style="background:#1a1a1a; border-radius:10px; border:3px solid #ffcc00; box-shadow: 0 0 20px rgba(0,0,0,0.8); opacity: 0.5; transform: scale(0.9); transition: all 0.3s; width: 100%; height: 100%;">
+            <rect x="5" y="5" width="90" height="15" fill="#333" rx="3" />
+            <circle cx="20" cy="40" r="12" fill="#444" stroke="#fff" stroke-width="2"/>
+            <circle cx="20" cy="40" r="4" fill="#000" />
+            <circle cx="80" cy="40" r="12" fill="#444" stroke="#fff" stroke-width="2"/>
+            <circle cx="80" cy="40" r="4" fill="#000" />
+            <rect x="38" y="32" width="24" height="16" fill="#111" stroke="#555" rx="2"/>
+            <line x1="42" y1="40" x2="58" y2="40" stroke="#ffcc00" stroke-width="3"/>
+            <rect x="15" y="9" width="70" height="7" fill="#00ffcc" opacity="0.8"/>
+            <line x1="50" y1="8" x2="50" y2="17" stroke="red" stroke-width="2"/>
+        </svg>
+        <div id="status-cross" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); border-radius: 12px;">
+            <span style="color: #ff0000; font-size: 60px; font-weight: bold; text-shadow: 2px 2px 4px #000;">✕</span>
+        </div>
+    </div>
+    <div id="track-info" style="position: absolute; bottom: 90px; right: 0; background: rgba(0,0,0,0.9); color: #ffcc00; padding: 5px 10px; border-radius: 5px; font-size: 12px; font-family: monospace; white-space: nowrap; display: none;">
+        SPELAR: INGET
+    </div>
+</div>
+
+<!-- ==========================================================================
+   H. FULLSTÄNDIGT SAMMANSLUTET SPRÅKSYSTEM & SPELMOTOR (SÄKRAD KÄLLKOD)
+   ========================================================================== -->
+<script>
+// --- SÄKER wrapper för LocalStorage för att förebygga krascher i sandlådor ---
+const safeStorage = {
+    _data: {},
+    getItem: function(key) {
+        try {
+            return window.localStorage.getItem(key);
+        } catch (e) {
+            return this._data[key] || null;
+        }
+    },
+    setItem: function(key, value) {
+        try {
+            window.localStorage.setItem(key, value);
+        } catch (e) {
+            this._data[key] = String(value);
+        }
+    }
+};
+
+// --- MULTI-LANGUAGE TRANSLATION DATA ---
+const translations = {
+    sv: {
+        score: "POÄNG",
+        time: "TID",
+        player: "SPELARE",
+        start_game: "STARTA TURNERING",
+        how_to_play: "HUR SPELAR JAG?",
+        leaderboard: "TOPPLISTA",
+        wake_up: "VAKNA!!!",
+        snooze: "SNOOZE!",
+        drag_clock: "KASTA UT KLOCKAN!",
+        multi_click: "KLICKA #X GÅNGER!",
+        dot_chase: "JAGA PRICKEN (#X)!",
+        spell_word: "STAVA: ",
+        q_spam: "SPAMMA Q #X GÅNGER!",
+        hold_key: "HÅLL '#X' I 2 SEK!",
+        rating_super: "SUPER (STJÄRNVINSTEN) - LEGENDARISK STATUS!",
+        rating_best: "BÄST - En sann försvarare av basen!",
+        rating_good: "BRA - Kämpa på!",
+        name_placeholder: "DITT NAMN, DIN GOOMBA?",
+        sensor_setup_title: "TURNERINGS-MODULER (VALFRITT)",
+        sensor_btn_all: "🎤+📸 AKTIVERA ALLT",
+        sensor_btn_mic: "🎤 ENDAST MIC",
+        medical_warning: "⚠️ MEDICINSK VARNING: Spelet innehåller intensiva stroboskopljus. Rekommenderas ej för personer med epilepsi.",
+        kamek_warn_desc: "KAMEK LOCKDOWN: Flikbyte eller DevTools låser spelet! Spelet går vidare vid både rätt och fel svar.",
+
+        // System Toasts & Alerts
+        on: "PÅ",
+        off: "AV",
+        right_click_forbidden: "HÖGERKLICK FÖRBJUDET! Terminalen låst.",
+        escape_locked: "ESCAPE ÄR SPÄRRAT PÅ LAN!",
+        devtools_forbidden: "DEVTOOLS FÖRBJUDET! Hacker-fasoner loggade.",
+        lost_focus: "TERMINAL TAPPAR FOKUS! Ingen fuskpaus tillåten.",
+        tab_switch_detected: "FLIKBYTE DETEKTERAT! Kamek ser allt.",
+        zoom_attempt: "ZOOM-FÖRSÖK DETEKTERAT!",
+        zoom_attempt_mock: "Nyehehe! Försöker du zooma in på mina hemligheter? Använd glasögon istället!",
+        trackpad_lockdown: "STYRPLATTA DETEKTERAD!",
+        trackpad_lockdown_mock: "Kameks sensorer känner av ett sidleds-svep! Station 24 kräver en hederlig gammal mus med rullhjul.",
+        double_session: "DUBBEL_SESSION_DETEKTERAD",
+        double_session_mock: "Försöker du vara på två ställen samtidigt? Kamek tillåter endast EN aktiv länk till Station 24 per terminal!",
+        ups_warning: "⚠️ STRÖMAVBROTT / GLAPP! Datorn körs på nödström (UPS)! Koppla in extern laddare omedelbart!",
+        power_status: "⚡ EXTERN STRÖM: OK (UPS SÄKRAD)",
+        power_battery: "🔋 UPS-RESERV (VARNING: INGEN EXTERN STRÖM!)",
+        camera_off_label: "KAMERA AVSTÄNGD",
+        integrity: "🛡️ INTEGRITET",
+        wall_integrity_label: "MUR-INTEGRITET: ",
+
+        // Diagnostics Screen
+        diag_ram: "Analyserar fysiskt arbetsminne (RAM)...",
+        diag_cpu: "Söker efter processorkärnor (i5/Ryzen 5)...",
+        diag_os: "Kontrollerar operativsystemets säkerhetsarkitektur...",
+        diag_disk: "Skannar efter tillgängligt lagringsutrymme på HDD...",
+        diag_ok: "OK!",
+        diag_fail: "MISSLYCKADES!",
+
+        // Device insults / Lockdowns
+        device_mobile: "MOBILTELEFON UPPTÄCKT! 🚫",
+        device_mobile_mock: "Detta är inget mobilspel! Math Mayhem kräver rå kraft, extern strömförsörjning och en riktig mus! Sluta fingra på skärmen.",
+        device_tablet: "SURFPLATTA UPPTÄCKT! 👶",
+        device_tablet_mock: "Paddor är till för att titta på barn-tv med, inte för att spela Math Mayhem! Gå och titta på Babblarna istället.",
+        device_smarttv: "SMART-TV UPPTÄCKT! 📺",
+        device_smarttv_mock: "Skärmen är stor, men din processor är en brödrost. YouTube är mycket bättre för dig. Gå och titta på kattklipp!",
+        device_console: "KONSOL UPPTÄCKT! 🎮",
+        device_console_mock: "Konsoler är till för att spela GTA på! Math Mayhem styrs med ren vilja, mus och tangentbord. Sälj din handkontroll.",
+        device_car: "BILSKÄRM UPPTÄCKT! 🚗",
+        device_car_mock: "Rullande trafikfara! Försöker du räkna matte på en Teslaskärm mitt på motorvägen?! Håll ögonen på vägen innan Kamek kraschar din autopilot!",
+        device_refrigerator: "SMART KYLSKÅP UPPTÄCKT! 🧊",
+        device_refrigerator_mock: "Vafan?! Försöker du spela arkadspel på dörren till ditt kylskåp? Gå och stäng mjölkpaketet istället!",
+        device_smartwatch: "SMARTKLOCKA UPPTÄCKT! ⌚",
+        device_smartwatch_mock: "Skärmen är ju för fan mindre än en enkrona! Hur ska du kunna räkna på den här? Skaffa ett mikroskop.",
+        device_smarthome: "SMART HEM-SKÄRM UPPTÄCKT! 🏠",
+        device_smarthome_mock: "Hur är detta ens fysiskt möjligt? Försöker du räkna matte från din smarta termostat eller dörrklocka? Kamek skrattar ihjäl sig!",
+        device_unknown: "OKÄND FLUM-ENHET DETEKTERAD! 👽",
+        device_unknown_mock: "Vad är detta för rymdteknologi? Enheten stöds ej av Station 24-protokollet!",
+        device_hw_ram_fail: "FÖR LITE RAM-MINNE DETEKTERAT!",
+        device_hw_ram_fail_mock: "Math Mayhem kräver minst 4GB RAM för att inte smeltä moderkortet. Kamek hånar din patetiska laptop! Skaffa en riktig rigg.",
+        device_hw_cpu_cores_fail: "PROCESSORKÄRNOR SAKNAS!",
+        device_hw_cpu_cores_fail_mock: "Minst 4 processorkärnor krävs för Station 24. Kamek hånar din sykkeldrivna processor!",
+        device_hw_storage_fail: "DISKUTRYMME ÄR KRITISKT LÅGT!",
+        device_hw_storage_fail_mock: "Kritiskt ledigt utrymme! Math Mayhem kräver minst 4GB ledigt hårddiskutrymme för att spara krypterade försvarskoder.",
+
+        // Runtime Lockdowns translated keys
+        KRITISKT_LÅGT_BATTERI: "KRITISKT LÅGT BATTERI",
+        KRITISKT_LÅGT_BATTERI_mock: "Minst 20% laddning krävs för att spela! Hämta laddaren, din Goomba!",
+        TIDS_MANIPULERING_DETEKTERAD: "TIDS-MANIPULERING DETEKTERAD",
+        TIDS_MANIPULERING_DETEKTERAD_mock: "Försöker du sakta ner tiden, din lilla tids-trollkarl? Nyehehehe! I Sektor 24 gjelder kun romtidens lover. Terminalen låst!",
+        ROBOT_OPERATÖR_DETEKTERAD: "ROBOT-OPERATÖR DETEKTERAD",
+        ROBOT_OPERATÖR_DETEKTERAD_mock: "Robotar har inget tillträde till Station 24! Kamek accepterar endast organiska hjärnor (hur svaga de än må vara). Systemet terminerat.",
+        HÖGERKLICK_DETEKTERAT: "HÖGERKLICK DETEKTERAT",
+        HÖGERKLICK_DETEKTERAT_mock: "FÖRSÖKER DU TITTA BAKOM RIDÅN? 🕵️ \n\nKamek ser dina giriga fingrar på högerknappen: 'NYEHEHEHE!' \nInget fusk genom inspektion tillåtet i Station 24!",
+        FLIKBYTE_ELLER_FOKUSFÖRLUST: "FLIKBYTE ELLER FOKUSFÖRLUST",
+        FLIKBYTE_ELLER_FOKUSFÖRLUST_mock: "Du försökte lämna fönstret! Google kan inte hjälpa dig här.",
+        PROCESSOR_FÖR_SVAG: "PROCESSOR FÖR SVAG",
+        PROCESSOR_FÖR_SVAG_mock: "Din processor är för klen! Station 24 kräver minst en dubbelkärnig CPU för att exekvera de matematiska algoritmerna.",
+        OFFLINE_VID_START: "OFFLINE VID START",
+        OFFLINE_VID_START_mock: "Internet krävs för att spela! Du kan inte infiltrera Station 24 utan en aktiv länk.",
+        GRAFIK_INKOMPATIBEL: "GRAFIK MOTORN INKOMPATIBEL",
+        GRAFIK_INKOMPATIBEL_mock: "Din terminal saknar stöd för WebGL (hårdvaruacceleration). Kamek vägrar rendera Math Mayhem på en stenålders-GPU!",
+        GPU_ERROR: "KRITISK GRAFIKFEL",
+        GPU_ERROR_mock: "Kritiskt fel i grafikmotorn. Terminalen låst för att skydda din monitor.",
+        ZOOM_FÖRSÖK_mock: "Nyehehe! Försöker du zooma in på mina hemligheter? Använd glasögon istället!",
+        STYRPLATTA_DETEKTERAD_mock: "Kameks sensorer känner av ett sidleds-svep! Station 24 kräver en hederlig gammal mus med rullhjul.",
+        DUBBEL_SESSION_DETEKTERAD_mock: "Försöker du vara på två ställen samtidigt? Kamek tillåter endast EN aktiv länk till Station 24 per terminal!",
+
+        // Röststyrningssystem
+        voice_cmd_snooze: ["snooze", "tyst", "stoppa", "stop", "væk", "slukk", "vakna"],
+        voice_cmd_radio: ["radio av", "radio på", "tystna", "mute", "radio off", "radio on"],
+        voice_cmd_strobe: ["stoppa strobe", "strobe av", "stoppa blixt", "stop strobe"],
+        voice_cmd_emergency: ["nöd", "nödlåda", "hjälp", "emergency", "help"],
+        kamek_loud_mock: "🧙‍♂️ KAMEK: 'Sluta skrika! Din röst skär i mina öron! NYEHEHEHE!'",
+        toxic_warning: "⚠️ VARNING #X/3: Vårda ditt språk! Kamek övervakar turneringen!",
+        toxic_lockdown_title: "KATASTROFAL TOXICITET DETEKTERAD",
+        toxic_lockdown_desc: '"Fula ord tillåts inte under turneringen. Terminalen har låsts." <br><br><span style="color:#ffcc00;">ÅTERSTARTAR OM <span id="countdown">10</span> SEKUNDER...</span>',
+        retry_btn: "FÖRSÖK IGEN",
+        toxic_lockdown: "SYSTEMET LÅST! - TOXICITET DETEKTERAD",
+
+        // Toasts
+        lang_changed: "🌐 SPRÅK: SVENSKA DETEKTERAT!",
+        good_luck: "LYCKA TILL, {name}!",
+        radio_off: "🔈 RADIO: AV",
+        radio_on: "🔊 EURODANCE: PÅ!",
+        now_playing: "🎵 SPELAS NU: ",
+        gamepad_unsupported: "⚠️ Spelkontroll stöds inte fullt ut (för få knappar).",
+        gamepad_connected: "🎮 Spillkontroll ansluten!",
+        offline_mode: "📶 Offline - lokalt LAN-läge säkrat",
+        online_mode: "✅ Online - ansluten till Station 24",
+        sensors_activated: "✅ SENSORER AKTIVERADE",
+        sensors_denied: "❌ SENSORTILLGÅNG NEKAD",
+        alarm_snoozed: "ALARM SNOOZAT!",
+        lb_back: "TILLBAKA",
+        end_menu: "MENY",
+
+        // Manual detaljer
+        inst_close_text: "STÄNG [X]",
+        inst_title_welcome: "VÄLKOMMEN OPERATÖR. LÄS NOGA - DITT SYSTEM BEROR PÅ DET.",
+        inst_basics_1: "Svara på matteekvationer så snabbt du kan för att öka din poäng och tid.",
+        inst_basics_2: "Se upp för plötsliga Kamek-larm som avbryter ditt fokus och kräver omedelbar åtgärd!",
+        inst_math_1: "Rätt svar ger +150 poäng samt +2 sekunder på klockan.",
+        inst_math_2: "Fel svar ger ett tidsavdrag på 5 sekunder och utlöser Kameks vrede.",
+        inst_lock_1: "Utvecklarverktyg (F12, inspektera element) stänger ner terminalen direkt.",
+        inst_lock_2: "Att byta flik eller fönster under pågående turnering ses som fusk och leder till direkt diskvalificering.",
+        inst_hw_1: "Smartphones, iPads och konsoler blockeras direkt av Kamek-protokollet.",
+        inst_hw_2: "Datorer utan tillräckligt med RAM (minst 4 GB) eller för klen processor nekas åtkomst.",
+
+        // Kameks hånlista och nya larmöversättningar
+        han_list: "MEN HERREGUD, KAN DU INTE RÄKNA?|KAMEK SKRATTAR ÅT DIN DUMHET!|MIN MORMOR ÄR SNABBARE ÄN DIG!|SÄMRE ÄN EN GOOMBA!|ÄR DU EN UTBILDAD SNIGEL?",
+        press_sequence: "TRYCK I ORDNING: #SEQ",
+        math_clutch: "SNABBRÄKNA: #PROB",
+        spell_words: "KAMEK,GOOMBA,KUNGSBACKA,DATORMUS,NÖDSIGNAL,KRAFTKÄLLA,TANGENTBORD,STRÖMBRYTARE,KRYPTERING,MATEMATIK"
+    },
+    en: {
+        score: "SCORE",
+        time: "TIME",
+        player: "PLAYER",
+        start_game: "START GAME",
+        how_to_play: "HOW TO PLAY?",
+        leaderboard: "LEADERBOARD",
+        wake_up: "WAKE UP!!!",
+        snooze: "SNOOZE!",
+        drag_clock: "THROW THE CLOCK OUT!",
+        multi_click: "CLICK #X TIMES!",
+        dot_chase: "CHASE THE DOT (#X)!",
+        spell_word: "SPELL: ",
+        q_spam: "SPAM Q #X TIMES!",
+        hold_key: "HOLD '#X' FOR 2 SEC!",
+        rating_super: "SUPER (STAR WIN) - LEGENDARY STATUS!",
+        rating_best: "BEST - A true defender of the base!",
+        rating_good: "GOOD - Keep it up!",
+        name_placeholder: "YOUR NAME, GOOMBA?",
+        sensor_setup_title: "TOURNAMENT MODULES (OPTIONAL)",
+        sensor_btn_all: "🎤+📸 ACTIVATE ALL",
+        sensor_btn_mic: "🎤 MIC ONLY",
+        medical_warning: "⚠️ MEDICAL WARNING: This game contains intense strobe lights. Not recommended for people with epilepsy.",
+        kamek_warn_desc: "KAMEK LOCKDOWN: Tab switch or DevTools locks the game! The game continues for both correct and incorrect answers.",
+
+        // System Toasts & Alerts
+        on: "ON",
+        off: "OFF",
+        right_click_forbidden: "RIGHT CLICK FORBIDDEN! Terminal locked.",
+        escape_locked: "ESCAPE IS BLOCKED ON LAN!",
+        devtools_forbidden: "DEVTOOLS FORBIDDEN! Hack attempt logged.",
+        lost_focus: "TERMINAL LOST FOCUS! No pausing allowed.",
+        tab_switch_detected: "TAB SWITCH DETECTED! Kamek is watching.",
+        zoom_attempt: "ZOOM ATTEMPT DETECTED!",
+        zoom_attempt_mock: "Nyehehe! Trying to zoom in on my secrets? Use glasses instead!",
+        trackpad_lockdown: "TRACKPAD DETECTED!",
+        trackpad_lockdown_mock: "Kamek's sensors detect a trackpad swipe! Station 24 requires an honest old scroll wheel mouse.",
+        double_session: "DOUBLE_SESSION_DETECTED",
+        double_session_mock: "Trying to be in two places at once? Kamek only allows ONE active connection to Station 24 per terminal!",
+        ups_warning: "⚠️ POWER FAULT! Laptop running on UPS reservoir! Connect external power immediately!",
+        power_status: "⚡ EXTERNAL POWER: OK (UPS ARMED)",
+        power_battery: "🔋 UPS-RESERVE (WARNING: NO EXTERNAL POWER!)",
+        camera_off_label: "CAMERA DEACTIVATED",
+        integrity: "🛡️ INTEGRITY",
+        wall_integrity_label: "WALL INTEGRITY: ",
+
+        // Diagnostics Screen
+        diag_ram: "Analyzing physical memory (RAM)...",
+        diag_cpu: "Looking for processor core counts (i5/Ryzen 5)...",
+        diag_os: "Verifying operating system secure design...",
+        diag_disk: "Scanning for available space on HDD...",
+        diag_ok: "PASSED!",
+        diag_fail: "FAILED!",
+
+        // Device insults / Lockdowns
+        device_mobile: "MOBILE PHONE DETECTED! 🚫",
+        device_mobile_mock: "This is not a mobile game! Math Mayhem requires raw power, external power supply, and a real mouse! Stop touching the screen.",
+        device_tablet: "TABLET DETECTED! 👶",
+        device_tablet_mock: "Tablets are for kids watching cartoons, not for playing Math Mayhem! Go watch Cocomelon instead.",
+        device_smarttv: "SMART TV DETECTED! 📺",
+        device_smarttv_mock: "The screen is big, but your processor is a toaster. YouTube is much better for you. Go watch cat videos!",
+        device_console: "CONSOLE DETECTED! 🎮",
+        device_console_mock: "Consoles are for playing GTA! Math Mayhem is mastered with pure willpower, mouse, and keyboard. Sell your gamepad.",
+        device_car: "CAR SCREEN DETECTED! 🚗",
+        device_car_mock: "Rolling traffic hazard! Are you trying to calculate math on a Tesla screen on the highway?! Keep your eyes on the road before Kamek crashes your autopilot!",
+        device_refrigerator: "SMART REFRIGERATOR DETECTED! 🧊",
+        device_refrigerator_mock: "What the hell?! Are you trying to play arcade games on your fridge door? Go close the milk carton instead!",
+        device_smartwatch: "SMARTWATCH DETECTED! ⌚",
+        device_smartwatch_mock: "The screen is smaller than a coin! How are you supposed to calculate here? Go get a microscope.",
+        device_smarthome: "SMART HOME SCREEN DETECTED! 🏠",
+        device_smarthome_mock: "How is this even physically possible? Calculating from your smart thermostat or doorbell? Kamek is dying of laughter!",
+        device_unknown: "UNKNOWN DEVICE DETECTED! 👽",
+        device_unknown_mock: "What kind of space technology is this? Your device is not supported by the Station 24 protocol!",
+        device_hw_ram_fail: "CRITICAL FAILURE: SPECIFICATION OF RAM!",
+        device_hw_ram_fail_mock: "Math Mayhem requires at least 4GB RAM to prevent motherboard meltdown. Kamek mocks your pathetic laptop! Upgrade your rig.",
+        device_hw_cpu_cores_fail: "CPU CORES INSUFFICIENT!",
+        device_hw_cpu_cores_fail_mock: "At least 4 CPU cores (i5/Ryzen 5 equivalent) required. Kamek mocks your bicycle-powered processor!",
+        device_hw_storage_fail: "DISK SPACE CRITICALLY LOW!",
+        device_hw_storage_fail_mock: "Critical free space limit! Math Mayhem requires at least 4GB free space to store encrypted defense codes.",
+
+        // Runtime Lockdowns translated keys
+        KRITISKT_LÅGT_BATTERI: "CRITICALLY LOW BATTERY",
+        KRITISKT_LÅGT_BATTERI_mock: "At least 20% battery charge required to play! Get your charger, you Goomba!",
+        TIDS_MANIPULERING_DETEKTERAD: "TIME MANIPULATION DETECTED",
+        TIDS_MANIPULERING_DETEKTERAD_mock: "Trying to slow down time, you little time wizard? Nyehehehe! In Station 24, only the laws of spacetime apply. Terminal locked!",
+        ROBOT_OPERATÖR_DETEKTERAD: "ROBOT OPERATOR DETECTED",
+        ROBOT_OPERATÖR_DETEKTERAD_mock: "Robots have no access to Station 24! Kamek only accepts organic brains (no matter how weak they might be). System terminated.",
+        HÖGERKLICK_DETEKTERAT: "RIGHT CLICK DETECTED",
+        HÖGERKLICK_DETEKTERAT_mock: "TRYING TO PEEK BEHIND THE CURTAIN? 🕵️ \n\nKamek sees your greedy fingers on the right click button: 'NYEHEHEHE!' \nNo cheating through inspection allowed in Station 24!",
+        FLIKBYTE_ELLER_FOKUSFÖRLUST: "TAB SWITCH OR FOCUS LOSS",
+        FLIKBYTE_ELLER_FOKUSFÖRLUST_mock: "You tried to leave the window! Google cannot help you here.",
+        PROCESSOR_FÖR_SVAG: "PROCESSOR TOO WEAK",
+        PROCESSOR_FÖR_SVAG_mock: "Your processor is too weak! Station 24 requires at least a dual-core CPU to execute the mathematical algorithms.",
+        OFFLINE_VID_START: "OFFLINE AT START",
+        OFFLINE_VID_START_mock: "Internet is required to play! You cannot infiltrate Station 24 without an active link.",
+        GRAFIK_INKOMPATIBEL: "GRAPHICS INCOMPATIBLE",
+        GRAFIK_INKOMPATIBEL_mock: "Your terminal lacks WebGL support (hardware acceleration). Kamek refuses to render Math Mayhem on a stone age GPU!",
+        GPU_ERROR: "CRITICAL GPU ERROR",
+        GPU_ERROR_mock: "Critical error in the graphics engine. Terminal locked to protect your monitor.",
+        ZOOM_FÖRSÖK_mock: "Nyehehe! Trying to zoom in on my secrets? Use glasses instead!",
+        STYRPLATTA_DETEKTERAD_mock: "Kamek's sensors detect a trackpad swipe! Station 24 requires an honest old scroll wheel mouse.",
+        DUBBEL_SESSION_DETEKTERAD_mock: "Trying to be in two places at once? Kamek only allows ONE active connection to Station 24 per terminal!",
+
+        // Voice controls
+        voice_cmd_snooze: ["snooze", "mute", "stop", "shutup", "quiet"],
+        voice_cmd_radio: ["radio off", "radio on", "music off", "music on"],
+        voice_cmd_strobe: ["stop strobe", "strobe off", "kill strobe"],
+        voice_cmd_emergency: ["emergency", "help"],
+        kamek_loud_mock: "🧙‍♂️ KAMEK: 'Stop screaming! Your voice hurts my ears! NYEHEHEHE!'",
+        toxic_warning: "⚠️ WARNING #X/3: Watch your language! Kamek is monitoring the tournament!",
+        toxic_lockdown_title: "CATASTROPHE TOXICITY DETECTED",
+        toxic_lockdown_desc: '"Profanity is not allowed during the tournament. Terminal locked." <br><br><span style="color:#ffcc00;">REBOOTING IN <span id="countdown">10</span> SECONDS...</span>',
+        retry_btn: "TRY AGAIN",
+        toxic_lockdown: "SYSTEM LOCKED! - TOXICITY DETECTED",
+
+        // Toasts
+        lang_changed: "🌐 LANGUAGE: ENGLISH DETECTED!",
+        good_luck: "GOOD LUCK, {name}!",
+        radio_off: "🔈 RADIO: OFF",
+        radio_on: "🔊 EURODANCE: ON!",
+        now_playing: "🎵 NOW PLAYING: ",
+        gamepad_unsupported: "⚠️ Gamepad not fully supported (too few buttons).",
+        gamepad_connected: "🎮 Gamepad connected!",
+        offline_mode: "📶 Offline - local LAN mode secured",
+        online_mode: "✅ Online - connected to Station 24",
+        sensors_activated: "✅ SENSORS ACTIVATED",
+        sensors_denied: "❌ SENSOR ACCESS DENIED",
+        alarm_snoozed: "ALARM SNOOZED!",
+        lb_back: "BACK",
+        end_menu: "MENU",
+
+        // Manual details
+        inst_close_text: "CLOSE [X]",
+        inst_title_welcome: "WELCOME OPERATOR. READ CAREFULLY - YOUR SYSTEM DEPENDS ON IT.",
+        inst_basics_1: "Answer math equations as fast as you can to increase your score and time.",
+        inst_basics_2: "Watch out for sudden Kamek Alarms that disrupt your focus and require immediate action!",
+        inst_math_1: "Correct answer gives +150 score and +2 seconds on the clock.",
+        inst_math_2: "Incorrect answer deducts 5 seconds and unleashes Kamek's wrath.",
+        inst_lock_1: "Developer tools (F12, Inspect Element) immediately shut down the terminal.",
+        inst_lock_2: "Switching tabs or windows during active tournament is considered cheating and leads to instant disqualification.",
+        inst_hw_1: "Smartphones, iPads, and consoles are blocked immediately by Kamek Protocol.",
+        inst_hw_2: "Computers without enough RAM (at least 4 GB) or slow processors are denied access.",
+
+        // Kamek's insults and alarms
+        han_list: "OH MY GOD, CAN'T YOU COUNT?|KAMEK LAUGHS AT YOUR DUMBNESS!|MY GRANDMOTHER IS FASTER THAN YOU!|WORSE THAN A GOOMBA!|ARE YOU A TRAINED SNAIL?",
+        press_sequence: "PRESS IN ORDER: #SEQ",
+        math_clutch: "CLUTCH MATH: #PROB",
+        spell_words: "KAMEK,GOOMBA,KEYBOARD,COMPUTER,EMERGENCY,BATTERY,MAINFRAME,CIRCUIT,ENCRYPTION,OVERHEATING"
+    },
+    da: {
+        score: "SCORE",
+        time: "TID",
+        player: "SPILLER",
+        start_game: "START TURNERING",
+        how_to_play: "HVORDAN SPILLER JEG?",
+        leaderboard: "TOPLISTE",
+        wake_up: "VAKNA!!!",
+        snooze: "SNOOZE!",
+        drag_clock: "KAST URET UD!",
+        multi_click: "KLIK #X GANGE!",
+        dot_chase: "JAGT PRIKKEN (#X)!",
+        spell_word: "STAV: ",
+        q_spam: "SPAM Q #X GANGE!",
+        hold_key: "HOLD '#X' I 2 SEK!",
+        rating_super: "SUPER (STJERNEGEVINST) - LEGENDARISK STATUS!",
+        rating_best: "BEDST - En sand forsvarer af basen!",
+        rating_good: "GODT - Kæmp videre!",
+        name_placeholder: "DIT NAVN, DIN GOOMBA?",
+        sensor_setup_title: "TURNERING SENSORER (VALGFRIT)",
+        sensor_btn_all: "🎤+📸 AKTIVER ALT",
+        sensor_btn_mic: "🎤 KUN MIC",
+        medical_warning: "⚠️ MEDICINSK ADVARSEL: Spillet indeholder intensive stroboskonlys. Anbefales ikke til folk med epilepsi.",
+        kamek_warn_desc: "KAMEK LOCKDOWN: Skift af fane eller DevTools låser spillet! Spillet fortsætter ved både rigtigt og forkert svar.",
+
+        // System Toasts & Alerts
+        on: "TIL",
+        off: "FRA",
+        right_click_forbidden: "HØJREKLIK FORBUDT! Terminalen er låst.",
+        escape_locked: "ESCAPE ER LÅST PÅ LAN!",
+        devtools_forbidden: "DEVTOOLS FORBUDT! Hacker-forsøg logget.",
+        lost_focus: "TERMINAL MISTER FOKUS! Ingen fuskpause tilladt.",
+        tab_switch_detected: "SKIFT AF FANE DETEKTERET! Kamek ser alt.",
+        zoom_attempt: "ZOOM FORSØG DETEKTERET!",
+        zoom_attempt_mock: "Nyehehe! Forsøger du at zoome ind på mine hemmeligheder? Brug briller i stedet!",
+        trackpad_lockdown: "PEGEFELT DETEKTERET!",
+        trackpad_lockdown_mock: "Kameks sensorer registrerer et pegefelt-svep! Station 24 kræver en rigtig mus med rullende hjul.",
+        double_session: "DOBBELT_SESSION_DETEKTERET",
+        double_session_mock: "Forsøger du at være to steder på samme tid? Kamek tillader kun EN aktiv forbindelse til Station 24 per terminal!",
+        ups_warning: "⚠️ STRØMAFBRYDELSE! Computer kører på UPS-nødstrøm! Tilslut ekstern oplader nu!",
+        power_status: "⚡ EKSTERN STRØM: OK (UPS SIKRET)",
+        power_battery: "🔋 UPS-RESERVE (ADVARSEL: INGEN EKSTERN STRØM!)",
+        camera_off_label: "KAMERA DEAKTIVERET",
+        integrity: "🛡️ INTEGRITET",
+        wall_integrity_label: "MUR-INTEGRITET: ",
+
+        // Diagnostics Screen
+        diag_ram: "Analyserer fysisk arbejdshukommelse (RAM)...",
+        diag_cpu: "Søger efter processorkerner (i5/Ryzen 5)...",
+        diag_os: "Kontrollerer operativsystemets sikkerhedsarkitektur...",
+        diag_disk: "Scanner efter ledig lagerplads på HDD...",
+        diag_ok: "GODKENDT!",
+        diag_fail: "MISLYKKEDES!",
+
+        // Device insults / Lockdowns
+        device_mobile: "MOBILTELEFON REGISTRERET! 🚫",
+        device_mobile_mock: "Dette er ikke et mobilspil! Math Mayhem kræver rå styrke, ekstern strømforsyning og en rigtig mus! Stop med at røre ved skærmen.",
+        device_tablet: "TABLET DETEKTERET! 👶",
+        device_tablet_mock: "Tablets er til at se børne-tv på, ikke til at spille Math Mayhem! Gå over og se Gurli Gris i stedet.",
+        device_smarttv: "SMART-TV DETEKTERET! 📺",
+        device_smarttv_mock: "Skærmen er stor, men din processor er en brødrister. YouTube is meget bedre for dig. Gå og se kattevideoer!",
+        device_console: "KONSOL DETEKTERET! 🎮",
+        device_console_mock: "Konsoller er til at spille GTA på! Math Mayhem styres med ren vilje, mus og tastatur. Sælg din controller.",
+        device_car: "BILSKÆRM DETEKTERET! 🚗",
+        device_car_mock: "Rullende trafikfare! Prøver du at regne matematik på en Tesla-skærm midt på motorvejen?! Hold øjnene på vejen, før Kamek crasher din autopilot!",
+        device_refrigerator: "SMART KØLESKAB DETEKTERET! 🧊",
+        device_refrigerator_mock: "Hvad fanden?! Prøver du at spille arkadespil på dit køleskab? Gå hen og luk mælkekartonen i stedet!",
+        device_smartwatch: "SMARTWATCH DETEKTERET! ⌚",
+        device_smartwatch_mock: "Skærmen is jo mindre end en lille mønt! Hvordan vil du sigte her? Få dig et mikroskop.",
+        device_smarthome: "SMART HJEMME-SKÆRM DETEKTERET! 🏠",
+        device_smarthome_mock: "Hvordan er det overhovedet muligt? Regne matematik fra din smarte termostat eller dørklokke? Kamek dør af grin!",
+        device_unknown: "UKENDT ENHED DETEKTERET! 👽",
+        device_unknown_mock: "Hvad er det for noget rumteknologi? Enheden understøttes ikke av Station 24-protokoller!",
+        device_hw_ram_fail: "UDSPECIFICERET RAM FEJL!",
+        device_hw_ram_fail_mock: "Math Mayhem kræver mindst 4GB RAM for ikke at smelte bundkortet. Kamek spotter din patetiske bærbare computer! Få en rigtig maskine.",
+        device_hw_cpu_cores_fail: "CPU KERNER ER UNDER DET MINIMUM KRAV!",
+        device_hw_cpu_cores_fail_mock: "Mindst 4 CPU-kerner kræves. Kamek spotter din cykel-drevne processor!",
+        device_hw_storage_fail: "DISKPLADS KRITISK LAV!",
+        device_hw_storage_fail_mock: "Kritisk ledig plads! Math Mayhem kræver mindst 4GB ledig diskplads til at gemme krypterede forsvarskoder.",
+
+        // Runtime Lockdowns translated keys
+        KRITISKT_LÅGT_BATTERI: "KRITISK LAVT BATTERI",
+        KRITISKT_LÅGT_BATTERI_mock: "Mindst 20% opladning kræves for at spille! Hent opladeren, din Goomba!",
+        TIDS_MANIPULERING_DETEKTERAD: "TIDSMANIPULATION DETEKTERET",
+        TIDS_MANIPULERING_DETEKTERAD_mock: "Prøver du å bremse tiden, din lille tids-troldmand? Nyehehehe! I Station 24 gælder kun rumtidens love. Terminalen er låst!",
+        ROBOT_OPERATÖR_DETEKTERAD: "ROBOT-OPERATØR DETEKTERET",
+        ROBOT_OPERATÖR_DETEKTERAD_mock: "Robotter har ingen adgang til Station 24! Kamek accepterer kun organiske hjerner (uanset hvor svage de er). Systemet er termineret.",
+        HÖGERKLICK_DETEKTERAT: "HØJREKLIK DETEKTERET",
+        HÖGERKLICK_DETEKTERAT_mock: "PRØVER DU AT KIGGE BAG SCENEN? 🕵️ \n\nKamek ser dine grådige fingre på højreklik-knappen: 'NYEHEHEHE!' \nIngen snyd via inspektion tilladt i Station 24!",
+        FLIKBYTE_ELLER_FOKUSFÖRLUST: "FANE-SKIFT ELLER FOKUSTAB",
+        FLIKBYTE_ELLER_FOKUSFÖRLUST_mock: "Du prøvede at forlade vinduet! Google kan ikke hjælpe dig her.",
+        PROCESSOR_FÖR_SVAG: "PROCESSOR FOR SVAG",
+        PROCESSOR_FÖR_SVAG_mock: "Din processor er for svag! Station 24 kræver mindst en dual-core CPU for at køre de matematiske algoritmer.",
+        OFFLINE_VID_START: "OFFLINE VED START",
+        OFFLINE_VID_START_mock: "Internet påkrævet for at spille! Du kan ikke infiltrere Station 24 uden et aktivt link.",
+        GRAFIK_INKOMPATIBEL: "GRAFIKMOTOR INKOMPATIBEL",
+        GRAFIK_INKOMPATIBEL_mock: "Din terminal mangler understøttelse af WebGL (hardwareacceleration). Kamek nægter at køre Math Mayhem på en stenalder-GPU!",
+        GPU_ERROR: "KRITISK GRAFIKFEJL",
+        GPU_ERROR_mock: "Kritisk fejl i grafikmotoren. Terminalen er låst for at beskytte din skærm.",
+        ZOOM_FÖRSÖK_mock: "Nyehehe! Forsøger du at zoome ind på mine hemmeligheder? Brug briller i stedet!",
+        STYRPLATTA_DETEKTERAD_mock: "Kameks sensorer registrerer et pegefelt-svep! Station 24 kræver en rigtig mus med rullende hjul.",
+        DUBBEL_SESSION_DETEKTERAD_mock: "Forsøger du at være to steder på samme tid? Kamek tillader kun EN aktiv forbindelse til Station 24 per terminal!",
+
+        // Voice controls
+        voice_cmd_snooze: ["snooze", "mute", "stands", "stop", "sluk"],
+        voice_cmd_radio: ["radio fra", "radio til", "lydløs"],
+        voice_cmd_strobe: ["stands strobe", "strobe fra"],
+        voice_cmd_emergency: ["nød", "nødkasse", "hjælp", "emergency"],
+        kamek_loud_mock: "🧙‍♂️ KAMEK: 'Stop med at skrige! Din stemme skærer i mine ører! NYEHEHEHE!'",
+        toxic_warning: "⚠️ ADVARSEL #X/3: Vask din mund! Kamek overvåger turneringen!",
+        toxic_lockdown_title: "KATASTROFAL TOKSICITET DETEKTERET",
+        toxic_lockdown_desc: '"Bandeord er ikke tilladt under turneringen. Terminalen er låst." <br><br><span style="color:#ffcc00;">GENSTARTER OM <span id="countdown">10</span> SEKUNDER...</span>',
+        retry_btn: "PRØV IGEN",
+        toxic_lockdown: "SYSTEM LÅST! - TOXICITY DETEKTERET",
+
+        // Toasts
+        lang_changed: "🌐 SPROG: DANSK DETEKTERET!",
+        good_luck: "HELD OG LYKKE, {name}!",
+        radio_off: "🔈 RADIO: FRA",
+        radio_on: "🔊 EURODANCE: TIL!",
+        now_playing: "🎵 SPILLER NU: ",
+        gamepad_unsupported: "⚠️ Gamepad understøttes ikke fuldt ud (for øvrigt få knapper).",
+        gamepad_connected: "🎮 Gamepad tilsluttet!",
+        offline_mode: "📶 Offline - lokal LAN-tilstand sikret",
+        online_mode: "✅ Online - tilsluttet Station 24",
+        sensors_activated: "✅ SENSORER AKTIVERET",
+        sensors_denied: "❌ SENSORADGANG AFVIST",
+        alarm_snoozed: "ALARM SNOOZET!",
+        lb_back: "TILBAGE",
+        end_menu: "MENU",
+
+        // Manual details
+        inst_close_text: "LUK [X]",
+        inst_title_welcome: "VELKOMMEN OPERATØR. LÆS GRUNDIGT - DIT SYSTEM AFHÆNGER AF DET.",
+        inst_basics_1: "Svar på matematik-ligninger så hurtigt du kan for at øge din score og tid.",
+        inst_basics_2: "Pas på pludselige Kamek Alarmer, der ødelægger dit fokus og kræver øjeblikkelig handling!",
+        inst_math_1: "Rigtigt svar giver +150 point og +2 sekunder på uret.",
+        inst_math_2: "Forkert svar trækker 5 sekunder fra og udløser Kameks vrede.",
+        inst_lock_1: "Udviklerværktøjer (F12, undersøg element) lukker straks terminalen ned.",
+        inst_lock_2: "Skift af faner eller vinduer under aktiv turnering betragtes som snyd og fører til øjeblikkelig diskvalifikation.",
+        inst_hw_1: "Smartphones, iPads og konsoller blokeres øjeblikkeligt af Kamek-protokollen.",
+        inst_hw_2: "Computere uden nok RAM (mindst 4 GB) eller for langsomme processorer nægtes adgang.",
+
+        // Kamek's insults and alarms
+        han_list: "ÅH GUD, KAN DU IKKE REGNE?|KAMEK LER AF DIN DUMHED!|MIN BEDSTEMOR ER HURTIGERE END DIG!|VÆRRE END EN GOOMBA!|ER DU EN TRÆNET SNEGL?",
+        press_sequence: "TRYK I RÆKKEFØLGE: #SEQ",
+        math_clutch: "HURTIG REGNING: #PROB",
+        spell_words: "KAMEK,GOOMBA,TASTATUR,COMPUTER,NØDSIGNAL,STRØM,KØBENHAVN,KRYPTERING,MATEMATIK,PØLSE"
+    },
+    no: {
+        score: "POENG",
+        time: "TID",
+        player: "SPILLER",
+        start_game: "START SPILL",
+        how_to_play: "INSTRUKSJONER",
+        leaderboard: "TOPPFORSVARERE",
+        wake_up: "VAKNA!!!",
+        snooze: "SNOOZE!",
+        drag_clock: "KAST UT KLOKKEN!",
+        multi_click: "KLIKK #X GANGER!",
+        dot_chase: "JAGT PRIKKEN (#X)!",
+        spell_word: "STAV: ",
+        q_spam: "SPAM Q #X GANGER!",
+        hold_key: "HOLD '#X' I 2 SEK!",
+        rating_super: "SUPER (STJERNEGEVINST) - LEGENDARISK STATUS!",
+        rating_best: "BEST - En sann forsvarare av basen!",
+        rating_good: "BRA - Kjemp videre!",
+        name_placeholder: "DITT NAVN, DIN GOOMBA?",
+        sensor_setup_title: "TURNERING SENSORER (VALGFRITT)",
+        sensor_btn_all: "🎤+📸 AKTIVER ALT",
+        sensor_btn_mic: "🎤 BARE MIC",
+        medical_warning: "⚠️ MEDISINSK ADVARSEL: Spillet inneholder intensive stroboskonlys. Anbefales ikke for personer med epilepsi.",
+        kamek_warn_desc: "KAMEK LOCKDOWN: Fanebytte eller DevTools sperrer spillet! Spillet går videre ved både rett og feil svar.",
+
+        // System Toasts & Alerts
+        on: "PÅ",
+        off: "AV",
+        right_click_forbidden: "HØYREKLIKK ER FORBUDT! Terminalen är locked.",
+        escape_locked: "ESCAPE ER SPERRET PÅ LAN!",
+        devtools_forbidden: "DEVTOOLS ER FORBUDT! Hacker-forsøk logget.",
+        lost_focus: "TERMINAL MISTER FOKUS! Juks ikke tillatt.",
+        tab_switch_detected: "FANEBYTTE OPPDAGET! Kamek ser alt.",
+        zoom_attempt: "ZOOM FORSØK OPPDAGET!",
+        zoom_attempt_mock: "Nyehehe! Prøver du å zoome inn på mine hemmeligheter? Bruk briller i stedet!",
+        trackpad_lockdown: "BERØRINGSFLATE DETEKTERT!",
+        trackpad_lockdown_mock: "Kameks sensorer registrerer et berøringsflate-svep! Station 24 krever en ekte mus med rullende hjul.",
+        double_session: "DOBBELT_SESSION_DETEKTERT",
+        double_session_mock: "Prøver du å være to steder på samme tid? Kamek tillater kun EN aktiv tilkobling til Station 24 per terminal!",
+        ups_warning: "⚠️ STRØMBRUDD! Datamaskinen kjører på nødstrøm (UPS)! Koble till ekstern lader umiddelsbart!",
+        power_status: "⚡ EKSTERN STRÖM: OK (UPS SIKRET)",
+        power_battery: "🔋 UPS-RESERVE (ADVARSEL: INGEN EKSTERN STRØM!)",
+        camera_off_label: "CAMERA DEAKTIVERT",
+        integrity: "🛡️ INTEGRITET",
+        wall_integrity_label: "MUR-INTEGRITET: ",
+
+        // Diagnostics Screen
+        diag_ram: "Analyserer fysisk minne (RAM)...",
+        diag_cpu: "Søker etter prosessorkjerner (i5/Ryzen 5)...",
+        diag_os: "Verifiserer operativsystemets sikkerhetsarkitektur...",
+        diag_disk: "Skanner etter ledig diskplass på HDD...",
+        diag_ok: "GODKJENT!",
+        diag_fail: "MISLYKTES!",
+
+        // Device insults / Lockdowns
+        device_mobile: "MOBILTELEFON OPPDAGET! 🚫",
+        device_mobile_mock: "Dette er ikke et mobilspill! Math Mayhem krever rå kraft, ekstern strømforsyning og en ekte mus! Slutt å ta på skjermen.",
+        device_tablet: "NETTBRETT OPPDAGET! 👶",
+        device_tablet_mock: "Nettbrett er til for å se på barne-tv med, ikke for å spille Math Mayhem! Gå og se på Fantorangen i stedet.",
+        device_smarttv: "SMART-TV OPPDAGET! 📺",
+        device_smarttv_mock: "Skjermen er stor, men prosessoren din er en brødrister. YouTube er mye bedre for deg. Gå og se på kattevideoer!",
+        device_console: "KONSOL OPPDAGET! 🎮",
+        device_console_mock: "Konsoller er til for å spille GTA på! Math Mayhem styres med ren vilje, mus og tastatur. Selg kontrolleren din.",
+        device_car: "BILSKJERM OPPDAGET! 🚗",
+        device_car_mock: "Rullende trafikkfare! Prøver du å regne matematik på en Tesla-skjerm midt på motorveien?! Hold øynene på veien før Kamek krasjer autopiloten din!",
+        device_refrigerator: "SMART KJØLESKAP OPPDAGET! 🧊",
+        device_refrigerator_mock: "Hva i alle dager?! Prøver du å spille arkadespill på kjøleskapsdøren din? Gå og lukk melkekartongen i stedet!",
+        device_smartwatch: "SMARTKLOCKA OPPDAGET! ⌚",
+        device_smartwatch_mock: "Skjermen er jo mindre enn en kronestykke! Hvordan skal du sikte her? Skaff deg et mikroskop.",
+        device_smarthome: "SMART HJEM-SKJERM OPPDAGET! 🏠",
+        device_smarthome_mock: "Hvordan er dette i det hele tatt fysisk mulig? Regne matematikk fra din smarte termostat eller ringeklokke? Kamek ler seg i hjel!",
+        device_unknown: "UKJENT ENHED OPPDAGET! 👽",
+        device_unknown_mock: "Hva slags romteknologi er dette? Enheten støttes ikke av Station 24-protokollen!",
+        device_hw_ram_fail: "IKKE NOK ARBEIDSMINNE DETEKTERT!",
+        device_hw_ram_fail_mock: "Math Mayhem krever minst 4GB RAM for ikke å smelte hovedkortet. Kamek håner din patetiske bærbare PC! Skaff deg en skikkelig maskin.",
+        device_hw_cpu_cores_fail: "FOR FÅ PROSESSORKJERNER FUNNET!",
+        device_hw_cpu_cores_fail_mock: "Minst 4 CPU-kjerner kreves. Kamek håner din sykkeldrevne prosessor!",
+        device_hw_storage_fail: "DISKPLASS ER ALVORLIG LAV!",
+        device_hw_storage_fail_mock: "Kritisk ledig plass! Math Mayhem krever minst 4GB ledig diskplass for å lagre krypterte forsvarskoder.",
+
+        // Runtime Lockdowns translated keys
+        KRITISKT_LÅGT_BATTERI: "KRITISK LAVT BATTERI",
+        KRITISKT_LÅGT_BATTERI_mock: "Minst 20% strøm kreves for å spille! Hent laderen, din Goomba!",
+        TIDS_MANIPULERING_DETEKTERAD: "TIDSMANIPULERING DETERT",
+        TIDS_MANIPULERING_DETEKTERAD_mock: "Prøver du å bremse tiden, din lille tids-trollmann? Nyehehehe! I Sektor 24 gjelder kun romtidens lover. Terminalen er låst!",
+        ROBOT_OPERATÖR_DETEKTERAD: "ROBOT-OPERATØR DETEKTERT",
+        ROBOT_OPERATÖR_DETEKTERAD_mock: "Robotter har ingen adgang til Sektor 24! Kamek godtar bare organiske hjerner (uanset hvor svake de er). Systemet er avsluttet.",
+        HÖGERKLICK_DETEKTERAT: "HØYREKLIKK DETEKTERT",
+        HÖGERKLICK_DETEKTERAT_mock: "PRØVER DU Å SE BAK SCENEN? 🕵️ \n\nKamek ser de grådige fingrene dine på høyreklikk-knappen: 'NYEHEHEHE!' \nIngen juks via inspeksjon tillatt i Sektor 24!",
+        FLIKBYTE_ELLER_FOKUSFÖRLUST: "FANEBYTTE ELLER FOKUSTAP",
+        FLIKBYTE_ELLER_FOKUSFÖRLUST_mock: "Du prøvde å forlate vinduet! Google kan ikke hjelpe deg her.",
+        PROCESSOR_FÖR_SVAG: "PROSESSOR FOR SVAK",
+        PROCESSOR_FÖR_SVAG_mock: "Prosessoren din er for svak! Sektor 24 krever minst en dual-core CPU for å kjøre de matematiske algoritmene.",
+        OFFLINE_VID_START: "OFFLINE VED START",
+        OFFLINE_VID_START_mock: "Internett kreves for å spille! Du kan ikke infiltrere Sektor 24 uten en aktiv lenke.",
+        GRAFIK_INKOMPATIBEL: "GRAFIKKMOTOR INKOMPATIBEL",
+        GRAFIK_INKOMPATIBEL_mock: "Terminalen din mangler støtte for WebGL (maskinvareakselerasjon). Kamek nekter å kjøre Math Mayhem på en steinalder-GPU!",
+        GPU_ERROR: "KRITISK GRAFIKKFEIL",
+        GPU_ERROR_mock: "Kritisk feil i grafikkmotoren. Terminalen er låst for å beskytte skjermen din.",
+        ZOOM_FÖRSÖK_mock: "Nyehehe! Prøver du å zoome inn på mine hemmeligheter? Bruk briller i stedet!",
+        STYRPLATTA_DETEKTERAD_mock: "Kameks sensorer registrerer et berøringsflate-svep! Station 24 krever en ekte mus med rullende hjul.",
+        DUBBEL_SESSION_DETEKTERAD_mock: "Prøver du å være to steder på samme tid? Kamek tillater kun EN aktiv tilkobling til Station 24 per terminal!",
+
+        // Voice controls
+        voice_cmd_snooze: ["snooze", "tyst", "stopp", "slukk", "vakna"],
+        voice_cmd_radio: ["radio av", "radio på", "lydløs", "mute"],
+        voice_cmd_strobe: ["stopp strobe", "strobe av"],
+        voice_cmd_emergency: ["nød", "nødboks", "hjelp", "emergency"],
+        kamek_loud_mock: "🧙‍♂️ KAMEK: 'Slutt å skrike! Stemmen din skjærer i ørene mine! NYEHEHEHE!'",
+        toxic_warning: "⚠️ ADVARSEL #X/3: Pass på språkbruken! Kamek overvåker turneringen!",
+        toxic_lockdown_title: "KATASTROFAL TOKSISITET DETEKTERT",
+        toxic_lockdown_desc: '"Banning er ikke tillatt under turneringen. Terminalen er låst." <br><br><span style="color:#ffcc00;">OMSTARTER OM <span id="countdown">10</span> SEKUNDER...</span>',
+        retry_btn: "PRØV IGJEN",
+        toxic_lockdown: "SYSTEM LÅST! - TOXICITY DETEKTERT",
+
+        // Toasts
+        lang_changed: "🌐 SPRÅK: NORSK OPPDAGET!",
+        good_luck: "LYKKE TIL, {name}!",
+        radio_off: "🔈 RADIO: AV",
+        radio_on: "🔊 EURODANCE: PÅ!",
+        now_playing: "🎵 SPILLER NÅ: ",
+        gamepad_unsupported: "⚠️ Spillkontroll støttes ikke fullt ut (for få knappar).",
+        gamepad_connected: "🎮 Spillkontroll tilkoblet!",
+        offline_mode: "📶 Offline - lokal LAN-modus sikret",
+        online_mode: "✅ Online - tilkoblet Station 24",
+        sensors_activated: "✅ SENSORER AKTIVERT",
+        sensors_denied: "❌ SENSORTILGANG NEKTET",
+        alarm_snoozed: "ALARM SNOOZET!",
+        lb_back: "TILBAKE",
+        end_menu: "MENU",
+
+        // Manual details
+        inst_close_text: "LUKK [X]",
+        inst_title_welcome: "VELKOMMEN OPERATØR. LES NØYE - DITT SYSTEM AVHENGER AV DET.",
+        inst_basics_1: "Svar på mattestykker så fort du kan for å øke poengsummen og tiden.",
+        inst_basics_2: "Se opp for plutselige Kamek-alarmer som forstyrrer fokuset ditt og krever øyeblikkelig handling!",
+        inst_math_1: "Riktig svar gir +150 poeng og +2 sekunder på uret.",
+        inst_math_2: "Feil svar trekker fra 5 sekunder og utløser Kameks sinne.",
+        inst_lock_1: "Utviklerverktøy (F12, inspiser element) stenger terminalen umiddelbart.",
+        inst_lock_2: "Å bytte fane eller vindu under pågående turnering regnes som juks og fører til øyeblikkelig diskvalifikasjon.",
+        inst_hw_1: "Smarttelefoner, iPads og konsoller blokkeres umiddelbart av Kamek-protokollen.",
+        inst_hw_2: "Datamaskiner uten nok RAM (minst 4 GB) eller treg prosessor nektes adgang.",
+
+        // Kamek's insults and alarms
+        han_list: "HERREGUD, KAN DU IKKE REGNE?|KAMEK LER AV DIN DUMHET!|BESTEMOREN MIN ER RASKERE ENN DEG!|VERRE ENN EN GOOMBA!|ER DU EN TRENT SNEGLE?",
+        press_sequence: "TRYKK I REKKEFØLGE: #SEQ",
+        math_clutch: "RASK REGNING: #PROB",
+        spell_words: "KAMEK,GOOMBA,TASTATUR,DATAMASKIN,NØDSIGNAL,STRØM,KRYPTERING,MATEMATIKK,OSLO,BATTERI"
+    }
+};
+
+// Standard eller sparad språkkod
+let currentLang = localStorage.getItem('gameLanguage');
+if (!currentLang) {
+    const browserLang = navigator.language.slice(0, 2);
+    currentLang = translations[browserLang] ? browserLang : 'en';
+    localStorage.setItem('gameLanguage', currentLang);
+}
+
+function t(key) {
+    return translations[currentLang]?.[key] || translations['en']?.[key] || key;
+}
+
+function setLanguage(lang) {
+    if (translations[lang]) {
+        currentLang = lang;
+        safeStorage.setItem('gameLanguage', lang);
+        initializeUIText();
+        showToast(t('lang_changed'), "#00ffcc");
+        // Starta om röststyrningen med de nya språkinställningarna direkt
+        if (typeof initVoiceControl === 'function') {
+            initVoiceControl();
+        }
+    }
+}
+
+function initializeUIText() {
+    if (typeof t === 'function') {
+        // Uppdatera texter på startsidan
+        document.getElementById('player-name').placeholder = t('name_placeholder');
+        document.getElementById('start-btn-text').textContent = t('start_game');
+        document.getElementById('instructions-btn-text').textContent = t('how_to_play');
+        document.getElementById('leaderboard-btn-text').textContent = t('leaderboard');
+        document.getElementById('kamek-warn-box').innerHTML = `<strong style="color:#ffcc00;">KAMEK LOCKDOWN:</strong> ${t('kamek_warn_desc')}`;
+        document.getElementById('sensor-setup-title').textContent = t('sensor_setup_title');
+        document.getElementById('sensor-all-btn').textContent = t('sensor_btn_all');
+        document.getElementById('sensor-mic-btn').textContent = t('sensor_btn_mic');
+
+        // Instruktioner Modal
+        document.getElementById('instructions-close-text').textContent = t('inst_close_text');
+        document.getElementById('inst-manual-title').textContent = t('how_to_play');
+        document.getElementById('inst-welcome-text').textContent = t('inst_title_welcome');
+        document.getElementById('inst-sensory-warning-box').innerHTML = `<strong>⚠️ ${t('integrity')}:</strong> ${t('medical_warning')}`;
+        
+        // Fyll i baslistan dynamiskt
+        document.getElementById('inst-basics-list').innerHTML = `
+            <li><strong>${t('score')}:</strong> ${t('inst_basics_1')}</li>
+            <li><strong>${t('time')}:</strong> ${t('inst_basics_2')}</li>
+        `;
+        
+        // Fyll i math listan dynamiskt
+        document.getElementById('inst-math-list').innerHTML = `
+            <li>${t('inst_math_1')}</li>
+            <li>${t('inst_math_2')}</li>
+        `;
+
+        document.getElementById('inst-cam-title').textContent = t('sensor_setup_title');
+        document.getElementById('inst-cam-list').innerHTML = `
+            <li><b>${t('sensor_btn_all')}:</b> ${t('sensors_activated')}</li>
+            <li><b>${t('camera_off_label')}:</b> Kamek-shield overlay aktiveras.</li>
+        `;
+
+        document.getElementById('inst-alarm-title').textContent = t('wake_up');
+        document.getElementById('inst-alarm-list').innerHTML = `
+            <li><b>${t('drag_clock')}</b></li>
+            <li><b>${t('dot_chase').replace(' (#X)', '')}</b></li>
+            <li><b>${t('press_sequence').replace(': #SEQ', '')}</b></li>
+            <li><b>${t('math_clutch').replace(': #PROB', '')}</b></li>
+        `;
+
+        document.getElementById('inst-lockdown-warning-header').textContent = t('kamek_warn_desc');
+        document.getElementById('inst-lockdown-list').innerHTML = `
+            <li>${t('inst_lock_1')}</li>
+            <li>${t('inst_lock_2')}</li>
+        `;
+
+        document.getElementById('inst-hardware-title').textContent = t('inst_hardware_title') || "💻 HARDWARE REQUIREMENTS";
+        document.getElementById('inst-hardware-list').innerHTML = `
+            <li>${t('inst_hw_1')}</li>
+            <li>${t('inst_hw_2')}</li>
+        `;
+
+        document.getElementById('inst-confirm-btn').textContent = t('ready') || "START SYSTEM!";
+
+        // HUD i spelet
+        document.getElementById('hud-player').textContent = t('player');
+        document.getElementById('hud-score').textContent = t('score');
+        document.getElementById('hud-time').textContent = t('time');
+
+        // Leaderboard
+        document.getElementById('leaderboard-title-header').textContent = `${t('leaderboard')} - STATION 24`;
+        document.getElementById('leaderboard-back-btn').textContent = t('lb_back');
+
+        // End screen
+        document.getElementById('end-menu-btn').textContent = t('end_menu');
+        
+        // Lockdown info
+        document.getElementById('lockdown-header').textContent = t('toxic_lockdown');
+        document.getElementById('lockdown-restart-btn').textContent = t('retry_btn');
+
+        // Kamera label
+        document.getElementById('camera-overlay-text').innerHTML = t('camera_off_label').replace(' ', '<br>');
+    }
+}
+
+window.setLanguage = setLanguage;
+</script>
+
+<script>
+    let score = 0, timeLeft = 60, currentAnswer = 0, gameActive = false, alarmActive = false, currentPlayer = "";
+    let timerInterval, currentAlarmAudio, blurTimeout, alarmTaskInterval;
+    let qSpamCount = 0, holdStartTime = 0, targetHoldKey = "", snoozeMode = "";
+
+    function showToast(text, color) {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        const t = document.createElement('div');
+        t.className = 'toast'; t.style.borderColor = color; t.innerText = text;
+        container.appendChild(t);
+        setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 500); }, 3000);
+    }
+
+    function saveHighScore(name, finalScore) {
+        let scores = JSON.parse(localStorage.getItem('math_mayhem_scores')) || [];
+        scores.push({ name: name, score: finalScore });
+        scores.sort((a, b) => b.score - a.score);
+        localStorage.setItem('math_mayhem_scores', JSON.stringify(scores.slice(0, 10)));
+    }
+
+    function toggleInstructions(show) { document.getElementById('instructions-modal').style.display = show ? 'block' : 'none'; }
+    window.onclick = (e) => { if (e.target == document.getElementById('instructions-modal')) toggleInstructions(false); };
+
+    function showLeaderboard() {
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('leaderboard-screen').style.display = 'block';
+        const scores = JSON.parse(localStorage.getItem('math_mayhem_scores')) || [];
+        document.getElementById('high-score-content').innerHTML = scores.map((s, i) => `<div style="font-size:24px; margin: 10px 0;">${i+1}. ${s.name} - ${s.score} PT</div>`).join('');
+    }
+
+// --- STATION 24 MEDIA ENGINE ---
+var audioCtx, analyser, dataArray, micStream;
+var badWordCount = 0;
+var forbiddenWords = {
+    sv: ["fan", "jävla", "skit", "helvete", "idiot", "pucko", "mupp"],
+    da: ["fuck", "lort", "idiot", "røvhul", "helvede"],
+    no: ["faen", "jævla", "skit", "helvete", "idiot"],
+    en: ["fuck", "shit", "bitch", "asshole", "idiot", "bastard"]
+};
+
+async function requestMediaAccess(useVideo, useAudio) {
+    var constraints = { 
+        video: useVideo ? { width: 640, height: 480 } : false, 
+        audio: useAudio 
+    };
+
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        showToast(t('sensors_activated'), "#00ff00");
+
+        if (useAudio) {
+            setupMicVisualizer(stream);
+            initVoiceControl(); // Startar röststyrningssystemet dynamiskt!
+        }
+        
+        if (useVideo) {
+            var videoEl = document.getElementById('webcam-feed');
+            if (videoEl) {
+                videoEl.srcObject = stream;
+                videoEl.style.display = 'block';
+                document.getElementById('camera-overlay').style.display = 'none';
+                setupFaceWatcher(videoEl).catch(e => console.log("Face-API delay:", e));
+            }
+        }
+    } catch (err) {
+        console.error("Media Error Detail:", err.name);
+        showToast(t('sensors_denied'), "red");
+    }
+}
+
+// 1. LJUD-VISUALISERING (STRECKEN)
+function setupMicVisualizer(stream) {
+    var container = document.getElementById('mic-visualizer-container');
+    if (container) container.style.display = 'flex';
+
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    var source = audioCtx.createMediaStreamSource(stream);
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 32;
+    source.connect(analyser);
+    
+    var bufferLength = analyser.frequencyBinCount;
+    dataArray = new Uint8Array(bufferLength);
+    let lastLoudTime = 0;
+
+    function update() {
+        if (!analyser) return;
+        analyser.getByteFrequencyData(dataArray);
+        var bars = document.querySelectorAll('.bar');
+        let maxVal = 0;
+        
+        for (var i = 0; i < bars.length; i++) {
+            var val = dataArray[i];
+            var h = Math.max(3, (val / 255) * 25);
+            if (bars[i]) {
+                bars[i].style.height = h + "px";
+                bars[i].style.background = val > 200 ? "#ff0000" : "#00ccff";
+            }
+            if (val > maxVal) maxVal = val;
+        }
+
+        // HÖGLJUDDETEKTION: Kameks hånskratt vid skrik eller slag på bordet!
+        if (maxVal > 245 && Date.now() - lastLoudTime > 6000 && gameActive && !alarmActive) {
+            lastLoudTime = Date.now();
+            new Audio('kamek.mp3').play().catch(()=>{});
+            showToast(t('kamek_loud_mock'), "var(--danger)");
+        }
+
+        requestAnimationFrame(update);
+    }
+    update();
+}
+
+// 2. RÖSTSTYRNINGSSYSTEM MED MULTISPRÅKSSUPPORT
+let voiceRecognitionInstance = null;
+let isVoiceListening = false;
+
+function initVoiceControl() {
+    if (voiceRecognitionInstance) {
+        try { voiceRecognitionInstance.stop(); } catch(e) {}
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+
+    voiceRecognitionInstance = new SpeechRecognition();
+    // Välj språkkod baserat på aktiv flagginställning
+    voiceRecognitionInstance.lang = currentLang === 'sv' ? 'sv-SE' : 
+                                   currentLang === 'da' ? 'da-DK' : 
+                                   currentLang === 'no' ? 'nb-NO' : 'en-US';
+    voiceRecognitionInstance.continuous = true;
+    voiceRecognitionInstance.interimResults = false;
+
+    voiceRecognitionInstance.onstart = () => { isVoiceListening = true; };
+    voiceRecognitionInstance.onend = () => {
+        isVoiceListening = false;
+        if (gameActive) {
+            try { voiceRecognitionInstance.start(); } catch(e) {}
+        }
+    };
+
+    voiceRecognitionInstance.onresult = (event) => {
+        const text = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+        console.log("Röst igenkänd: ", text);
+
+        // A. Toxic Check (Svordomar på lokalt språk + engelska som alltid är aktivt)
+        const forbiddenLocal = forbiddenWords[currentLang] || [];
+        const forbiddenEng = forbiddenWords.en;
+        if (forbiddenLocal.some(word => text.includes(word)) || forbiddenEng.some(word => text.includes(word))) {
+            badWordCount++;
+            new Audio('kamek.mp3').play().catch(()=>{});
+            if (badWordCount < 3) {
+                showToast(t('toxic_warning').replace('#X', badWordCount), "var(--danger)");
+            } else {
+                kamekPurpleLockdown();
+            }
+            return;
+        }
+
+        // B. Kamek Skratt-Triggers
+        const laughTriggers = ["skratta", "laugh", "grine", "le", "kamek", "fusk", "cheat", "snyd", "juks", "wizard", "trollkarl"];
+        if (laughTriggers.some(trigger => text.includes(trigger))) {
+            new Audio('kamek_laugh.mp3').play().catch(()=>{});
+            showToast("🧙‍♂️ Kamek: NYEHEHEHE!", "var(--gold)");
+            return;
+        }
+
+        // C. Spel-Kommandon (Matchas mot valda språket + engelska som fallback)
+        let actionFound = false;
+
+        if (t('voice_cmd_snooze').some(cmd => text.includes(cmd)) || text.includes("snooze") || text.includes("stop")) {
+            if (alarmActive) {
+                snooze();
+                actionFound = true;
+            }
+        } 
+        else if (t('voice_cmd_radio').some(cmd => text.includes(cmd)) || text.includes("music") || text.includes("radio")) {
+            toggleMusic();
+            actionFound = true;
+        }
+        else if (t('voice_cmd_strobe').some(cmd => text.includes(cmd)) || text.includes("strobe")) {
+            killStrobe();
+            showToast("🎤 Command: Strobe Kill", "var(--primary)");
+            actionFound = true;
+        }
+        else if (t('voice_cmd_emergency').some(cmd => text.includes(cmd)) || text.includes("help") || text.includes("emergency")) {
+            if (gameActive && !alarmActive) {
+                timeLeft += 5;
+                showToast("🎤 CHEAT: +5s!", "orange");
+                new Audio('kamek.mp3').play().catch(()=>{});
+                actionFound = true;
+            }
+        }
+
+        if (actionFound && jukebox) {
+            let oldVol = jukebox.volume;
+            jukebox.volume = 0.05; // Ducka musikvolymen temporärt
+            setTimeout(() => { if (jukebox) jukebox.volume = oldVol; }, 1200);
+        }
+    };
+
+    try {
+        voiceRecognitionInstance.start();
+    } catch(e) {}
+}
+
+function kamekPurpleLockdown() {
+    if (window.stop) window.stop();
+    if (jukebox) jukebox.pause();
+    
+    let count = 10;
+    document.body.innerHTML = `
+        <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#1a0033;display:flex;flex-direction:column;justify-content:center;align-items:center;color:white;font-family:Arial;border:15px double #8200ff;box-sizing:border-box;z-index:1000000;">
+            <h1 style="font-family:'Luckiest Guy';font-size:50px;color:#ffcc00;margin:20px 0;">${t('toxic_lockdown_title')}</h1>
+            <div style="background:rgba(0,0,0,0.5);padding:30px;border-radius:20px;border:1px dashed #8200ff;text-align:center;">
+                <p style="font-size:30px;font-style:italic;line-height:1.6;">${t('toxic_lockdown_desc')}</p>
+            </div>
+            <p style="margin-top:40px;color:#8200ff;font-family:monospace;font-weight:bold;">SYSTEM_ERROR: TOXIC_OPERATOR_DETECTED</p>
+            <button onclick="location.reload()" style="margin-top:20px;padding:10px 30px;font-family:'Luckiest Guy';cursor:pointer;background:#ffcc00;border:none;border-radius:10px;">${t('retry_btn')}</button>
+        </div>`;
+    
+    const timer = setInterval(() => {
+        count--;
+        const countEl = document.getElementById('countdown');
+        if (countEl) countEl.textContent = count;
+        if (count <= 0) {
+            clearInterval(timer);
+            location.reload();
+        }
+    }, 1000);
+}
+
+// 3. AFK-VAKT (FACE DETECTION)
+async function setupFaceWatcher(video) {
+    if (typeof faceapi === 'undefined') {
+        console.log("Face-API saknas.");
+        return;
+    }
+
+    await faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/');
+    
+    var absenceTicks = 0;
+    var faceInterval = setInterval(async function() {
+        if (!gameActive) return;
+
+        var detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
+        
+        if (detections.length === 0) {
+            absenceTicks++;
+            if (absenceTicks === 5) showToast("⚠️ VARNING: OPERATÖR EJ DETEKTERAD!", "orange");
+            if (absenceTicks >= 12) {
+                triggerKamek("OPERATÖR_SAKNAS", "En operatör lämnar aldrig sin post! Terminalen låst för din säkerhet.");
+                clearInterval(faceInterval);
+            }
+        } else {
+            absenceTicks = 0;
+        }
+    }, 1000);
+}
+
+/* --- TOTAL KAMEK LOCKDOWN --- */
+(function() {
+    var ua = navigator.userAgent.toLowerCase();
+    var isIE = !!document.documentMode;
+    var isMobile = /iphone|android|blackberry|iemobile/i.test(ua);
+    var isTablet = /ipad|playbook|silk/i.test(ua) || (navigator.maxTouchPoints > 0 && /macintosh/.test(ua));
+    var isCar = /tesla|carbrowser/i.test(ua);
+    var isTV = /smarttv|tizen|web0s|roku/i.test(ua);
+    var isConsole = /playstation|nintendo|xbox/i.test(ua);
+
+    window.triggerKamek = function(reasonKey, mockeryKey) {
+        if (!gameActive) return;
+        gameActive = false; clearInterval(timerInterval);
+        if (currentAlarmAudio) currentAlarmAudio.pause();
+        document.getElementById('lockdown-overlay').style.display = 'flex';
+
+        // Läs in översättningarna dynamiskt om nyckeln finns, annars fallback till råsträngen
+        var resolvedReason = t(reasonKey) || reasonKey;
+        var resolvedMockery = t(mockeryKey) || mockeryKey;
+
+        document.getElementById('lockdown-reason-text').innerText = resolvedReason;
+        document.getElementById('lockdown-mockery').innerText = resolvedMockery;
+        new Audio('kamek.mp3').play().catch(()=>{});
+        window.stop();
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+        if (isIE) triggerKamek("INTERNET_EXPLORER_DETEKTERAD", "Internet Explorer? Museet ringde och vill ha tillbaka sin programvara. Byt till en riktig dator!");
+        else if (isCar) triggerKamek("FORDONSTERMINAL_DETEKTERAD", "Parkera bilen innan du krockar terminalen. PSL631 stöder inte rullande hårdvara.");
+        else if (isTV) triggerKamek("SMART_TV_DETEKTERAD", "Soffan är inte en godkänd kommandocentral. En TV är till för att se på film, ikke for seriøst arbejde.");
+        else if (isConsole) triggerKamek("KONSOL_DETEKTERAD", "Gå tillbaka till din aim-assist, konsol-bonde. Station 24 körs endast på 'Master Race'-hårdvara.");
+        else if (isTablet) triggerKamek("PADDA_DETEKTERAD", "Kladdiga fingrar på glaset är inte professionellt. En Padda är inte en dator.");
+        else if (isMobile) triggerKamek("MOBIL_DETEKTERAD", "Sitter du på toaletten? Din skärm är för liten för denna intelligensnivå. Station 24 är inte ett mobilspel.");
+    });
+
+    window.addEventListener('blur', () => { if (gameActive) triggerKamek("FLIKBYTE_ELLER_FOKUSFÖRLUST", "FLIKBYTE_ELLER_FOKUSFÖRLUST_mock"); });
+    window.addEventListener('keydown', (e) => {
+        const isF12 = e.key === "F12", isSource = (e.ctrlKey && e.key.toLowerCase() === 'u'), isInspect = (e.ctrlKey && e.shiftKey && "IJC".includes(e.key.toUpperCase())), isEsc = e.key === "Escape";
+        if ((isF12 || isSource || isInspect || isEsc) && gameActive) {
+            e.preventDefault();
+            const reason = isEsc ? "PAUS_FÖRSÖK_STÖDS_EJ" : "UTVECKLARVERKTYG_DETEKTERADE";
+            const mock = isEsc ? "Det finns ingen paus i Station 24! Kamek ser dina desperata försök!" : "Försöker du hacka källkod? Din lilla hacker-goomba!";
+            triggerKamek(reason, mock);
+        }
+        if (alarmActive) {
+            if (snoozeMode === "Q_SPAM" && e.key.toLowerCase() === 'q') { qSpamCount++; document.getElementById('alarm-msg').innerText = "SPAMMA Q: " + (10 - qSpamCount); if (qSpamCount >= 10) snooze(); }
+            if (snoozeMode === "HOLD_KEY" && e.key.toUpperCase() === targetHoldKey && holdStartTime === 0) holdStartTime = Date.now();
+            
+            // Ny SEQUENCE-kontroll
+            if (snoozeMode === "SEQUENCE" && window.activeSequence) {
+                let targetKey = window.activeSequence[window.activeSequenceIndex];
+                if (e.key.toUpperCase() === targetKey) {
+                    window.activeSequenceIndex++;
+                    let dispSeq = window.activeSequence.map((char, idx) => {
+                        if (idx < window.activeSequenceIndex) {
+                            return "<span style='color:#00ff00;'>" + char + "</span>";
+                        }
+                        return "<span>" + char + "</span>";
+                    }).join(' - ');
+                    document.getElementById('alarm-msg').innerHTML = t('press_sequence').replace('#SEQ', dispSeq);
+                    
+                    if (window.activeSequenceIndex >= window.activeSequence.length) {
+                        snooze();
+                    }
+                } else {
+                    // Tryckte fel tangent, men ignorera om det är systemkontroller
+                    if (!isF12 && !isSource && !isInspect && !isEsc && e.key.length === 1) {
+                        window.activeSequenceIndex = 0;
+                        let dispSeq = window.activeSequence.map(char => "<span>" + char + "</span>").join(' - ');
+                        document.getElementById('alarm-msg').innerHTML = t('press_sequence').replace('#SEQ', dispSeq);
+                        new Audio('kamek.mp3').play().catch(()=>{});
+                    }
+                }
+            }
+        }
+    });
+    window.addEventListener('keyup', (e) => { if (alarmActive && snoozeMode === "HOLD_KEY" && e.key.toUpperCase() === targetHoldKey) holdStartTime = 0; });
+})();
+
+// --- SMART KAMEK WHEEL-SENSOR V2 ---
+window.addEventListener('wheel', function(e) {
+    if (!gameActive) return;
+
+    var isTrackpad = Math.abs(e.deltaX) > 0;
+    var isPinch = e.ctrlKey;
+
+    if (isPinch) {
+        e.preventDefault();
+        triggerKamek("ZOOM_FÖRSÖK", "ZOOM_FÖRSÖK_mock");
+    } 
+    else if (isTrackpad && Math.abs(e.deltaX) > 5) {
+        triggerKamek("STYRPLATTA_DETEKTERAD", "STYRPLATTA_DETEKTERAD_mock");
+    }
+}, { passive: false });
+
+    function startGame() {
+        currentPlayer = document.getElementById('player-name').value.trim() || "Gäst";
+        document.getElementById('display-name').innerText = currentPlayer.toUpperCase();
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('game-container').style.display = 'block';
+        gameActive = true; score = 0; timeLeft = 60;
+        startTimer(); generateQuestion();
+    }
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            if (!alarmActive && gameActive) {
+                timeLeft--;
+                const tEl = document.getElementById('timer'); tEl.innerText = timeLeft;
+                if (timeLeft <= 10 && timeLeft > 0) { tEl.classList.add('timer-panic'); if (timeLeft % 2 === 0) document.body.classList.add('bg-panic'); else document.body.classList.remove('bg-panic'); }
+                else { tEl.classList.remove('timer-panic'); document.body.classList.remove('bg-panic'); }
+                if (Math.random() < (0.08 + score/40000) && timeLeft > 10) triggerAlarm();
+                if (timeLeft <= 0) endGame("TIDEN SLUT!");
+            }
+        }, 1000);
+    }
+
+    function generateQuestion() {
+        let diff = Math.floor(score / 2000), ops = ['+', '-', '*'];
+        if (score > 2000) ops.push('/');
+        if (score > 4000) ops.push('%');
+        if (score > 6000) ops.push('^', 'sqrt');
+        const op = ops[Math.floor(Math.random() * ops.length)];
+        let n1, n2;
+        if (op === '/') { n2 = Math.floor(Math.random()*9)+2; currentAnswer = Math.floor(Math.random()*10)+1; n1 = currentAnswer * n2; document.getElementById('question').innerText = n1 + " / " + n2; }
+        else if (op === '%') { let p = [10, 20, 25, 50, 75]; n2 = p[Math.floor(Math.random()*p.length)]; n1 = (Math.floor(Math.random()*10)+1)*20; currentAnswer = (n2/100)*n1; document.getElementById('question').innerText = n2 + "% AV " + n1; }
+        else if (op === '^') { n1 = Math.floor(Math.random()*10)+2; currentAnswer = Math.pow(n1, 2); document.getElementById('question').innerText = n1 + "²"; }
+        else if (op === 'sqrt') { currentAnswer = Math.floor(Math.random()*11)+2; n1 = currentAnswer*currentAnswer; document.getElementById('question').innerText = "√" + n1; }
+        else if (op === '*') { n1 = Math.floor(Math.random()*(10+diff))+2; n2 = Math.floor(Math.random()*(10+diff))+2; currentAnswer = n1*n2; document.getElementById('question').innerText = n1 + " × " + n2; }
+        else if (op === '-') { n1 = Math.floor(Math.random()*(50+diff))+20; n2 = Math.floor(Math.random()*19)+2; currentAnswer = n1-n2; document.getElementById('question').innerText = n1 + " - " + n2; }
+        else { n1 = Math.floor(Math.random()*(50+diff))+2; n2 = Math.floor(Math.random()*(50+diff))+2; currentAnswer = n1+n2; document.getElementById('question').innerText = n1 + " + " + n2; }
+        setupOptions(currentAnswer);
+    }
+
+    function setupOptions(correct) {
+        let opts = [correct];
+        while(opts.length < 4) { let a = correct + (Math.floor(Math.random()*16)-8); if(a > 0 && !opts.includes(a)) opts.push(a); }
+        opts.sort(() => Math.random()-0.5);
+        const grid = document.getElementById('answer-options'); grid.innerHTML = '';
+        opts.forEach(o => {
+            const b = document.createElement('button'); b.className = 'answer-btn'; b.innerText = o;
+            b.onclick = () => {
+                if (o === correct) { score += 150 + (Math.floor(score/1000)*10); timeLeft += 2; new Audio('pling.mp3').play().catch(()=>{}); }
+                else { 
+                    new Audio('kamek.mp3').play().catch(()=>{}); 
+                    // Slå upp hånlista baserat på vald språkkod dynamiskt
+                    var activeHanList = (t('han_list') || "").split('|');
+                    var randomInsult = activeHanList[Math.floor(Math.random() * activeHanList.length)] || "FEL!";
+                    showToast(randomInsult, "purple"); 
+                    timeLeft -= 5; 
+                }
+                document.getElementById('display-score').innerText = score;
+                generateQuestion();
+            };
+            grid.appendChild(b);
+        });
+        if (Math.random() < 0.20) { setTimeout(() => { const btns = Array.from(grid.children).sort(() => Math.random()-0.5); grid.innerHTML = ''; btns.forEach(btn => grid.appendChild(btn)); new Audio('kamek_laugh.mp3').play().catch(()=>{}); }, 1500); }
+    }
+
+    function triggerAlarm() {
+        alarmActive = true; 
+        const overlay = document.getElementById('alarm-overlay'), 
+              taskArea = document.getElementById('alarm-task-area'), 
+              mainBtn = document.getElementById('main-snooze'),
+              alarmImg = document.getElementById('alarm-img');
+
+        overlay.style.display = 'flex'; 
+        taskArea.innerHTML = ''; 
+        
+        mainBtn.style.display = 'none'; 
+        mainBtn.onclick = snooze; 
+        alarmImg.style.transform = "translate(0, 0)";
+        alarmImg.style.cursor = "default";
+        alarmImg.onmousedown = null; 
+
+        // Nu inkluderar vi de nya utmaningarna i slumpgeneratorn!
+        let modes = ["SIMPLE", "DOT", "WORD", "MULTI_CLICK", "HOLD_KEY", "Q_SPAM", "DRAG_AWAY", "SEQUENCE", "MATH_CLUTCH"]; 
+        snoozeMode = modes[Math.floor(Math.random() * modes.length)];
+
+        if (snoozeMode === "SIMPLE") { 
+            document.getElementById('alarm-msg').innerText = t('wake_up'); 
+            mainBtn.style.display = 'block'; 
+        } 
+        else if (snoozeMode === "MULTI_CLICK") { 
+            let c = 6 + Math.floor(score/5000); 
+            document.getElementById('alarm-msg').innerText = t('multi_click').replace('#X', c); 
+            mainBtn.style.display = 'block'; 
+            mainBtn.onclick = () => { c--; document.getElementById('alarm-msg').innerText = t('multi_click').replace('#X', c); if(c<=0) snooze(); }; 
+        }
+        else if (snoozeMode === "DRAG_AWAY") {
+            document.getElementById('alarm-msg').innerText = t('drag_clock');
+            initDragSnooze(alarmImg); 
+        }
+        else if (snoozeMode === "DOT") {
+            let dots = 1 + Math.floor(score/8000); document.getElementById('alarm-msg').innerText = t('dot_chase').replace('#X', dots);
+            for (let i=0; i<dots; i++) {
+                const dot = document.createElement('div'); dot.style.cssText = "width:60px; height:60px; background:yellow; border-radius:50%; position:absolute; cursor:pointer; border: 3px solid black; z-index:1001;";
+                taskArea.appendChild(dot); const move = () => { dot.style.top = (Math.random()*70+15)+"%"; dot.style.left = (Math.random()*70+15)+"%"; }; move();
+                let int = setInterval(move, 800 - Math.min(400, score/100));
+                dot.onclick = () => { dot.remove(); clearInterval(int); dots--; if(dots<=0) snooze(); };
+            }
+        } 
+        else if (snoozeMode === "WORD") {
+            // Nu hämtar vi språkbaserade ord direkt från translations!
+            const wordListStr = t('spell_words') || "KAMEK,GOOMBA,LANBIT,DATORMUS";
+            const ws = wordListStr.split(',');
+            const tWord = ws[Math.floor(Math.random() * ws.length)];
+            document.getElementById('alarm-msg').innerHTML = t('spell_word') + "<span style='color:yellow'>"+tWord+"</span>";
+            const inp = document.createElement('input'); inp.id = "snooze-input"; inp.oninput = () => { if(inp.value.toUpperCase() === tWord) snooze(); else if(!tWord.startsWith(inp.value.toUpperCase())) endGame("STAVFEL!"); };
+            taskArea.appendChild(inp); setTimeout(() => inp.focus(), 50);
+        } 
+        else if (snoozeMode === "Q_SPAM") { 
+            qSpamCount = 0; document.getElementById('alarm-msg').innerText = t('q_spam').replace('#X', 10); 
+            dotTimeout = setTimeout(() => { if(alarmActive) endGame("FÖR SEGT SPAM!"); }, 5000); 
+        }
+        else if (snoozeMode === "HOLD_KEY") { 
+            targetHoldKey = ['A','S','D','F'][Math.floor(Math.random()*4)]; 
+            document.getElementById('alarm-msg').innerText = t('hold_key').replace('#X', targetHoldKey); 
+            alarmTaskInterval = setInterval(() => { if(holdStartTime>0 && Date.now()-holdStartTime>=2000) snooze(); }, 100); 
+        }
+        else if (snoozeMode === "SEQUENCE") {
+            const chars = ["W", "A", "S", "D", "R", "E", "F"];
+            let seq = [];
+            while(seq.length < 3) {
+                let rChar = chars[Math.floor(Math.random() * chars.length)];
+                if(!seq.includes(rChar)) seq.push(rChar);
+            }
+            window.activeSequence = seq;
+            window.activeSequenceIndex = 0;
+            let dispSeq = seq.map(char => "<span>" + char + "</span>").join(' - ');
+            document.getElementById('alarm-msg').innerHTML = t('press_sequence').replace('#SEQ', dispSeq);
+        }
+        else if (snoozeMode === "MATH_CLUTCH") {
+            let a = Math.floor(Math.random() * 12) + 5;
+            let b = Math.floor(Math.random() * 12) + 5;
+            let op = Math.random() < 0.5 ? "+" : "-";
+            let ans = op === "+" ? (a + b) : (a - b);
+            window.activeClutchAnswer = ans;
+            document.getElementById('alarm-msg').innerText = t('math_clutch').replace('#PROB', `${a} ${op} ${b} = ?`);
+            
+            const inp = document.createElement('input'); 
+            inp.id = "snooze-input"; 
+            inp.type = "number";
+            inp.oninput = () => { 
+                if(parseInt(inp.value) === window.activeClutchAnswer) snooze(); 
+            };
+            taskArea.appendChild(inp); 
+            setTimeout(() => inp.focus(), 50);
+        }
+        
+        const sounds = ['alarm_buzzer.mp3', 'cukoo_clock.mp3', 'classic_alarm.mp3','clock_alarm.mp3'];
+        currentAlarmAudio = new Audio(sounds[Math.floor(Math.random()*sounds.length)]);
+        currentAlarmAudio.loop = true;
+        currentAlarmAudio.play().catch(()=>{});
+    }
+
+    function snooze() {
+        alarmActive = false; 
+        document.getElementById('alarm-overlay').style.display = 'none'; 
+        if(currentAlarmAudio) currentAlarmAudio.pause(); 
+        
+        window.onmousemove = null;
+        window.onmouseup = null;
+        window.activeSequence = null;
+        
+        clearInterval(alarmTaskInterval); 
+        clearTimeout(dotTimeout); 
+        snoozeMode = ""; 
+        showToast(t('alarm_snoozed'), "#00ff00");
+    }
+        
+    function initDragSnooze(el) {
+        let isDragging = false;
+        let startX, startY;
+        el.style.cursor = "grab";
+
+        el.onmousedown = function(e) {
+            isDragging = true;
+            el.style.cursor = "grabbing";
+            startX = e.clientX;
+            startY = e.clientY;
+            e.preventDefault();
+        };
+
+        window.onmousemove = function(e) {
+            if (!isDragging || snoozeMode !== "DRAG_AWAY") return;
+            let dx = e.clientX - startX;
+            let dy = e.clientY - startY;
+            el.style.transform = `translate(${dx}px, ${dy}px)`;
+
+            if (Math.abs(dx) > window.innerWidth / 2 || Math.abs(dy) > window.innerHeight / 2) {
+                isDragging = false;
+                snooze();
+            }
+        };
+
+        window.onmouseup = function() {
+            if (!isDragging) return;
+            isDragging = false;
+            el.style.cursor = "grab";
+            if (snoozeMode === "DRAG_AWAY") {
+                el.style.transition = "transform 0.3s ease";
+                el.style.transform = "translate(0, 0)";
+                setTimeout(() => { el.style.transition = ""; }, 300);
+            }
+        };
+    }
+
+    function endGame(reason) {
+        gameActive = false; clearInterval(timerInterval); saveHighScore(currentPlayer, score);
+        document.getElementById('game-container').style.display = 'none'; document.getElementById('alarm-overlay').style.display = 'none';
+        const s = document.getElementById('end-screen'); s.style.display = 'block';
+        let titleVal, mMsg, cColor, sndName;
+        if (score >= 10000) { titleVal = "SUPER"; mMsg = t('rating_super'); cColor = "#ff00ff"; sndName = "secret.mp3"; }
+        else if (score >= 6000) { titleVal = "BÄST"; mMsg = t('rating_best'); cColor = "#ffcc00"; sndName = "yay.mp3"; }
+        else { titleVal = "BRA"; mMsg = t('rating_good'); cColor = "#00ff00"; sndName = "pling.mp3"; }
+        document.getElementById('end-title').innerText = titleVal; document.getElementById('end-title').style.color = cColor;
+        document.getElementById('end-message').innerHTML = `${reason}<br>${t('score')}: ${score}<br>${mMsg}`;
+        new Audio(sndName).play().catch(()=>{});
+    }
+
+    function triggerDeviceLockdown(deviceType) {
+        var reason = t(deviceType) || deviceType;
+        var mock = t(deviceType + "_mock") || t('device_unknown_mock');
+        triggerKamek(reason, mock);
+    }
+    window.triggerDeviceLockdown = triggerDeviceLockdown;
+
+// Systembevakning
+(function() {
+    if ('getBattery' in navigator) {
+        navigator.getBattery().then(bat => {
+            const checkBat = () => {
+                let lvl = Math.round(bat.level * 100);
+                if (!bat.charging && lvl < 20) {
+                    triggerKamek("KRITISKT_LÅGT_BATTERI", "KRITISKT_LÅGT_BATTERI_mock");
+                } else if (!bat.charging && lvl < 30) {
+                    showToast("⚠️ " + t('power_battery') + " (" + lvl + "%)", "orange");
+                }
+            };
+            checkBat();
+            if (typeof bat.addEventListener === 'function') {
+                bat.addEventListener('levelchange', checkBat);
+                bat.addEventListener('chargingchange', checkBat);
+            } else {
+                bat.onlevelchange = checkBat;
+                bat.onchargingchange = checkBat;
+            }
+        });
+    }
+
+    let lastRealTime = Date.now();
+    let lastFrameTime = performance.now();
+
+    const checkTimeDrift = () => {
+        const currentRealTime = Date.now();
+        const currentFrameTime = performance.now();
+
+        const realDelta = currentRealTime - lastRealTime;
+        const frameDelta = currentFrameTime - lastFrameTime;
+
+        if (Math.abs(realDelta - frameDelta) > 500 && gameActive) {
+            triggerKamek("TIDS_MANIPULERING_DETEKTERAD", "TIDS_MANIPULERING_DETEKTERAD_mock");
+        }
+
+        lastRealTime = currentRealTime;
+        lastFrameTime = currentFrameTime;
+        if (gameActive) requestAnimationFrame(checkTimeDrift);
+    };
+    requestAnimationFrame(checkTimeDrift);
+
+    const isBot = navigator.webdriver || window.callPhantom || window._phantom || window.__nightmare;
+
+    if (isBot) {
+        setTimeout(() => {
+            triggerKamek("ROBOT_OPERATÖR_DETEKTERAD", "ROBOT_OPERATÖR_DETEKTERAD_mock");
+        }, 2000);
+    }
+
+    window.addEventListener('resize', () => {
+        if (gameActive) {
+            showToast("⚠️ VARNING: FÖNSTRET ÄNDRAS - KAMEK BLIR IRRITERAD!", "orange");
+        }
+    });
+
+    const checkZoom = () => {
+        if (window.devicePixelRatio > 1.5 || window.devicePixelRatio < 0.75) {
+            showToast("🔍 VARNING: ONORMAL ZOOM-NIVÅ DETEKTERAD!", "orange");
+        }
+    };
+    setInterval(checkZoom, 10000);
+
+    const checkAudio = () => {
+        if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            if (ctx.state === 'suspended' && gameActive) {
+                showToast("🔇 VARNING: LJUDET ÄR AVSTÄNGT ELLER BLOCKERAT!", "#00ccff");
+            }
+            ctx.close();
+        }
+    };
+    setTimeout(checkAudio, 5000);
+
+    window.addEventListener('offline', () => {
+        if (gameActive) {
+            triggerKamek("ANSLUTNING_BRUTEN", 
+                "Internet krävs för att spela! Station 24 kan inte rapportera dina framsteg till stordatormatrisen i offline-läge. Återanslut omedelbart!");
+        }
+    });
+
+    let lastCheck = performance.now();
+    setInterval(() => {
+        let now = performance.now();
+        if (now - lastCheck > 1500 && gameActive) {
+            showToast("🔥 VARNING: SYSTEMET ÖVERHETTAS - CPU-STRYPNING DETEKTERAD!", "orange");
+        }
+        lastCheck = now;
+    }, 1000);
+
+    if (window.innerWidth < 1024 || window.innerHeight < 700) {
+        showToast("📏 VARNING: LÅG UPPLÖSNING - VISSA ELEMENT KAN DOLAS!", "orange");
+    }
+
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        if (gameActive) {
+            triggerKamek("HÖGERKLICK_DETEKTERAT", "HÖGERKLICK_DETEKTERAT_mock");
+        }
+    });
+
+    (function() {
+        const channel = new BroadcastChannel('station24_check');
+        channel.postMessage('new_session');
+        
+        channel.onmessage = (msg) => {
+            if (msg.data === 'new_session' && (gameActive || !document.hidden)) {
+                triggerKamek("DUBBEL_SESSION_DETEKTERAD", "DUBBEL_SESSION_DETEKTERAD_mock");
+            }
+        };
+    })();
+
+    if (navigator.bluetooth && gameActive) {
+        setTimeout(() => {
+            showToast("📡 TIPS: ANVÄND TRÅDBUNDEN MUS FÖR LÄGRE LATENS", "#00ccff");
+        }, 10000);
+    }
+
+    if (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 2) {
+        document.addEventListener("DOMContentLoaded", () => {
+            triggerKamek("PROCESSOR_FÖR_SVAG", "PROCESSOR_FÖR_SVAG_mock");
+        });
+    }
+
+    if (!navigator.onLine) {
+        document.addEventListener("DOMContentLoaded", () => {
+            triggerKamek("OFFLINE_VID_START", "OFFLINE_VID_START_mock");
+        });
+    }
+
+    (function() {
+        try {
+            const canvasObj = document.createElement('canvas');
+            const gl = canvasObj.getContext('webgl') || canvasObj.getContext('experimental-webgl');
+            if (!gl) {
+                triggerKamek("GRAFIK_INKOMPATIBEL", "GRAFIK_INKOMPATIBEL_mock");
+            }
+        } catch (e) {
+            triggerKamek("GPU_ERROR", "GPU_ERROR_mock");
+        }
+    })();
+
+    const adTest = document.createElement('div');
+    adTest.innerHTML = '&nbsp;'; adTest.className = 'adsbox';
+    adTest.style.cssText = 'position:absolute;top:-1000px;';
+    document.body.appendChild(adTest);
+    setTimeout(() => {
+        if (adTest.offsetHeight === 0) showToast("🚫 ADBLOCK DETEKTERAD!", "orange");
+        adTest.remove();
+    }, 1500);
+
+    if (navigator.connection && (navigator.connection.effectiveType === '2g' || navigator.connection.saveData)) {
+        showToast("🌐 LÅNGSAM ANSLUTNING!", "orange");
+    }
+})();
+</script>
+
+<script>
+// --- MUSIC JUKEBOX ---
+const KAMEK_TRACKS = [
+    'bowsers_galaxy.mp3',
+    'gerudo_valley.mp3',
+    'gusty_garden.mp3',
+    'coconut_mall.mp3',
+    'pokemon_main.mp3',
+    'mario64_slider.mp3',
+    'mk64_rr.mp3',
+    'mk64_raceway.mp3'
+];
+
+const jukebox = new Audio();
+jukebox.loop = true;
+jukebox.volume = 0.5;
+
+let musicActive = false;
+
+const uiContainer = document.getElementById('audio-interface');
+const uiImg = document.getElementById('boombox-img');
+const uiCross = document.getElementById('status-cross');
+const uiInfo = document.getElementById('track-info');
+
+function playRandomTrack() {
+    const randomIdx = Math.floor(Math.random() * KAMEK_TRACKS.length);
+    const trackName = KAMEK_TRACKS[randomIdx];
+    jukebox.src = trackName;
+    
+    jukebox.play().then(() => {
+        uiInfo.innerText = t('now_playing') + trackName.replace('.mp3', '').toUpperCase();
+        uiInfo.style.display = 'block';
+        setTimeout(() => { uiInfo.style.display = 'none'; }, 3000);
+    }).catch(err => console.log("Interaktion krävs"));
+}
+
+function toggleMusic() {
+    musicActive = !musicActive;
+    
+    if (musicActive) {
+        if (!jukebox.src) playRandomTrack();
+        else jukebox.play();
+        
+        uiImg.style.opacity = "1";
+        uiImg.style.transform = "scale(1.1)";
+        uiCross.style.display = "none";
+        uiContainer.classList.add('active');
+        showToast(t('radio_on'), "var(--primary)");
+    } else {
+        jukebox.pause();
+        uiImg.style.opacity = "0.5";
+        uiImg.style.transform = "scale(0.9)";
+        uiCross.style.display = "flex";
+        uiContainer.classList.remove('active');
+        showToast(t('radio_off'), "#888");
+    }
+}
+
+uiContainer.addEventListener('click', toggleMusic);
+
+document.addEventListener('keydown', (e) => {
+    if (e.key.toLowerCase() === 'm') {
+        toggleMusic();
+    }
+});
+
+// Starta diagnostic checks samt hämta initialt språk
+function runDiagnosticChecks() {
+    // Sätt översättningar för analysskärmen direkt baserat på språk
+    document.getElementById('diag-ram').innerHTML = t('diag_ram');
+    document.getElementById('diag-cpu').innerHTML = t('diag_cpu');
+    document.getElementById('diag-os').innerHTML = t('diag_os');
+    document.getElementById('diag-disk').innerHTML = t('diag_disk');
+
+    let w = window.innerWidth || document.documentElement.clientWidth;
+    let h = window.innerHeight || document.documentElement.clientHeight;
+
+    // Fas 1: RAM-minne
+    setTimeout(() => {
+        let ramOk = true;
+        if (navigator.deviceMemory && navigator.deviceMemory < 4) {
+            ramOk = false;
+        }
+        
+        if (!ramOk) {
+            document.getElementById('diag-ram').innerHTML = t('diag_ram') + " <span style='color:red; font-weight:bold;'>" + t('diag_fail') + "</span>";
+            setTimeout(() => triggerDeviceLockdown(t('device_hw_ram_fail')), 1000);
+            return;
+        } else {
+            document.getElementById('diag-ram').innerHTML = t('diag_ram') + " <span style='color:#00ff00; font-weight:bold;'>" + t('diag_ok') + "</span>";
+            document.getElementById('diag-cpu').style.display = "block";
+        }
+
+        // Fas 2: Processorkärnor
+        setTimeout(() => {
+            let cpuOk = true;
+            if (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4) {
+                cpuOk = false;
+            }
+
+            if (!cpuOk) {
+                document.getElementById('diag-cpu').innerHTML = t('diag_cpu') + " <span style='color:red; font-weight:bold;'>" + t('diag_fail') + "</span>";
+                setTimeout(() => triggerDeviceLockdown(t('device_hw_cpu_cores_fail')), 1000);
+                return;
+            } else {
+                document.getElementById('diag-cpu').innerHTML = t('diag_cpu') + " <span style='color:#00ff00; font-weight:bold;'>" + t('diag_ok') + "</span>";
+                document.getElementById('diag-os').style.display = "block";
+            }
+
+            // Fas 3: OS och enhetsskydd
+            setTimeout(() => {
+                document.getElementById('diag-os').innerHTML = t('diag_os') + " <span style='color:#00ff00; font-weight:bold;'>" + t('diag_ok') + "</span>";
+                document.getElementById('diag-disk').style.display = "block";
+
+                // Fas 4: Hårddiskutrymme
+                setTimeout(() => {
+                    if (navigator.storage && navigator.storage.estimate) {
+                        navigator.storage.estimate().then(estimate => {
+                            let freeSpaceGB = (estimate.quota - estimate.usage) / (1024 * 1024 * 1024);
+                            if (freeSpaceGB < 4) {
+                                document.getElementById('diag-disk').innerHTML = t('diag_disk') + " <span style='color:red; font-weight:bold;'>" + t('diag_fail') + "</span>";
+                                setTimeout(() => triggerDeviceLockdown(t('device_hw_storage_fail')), 1000);
+                            } else {
+                                document.getElementById('diag-disk').innerHTML = t('diag_disk') + " <span style='color:#00ff00; font-weight:bold;'>" + t('diag_ok') + "</span>";
+                                setTimeout(() => {
+                                    document.getElementById('diagnostic-screen').style.display = 'none';
+                                }, 600);
+                            }
+                        }).catch(() => {
+                            document.getElementById('diag-disk').innerHTML = t('diag_disk') + " <span style='color:#00ff00; font-weight:bold;'>" + t('diag_ok') + "</span>";
+                            setTimeout(() => {
+                                document.getElementById('diagnostic-screen').style.display = 'none';
+                            }, 600);
+                        });
+                    } else {
+                        document.getElementById('diag-disk').innerHTML = t('diag_disk') + " <span style='color:#00ff00; font-weight:bold;'>" + t('diag_ok') + "</span>";
+                        setTimeout(() => {
+                            document.getElementById('diagnostic-screen').style.display = 'none';
+                        }, 600);
+                    }
+                }, 400);
+
+            }, 400);
+
+        }, 400);
+
+    }, 400);
+}
+
+// Starta på onload
+window.onload = function() {
+    initializeUIText();
+    runDiagnosticChecks();
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Station 24 - Memory Chaos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
+<script>
+// --- TOTAL BLOCKING FOR INTERNET EXPLORER ---
+(function() {
+    var isIE = !!document.documentMode;
+    var supportsModern = typeof window.Promise !== "undefined";
+
+    if (isIE || !supportsModern) {
+        var h = "";
+        h += '<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#8b0000;color:#fff;z-index:999999;display:block;text-align:center;padding-top:100px;font-family:sans-serif;">';
+        h += '<h1 style="font-size:50px;color:#ffcc00;">⚠ STOP! ⚠</h1>';
+        h += '<p style="font-size:24px;">YOUR BROWSER IS NOT SUPPORTED.</p>';
+        h += '<p style="max-width:600px;margin:20px auto;">Station 24 requires a modern browser like Chrome, Edge, or Firefox to function correctly and safely.</p>';
+        h += '<div style="margin-top:50px;font-weight:bold;color:#ffaa00;">SECURITY CREW: Psl631 denies access.</div>';
+        h += '</div>';
+        
+        document.write(h); 
+        if (window.stop) window.stop(); 
+        document.execCommand("Stop");
+        throw new Error("Application halted: Legacy browser.");
+    }
+})();
+</script>
+    <style>
+        html, body {
+            margin: 0; padding: 0; min-height: 100vh;
+            background-image: url('lanbit_bg.jfif'); background-size: cover;
+            background-position: center; background-attachment: fixed;
+            font-family: 'Luckiest Guy', cursive; color: white;
+            display: flex; flex-direction: column; align-items: center;
+            overflow-y: auto; transition: background-color 0.1s;
+        }
+
+        #start-screen, #end-screen {
+            background: rgba(0, 0, 0, 0.9); padding: 30px; border-radius: 30px;
+            margin: 30px auto; text-align: center; border: 8px solid #ffcc00;
+            max-width: 700px; z-index: 200;
+        }
+
+        #end-screen { display: none; position: fixed; top: 15%; }
+
+        .guide-box {
+            background: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 15px;
+            margin: 15px 0; text-align: left; font-size: 16px; line-height: 1.4;
+        }
+
+        .guide-box h2 { color: #ffcc00; margin-top: 0; text-align: center; font-size: 28px; }
+        .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .casual-info { border-left: 5px solid #00ff00; padding-left: 10px; }
+        .classic-info { border-left: 5px solid #ff3300; padding-left: 10px; }
+        
+        .how-to-play {
+            margin-top: 15px; border-top: 2px solid rgba(255,255,255,0.2); padding-top: 10px;
+        }
+
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
+
+        .toast {
+            background: rgba(0, 0, 0, 0.85); color: white; padding: 15px 25px;
+            border-radius: 10px; margin-top: 10px; border-left: 5px solid #ffcc00;
+            font-family: 'Luckiest Guy', cursive; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            animation: slideIn 0.5s, fadeOut 0.5s 4.5s forwards;
+        }
+
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+        input, select, button {
+            font-family: 'Luckiest Guy', cursive; font-size: 22px;
+            margin: 10px; padding: 10px; border-radius: 10px; border: none;
+        }
+
+        .btn-casual { background-color: #00ff00; color: black; cursor: pointer; }
+        .btn-classic { background-color: #ff3300; color: white; cursor: pointer; }
+        .btn-restart { background-color: #ffcc00; color: black; cursor: pointer; margin-top: 20px; }
+
+        #game-container { display: none; width: 95%; max-width: 1100px; margin: 20px auto; text-align: center; }
+        #game-board {
+            display: grid; gap: 15px; justify-content: center;
+            background: rgba(0, 0, 0, 0.5); padding: 25px;
+            border: 10px solid #333; border-radius: 20px; transition: all 0.2s;
+        }
+
+        .card {
+            width: 100px; height: 100px; background-image: url('lanbit.jpg');
+            background-size: contain; background-repeat: no-repeat; background-position: center;
+            background-color: #1a1a1a; cursor: pointer; border: 3px solid #fff;
+            border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden;
+        }
+
+        .card img { width: 100%; height: 100%; object-fit: contain; display: none; pointer-events: none; }
+        .card.flipped { background-image: none; background-color: #444; }
+        .card.flipped img { display: block; }
+
+        .frame-correct { border-color: #00ff00 !important; }
+        .frame-wrong { border-color: #ff0000 !important; }
+        .frame-warning { border-color: #ffff00 !important; }
+        .frame-danger { border-color: #ff0000 !important; }
+        #countdown { font-size: 180px; color: #ffcc00; position: fixed; top: 30%; z-index: 100; display: none; }
+    </style>
+</head>
+<body>
+<noscript>
+    <div style="
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        background: #000; color: #ff0000; z-index: 999999;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        text-align: center; font-family: 'Courier New', Courier, monospace; padding: 20px;
+    ">
+        <h1 style="font-size: clamp(30px, 10vw, 80px); border: 5px solid #ff0000; padding: 20px;">
+            SYSTEM ERROR: NO BRAIN FOUND
+        </h1>
+        <p style="font-size: 24px; margin-top: 30px; color: #fff; max-width: 800px;">
+            TRYING TO RUN STATION 24 WITHOUT JAVASCRIPT? <br>
+            THAT IS LIKE TRYING TO PLAY SUPER MARIO WITHOUT A CONTROLLER.
+        </p>
+        <div style="background: #330000; padding: 20px; margin-top: 20px; border-radius: 10px;">
+            <p style="color: #ffaa00; font-weight: bold;">
+                ACTIVATE JAVASCRIPT AND RELOAD THE PAGE, OR JUST GO TO SLEEP.
+            </p>
+        </div>
+        <p style="margin-top: 50px; opacity: 0.5;">
+            LOG: Security-Crew Psl631 has denied your access.
+        </p>
+    </div>
+</noscript>
+<div id="start-screen">
+    <h1>STATION 24 - MEMORY</h1>
+    
+    <div class="guide-box">
+        <h2>RULES & MODES</h2>
+        <div class="mode-grid">
+            <div class="casual-info">
+                <strong style="color:#00ff00">CASUAL</strong><br>
+                • mm.ss.cc (Counts up)[cite: 3]<br>
+                • Kamek is a normal PAIR[cite: 3]<br>
+                • No time pressure - just training!<br>
+                • Win gold coins!
+            </div>
+            <div class="classic-info">
+                <strong style="color:#ff3300">CLASSIC</strong><br>
+                • Timer (Down)[cite: 3]<br>
+                • Traps: Kamek, Bowser & NUKE[cite: 3]<br>
+                • Win the Star Prize!
+            </div>
+        </div>
+        <div class="how-to-play">
+            <strong style="color:#ffcc00">WARNING:</strong> In Extreme Mode, you can find the <strong>NUKE</strong>. It resets your moves and steals 20 seconds![cite: 3]
+        </div>
+    </div>
+
+    <input type="text" id="player-name" placeholder="TYPE YOUR NAME..."> 
+    <button onclick="toggleInstructions(true)" style="background: #00ccff; color: white; cursor: pointer; width: 80%; margin-bottom: 20px;">
+        📖 READ GAME INSTRUCTIONS
+    </button>
+
+<div id="instructions-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:1000; overflow-y:auto;">
+    <div style="background:#ffffff; border: 8px solid #ffcc00; width: 95%; max-width: 800px; margin: 20px auto; padding: 25px; border-radius: 15px; color: #333; font-family: Arial, Helvetica, sans-serif; line-height: 1.5; box-shadow: 0 0 50px rgba(0,0,0,0.5);">
+        
+        <span onclick="toggleInstructions(false)" style="float:right; font-size:45px; cursor:pointer; color:#8b0000; font-weight:bold; line-height: 30px;">&times;</span>
+        
+        <h2 style="color:#000; text-align:center; font-size: 28px; border-bottom: 4px solid #ffcc00; padding-bottom: 10px; margin-top: 0; text-transform: uppercase;">How do I play Lanbit Memory?</h2>
+        
+        <div style="font-size: 16px;">
+            <section style="background: #f0f8ff; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #007bff;">
+                <h3 style="margin-top: 0; color: #007bff;">🎮 HOW IT WORKS</h3>
+                <p><strong>1. Type your name:</strong> Start by registering your alias for the leaderboard.</p>
+                <p><strong>2. Flip cards:</strong> All cards have a <strong>Lanbit logo</strong> on the back. Click a logo to see the image.</p>
+                <p><strong>3. Find pairs:</strong> Click a second card. If the images match, they stay flipped. If they are different, they flip back after one second.</p>
+            </section>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <section style="border: 2px solid #28a745; padding: 15px; border-radius: 10px;">
+                    <h3 style="color: #28a745; margin-top: 0;">🟦 CASUAL (Training)</h3>
+                    <ul style="padding-left: 20px;">
+                        <li><strong>Time:</strong> Counts <strong>upwards</strong> from 00.00.00[cite: 3].</li>
+                        <li><strong>Traps:</strong> None. Kamek acts as a normal pair[cite: 3].</li>
+                        <li><strong>Goal:</strong> Fastest time wins the tournament!</li>
+                        <li><strong>Gold Coin:</strong> Win one if you get the rating "EXCELLENT!"[cite: 3].</li>
+                    </ul>
+                </section>
+
+                <section style="border: 2px solid #dc3545; padding: 15px; border-radius: 10px;">
+                    <h3 style="color: #dc3545; margin-top: 0;">🟥 CLASSIC (Challenge)</h3>
+                    <ul style="padding-left: 20px;">
+                        <li><strong>Time:</strong> Counts <strong>downwards</strong> (Timer). If time runs out, you lose[cite: 3].</li>
+                        <li><strong>Bonus:</strong> Every correct pair gives <strong>+5 seconds</strong>[cite: 3].</li>
+                        <li><strong>Traps:</strong> Kamek shuffles, Bowser deducts time, and NUKE is a disaster[cite: 3]!</li>
+                        <li><strong>Star:</strong> Win the star on EXTREME[cite: 3]!</li>
+                    </ul>
+                </section>
+            </div>
+
+            <div style="background: #fff3cd; padding: 15px; border-radius: 10px; margin-top: 20px; border-left: 8px solid #ffcc00; font-size: 14px;">
+                <strong>SECURITY:</strong> Security Crew <strong>Psl631</strong> is monitoring the station. No cheating (F12/Right-Click/Blur) – Kamek will lock the game immediately and laugh at you with <code>kamek.mp3</code>[cite: 3]!
+            </div>
+        </div>
+        
+        <button onclick="toggleInstructions(false)" style="background:#28a745; color:white; width:100%; margin-top: 20px; padding: 15px; font-size: 20px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; font-family: Arial, sans-serif;">I UNDERSTAND, START THE GAME!</button>
+    </div>
+</div>  <button class="open-settings-btn" onclick="openMediaPopup()">🎥 INSTÄLLNINGAR</button> <button class="open-settings-btn" onclick="window.location='index.html'">SVENSK VERSION</button>
+    <br>
+    <select id="difficulty">
+        <option value="16">EASY (16 CARDS)</option>
+        <option value="24">MEDIUM (24 CARDS)</option>
+        <option value="32">HARD (32 CARDS + KAMEK)</option>
+        <option value="48">HARDCORE (48 CARDS + EVERYTHING)</option>
+        <option value="64">EXTREME (64 CARDS + NUKE)</option>
+    </select>
+    <br>
+    <button class="btn-casual" onclick="prepareGame('casual')">START CASUAL</button>
+    <button class="btn-classic" onclick="prepareGame('classic')">START CLASSIC</button>
+<div id="leaderboard-container" style="margin-top: 20px; border-top: 2px solid #ffcc00; padding-top: 10px;">
+    <h3>🏆 LEADERBOARD (CASUAL)</h3>
+    <table id="leaderboard-table" style="width: 100%; font-size: 18px; border-collapse: collapse;">
+        <thead>
+            <tr style="color: #ffcc00;">
+                <th>POS</th>
+                <th>NAME</th>
+                <th>TIME</th>
+                <th>MOVES</th>
+            </tr>
+        </thead>
+        <tbody id="leaderboard-body">
+        </tbody>
+    </table>
+    <button onclick="clearLeaderboard()" style="font-size: 12px; background: red; color: white; margin-top: 10px;">CLEAR LIST</button>
+</div>
+</div>
+
+<div id="end-screen">
+    <h1 id="end-title"></h1>
+    <p id="end-message" style="font-size: 24px;"></p>
+    <button class="btn-restart" onclick="location.reload()">MENU</button>
+</div>
+
+<div id="countdown"></div>
+
+<div id="game-container">
+    <div id="stats-text" style="font-size: 28px; margin-bottom: 15px;">
+        PLAYER: <span id="display-name"></span> | 
+        MOVES: <span id="display-moves">0</span> | 
+        TIME: <span id="timer">00.00.00</span>
+    </div>
+    <div id="game-board"></div>
+</div>
+
+<script>
+    const ALL_IMAGES = ['360con.jfif', 'a.jfif','ac.jfif', 'bskal.jfif', 'and.jfif', 'ds.jfif', 'lurar.jfif', 'hdd.jfif', 'mk64.jfif','fia.jfif', 'ic3.jpg','ir.jpg','x2og.jpg', 'x2.jpg','sopbil.jfif','ksb.jfif', 'bandspelare.jfif', 'xbd.jfif','clock.jfif', 'vcr.jfif','crt2.jfif', 'crt3.jfif','tv.jfif', 'cd.jfif','cds.jfif','radio.jfif','gccrt.jfif', 'ps3.jfif', 'chess.jfif', 'yatzy.jfif', 'bse.jfif', 'monopol.jfif',  'cr.jfif', 'cr2.jfif', 'aaa.jfif', 'aa.jfif', '9v.jfif', 'dc.jfif', 'd10.jpg', 'gm.jpg', 'star.jpg', 'box.jpg', 'm.jpg', 'nb.jpg',  'ttr.jfif', 'br.jfif', 'ff.jpg', 'ps2crt.jfif', 'bamse.png', 'boo.jfif',  'kp.jfif',  'ck.jfif', 'vargen.jfif', 'mikro.jfif', 'bilar.jfif', 'pizzakartong.jfif',  'hb.jfif', 'nc.jfif', 'vk.jfif', 'gb.jfif', 'gd.jfif', 'kd.jfif', 'creeper2.jfif', '360conw.jfif', 'mario.jfif', 'yoshi.jfif', '360crt.jpg', '360.jfif', 'n64.jfif', 'crash.jpg', 'creeper.jfif', 'crt.jfif', 'crtm.jfif', 'dh.jfif', 'dh2.jfif', 'dhg.jfif', 'eluttag.jfif', 'fst.jfif', 'gb c.jfif', 'gc.jpg', 'gpc.jfif', 'gta v.jpg', 'hs.jfif', 'lb c.jfif', 'mc.jpg', 'mch.jfif', 'mus.jfif', 'mushroom.jfif', 'nes.jfif', 'pk.jfif', 'ps1.jfif', 'ps2.jfif', 'ps5c.jfif', 'ratt.jfif', 'rb.jfif', 'bus.jfif', 'rbr.jfif', 's2.jfif', 'shd.jfif', 'xbc.jfif', 'sonic.jfif', 'tgtbord.jfif', 'varmkorv.jfif', 'wii.jfif', 'x360.jpg', 'sonic.jpg'];
+    let timeLeft, timeMilliseconds, moveCount, timerInterval, flippedCards, matchedPairs, isProcessing, totalPairsNeeded, selectedMode, currentPlayerName;
+
+    function displayLeaderboard() {
+        const scores = JSON.parse(localStorage.getItem('casualScores')) || [];
+        const tbody = document.getElementById('leaderboard-body');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        scores.forEach((score, index) => {
+            const row = tbody.insertRow();
+            row.innerHTML = `<td>${index + 1}</td><td>${score.name}</td><td>${formatCasualTime(score.time)}</td><td>${score.moves}</td>`;
+        });
+    }
+
+    function toggleInstructions(show) {
+        document.getElementById('instructions-modal').style.display = show ? 'block' : 'none';
+    }
+
+    window.onclick = function(event) {
+        if (event.target == document.getElementById('instructions-modal')) toggleInstructions(false);
+    }
+
+    function saveCasualTime(name, time, moves) {
+        let scores = JSON.parse(localStorage.getItem('casualScores')) || [];
+        scores.push({ name, time, moves });
+        scores.sort((a, b) => a.time - b.time || a.moves - b.moves);
+        localStorage.setItem('casualScores', JSON.stringify(scores.slice(0, 5)));
+        displayLeaderboard();
+    }
+
+    function clearLeaderboard() {
+        if(confirm("Do you really want to clear the Casual leaderboard?")) {
+            localStorage.removeItem('casualScores');
+            displayLeaderboard();
+        }
+    }
+
+    function triggerKamekLock(reason) {
+        isProcessing = true;
+        if (timerInterval) clearInterval(timerInterval);
+        playAudio('kamek.mp3'); 
+        const lockOverlay = document.createElement('div');
+        lockOverlay.id = 'kamek-lock';
+        lockOverlay.style = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #4b0082; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 40px 20px; text-align: center; font-family: 'Luckiest Guy', cursive; color: #ffcc00; overflow-y: auto; box-sizing: border-box;`;
+        lockOverlay.innerHTML = `<div style="background: #6a0dad; padding: 20px; border: 5px solid #ffcc00; border-radius: 50%; display: inline-block;"><img src="kamek.jfif" alt="Kamek" style="width: 250px; height: 250px; object-fit: contain;"></div><h1 style="font-size: clamp(40px, 8vw, 60px); margin-top: 20px;">HIII-HEEE-HEEE!</h1><p style="font-size: 30px; color: white; max-width: 800px;">DID YOU JUST TRY TO CHEAT, ${currentPlayerName ? currentPlayerName.toUpperCase() : 'CHEATER'}?</p><p style="font-size: 24px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; max-width: 600px;">${reason}</p><button onclick="location.reload()" style="background: #ffcc00; color: black; padding: 20px 40px; margin: 30px 0; border-radius: 15px; cursor: pointer; font-size: 24px; border: none; font-family: 'Luckiest Guy', cursive;">FORGIVE ME KAMEK...</button>`;
+        document.body.style.overflow = 'hidden'; 
+        document.body.appendChild(lockOverlay);
+    }
+
+    document.addEventListener('contextmenu', e => { e.preventDefault(); if (gameState === 'PLAYING') triggerKamekLock("RIGHT-CLICK IS FORBIDDEN AT STATION 24!"); });
+    document.addEventListener('keydown', e => { if (e.key === "F12" || (e.ctrlKey && e.shiftKey && ["I","J","C"].includes(e.key)) || (e.ctrlKey && e.key === "U")) { e.preventDefault(); if (gameState === 'PLAYING') triggerKamekLock("DO NOT TRY TO LOOK BEHIND THE CURTAIN!"); } });
+
+    function showToast(message, color = "#ffcc00") {
+        const container = document.getElementById('toast-container') || createToastContainer();
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.style.borderLeft = `8px solid ${color}`;
+        toast.innerText = message;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 5000);
+    }
+
+    function createToastContainer() {
+        const div = document.createElement('div');
+        div.id = 'toast-container';
+        document.body.appendChild(div);
+        return div;
+    }
+
+    window.addEventListener('offline', () => showToast("⚠️ INTERNET DISCONNECTED! CANNOT CONNECT TO SERVER.", "#ff0000"));
+    window.addEventListener('online', () => showToast("✅ CONNECTION RESTORED.", "#00ff00"));
+
+    if ('getBattery' in navigator) {
+        navigator.getBattery().then(battery => {
+            const updateBattery = () => { if (!battery.charging) showToast("🔋 WARNING: LOW BATTERY! GAME RUNNING ON BACKUP POWER.", "#ffaa00"); };
+            battery.addEventListener('levelchange', updateBattery);
+            battery.addEventListener('chargingchange', updateBattery);
+        });
+    }
+
+    window.addEventListener('blur', () => {
+        if (gameState === 'PLAYING') {
+            showToast("🔍 GAME LOST FOCUS! RETURN WITHIN 5 SECONDS...", "#ffcc00");
+            blurTimeout = setTimeout(() => triggerKamekLock("YOU WERE GONE TOO LONG! TRYING TO LOOK UP ANSWERS?"), 5000);
+        }
+    });
+
+    window.addEventListener('focus', () => { if (typeof blurTimeout !== 'undefined') { clearTimeout(blurTimeout); showToast("✅ FOCUS RESTORED. GAME CONTINUES.", "#00ff00"); } });
+
+    let idleTimer, lockTimer;
+    function resetIdleTimers() {
+        clearTimeout(idleTimer); clearTimeout(lockTimer);
+        if (gameState !== 'PLAYING') return;
+        idleTimer = setTimeout(() => showToast("💤 HELLO? THE TOURNAMENT DOESN'T WAIT! ACT BEFORE KAMEK LOCKS YOU.", "#ffaa00"), 30000); 
+        lockTimer = setTimeout(() => triggerKamekLock("USER TIMEOUT: YOU WERE INACTIVE FOR TOO LONG!"), 60000);
+    }
+
+    document.addEventListener('mousedown', resetIdleTimers);
+    document.addEventListener('keydown', resetIdleTimers);
+    document.addEventListener('mousemove', resetIdleTimers);
+
+    function formatCasualTime(ms) {
+        let min = Math.floor(ms / 60000);
+        let sec = Math.floor((ms % 60000) / 1000);
+        let cs = Math.floor((ms % 1000) / 10);
+        return `${String(min).padStart(2,'0')}.${String(sec).padStart(2,'0')}.${String(cs).padStart(2,'0')}`;
+    }
+
+    function prepareGame(mode) {
+        selectedMode = mode;
+        currentPlayerName = document.getElementById('player-name').value.trim() || "Guest";
+        document.getElementById('start-screen').style.display = 'none';
+        const cd = document.getElementById('countdown');
+        cd.style.display = 'block';
+        let count = 3; cd.innerText = count;
+        const countInt = setInterval(() => {
+            count--; cd.innerText = count;
+            if(count === 0) { clearInterval(countInt); cd.style.display = 'none'; initGame(currentPlayerName); }
+        }, 1000);
+    }
+
+    function initGame(name) {
+        gameState = 'PLAYING';
+        document.getElementById('display-name').innerText = name.toUpperCase();
+        document.getElementById('game-container').style.display = 'block';
+        moveCount = 0; matchedPairs = 0; flippedCards = []; isProcessing = false;
+        document.getElementById('display-moves').innerText = "0";
+        const diff = parseInt(document.getElementById('difficulty').value);
+        const board = document.getElementById('game-board');
+        board.innerHTML = ''; board.className = '';
+        board.style.gridTemplateColumns = `repeat(${diff >= 32 ? 8 : 4}, 100px)`;
+
+        if (selectedMode === 'classic') {
+            timeLeft = (diff === 16) ? 30 : (diff === 24) ? 45 : (diff === 32) ? 60 : (diff === 48) ? 90 : 120;
+            document.getElementById('timer').innerText = timeLeft;
+            timerInterval = setInterval(() => {
+                timeLeft--; 
+                document.getElementById('timer').innerText = timeLeft;
+                if(timeLeft < 10 && timeLeft > 0) playAudio('tick.mp3');
+                if(timeLeft <= 5) board.className = 'frame-danger';
+                else if(timeLeft <= 10) board.className = 'frame-warning';
+                if(timeLeft <= 0) endGame(false);
+            }, 1000);
+        } else {
+            timeMilliseconds = 0;
+            timerInterval = setInterval(() => {
+                timeMilliseconds += 10;
+                document.getElementById('timer').innerText = formatCasualTime(timeMilliseconds);
+            }, 10);
+        }
+
+        let numPairs = diff / 2; totalPairsNeeded = numPairs;
+        let deck = []; let tempPool = [...ALL_IMAGES];
+        for(let i=0; i<numPairs; i++) {
+            if(tempPool.length === 0) tempPool = [...ALL_IMAGES];
+            let img = tempPool.splice(Math.floor(Math.random()*tempPool.length), 1)[0];
+            deck.push(img, img);
+        }
+
+        if(selectedMode === 'classic') {
+            if(diff >= 32) { deck[deck.length-1] = 'KAMEK'; totalPairsNeeded--; }
+            if(diff >= 48) { deck[deck.length-2] = 'BOWSER'; totalPairsNeeded--; }
+            if(diff === 64) { deck[deck.length-3] = 'KAMEK'; deck[deck.length-4] = 'NUKE'; totalPairsNeeded -= 2; }
+        } else {
+            deck[deck.length-1] = 'KAMEK'; deck[deck.length-2] = 'KAMEK';
+        }
+
+        deck.sort(() => Math.random() - 0.5).forEach(item => {
+            const card = document.createElement('div'); card.className = 'card'; card.dataset.value = item;
+            const img = document.createElement('img'); img.src = item === 'KAMEK' ? 'kamek.jfif' : item === 'BOWSER' ? 'bowser.jfif' : item === 'NUKE' ? 'nuke.png' : item;
+            card.appendChild(img); card.onclick = () => flipCard(card); board.appendChild(card);
+        });
+    }
+
+    function flipCard(card) {
+        if (isProcessing || card.classList.contains('flipped')) return;
+        card.classList.add('flipped');
+        if (selectedMode === 'classic') {
+            if (card.dataset.value === 'KAMEK') { isProcessing = true; playAudio('kamek.mp3'); triggerFlash('purple'); setTimeout(shuffleBoard, 1000); return; }
+            if (card.dataset.value === 'BOWSER') { isProcessing = true; playAudio('bowser_roar.mp3'); timeLeft -= 5; triggerFlash('red'); setTimeout(() => { card.classList.remove('flipped'); isProcessing = false; }, 1000); return; }
+            if (card.dataset.value === 'NUKE') { isProcessing = true; playAudio('nuke.mp3'); timeLeft -= 20; moveCount = 0; document.getElementById('display-moves').innerText = "0"; triggerFlash('yellow'); setTimeout(() => { card.classList.remove('flipped'); isProcessing = false; }, 1200); return; }
+        }
+        flippedCards.push(card);
+        if (flippedCards.length === 2) {
+            isProcessing = true; moveCount++; document.getElementById('display-moves').innerText = moveCount;
+            const [c1, c2] = flippedCards;
+            if (c1.dataset.value === c2.dataset.value) {
+                playAudio(c1.dataset.value === 'KAMEK' ? 'kamek.mp3' : 'pling.mp3');
+                matchedPairs++; flippedCards = []; isProcessing = false;
+                if(selectedMode === 'classic') timeLeft += 5;
+                if (matchedPairs >= totalPairsNeeded) endGame(true);
+            } else {
+                playAudio('boooop.mp3');
+                setTimeout(() => { c1.classList.remove('flipped'); c2.classList.remove('flipped'); flippedCards = []; isProcessing = false; }, 1000);
+            }
+        }
+    }
+
+    function triggerFlash(color) {
+        const old = document.body.style.backgroundColor; document.body.style.backgroundColor = color;
+        setTimeout(() => document.body.style.backgroundColor = old, 500);
+    }
+
+    function shuffleBoard() {
+        const board = document.getElementById('game-board');
+        Array.from(board.children).forEach(c => c.classList.remove('flipped'));
+        setTimeout(() => { for (let i = board.children.length; i >= 0; i--) board.appendChild(board.children[Math.random() * i | 0]); flippedCards = []; isProcessing = false; }, 500);
+    }
+
+    function endGame(won) {
+        gameState = 'ENDED';
+        clearInterval(timerInterval);
+        const screen = document.getElementById('end-screen'); screen.style.display = 'block';
+        const pairs = parseInt(document.getElementById('difficulty').value)/2;
+        const eff = moveCount / pairs;
+        if (selectedMode === 'casual') saveCasualTime(currentPlayerName, timeMilliseconds, moveCount);
+        let res;
+        if (!won && selectedMode === 'classic') res = {t:"TERRIBLE", s:"mk64_loser.wav", msg:"MK64 LOSER - GO TO SLEEP![cite: 3]"};
+        else {
+            if (eff < 2.0) res = {t:"EXCELLENT!", s:"yay.mp3", msg:"LEGENDARY! THE GOLD COIN IS YOURS![cite: 3]"};
+            else if (eff < 2.5) res = {t:"GOOD!", s:"pling.mp3", msg:"PRETTY GOOD, BUT CAN YOU DO BETTER?[cite: 3]"};
+            else if (eff < 3.0) res = {t:"AVERAGE", s:"boooop.mp3", msg:"WAS THAT ALL YOU HAD?[cite: 3]"};
+            else if (eff < 4.0) res = {t:"BAD", s:"sad_trombone.mp3", msg:"WORSE THAN A GOOMBA![cite: 3]"};
+            else res = {t:"TERRIBLE", s:"mk64_loser.wav", msg:"TOTAL FAILURE - RESIGN![cite: 3]"};
+        }
+        playAudio(res.s);
+        document.getElementById('end-title').innerText = res.t;
+        document.getElementById('end-title').style.color = (won || eff < 2.5) ? "#00ff00" : "#ff0000";
+        document.getElementById('end-message').innerHTML = `${res.msg}<br>Time: ${selectedMode === 'casual' ? formatCasualTime(timeMilliseconds) : timeLeft+'s'}<br>Moves: ${moveCount}`;
+    }
+
+    function playAudio(f) { new Audio(f).play().catch(()=>{}); }
+</script>
+</body>
+</html>

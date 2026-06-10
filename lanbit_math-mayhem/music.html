@@ -1,0 +1,81 @@
+<div id="audio-interface" style="position: fixed; bottom: 20px; right: 20px; z-index: 99999; cursor: pointer; user-select: none;">
+    <div id="boombox-container" style="position: relative; width: 80px; height: 80px;">
+        <img src="bandspelare.jfif" id="boombox-img" alt="Musik" style="width: 100%; height: 100%; border-radius: 12px; border: 3px solid #ffcc00; box-shadow: 0 0 20px rgba(0,0,0,0.8); opacity: 0.5; transform: scale(0.9); transition: all 0.3s;">
+        
+        <div id="status-cross" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); border-radius: 12px;">
+            <span style="color: #ff0000; font-size: 60px; font-weight: bold; text-shadow: 2px 2px 4px #000;">✕</span>
+        </div>
+    </div>
+    <div id="track-info" style="position: absolute; bottom: 90px; right: 0; background: rgba(0,0,0,0.8); color: #ffcc00; padding: 5px 10px; border-radius: 5px; font-size: 12px; font-family: monospace; white-space: nowrap; display: none;">
+        SPELAR: INGET
+    </div>
+</div>
+
+<script>
+// --- KONFIGURATION ---
+const KAMEK_TRACKS = [
+    'bowsers_galaxy.mp3',
+    'gerudo_valley.mp3',
+    'gusty_garden.mp3',
+    'coconut_mall.mp3',
+    'pokemon_main.mp3',
+    'mario64_slider.mp3',
+    'mk64_rr.mp3',
+    'mk64_raceway.mp3'
+];
+
+const jukebox = new Audio();
+jukebox.loop = true;
+jukebox.volume = 0.5; // Balanserad volym
+
+let musicActive = false; // MUTAD SOM STANDARD
+
+const uiContainer = document.getElementById('audio-interface');
+const uiImg = document.getElementById('boombox-img');
+const uiCross = document.getElementById('status-cross');
+const uiInfo = document.getElementById('track-info');
+
+// Funktion för att slumpa och starta musik
+function playRandomTrack() {
+    const randomIdx = Math.floor(Math.random() * KAMEK_TRACKS.length);
+    const trackName = KAMEK_TRACKS[randomIdx];
+    jukebox.src = trackName;
+    
+    jukebox.play().then(() => {
+        uiInfo.innerText = "SPELAR: " + trackName.replace('.mp3', '').toUpperCase();
+        uiInfo.style.display = 'block';
+        setTimeout(() => { uiInfo.style.display = 'none'; }, 3000);
+    }).catch(err => console.log("Interaktion krävs"));
+}
+
+// Växla ljud på/av
+function toggleMusic() {
+    musicActive = !musicActive;
+    
+    if (musicActive) {
+        // Sätt på musik
+        if (!jukebox.src) playRandomTrack();
+        else jukebox.play();
+        
+        uiImg.style.opacity = "1";
+        uiImg.style.transform = "scale(1.1)";
+        uiCross.style.display = "none";
+    } else {
+        // Tysta musik
+        jukebox.pause();
+        uiImg.style.opacity = "0.5";
+        uiImg.style.transform = "scale(0.9)";
+        uiCross.style.display = "flex";
+    }
+}
+
+// Lyssnare för klick
+uiContainer.addEventListener('click', toggleMusic);
+
+// Lyssnare för tangentbord "M"
+document.addEventListener('keydown', (e) => {
+    if (e.key.toLowerCase() === 'm') {
+        toggleMusic();
+    }
+});
+</script>

@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KLICK-KAOS | LANbit Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Fredoka+One&display=swap" rel="stylesheet">
+    <script>
+    (function() {
+        var isAncient = false;
+        var reason = "";
+
+        // Kolla efter moderna funktioner (ES6+)
+        // Om dessa saknas är webbläsaren för gammal för LANbit KLICK!
+        try {
+            // Vi testar om webbläsaren förstår "eval" med modern syntax
+            eval("var test = function(a) { if(a === void 0) a = 1; const {b} = {b:2}; let c = 'd'; };");
+        } catch (e) {
+            isAncient = true;
+            reason = "DIN WEBBLÄSARE TILLHÖR ETT MUSEUM. Din teknik är så gammal att den tror att 'Gangnam Style' fortfarande är top 1 på listan.";
+        }
+
+        // Extra koll för Internet Explorer specifikt
+        if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0) {
+            isAncient = true;
+            reason = "INTERNET EXPLORER? Min mormor ringde, hon vill ha tillbaka sin webbläsare från 1995. Skaffa en riktig dator.";
+        }
+
+        if (isAncient) {
+            // Vi skriver över hela sidan direkt med "Classic JS" för att blockera allt
+            window.onload = function() {
+                document.body.innerHTML = 
+                    '<div style="background:#050505; color:#ff0033; height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; font-family:sans-serif; padding:20px; border:20px solid #ff0033; box-sizing:border-box;">' +
+                        '<h1 style="font-size:5rem; margin:0;">STENÅLDERS-VARNING!</h1>' +
+                        '<p style="font-size:2rem; max-width:800px; text-transform:uppercase;">' + reason + '</p>' +
+                        '<div style="background:#222; padding:20px; border-radius:10px; margin-top:20px; border:2px dashed #f00;">' +
+                            '<strong>LOGG:</strong> > Browser_Status: CRITICAL_FAILURE<br>' +
+                            '> Action: Access_Denied_To_Peasant_Tech' +
+                        '</div>' +
+                        '<p style="margin-top:30px; color:#666;">Uppgradera till Chrome, Firefox eller Edge - eller lämna LANet i skam.</p>' +
+                    '</div>';
+                document.body.style.overflow = "hidden";
+            };
+            // Stoppar resterande script från att ens försöka ladda
+            if (window.stop) window.stop();
+        }
+    })();
+</script>
+    <style>
+        :root {
+            --primary: #ff006e;
+            --secondary: #3a86ff;
+            --warning: #ffbe0b;
+            --danger: #fb5607;
+            --success: #23d5ab;
+        }
+
+        body {
+            margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh;
+            font-family: 'Fredoka One', sans-serif;
+            background: url('lanbit_bg.jfif') no-repeat center center fixed;
+            background-size: cover; background-color: #111;
+            overflow: hidden;
+        }
+
+        /* TOAST SYSTEM */
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+        .toast {
+            background: rgba(0, 0, 0, 0.9); color: white; padding: 15px 20px;
+            border-radius: 12px; margin-bottom: 8px; border-left: 6px solid var(--secondary);
+            font-size: 0.9rem; box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+            animation: slideIn 0.3s ease-out; min-width: 250px;
+        }
+        .toast.error { border-left-color: var(--danger); }
+        .toast.warning { border-left-color: var(--warning); }
+        .toast.success { border-left-color: var(--success); }
+
+        @keyframes slideIn { from { transform: translateX(110%); } to { transform: translateX(0); } }
+
+        /* GAME UI */
+        #game-container {
+            background: rgba(255, 255, 255, 0.94); padding: 35px; border-radius: 40px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6); text-align: center; width: 380px;
+            border: 6px solid #000; position: relative; z-index: 10;
+        }
+
+        h1 { font-family: 'Bangers', cursive; font-size: 3.8rem; margin: 0; color: var(--primary); text-shadow: 3px 3px 0px #000; }
+
+        input {
+            padding: 12px; font-size: 1.2rem; border-radius: 15px; border: 3px solid #333;
+            width: 85%; margin: 20px 0; text-align: center; font-family: 'Fredoka One', sans-serif;
+        }
+
+        button { cursor: pointer; font-family: 'Bangers', cursive; border: 3px solid #000; transition: all 0.1s; }
+
+        #start-btn { background: var(--secondary); color: white; font-size: 2.2rem; padding: 10px 50px; border-radius: 50px; }
+        #click-btn {
+            background: var(--warning); font-size: 3.5rem; width: 180px; height: 180px;
+            border-radius: 50%; display: none; margin: 20px auto; box-shadow: 0 8px 0 #b08d00;
+        }
+        #click-btn:active { transform: translateY(4px); box-shadow: 0 4px 0 #b08d00; }
+
+        #stats { display: none; font-size: 1.6rem; margin-bottom: 10px; }
+        #leaderboard { margin-top: 20px; font-size: 0.85rem; text-align: left; border-top: 3px dashed #000; padding-top: 15px; }
+        .hidden { display: none !important; }
+
+        /* KAMEK OVERLAY */
+        #kamek-screen {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 10000; color: white; text-align: center;
+        }
+        #kamek-img {
+            width: 200px; /* Kamek är nu mindre */
+            height: auto;
+            margin-bottom: 20px;
+            border: 4px solid var(--danger);
+            border-radius: 20px;
+        }
+        #kamek-screen h2 { font-family: 'Bangers', cursive; font-size: 3.5rem; color: #ff0000; margin: 0; }
+        
+        /* Scrollbar varningsruta */
+        #cheat-log {
+            width: 300px;
+            max-height: 100px;
+            overflow-y: auto;
+            background: rgba(255, 0, 0, 0.2);
+            border: 2px solid var(--danger);
+            padding: 10px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 0.9rem;
+            text-align: left;
+            border-radius: 10px;
+        }
+        #cheat-log::-webkit-scrollbar { width: 8px; }
+        #cheat-log::-webkit-scrollbar-thumb { background: var(--danger); border-radius: 10px; }
+
+        .reload-btn {
+            background: var(--success);
+            color: black;
+            font-size: 1.5rem;
+            padding: 10px 30px;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+#compat-shield {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: #0a0a0a; color: #ff0033; z-index: 20000;
+    display: none; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center; font-family: 'Fredoka One', sans-serif;
+}
+.warning-icon { font-size: 5rem; margin-bottom: 20px; }
+.compat-box {
+    border: 3px solid #ff0033; padding: 30px; border-radius: 20px;
+    background: rgba(255, 0, 0, 0.1); width: 80%; max-width: 500px;
+}
+#compat-shield h2 { font-family: 'Bangers'; font-size: 3rem; margin: 0; }
+.device-log {
+    background: #000; color: #0f0; padding: 10px; margin-top: 20px;
+    font-family: monospace; font-size: 0.8rem; border-radius: 5px; text-align: left;
+}
+    </style>
+</head>
+<body oncontextmenu="return false;">
+<div id="id-compat-shield" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:#0a0a0a; color:#ff0033; z-index:20000; flex-direction:column; justify-content:center; align-items:center; text-align:center; font-family:'Fredoka One', sans-serif;">
+    <div style="border:3px solid #ff0033; padding:30px; border-radius:20px; background:rgba(255,0,0,0.1); width:85%; max-width:600px;">
+        <div style="font-size:5rem; margin-bottom:10px;">⚠️</div>
+        <h2 style="font-family:'Bangers'; font-size:3.5rem; margin:0;">ÅTKOMST NEKAD</h2>
+        
+        <p id="mockery-text" style="font-size:1.4rem; color:#fff; margin:20px 0; text-transform:uppercase;"></p>
+        
+        <div style="background:#000; color:#0f0; padding:15px; font-family:monospace; font-size:0.85rem; border-radius:10px; text-align:left; border:1px solid #333;">
+            <div style="color:#555; margin-bottom:5px;">[SYSTEM_LOG]</div>
+            > DETECTED_DEVICE: <span id="detected-device" style="color:#fff;">Oidentifierad</span><br>
+            > DETECTED_BROWSER: <span id="detected-browser" style="color:#fff;">Okänd</span><br>
+            <span id="system-error-log" style="color:#f00;">> CRITICAL: Hardware architecture not supported.</span>
+        </div>
+        
+        <p style="color:#555; font-size:0.7rem; margin-top:15px;">LANbit Anti-Peasant System v2.6.4</p>
+    </div>
+</div>
+
+<div id="toast-container"></div>
+
+<div id="kamek-screen">
+    <img id="kamek-img" src="kamek.jfif" alt="Kamek">
+    <h2>SESSION LÅST!</h2>
+    <div id="cheat-log">
+        <strong>VARNINGSLOGG:</strong><br>
+        <span id="lock-reason">Ingen anledning angiven.</span>
+    </div>
+    <button class="reload-btn" onclick="location.reload()">LADDA OM SPELET</button>
+</div>
+
+<audio id="kamek-audio" src="kamek.mp3" loop></audio>
+
+<div id="ad-tester" class="ad-zone ads banner-ad" style="position:absolute; width:1px; height:1px; left:-999px;"></div>
+
+<div id="game-container">
+    <h1>LANbit KLICK!</h1>
+
+    <div id="setup">
+        <input type="text" id="player-name" placeholder="DITT NAMN (TOMT = GÄST)" maxlength="12">
+        <br>
+        <button id="start-btn">STARTA!</button>
+    </div>
+
+    <div id="stats">
+        TID: <span id="timer" style="color:var(--primary)">10</span>s | KLICK: <span id="current-score">0</span>
+    </div>
+
+    <button id="click-btn">KLICKA!</button>
+
+    <div id="result" class="hidden">
+        <h2 id="final-msg">RESULTAT</h2>
+        <button id="reset-btn" style="padding:10px 25px; border-radius:15px; font-size:1.2rem;">KÖR IGEN</button>
+    </div>
+
+    <div id="leaderboard">
+        <strong>TOPP 5 (LAN):</strong>
+        <div id="highscores">Inga poäng än...</div>
+    </div>
+</div>
+
+<script>
+    let score = 0, timeLeft = 10, timerId = null, playerName = "", isCheating = false;
+
+window.addEventListener('load', () => {
+    const ua = navigator.userAgent;
+    const shield = document.getElementById('id-compat-shield');
+    const mock = document.getElementById('mockery-text');
+    const devInfo = document.getElementById('detected-device');
+    const browInfo = document.getElementById('detected-browser');
+
+    let isBlocked = false;
+    let reason = "";
+
+    // 1. Detektering av enheter och webbläsare
+    if (/iPhone|iPad|iPod/.test(ua)) {
+        reason = "Apple-entusiast? Det här är ett spel för gamers, inte för folk som köper statusprylar. Skaffa en PC.";
+        devInfo.innerText = "iProduct (Overpriced)";
+    } else if (/Android/.test(ua)) {
+        reason = "En Android-telefon? Att klicka på en smutsig glasskärm räknas inte som gaming. Gå hem.";
+        devInfo.innerText = "Android Handheld (Pocket Toy)";
+    } else if (/Xbox|PlayStation|Nintendo/.test(ua)) {
+        reason = "Konsol-bonde detekterad. Webbläsaren i din låda är sämre än en brödrost. Använd en mus som en vuxen.";
+        devInfo.innerText = "Game Console (Peasant Box)";
+    } else if (/Tesla|Automotive/.test(ua)) {
+        reason = "Sitter du i en bil? Fokusera på vägen istället för att försöka fuska på LANbit. Pinsamt.";
+        devInfo.innerText = "Vehicle Computer (Drive-by Clicker)";
+    } else if (/Smart-TV|Tizen|WebOS/.test(ua)) {
+        reason = "Försöker du spela på en TV? Vad är nästa steg, klicka med fjärrkontrollen? Pinsamt.";
+        devInfo.innerText = "Smart TV (Living Room Noob)";
+    } else if (/Trident|MSIE/.test(ua)) {
+        reason = "Internet Explorer? Vi ringer från 2026 och meddelar att din webbläsare tillhör ett museum.";
+        browInfo.innerText = "Internet Explorer (Archaeological Find)";
+        isBlocked = true;
+    }
+
+    // 2. Extra check för touch-enheter som inte är laptops
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    const isSmallScreen = window.innerWidth < 1024;
+
+    if (reason || (isTouch && isSmallScreen)) {
+        isBlocked = true;
+        if (!reason) reason = "Dina specifikationer matchar en mobil eller padda. Endast Master Race (PC) tillåts här.";
+    }
+
+    // 3. Visa skölden om enheten är blockerad
+    if (isBlocked) {
+        shield.style.display = 'flex';
+        mock.innerText = reason;
+        
+        // Fyll i loggen om den inte redan är fylld
+        if (devInfo.innerText === "Oidentifierad") devInfo.innerText = "Mobile/Handheld Device";
+        if (browInfo.innerText === "Okänd") {
+            const browserName = (ua.match(/(firefox|msie|chrome|safari|trident)/ig) || ["Unknown"])[0];
+            browInfo.innerText = browserName;
+        }
+
+        // Stoppa spelet helt
+        window.stop();
+        throw new Error("ACCESS_DENIED: Unsuitable Hardware.");
+    }
+});
+
+
+    // --- TOAST SYSTEM ---
+    function showToast(msg, type = 'info') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerText = msg;
+        container.appendChild(toast);
+        setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 4000);
+    }
+
+    // --- ANTI-FUSK ENGINE ---
+    function triggerKamek(reason) {
+        if (isCheating) return;
+        isCheating = true;
+        clearInterval(timerId);
+        
+        document.getElementById('lock-reason').innerText = "ANLEDNING: " + reason;
+        document.getElementById('kamek-screen').style.display = 'flex';
+        document.getElementById('kamek-audio').play().catch(e => console.log("Ljud blockerat"));
+        
+        document.getElementById('game-container').innerHTML = "<h1 style='color:red'>SESSION LÅST</h1><p>Otillåten aktivitet detekterad.</p>";
+        showToast("KRITISKT FEL: " + reason, "error");
+    }
+
+    // Upptäck flikbyte/minimering
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden && timerId) triggerKamek("Flikbyte/Minimering detekterad under pågående spel.");
+    });
+
+    // Upptäck om fönstret tappar fokus
+    window.addEventListener('blur', () => {
+        if (timerId) triggerKamek("Fönstret tappade fokus (klick utanför spelet).");
+    });
+
+    // Blockera högerklick och trigga Kamek
+window.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    if (timerId) triggerKamek("Högerklick detekterat (Försök till Inspektera).");
+});
+
+// Blockera F12, Ctrl+Shift+I, Ctrl+U, ESC och Spara-kommandon
+window.addEventListener('keydown', (e) => {
+    if (e.keyCode == 123) { // F12
+        e.preventDefault();
+        triggerKamek("F12 (Developer Tools) detekterat.");
+    } else if (e.key === "Escape") { // ESC (Pausförsök)
+        e.preventDefault();
+        if (timerId) triggerKamek("Escape-tangenten trycktes (Pausförsök detekterat).");
+    } else if (e.ctrlKey && e.shiftKey && e.keyCode == 73) { // Ctrl+Shift+I
+        e.preventDefault();
+        triggerKamek("Ctrl+Shift+I (Inspektera) detekterat.");
+    } else if (e.ctrlKey && (e.keyCode == 85 || e.keyCode == 83 || e.keyCode == 80)) { 
+        // Ctrl+U (Källkod), Ctrl+S (Spara), Ctrl+P (Print)
+        e.preventDefault();
+        triggerKamek("System-genväg (Ctrl+U/S/P) detekterad.");
+    }
+});
+
+    // --- SYSTEMVARNINGAR ---
+    window.addEventListener('offline', () => showToast("SYSTEM: Internetanslutning bruten!", "error"));
+    window.addEventListener('online', () => showToast("SYSTEM: Anslutning återställd.", "success"));
+
+    window.onload = () => {
+        const adTester = document.getElementById('ad-tester');
+        if (!adTester || adTester.offsetParent === null || adTester.offsetHeight === 0) {
+            showToast("VARNING: AdBlocker detekterad.", "warning");
+        }
+    };
+
+    const storageAvailable = (() => {
+        try { localStorage.setItem('t', 't'); localStorage.removeItem('t'); return true; }
+        catch(e) { showToast("SYSTEM: Kan inte skriva till disk!", "error"); return false; }
+    })();
+
+// --- AVANCERAD SYSTEMÖVERVAKNING ---
+
+// 1. Batterikontroll (Kräver laptop)
+if (navigator.getBattery) {
+    navigator.getBattery().then(function(battery) {
+        function checkBattery() {
+            if (!battery.charging) {
+                if (battery.level < 0.15) {
+                    showToast("SYSTEM: Batteri lågt (" + Math.round(battery.level * 100) + "%). Hämta laddaren, n00b.", "warning");
+                }
+                if (battery.level < 0.05 && timerId) {
+                    triggerKamek("STRÖMBRIST: Din laptop orkade inte med ditt klickande. Pinsamt.");
+                }
+            }
+        }
+        battery.addEventListener('levelchange', checkBattery);
+        battery.addEventListener('chargingchange', checkBattery);
+        checkBattery();
+    });
+}
+
+// 2. RAM-minne & Memory Pressure (Endast Chrome/Edge)
+if (navigator.deviceMemory && navigator.deviceMemory < 4) {
+    showToast("HÅRDVARU-HÅN: Endast " + navigator.deviceMemory + "GB RAM? Kör du spelet på en brödrost?", "warning");
+}
+
+// Övervaka minnesanvändning under spelets gång
+if (window.performance && window.performance.memory) {
+    setInterval(function() {
+        var mem = window.performance.memory;
+        // Om spelet använder mer än 90% av tilldelat minne
+        if (mem.usedJSHeapSize > mem.jsHeapSizeLimit * 0.9 && timerId) {
+            triggerKamek("MEMORY_LEAK_DETECTED: Din dator pallar inte trycket. Stäng ner dina 500 Chrome-flikar.");
+        }
+    }, 5000);
+}
+
+// 3. GPU/WebGL-krasch (Om grafiken dör)
+window.addEventListener('webglcontextlost', function(event) {
+    event.preventDefault();
+    triggerKamek("GPU_CRASH: Ditt grafikkort gav upp. Köp ett RTX-kort istället för att köra på integrerad grafik.");
+}, false);
+
+// 4. Stora CPU-lags (Jank detection)
+let lastFrameTime = performance.now();
+function checkJank() {
+    let now = performance.now();
+    let delta = now - lastFrameTime;
+    if (delta > 500 && timerId) { // Om en frame tar mer än 0.5 sekunder
+        showToast("SYSTEM: Kraftigt CPU-lag detekterat! Sluta ladda ner torrents under spelet.", "error");
+    }
+    lastFrameTime = now;
+    requestAnimationFrame(checkJank);
+}
+requestAnimationFrame(checkJank);
+
+// 5. Thermal Throttling / FPS Drop (Kritisk spärr)
+let frameCounts = 0;
+let lastTime = performance.now();
+
+function monitorFPS() {
+    frameCounts++;
+    let currentTime = performance.now();
+    
+    if (currentTime >= lastTime + 1000) {
+        let fps = frameCounts;
+        
+        // Om FPS dyker under 20 under pågående spel = Kritisk hårdvaru-fail
+        if (fps < 20 && timerId) {
+            triggerKamek("HARDWARE_FAILURE: Din PC throttlar hårdare än en strypt moppe. Köp ny kylpasta.");
+        }
+        
+        frameCounts = 0;
+        lastTime = currentTime;
+    }
+    requestAnimationFrame(monitorFPS);
+}
+requestAnimationFrame(monitorFPS);
+
+    // --- SPEL-LOGIK ---
+    const startBtn = document.getElementById('start-btn');
+    const clickBtn = document.getElementById('click-btn');
+    const nameInput = document.getElementById('player-name');
+
+    updateLeaderboardDisplay();
+
+    startBtn.onclick = () => {
+        if (isCheating) return;
+        playerName = nameInput.value.trim() || "Gäst";
+        document.getElementById('setup').classList.add('hidden');
+        document.getElementById('stats').style.display = 'block';
+        clickBtn.style.display = 'block';
+        document.getElementById('result').classList.add('hidden');
+        startGame();
+    };
+
+    let lastClickTime = 0;
+let fastClickCount = 0;
+
+clickBtn.onclick = () => {
+    if (isCheating) return;
+    
+    const now = Date.now();
+    const clickInterval = now - lastClickTime;
+
+    // Autoclicker-check: Om klicket sker snabbare än 35ms (ca 28 klick/sek)
+    if (lastClickTime !== 0 && clickInterval < 35) {
+        fastClickCount++;
+        if (fastClickCount > 2) { // Tillåt ett enstaka snabbt klick, men inte flera på rad
+            triggerKamek("Autoclicker/Makro detekterat (För snabba klick).");
+            return;
+        }
+    } else {
+        fastClickCount = 0; // Återställ om hastigheten sänks
+    }
+    
+    lastClickTime = now;
+    score++;
+    document.getElementById('current-score').innerText = score;
+    clickBtn.style.transform = `scale(1.1) rotate(${Math.random() * 8 - 4}deg)`;
+    setTimeout(() => clickBtn.style.transform = "scale(1) rotate(0deg)", 50);
+};
+
+    function startGame() {
+        score = 0; timeLeft = 10;
+        document.getElementById('current-score').innerText = score;
+        document.getElementById('timer').innerText = timeLeft;
+
+        timerId = setInterval(() => {
+            timeLeft--;
+            document.getElementById('timer').innerText = timeLeft;
+            if (timeLeft <= 0) endGame();
+        }, 1000);
+    }
+
+    function endGame() {
+        clearInterval(timerId);
+        timerId = null;
+        clickBtn.style.display = 'none';
+        document.getElementById('result').classList.remove('hidden');
+
+        let title = "Bra spelat!";
+        let color = "red";
+
+        if (score >= 100) { title = "⭐ STJÄRNVINST ⭐"; color = "var(--primary)"; }
+        else if (score >= 85) { title = "🥇 1:A VINST (LEGEND)"; color = "#d4af37"; }
+        else if (score >= 70) { title = "🥈 2:A VINST (PRO)"; color = "#aaa9ad"; }
+        else if (score >= 55) { title = "🥉 3:E VINST (SNABB)"; color = "#cd7f32"; } 
+
+        document.getElementById('final-msg').innerHTML = `
+            <div style="color:${color}; font-size:1.4rem; margin-bottom:5px;">${title}</div>
+            ${playerName}: ${score} KLICK!
+        `;
+        
+        if (storageAvailable) {
+            saveScore(playerName, score);
+            updateLeaderboardDisplay();
+        }
+    }
+
+    function saveScore(name, score) {
+        let scores = JSON.parse(localStorage.getItem('lanScores') || '[]');
+        scores.push({ name, score });
+        scores.sort((a, b) => b.score - a.score);
+        localStorage.setItem('lanScores', JSON.stringify(scores.slice(0, 5)));
+    }
+
+    function updateLeaderboardDisplay() {
+        if (!storageAvailable) return;
+        let scores = JSON.parse(localStorage.getItem('lanScores') || '[]');
+        if (scores.length === 0) return;
+        document.getElementById('highscores').innerHTML = scores.map((s, i) => 
+            `<div>${i+1}. ${s.name} - <strong>${s.score}</strong></div>`
+        ).join('');
+    }
+
+    document.getElementById('reset-btn').onclick = () => {
+        location.reload();
+    };
+</script>
+
+</body>
+</html>

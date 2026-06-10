@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glitcheds webbspels-hubb! // THE BOSS HQ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --glitched-purple: #120024;
+            --glitched-cyan: #00ffcc;
+            --glitched-dark: #070110;
+            --glitched-accent: #ff00ff;
+            --glitched-warning: #ff0033;
+            --monitor-glow: rgba(0, 255, 204, 0.15);
+            --bg-black: #05020a;
+            --glitched-blue: #00ccff;
+        }
+
+        body {
+            background-color: var(--glitched-dark);
+            background-image: radial-gradient(circle at 50% 30%, #1a0033 0%, var(--glitched-dark) 70%);
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 40px 0;
+        }
+
+        .monitor-frame {
+            width: 95%;
+            max-width: 1050px;
+            min-height: 85vh; 
+            border: 4px solid var(--glitched-cyan);
+            border-radius: 24px;
+            background: rgba(12, 1, 24, 0.9);
+            position: relative;
+            margin: auto;
+            box-shadow: 0 0 40px rgba(0, 255, 204, 0.25), inset 0 0 60px rgba(130, 0, 255, 0.2);
+            padding: 40px;
+            box-sizing: border-box;
+            backdrop-filter: blur(10px);
+        }
+
+        .scanlines {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 20px;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%), 
+                        linear-gradient(90deg, rgba(0, 255, 204, 0.03), rgba(130, 0, 255, 0.02), rgba(0, 255, 204, 0.03));
+            background-size: 100% 4px, 4px 100%;
+            pointer-events: none;
+            z-index: 10;
+            opacity: 0.7;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .glitched-logo {
+            max-width: 280px;
+            height: auto;
+            filter: drop-shadow(0 0 15px rgba(0, 255, 204, 0.5));
+            animation: logo-float 4s infinite alternate ease-in-out;
+        }
+
+        @keyframes logo-float {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-10px); }
+        }
+
+        h1 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 2rem;
+            text-align: center;
+            margin: 0 0 10px 0;
+            color: #ffffff;
+            text-shadow: 0 0 10px var(--glitched-cyan);
+            letter-spacing: -1px;
+        }
+
+        .hub-subtitle {
+            text-align: center;
+            font-family: 'VT323', monospace;
+            font-size: 1.6rem;
+            color: var(--glitched-cyan);
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .links-grid {
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 20px;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 255, 204, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: 0.2s ease-in-out;
+        }
+
+        .game-card:hover {
+            background: rgba(0, 255, 204, 0.08);
+            border-color: var(--glitched-cyan);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 204, 0.1);
+        }
+
+        .game-card.high-intensity {
+            border-color: rgba(255, 0, 51, 0.3);
+            background: rgba(51, 0, 10, 0.15);
+        }
+        .game-card.high-intensity:hover {
+            border-color: var(--glitched-warning);
+            background: rgba(51, 0, 10, 0.3);
+            box-shadow: 0 5px 15px rgba(255, 0, 51, 0.15);
+        }
+
+        .nav-link {
+            display: inline-block;
+            color: #ffffff;
+            text-decoration: none;
+            font-family: 'VT323', monospace;
+            font-size: 2.2rem;
+            line-height: 1.1;
+            transition: 0.2s;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .nav-link:hover {
+            color: var(--glitched-cyan);
+            text-shadow: 0 0 8px var(--glitched-cyan);
+        }
+
+        .game-card.high-intensity .nav-link:hover {
+            color: var(--glitched-warning);
+            text-shadow: 0 0 8px var(--glitched-warning);
+        }
+
+        .meta-info {
+            font-size: 0.85rem;
+            color: #b3a0c9;
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .tag-diff {
+            font-weight: bold;
+        }
+        .diff-easy { color: #3afb11; }
+        .diff-medium { color: #ffcc00; }
+        .diff-hard { color: #ff5500; }
+        .diff-extreme { color: #ff00ff; animation: extreme-pulse 1s infinite alternate; }
+
+        /* Språktaggar */
+        .lang-tag {
+            display: inline-block;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-top: 2px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        .lang-en {
+            background: rgba(0, 204, 255, 0.15);
+            border: 1px solid var(--glitched-blue);
+            color: var(--glitched-blue);
+        }
+        .lang-scan {
+            background: rgba(255, 204, 0, 0.15);
+            border: 1px solid #ffcc00;
+            color: #ffcc00;
+        }
+
+        @keyframes extreme-pulse {
+            0% { text-shadow: 0 0 2px #ff00ff; }
+            100% { text-shadow: 0 0 8px #ff00ff; }
+        }
+
+        .card-sensory-warning {
+            font-size: 0.75rem;
+            line-height: 1.4;
+            padding: 6px 10px;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.4);
+            border-left: 3px solid #aaa;
+            color: #dcdcdc;
+        }
+        .card-sensory-warning.severe {
+            border-left-color: var(--glitched-warning);
+            background: rgba(255, 0, 51, 0.1);
+            color: #ffcccc;
+        }
+        .card-sensory-warning b {
+            color: #ffffff;
+        }
+
+        .sensor-warning-box {
+            border: 2px solid #ff0033;
+            background: rgba(51, 0, 10, 0.8);
+            padding: 20px;
+            margin-top: 35px;
+            border-radius: 12px;
+            text-align: left;
+            box-shadow: 0 0 20px rgba(255, 0, 51, 0.15);
+        }
+
+        .sensor-warning-box h3 {
+            margin: 0 0 8px 0;
+            color: #ff0033;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .sensor-warning-box p {
+            margin: 0;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #e0d0d0;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-family: 'VT323', monospace;
+            font-size: 1.4rem;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 3px;
+        }
+        
+        @media (max-width: 768px) {
+            .links-grid { grid-template-columns: 1fr; gap: 15px; }
+            h1 { font-size: 1.4rem; }
+            .glitched-logo { max-width: 200px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="scanlines"></div>
+    <div class="monitor-frame">
+        
+        <div class="logo-container">
+            <img src="glitched.png" alt="Glitched Logo" class="glitched-logo">
+        </div>
+
+        <div class="terminal-header" style="text-align: center; margin-bottom: 40px;">
+            <h1 class="terminal-title">Glitcheds webbspels-hubb!</h1>
+            <div class="hub-subtitle" style="font-family: 'Montserrat', sans-serif; font-size: 1.05rem; color: #b3a0c9; line-height: 1.6; max-width: 800px; margin: 15px auto 0 auto; font-weight: normal; text-transform: none; letter-spacing: 0.5px;">
+                Välkommen till Glitcheds officiella arkadkommandocentral på Elmia 2026! Här har vi samlat våra specialutvecklade festivalspel, designade för att sätta dina reflexer, din hårdvarukunskap, din logik och dina snabbskrivningsfingrar på ultimat prov. Välj en modul nedan, dominera highscore-listan och visa mässgolvet vad du går för!
+            </div>
+        </div>
+
+        <div class="links-grid">
+            
+            <div class="game-card high-intensity" style="
+                grid-column: 1 / -1; 
+                border: 3px solid var(--glitched-accent); 
+                box-shadow: 0 0 25px rgba(255, 0, 255, 0.4), inset 0 0 15px rgba(255, 0, 255, 0.2);
+                background: linear-gradient(135deg, rgba(26, 0, 51, 0.9) 0%, rgba(7, 1, 16, 0.95) 100%);
+                padding: 25px;
+                transform: scale(1.01);
+            ">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <a href="The%20Boss%20-%20Base%20Defense/QWERTY_DEFENSE.html" class="nav-link" style="font-size: 2.2rem; letter-spacing: 2px;">
+                            > QWERTY DEFENSE
+                        </a>
+                        <span style="
+                            background: linear-gradient(45deg, #ff00ff, #00ffcc);
+                            color: #fff;
+                            padding: 5px 12px;
+                            border-radius: 4px;
+                            font-family: 'Press Start 2P', sans-serif;
+                            font-size: 0.75rem;
+                            animation: pulse 1.5s infinite;
+                            font-weight: bold;
+                        ">OFFICIELLT FESTIVALSPEL</span>
+                    </div>
+                    <div class="lang-tag lang-en">🌐 English version available</div>
+                    
+                    <div style="font-family: 'Montserrat', sans-serif; font-size: 1.1rem; color: #fff; margin: 5px 0 15px 0; line-height: 1.6;">
+                        Det här är <b>festivalens officiella webbspel</b> där man kan vinna fina priser om man lyckas hålla maskoten QWERTY vid liv till minst ett visst antal poäng! Skydda QWERTY från elaka virus- och fiendeattacker genom att skjuta på fienderna som invaderar QWERTY!
+                    </div>
+                    
+                    <div style="margin-bottom: 15px; font-family: 'Montserrat', sans-serif;">
+                        <a href="https://glitched.se/sv/" target="_blank" style="
+                            color: var(--glitched-cyan); 
+                            text-decoration: underline; 
+                            font-weight: bold; 
+                            font-size: 1rem;
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 5px;
+                        ">
+                            🔗 Besök festivalens hemsida (glitched.se)
+                        </a>
+                    </div>
+
+                    <div class="meta-info" style="font-size: 0.95rem;">Svårighet: <span class="tag-diff diff-extreme" style="padding: 4px 10px;">EXTREM (3D)</span> (men kan justeras) | Åldersrek: 7+ | Prischans: <span style="color: #ffcc00; font-weight: bold;">JA! 🎁</span></div>
+                </div>
+                <div class="card-sensory-warning severe" style="margin-top: 15px;"><b>🚨 SENSORISK RISK:</b> Fullt stroboskop-inferno, skakande 3D-kamera, intensiva <b>laserstrålar</b> samt dämpade effekter vid giftdimma. Använd [S] på tangentbordet för nödstopp!</div>
+            </div>
+
+            <div class="game-card">
+                <div>
+                    <a href="lanbit_quiz/index.html" class="nav-link">> GLITCHEDS OFFICIELLA QUIZ</a>
+                    <div class="lang-tag lang-en">🌐 English version available</div>
+                    <div style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
+                        Svara på kluriga frågor och testa dina IT- och gaming-kunskaper i Glitcheds egna quiz!
+                    </div>
+                    <div class="meta-info">Svårighet: <span class="tag-diff diff-medium">Medium</span> | Åldersrek: 7+</div>
+                </div>
+                <div class="card-sensory-warning"><b>Sensorisk profil:</b> Texttungt. Inga rörliga ljus, men contains skarpa ljudeffekter med ett ljust "pling" vid rätt svar och ett högt "BZZZZT"-ljud vid fel.</div>
+            </div>
+            
+            <div class="game-card">
+                <div>
+                    <a href="lanbit hänga gubbe/index.html" class="nav-link">> GLITCHEDS HÄNGA GUBBE</a>
+                    <div class="lang-tag lang-scan">🇩🇰 🇳🇴 🇸🇪 Skandinavisk version tillgänglig</div>
+                    <div style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
+                        Det klassiska ordspelet i officiell festival-tappning. Gissa rätt bokstäver innan du blir hängd!
+                    </div>
+                    <div class="meta-info">Svårighet: <span class="tag-diff diff-easy">Lätt</span> | Åldersrek: 7+</div>
+                </div>
+                <div class="card-sensory-warning"><b>Sensorisk profil:</b> Statiskt UI. Låg visuell och auditorisk stress.</div>
+            </div>
+            
+            <div class="game-card">
+                <div>
+                    <a href="The%20Boss%20-%20Base%20Defense/index.html" class="nav-link">> GLITCHEDS BASE DEFENSE</a>
+                    <div class="lang-tag lang-scan">🇩🇰 🇳🇴 🇸🇪 Skandinavisk version tillgänglig</div>
+                    <div style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
+                        Försvara Glitched-basen mot vågor av fientliga rymdskepp med ditt officiella försvarstorn!
+                    </div>
+                    <div class="meta-info">Svårighet: <span class="tag-diff diff-medium">Medium</span> | Åldersrek: 7+</div>
+                </div>
+                <div class="card-sensory-warning"><b>Sensorisk profil:</b> Innehåller snabba stroboskopeffekter, blinkande ljusblixtar och retropartiklar vid explosioner samt linjära spårskott.</div>
+            </div>
+
+            <div class="game-card high-intensity">
+                <div>
+                    <a href="The%20Boss%20-%20Base%20Defense/base_defense_boss2.html" class="nav-link">> GLITCHEDS BASE DEFENSE BOSS</a>
+                    <div style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #ffcccc; margin: 8px 0 16px 0; line-height: 1.5; font-weight: normal;">
+                        Slutstriden i Glitched-basen! Ta dig an den gigantiska moderskepps-bossen i en intensiv uppgörelse.
+                    </div>
+                    <div class="meta-info">Svårighet: <span class="tag-diff diff-hard">Svår</span> | Åldersrek: 10+</div>
+                </div>
+                <div class="card-sensory-warning severe"><b>🚨 SENSORISK RISK:</b> Innehåller kraftfulla stroboskopeffekter, intensiva <b>lasereffekter</b>, blinkande bosssköldar och ihållande ljusblixtar vid träff.</div>
+            </div>
+            
+            <div class="game-card">
+                <div>
+                    <a href="lanbit_math-mayhem/index2.html" class="nav-link">> GLITCHEDS MATH MAYHEM</a>
+                    <div class="lang-tag lang-en">🌐 English version available</div>
+                    <div style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
+                        Officiell huvudräkning under extrem tidspress! Lös mattetalen innan varningsklockan slår noll. Men se upp för plötsliga alarm som ska snoozas!
+                    </div>
+                    <div class="meta-info">Svårighet: <span class="tag-diff diff-hard">Svår</span> | Åldersrek: 7+</div>
+                </div>
+                <div class="card-sensory-warning"><b>Sensorisk profil:</b> Hög tidspress med pulserande varningsklockor.</div>
+            </div>
+            
+            <div class="game-card">
+                <div>
+                    <a href="lanbit_aimtrainer/index.html" class="nav-link">> GLITCHEDS AIM TRAINER</a>
+                    <div style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 8px 0 16px 0; line-height: 1.5; font-weight: normal;">
+                        Pricka målen så snabbt du kan. Glitcheds officiella uppvärmning för FPS- och e-sportproffs!
+                    </div>
+                    <div class="meta-info">Svårighet: <span class="tag-diff diff-medium">Medium</span> | Åldersrek: 7+</div>
+                </div>
+                <div class="card-sensory-warning"><b>Sensorisk profil:</b> Snabba målvandringar och rörliga mikromönster.</div>
+            </div>
+            
+            <div class="game-card">
+                <div>
+                    <a href="lanbit_antivirus/index2.html" class="nav-link">> GLITCHEDS CYBER-SANITIZER</a>
+                    <div style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 8px 0 16px 0; line-height: 1.5; font-weight: normal;">
+                        Fånga snälla filer och rensa bort virus i ett flytande, snabbt samlarspel signerat Glitched.
+                    </div>
+                    <div class="meta-info">Svårighet: <span class="tag-diff diff-easy">Lätt</span> | Åldersrek: 7+</div>
+                </div>
+                <div class="card-sensory-warning"><b>Sensorisk profil:</b> Glidande rörelsemönster med mjuka färgövergångar.</div>
+            </div>
+            
+            <div class="game-card">
+                <div>
+                    <a href="lanbit_reaktionsspel/index2.html" class="nav-link">> GLITCHEDS REAKTIONSSPEL</a>
+                    <div class="lang-tag lang-scan">🇩🇰 🇳🇴 🇸🇪 Skandinavisk version tillgänglig</div>
+                    <div style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
+                        Håll musen redo! Officiellt reflextest där du klickar så fort skärmen växlar färg.
+                    </div>
+                    <div class="meta-info">Svårighet: <span class="tag-diff diff-medium">Medium</span> | Åldersrek: 7+</div>
+                </div>
+                <div class="card-sensory-warning"><b>Sensorisk profil:</b> Plötsliga, skarpa färgskiften (ex. rött till grönt) över hela skärmytan.</div>
+            </div>
+            
+            <div class="game-card">
+                <div>
+                    <a href="keyboard warrior/index_II.html" class="nav-link">> GLITCHEDS KEYBOARD WARRIOR</a>
+                    <div style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 8px 0 16px 0; line-height: 1.5; font-weight: normal;">
+                        Skriv eller dö! Hammer-knappa in Glitched-orden på tangentbordet innan de faller i botten.
+                    </div>
+                    <div class="meta-info">Svårighet: <span class="tag-diff diff-hard">Svår</span> | Åldersrek: 10+</div>
+                </div>
+                <div class="card-sensory-warning"><b>Sensorisk profil:</b> Mycket hög fysisk klickfrekvens, text som rör sig snabbt nedåt.</div>
+            </div>
+            
+            <div class="game-card">
+                <div>
+                    <a href="lanbit_memory/index.html" class="nav-link">> GLITCHEDS MEMORY</a>
+                    <div class="lang-tag lang-en">🌐 English version available</div>
+                    <div style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
+                        Hitta matchande festival-par och testa ditt fotografiska minne i lugn och ro.
+                    </div>
+                    <div class="meta-info">Svårighet: <span class="tag-diff diff-easy">Lätt</span> | Åldersrek: 7+</div>
+                </div>
+                <div class="card-sensory-warning"><b>Sensorisk profil:</b> Lugnt gränssnitt med repeterande bildmönster.</div>
+            </div>
+            
+            <div class="game-card">
+                <div>
+                    <a href="lanbit_spamklicker/index.html" class="nav-link">> GLITCHEDS SPAM-KLICKER</a>
+                    <div style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 8px 0 16px 0; line-height: 1.5; font-weight: normal;">
+                        Ren klick-hastighet! Hur många gånger hinner du spamma Glitched-knappen innan tiden tar slut?
+                    </div>
+                    <div class="meta-info">Svårighet: <span class="tag-diff diff-medium">Medium</span> | Åldersrek: 10+</div>
+                </div>
+                <div class="card-sensory-warning"><b>Sensorisk profil:</b> Snabba talförändringar och repetitiva, mekaniska klickljud.</div>
+            </div>
+        </div>
+
+        <div class="sensor-warning-box">
+            <h3>⚠️ OVERALL SENSORISK VARNING &amp; INFORMATION</h3>
+            <p>Vissa av webbläsarspelen i denna terminal (särskilt Qwerty Defense och Base Defense Boss) innehåller snabba 3D-rörelser, intensiva ljusfrekvenser, lasereffekter och stroboskopeffekter. Om du upplever obehag, visuell stress eller sensorisk överbelastning, tryck på [S] på tangentbordet för akut nödstopp, eller kontakta Glitched Crew i montern för assistans.</p>
+        </div>
+
+        <div class="footer">
+            SYSTEM STATUS: ONLINE | OPERATOR: PSL631 | VENUE: ELMIA HALL D<br>
+            <a href="https://docs.google.com/document/d/1oMtMZWXSW8DhpPGlAClCrqfEbuWaSSk7CrwN6R1p5cQ/edit?usp=sharing" target="_blank">Turneringsinformation</a>
+        </div>
+    </div> 
+</body>
+</html>

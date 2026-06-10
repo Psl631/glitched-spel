@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CYBER-SANITIZER 2026 | STATION 24 ELITE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Montserrat:wght@400;700&family=Bangers&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00ff41; --kamek-purple: #1a0033; --kamek-glow: #8200ff;
+            --gold: #ffcc00; --danger: #ff0033; --glass: rgba(5, 5, 5, 0.92);
+        }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; min-height: 100vh;
+            background: url('lanbit_bg.jfif') no-repeat center center fixed;
+            background-size: cover; display: flex; justify-content: center; align-items: center;
+            font-family: 'Montserrat', sans-serif; color: white; overflow: hidden;
+        }
+
+        #game-container { width: 95vw; max-width: 1100px; display: flex; flex-direction: column; align-items: center; z-index: 10; }
+        
+        /* --- STARTSKÄRM --- */
+        #setup { background: var(--glass); padding: 40px; border-radius: 30px; border: 4px solid var(--primary); text-align: center; backdrop-filter: blur(10px); max-width: 600px; }
+        .strobe-warning { background: var(--danger); padding: 12px; border-radius: 10px; font-weight: bold; margin-bottom: 15px; border: 2px solid white; }
+        .game-intro { color: var(--primary); font-size: 1.1rem; margin-bottom: 25px; font-weight: 600; line-height: 1.4; }
+
+        /* --- AOC MONITOR --- */
+        .monitor-frame { width: 90vw; max-width: 1100px; background: #1a1a1a; border: 4px solid #333; border-radius: 15px 15px 0 0; padding: 12px 12px 0 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
+        .monitor-screen {
+            width: 100%; height: 60vh; min-height: 500px;
+            background: url('bliss.jfif') no-repeat center center;
+            background-size: cover; position: relative; overflow: hidden; border: 2px solid #000;
+        }
+        #desktop { width: 100%; height: 100%; position: relative; cursor: crosshair; }
+
+        /* --- OBJEKT --- */
+        .virus { position: absolute; width: 60px; height: 60px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; z-index: 50; filter: drop-shadow(0 0 10px rgba(255,255,255,0.5)); }
+        .nuke { 
+            position: absolute; width: 70px; height: 70px; border: 4px solid #ff0000; background: #000;
+            display: flex; align-items: center; justify-content: center; font-size: 3rem; cursor: pointer;
+            z-index: 70; border-radius: 15px; animation: nuke-pulse 0.5s infinite;
+        }
+        @keyframes nuke-pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); background: #400; box-shadow: 0 0 30px #f00; } 100% { transform: scale(1); } }
+
+        /* --- ANNONS FÄLLOR --- */
+        .popup-ad { 
+            position: absolute; width: 280px; background: #ece9d8; border: 2px solid #005293; 
+            color: black; z-index: 500; box-shadow: 10px 10px 0 rgba(0,0,0,0.5); font-family: Tahoma, sans-serif;
+        }
+        .ad-header { background: linear-gradient(90deg, #0054e3, #27c4ff); color: white; padding: 4px; font-size: 11px; display: flex; justify-content: space-between; }
+        .ad-body { padding: 10px; font-size: 13px; }
+
+        #video-ad-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: black; z-index: 3000000; display: none;
+            flex-direction: column; justify-content: center; align-items: center;
+        }
+        .skip-ad-btn { position: absolute; bottom: 50px; right: 50px; padding: 15px 30px; background: rgba(255,255,255,0.2); color: white; border: 1px solid white; cursor: not-allowed; }
+
+        /* --- ALARM OVERLAY --- */
+        #alarm-overlay { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(139, 0, 0, 0.95); z-index: 2000; display: none;
+            flex-direction: column; justify-content: center; align-items: center; text-align: center;
+        }
+        .vibrate-clock { width: 130px; animation: vibrate 0.1s infinite; cursor: grab; }
+        @keyframes vibrate { 0% { transform: translate(0); } 20% { transform: translate(-5px, 5px); } 100% { transform: translate(0); } }
+        
+        .catch-dot { position: absolute; width: 40px; height: 40px; background: yellow; border-radius: 50%; border: 3px solid black; transition: all 1.2s ease-in-out; cursor: pointer; }
+        .hold-bar { width: 200px; height: 20px; background: #333; border: 2px solid white; margin-top: 10px; }
+        #hold-fill { width: 0%; height: 100%; background: var(--primary); }
+
+        /* --- MONITOR DELAR --- */
+        .monitor-bottom-bezel { width: 100%; height: 45px; background: #111; display: flex; justify-content: center; align-items: center; border-top: 1px solid #333; position: relative; }
+        .aoc-logo { color: #555; font-weight: bold; letter-spacing: 3px; font-size: 16px; }
+        .monitor-stand-neck { width: 100px; height: 30px; background: #111; margin: 0 auto; }
+        .monitor-stand-base { width: 250px; height: 12px; background: #1a1a1a; margin: 0 auto; border-radius: 8px 8px 0 0; }
+
+        /* --- KAMERA --- */
+        #kamek-cam-box { position: fixed; bottom: 20px; left: 20px; width: 200px; height: 140px; background: #000; border: 3px solid var(--kamek-glow); border-radius: 12px; overflow: hidden; z-index: 10000; }
+        #kamek-video { width: 100%; height: 100%; object-fit: cover; }
+
+        /* --- UI --- */
+        .ui-stats { position: absolute; top: 0; width: 100%; padding: 10px; background: rgba(0,0,0,0.8); display: flex; justify-content: space-around; font-family: 'Luckiest Guy'; font-size: 20px; color: var(--gold); z-index: 100; }
+        .hidden { display: none !important; }
+        .strobe-active { animation: strobe-anim 0.1s infinite !important; }
+        @keyframes strobe-anim { 0% { filter: invert(1); } 50% { filter: none; } 100% { filter: contrast(2); } }
+
+        /* --- SLUTSKÄRMAR --- */
+        #bsod { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #0078d7; color: white; display: none; flex-direction: column; justify-content: center; padding: 0 10%; z-index: 1000000; font-family: sans-serif; }
+        #end-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #1a0033; display: none; flex-direction: column; justify-content: center; align-items: center; border: 20px double var(--kamek-glow); z-index: 1000001; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <h1 id="game-title">CYBER-SANITIZER 2026</h1>
+
+        <div id="setup">
+            <div class="strobe-warning">⚠️ VARNING: INTENSIVT STROBOSKOP-LJUS!</div>
+            <p class="game-intro">Din dator har drabbats av virus - hur många virus kan du rensa innan datorn kraschar helt!</p>
+            
+            <div class="media-controls" style="margin-bottom: 20px; display: flex; gap: 10px; justify-content: center;">
+                <button class="btn-sub" onclick="toggleMedia('cam')" id="cam-btn" style="background:#222; color:white; padding:10px; border:1px solid var(--kamek-glow); cursor:pointer;">📸 KAMERA: AV</button>
+                <button class="btn-sub" onclick="toggleMedia('mic')" id="mic-btn" style="background:#222; color:white; padding:10px; border:1px solid var(--kamek-glow); cursor:pointer;">🎤 MIC: AV</button>
+            </div>
+
+            <input type="text" id="player-name" placeholder="DITT ALIAS..." style="background:#000; border:2px solid var(--primary); color:var(--primary); padding:15px; width:80%; text-align:center; margin-bottom:20px;">
+            <button onclick="beginProtocol()" style="background:var(--primary); color:black; font-family:'Luckiest Guy'; padding:20px 40px; font-size:24px; border:none; border-radius:15px; cursor:pointer;">STARTA SANERING</button>
+        </div>
+
+        <div id="game-ui" class="hidden">
+            <div class="monitor-frame">
+                <div class="monitor-screen">
+                    <div id="alarm-overlay">
+                        <img src="clock.jfif" class="vibrate-clock">
+                        <h2 id="alarm-msg" style="font-family:'Luckiest Guy'; font-size:32px;">VAKNA!!!</h2>
+                        <div id="alarm-task-area"></div>
+                    </div>
+
+                    <div class="ui-stats">
+                        <span>CPU_LOAD: <span id="cpu-load">0</span>%</span>
+                        <span>RENSADE: <span id="score">0</span></span>
+                    </div>
+                    <div id="desktop"></div>
+                </div>
+                <div class="monitor-bottom-bezel"><div class="aoc-logo">AOC</div></div>
+            </div>
+            <div class="monitor-stand-neck"></div><div class="monitor-stand-base"></div>
+            
+            <div style="margin-top:20px;">
+                <button onclick="killStrobe()" style="background:#444; color:white; font-family:'Luckiest Guy'; padding:10px 20px; border:none; border-radius:5px; cursor:pointer;">STOPPA STROBE (S)</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="kamek-cam-box">
+        <video id="kamek-video" autoplay playsinline muted></video>
+        <div id="kamek-cam-off" style="text-align:center; padding-top:45px; color:var(--gold); font-family:'Luckiest Guy';">OPERATÖR OFFLINE</div>
+    </div>
+
+    <div id="bsod">
+        <h1 style="font-size:100px;">:(</h1>
+        <h2 style="font-weight:300; font-size:24px;">Din dator stötte på ett problem och måste startas om. <br>Vi samlar in lite felinformation...</h2>
+        <p style="font-size:20px;" id="bsod-progress">0% komplett</p>
+    </div>
+
+    <div id="end-screen">
+        <img src="kamek.jfif" style="width:150px; border-radius:50%; border:4px solid var(--gold);">
+        <h1 style="font-family:'Luckiest Guy'; font-size:60px; color:var(--gold);">SYSTEM KRASCH</h1>
+        <h2 id="final-score" style="font-size:32px;">POÄNG: 0</h2>
+        <p id="mockery" style="font-style:italic; font-size:24px; color:var(--gold); padding:0 20px;"></p>
+        <button onclick="location.reload()" style="padding:15px 30px; background:var(--gold); font-family:'Luckiest Guy'; border:none; cursor:pointer; margin-top:20px; border-radius:10px;">REBOOT</button>
+    </div>
+
+    <div id="video-ad-overlay">
+        <video id="ad-video" muted playsinline><source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4"></video>
+        <button id="skip-btn" class="skip-ad-btn" onclick="videoAdTrap()">Hoppa över om 5s</button>
+    </div>
+
+    <script>
+        let gameActive = false, alarmActive = false, strobeActive = false;
+        let score = 0, cpuLoad = 0, useCam = false, useMic = false;
+        let snoozeMode = "", qSpamCount = 0, holdStartTime = 0, targetHoldTime = 0, currentKey = "";
+        
+        const sfx = {
+            kamek: new Audio('kamek.mp3'),
+            alarm: new Audio('alarm_buzzer.mp3'),
+            tuta: new Audio('tuta.mp3'),
+            yay: new Audio('yay.mp3'),
+            loss: new Audio('f6_sad_trombone.mp3')
+        };
+
+        const adData = [
+            { t: "SJ - Boka LAN-resa", b: "Ta tåget till Lanbit! Billigt & Bra.", l: "https://www.sj.se" },
+            { t: "KAMEK MERCH", b: "Köp en trollstav! 50% rabatt för sopor.", l: "https://station24.se" },
+            { t: "LADDA NER RAM", b: "Seg dator? Klicka för 128GB GRATIS!", l: "https://google.com" }
+        ];
+
+        function toggleMedia(type) {
+            if(type === 'cam') { useCam = !useCam; document.getElementById('cam-btn').innerText = useCam ? "📸 KAMERA: PÅ" : "📸 KAMERA: AV"; }
+            else { useMic = !useMic; document.getElementById('mic-btn').innerText = useMic ? "🎤 MIC: PÅ" : "🎤 MIC: AV"; }
+        }
+
+        async function beginProtocol() {
+            if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{});
+            if (useCam || useMic) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: useCam, audio: useMic });
+                    document.getElementById('kamek-video').srcObject = stream;
+                    document.getElementById('kamek-cam-off').style.display = 'none';
+                } catch(e) { console.warn("Media denied"); }
+            }
+            document.getElementById('setup').classList.add('hidden');
+            document.getElementById('game-ui').classList.remove('hidden');
+            document.getElementById('game-title').style.display = 'none';
+            gameActive = true;
+            mainLoop();
+        }
+
+        function mainLoop() {
+            if(!gameActive) return;
+            if(!alarmActive) {
+                cpuLoad += (0.15 + (score / 300));
+                document.getElementById('cpu-load').innerText = Math.floor(cpuLoad);
+                if(cpuLoad >= 100) triggerDeath("CPU_OVERHEAT");
+                
+                if(Math.random() > 0.98) spawnObject();
+                if(Math.random() > 0.997) triggerAlarm();
+                if(Math.random() > 0.999) triggerVideoAd();
+                if(Math.random() > 0.99) triggerStrobe();
+            }
+            setTimeout(mainLoop, 100);
+        }
+
+        function spawnObject() {
+            const d = document.getElementById('desktop');
+            const type = Math.random();
+            const obj = document.createElement('div');
+            obj.style.left = Math.random()*85 + "%";
+            obj.style.top = Math.random()*70 + 10 + "%";
+
+            if (type < 0.08) { // NUKE
+                obj.className = "nuke"; obj.innerHTML = "☢️";
+                obj.onclick = () => triggerDeath("NUCLEAR_EVENT");
+            } else if (type < 0.12) { // KYLPASTA
+                obj.className = "virus"; obj.innerHTML = "🧴";
+                obj.onclick = () => { cpuLoad = 0; sfx.yay.play(); obj.remove(); };
+            } else if (type < 0.20) { // AD TRAP
+                spawnAd(); return;
+            } else { // VIRUS
+                const e = ["👾","🦠","🐛","💾","📡"];
+                obj.className = "virus"; obj.innerHTML = e[Math.floor(Math.random()*e.length)];
+                obj.onclick = () => { score++; cpuLoad -= 3; sfx.tuta.play(); obj.remove(); document.getElementById('score').innerText = score; };
+            }
+            d.appendChild(obj);
+            setTimeout(() => { if(obj.parentNode) obj.remove(); }, 3000);
+        }
+
+        function spawnAd() {
+            const data = adData[Math.floor(Math.random()*adData.length)];
+            const ad = document.createElement('div');
+            ad.className = "popup-ad";
+            ad.style.left = Math.random()*60 + "%"; ad.style.top = Math.random()*50 + "%";
+            ad.innerHTML = `<div class="ad-header"><span>${data.t}</span><button onclick="this.parentElement.parentElement.remove()">X</button></div>
+                            <div class="ad-body">${data.b}<br><br><button onclick="window.open('${data.l}','_blank')">ÖPPNA</button></div>`;
+            document.getElementById('desktop').appendChild(ad);
+        }
+
+        function triggerVideoAd() {
+            const overlay = document.getElementById('video-ad-overlay');
+            const video = document.getElementById('ad-video');
+            const btn = document.getElementById('skip-btn');
+            overlay.style.display = 'flex';
+            video.play();
+            let time = 5;
+            btn.disabled = true;
+            const int = setInterval(() => {
+                time--;
+                btn.innerText = `Hoppa över om ${time}s`;
+                if(time <= 0) {
+                    clearInterval(int);
+                    btn.innerText = "HOPPA ÖVER >>>";
+                    btn.disabled = false;
+                    btn.style.cursor = "pointer";
+                }
+            }, 1000);
+        }
+
+        function videoAdTrap() {
+            window.open('https://youtube.com', '_blank');
+            document.getElementById('video-ad-overlay').style.display = 'none';
+            document.getElementById('ad-video').pause();
+        }
+
+        function triggerAlarm() {
+            alarmActive = true;
+            sfx.alarm.loop = true; sfx.alarm.play();
+            const overlay = document.getElementById('alarm-overlay');
+            const area = document.getElementById('alarm-task-area');
+            const msg = document.getElementById('alarm-msg');
+            overlay.style.display = 'flex';
+            area.innerHTML = "";
+            
+            const modes = ["SPELL", "HOLD", "SPAM", "SNOOZE", "DOTS", "DRAG"];
+            snoozeMode = modes[Math.floor(Math.random()*modes.length)];
+
+            if(snoozeMode === "SPELL") {
+                const w = ["KAMEK", "STATION24", "TERMINAL", "SANERING"];
+                let t = w[Math.floor(Math.random()*w.length)];
+                msg.innerText = `STAVA: ${t}`;
+                let i = document.createElement('input');
+                i.style.fontSize="30px";
+                i.oninput = () => { if(i.value.toUpperCase() === t) snooze(); };
+                area.appendChild(i); i.focus();
+            } else if(snoozeMode === "HOLD") {
+                currentKey = "F"; targetHoldTime = 3000;
+                msg.innerText = "HÅLL IN [F] I 3 SEK";
+                area.innerHTML = `<div class="hold-bar"><div id="hold-fill"></div></div>`;
+            } else if(snoozeMode === "SPAM") {
+                qSpamCount = 12; msg.innerText = `HAMRA Q! (${qSpamCount})`;
+            } else if(snoozeMode === "SNOOZE") {
+                msg.innerText = "KLICKA SNOOZE!";
+                let b = document.createElement('button');
+                b.innerText = "SNOOZE"; b.className="btn-sub"; b.style.fontSize="30px";
+                b.onclick = snooze; area.appendChild(b);
+            } else if(snoozeMode === "DOTS") {
+                msg.innerText = "FÅNGA PRICKARNA!";
+                spawnAlarmDot(3);
+            } else if(snoozeMode === "DRAG") {
+                msg.innerText = "DRA BORT KLOCKAN!";
+                let c = document.querySelector('.vibrate-clock');
+                c.style.display = "block";
+                c.ondragend = (e) => { if(Math.abs(e.clientX - window.innerWidth/2) > 250) snooze(); };
+            }
+
+            let fail = setTimeout(() => { if(alarmActive) triggerDeath("LARM_FAIL"); }, 10000);
+        }
+
+        function spawnAlarmDot(count) {
+            if(count <= 0) { snooze(); return; }
+            const dot = document.createElement('div');
+            dot.className = "catch-dot";
+            dot.style.left = "50%"; dot.style.top = "50%";
+            dot.onclick = () => { dot.remove(); spawnAlarmDot(count-1); };
+            document.getElementById('alarm-task-area').appendChild(dot);
+            setTimeout(() => { dot.style.left = Math.random()*80 + "%"; dot.style.top = Math.random()*80 + "%"; }, 100);
+            const move = setInterval(() => {
+                if(!dot.parentNode) clearInterval(move);
+                dot.style.left = Math.random()*80 + "%"; dot.style.top = Math.random()*80 + "%";
+            }, 1500);
+        }
+
+        function snooze() {
+            alarmActive = false;
+            sfx.alarm.pause(); sfx.alarm.currentTime = 0;
+            document.getElementById('alarm-overlay').style.display = 'none';
+        }
+
+        function triggerStrobe() {
+            strobeActive = true;
+            document.body.classList.add('strobe-active');
+            sfx.kamek.play();
+        }
+
+        function killStrobe() {
+            strobeActive = false;
+            document.body.classList.remove('strobe-active');
+        }
+
+        function triggerDeath(reason) {
+            gameActive = false; alarmActive = false;
+            sfx.alarm.pause(); sfx.loss.play();
+            const bsod = document.getElementById('bsod');
+            bsod.style.display = "flex";
+            let p = 0;
+            const int = setInterval(() => {
+                p += Math.floor(Math.random()*20);
+                if(p >= 100) { p = 100; clearInterval(int); }
+                document.getElementById('bsod-progress').innerText = p + "% komplett";
+            }, 300);
+
+            setTimeout(() => {
+                bsod.style.display = "none";
+                showEndScreen();
+            }, 3500);
+        }
+
+        function showEndScreen() {
+            const screen = document.getElementById('end-screen');
+            screen.style.display = "flex";
+            document.getElementById('final-score').innerText = `POÄNG: ${score}`;
+            const m = document.getElementById('mockery');
+            if(score < 20) m.innerText = "Nyehehehe! En Goomba spelar bättre än dig!";
+            else if(score < 60) m.innerText = "Patetiskt. Din dator dog av skam.";
+            else m.innerText = "Okej... du kan sanera. Men jag vann ändå!";
+        }
+
+        function triggerKamekLockdown(code, msg) {
+            if(!gameActive) return;
+            gameActive = false;
+            if(window.stop) window.stop();
+            sfx.kamek.play();
+            document.body.innerHTML = `
+                <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#1a0033;display:flex;flex-direction:column;justify-content:center;align-items:center;color:white;text-align:center;border:15px double #8200ff;z-index:9999999;">
+                    <img src="kamek.jfif" style="width:150px;border-radius:50%;border:4px solid gold;">
+                    <h1 style="font-family:'Luckiest Guy';font-size:50px;color:gold;">LÅST AV KAMEK</h1>
+                    <p style="font-size:28px;font-style:italic;">"${msg}"</p>
+                    <p style="font-family:monospace;color:gold;">ERROR_CODE: ${code}</p>
+                    <button onclick="location.reload()" style="padding:15px 30px;background:gold;border:none;cursor:pointer;font-family:'Luckiest Guy';">REBOOT</button>
+                </div>`;
+        }
+
+        // --- VAKTER ---
+        window.addEventListener('blur', () => { if(gameActive) triggerKamekLockdown("FOCUS_LOST", "Vart ska du? Saneringen kräver din blick!"); });
+        window.addEventListener('keydown', (e) => {
+            if(!gameActive) return;
+            if(e.key === "F12" || e.key === "Escape") triggerKamekLockdown("ILLEGAL_KEY", "Nyehehehe! Inga genvägar här!");
+            if(e.key.toLowerCase() === 's') killStrobe();
+            
+            if(alarmActive && snoozeMode === "SPAM" && e.key.toLowerCase() === 'q') {
+                qSpamCount--;
+                document.getElementById('alarm-msg').innerText = `HAMRA Q! (${qSpamCount})`;
+                if(qSpamCount <= 0) snooze();
+            }
+            if(alarmActive && snoozeMode === "HOLD" && e.key.toUpperCase() === currentKey) {
+                if(holdStartTime === 0) holdStartTime = Date.now();
+                let elap = Date.now() - holdStartTime;
+                document.getElementById('hold-fill').style.width = (elap/targetHoldTime)*100 + "%";
+                if(elap >= targetHoldTime) { snooze(); holdStartTime = 0; }
+            }
+        });
+        window.addEventListener('keyup', () => { holdStartTime = 0; });
+        window.addEventListener('wheel', (e) => {
+            if(gameActive && !Number.isInteger(e.deltaY)) triggerKamekLockdown("TRACKPAD_DETECTED", "Sluta smeka datorn! Använd en mus!");
+        }, { passive: false });
+        document.addEventListener('contextmenu', (e) => { e.preventDefault(); if(gameActive) triggerKamekLockdown("CONTEXT_MENU", "Snoozar du? Klicka inte där!"); });
+    </script>
+</body>
+</html>

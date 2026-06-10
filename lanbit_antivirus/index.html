@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Virusrensaren 3.6 - Stabil version</title>
+    <style>
+        body, html { margin:0; padding:0; width:100%; height:100%; background:#000; font-family:'Tahoma', sans-serif; overflow:hidden; user-select:none; }
+        .monitor { width:100vw; height:100vh; background:#d4d0c8; border:16px solid #b5b1a9; box-sizing:border-box; position:relative; }
+        .screen { width:100%; height:100%; background-image: url('bliss.jfif'); background-size:cover; position:relative; overflow:hidden; box-shadow:inset 0 0 40px rgba(0,0,0,0.6); }
+        .top-bar { position:absolute; top:0; left:0; right:0; height:40px; background:rgba(212, 208, 200, 0.9); display:flex; align-items:center; justify-content:space-between; padding:0 20px; z-index:100; }
+        .window { position:absolute; background:#d4d0c8; border:2px solid #fff; border-right-color:#404040; border-bottom-color:#404040; box-shadow:3px 3px 15px rgba(0,0,0,0.5); z-index:10; width:250px; }
+        .win-header { background:linear-gradient(90deg, #0058e6, #3a97fc); color:white; padding:5px 8px; font-size:13px; font-weight:bold; display:flex; justify-content:space-between; }
+        .win-body { padding:15px; text-align:center; font-size:13px; }
+        .overlay { position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:flex; justify-content:center; align-items:center; z-index:200; }
+        .menu-box { background:#d4d0c8; border:3px solid #fff; padding:40px; text-align:center; box-shadow:5px 5px 25px #000; }
+        .main-btn { background:#0058e6; color:#fff; border:2px solid #3a97fc; padding:12px 30px; font-size:18px; font-weight:bold; cursor:pointer; }
+        #xpToastContainer { position:fixed; bottom:40px; right:20px; z-index:99999; display:flex; flex-direction:column; gap:10px; pointer-events:none; }
+        .xp-balloon { background:#ffffe1; color:#000; border:1px solid #666; padding:10px; font-size:12px; box-shadow:3px 3px 6px #000; width:280px; }
+        #biometricPanel { position:absolute; top:55px; right:20px; width:190px; background:#d4d0c8; border:2px solid #fff; z-index:9999; font-size:11px; }
+        .video-ad-overlay { position:fixed; top:0; left:0; width:100vw; height:100vh; background:#000; z-index:450000; display:none; }
+        .lockdown { position:fixed; top:0; left:0; width:100vw; height:100vh; background:#000; color:red; z-index:999999; display:none; text-align:center; padding:100px; }
+    </style>
+</head>
+<body>
+
+    <div id="xpToastContainer"></div>
+    <div id="biometricPanel">
+        <div style="background:#000080; color:#fff; padding:4px;">🛡️ BIOMETRISK AI</div>
+        <div style="padding:8px;">
+            <div id="spyCamBox" style="width:100%; height:120px; background:#000; color:red; display:flex; align-items:center; justify-content:center;">
+                <img id="spyOffImage" src="telia.png" style="width:50px; display:none;">
+                <span id="spyCamStatus">KAMERA AV</span>
+            </div>
+            <div id="spyStatusLog">VÄNTAR...</div>
+        </div>
+    </div>
+
+    <div class="lockdown" id="lockdownScreen">
+        <h1>🚨 SYSTEMET LÅST 🚨</h1>
+        <p id="lockdownInsult"></p>
+        <button class="main-btn" onclick="location.reload()">Ladda om systemet</button>
+    </div>
+
+    <div class="monitor">
+        <div class="screen" id="screen">
+            <div class="top-bar">
+                <div class="stats">Poäng: <span id="score">0</span></div>
+                <div class="stats">Hälsa: <div style="display:inline-block; width:100px; height:10px; background:green;" id="healthBar"></div></div>
+            </div>
+            <div class="overlay" id="startMenu">
+                <div class="menu-box">
+                    <h1>Virusrensaren 3.6</h1>
+                    <div class="biometric-start-toggles">
+                        <input type="checkbox" id="biometricUseCam" checked> Kamera<br>
+                        <input type="checkbox" id="biometricUseMic" checked> Mikrofon
+                    </div>
+                    <button class="main-btn" id="startBtn" onclick="window.initStartFlow()">JA</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script id="full-game-engine">
+        // Globala variabler
+        window.score = 0; window.gameActive = false; window.authStep = 0;
+
+        // Initiera systemet när sidan laddats helt
+        window.onload = function() {
+            console.log("System redo.");
+        };
+
+        window.initStartFlow = function() {
+            const btn = document.getElementById('startBtn');
+            const useCam = document.getElementById('biometricUseCam').checked;
+            const useMic = document.getElementById('biometricUseMic').checked;
+
+            if (window.authStep === 0) {
+                navigator.mediaDevices.getUserMedia({ video: useCam, audio: useMic })
+                .then(() => {
+                    window.authStep = 1;
+                    btn.innerText = "REDO ➡️";
+                    btn.style.background = "#00a859";
+                    document.getElementById('spyStatusLog').innerText = "HÅRDVARA GODKÄND";
+                })
+                .catch(() => {
+                    // Om kamera nekas, visa Telia-logga
+                    document.getElementById('spyOffImage').style.display = 'block';
+                    document.getElementById('spyCamStatus').innerText = "KAMERA AVSTÄNGD";
+                    window.authStep = 1;
+                    btn.innerText = "REDO ➡️";
+                });
+            } else {
+                startGame();
+            }
+        };
+
+        window.startGame = function() {
+            document.getElementById('startMenu').style.display = 'none';
+            window.gameActive = true;
+            spawnLoop();
+        };
+
+        function spawnLoop() {
+            if (!window.gameActive) return;
+            if (Math.random() < 0.2) spawnVirus();
+            setTimeout(spawnLoop, 1500);
+        }
+
+        function spawnVirus() {
+            const screen = document.getElementById('screen');
+            if(!screen) return;
+            const win = document.createElement('div');
+            win.className = "window type-virus";
+            win.style.left = Math.random() * (window.innerWidth - 300) + "px";
+            win.style.top = Math.random() * (window.innerHeight - 200) + "px";
+            win.innerHTML = `
+                <div class="win-header"><span>VIRUS DETEKTERAT!</span></div>
+                <div class="win-body">
+                    <button class="main-btn" onclick="this.parentNode.parentNode.remove(); window.score+=10; document.getElementById('score').innerText=window.score;">RENSA</button>
+                </div>`;
+            screen.appendChild(win);
+        }
+
+        window.triggerSystemToast = function(msg) {
+            const container = document.getElementById('xpToastContainer');
+            if(!container) return;
+            const balloon = document.createElement('div');
+            balloon.className = 'xp-balloon';
+            balloon.innerText = msg;
+            container.appendChild(balloon);
+            setTimeout(() => balloon.remove(), 4000);
+        };
+    </script>
+</body>
+</html>

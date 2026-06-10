@@ -1,0 +1,2388 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Station 24 - N. Gin Boss Battle ULTRA 3D</title>
+    <!-- Google Fonts för rätt retro/arkadkänsla -->
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=VT323&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Three.js CDN för 3D-grafiken -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        /* ==========================================================================
+           1. GRUNDLÄGGANDE STYLING & CRT SCANLINES
+           ========================================================================== */
+        :root {
+            --primary: #00ffcc;
+            --gold: #ffcc00;
+            --kamek-glow: #8200ff;
+            --danger: #ff0033;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #030008;
+            font-family: 'Luckiest Guy', cursive;
+            user-select: none;
+            color: white;
+        }
+
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #gameCanvas {
+            z-index: 1;
+            cursor: none !important;
+        }
+
+        /* 2D HUD Canvas placeras ovanpå 3D scenen för siktet och skador */
+        #hudCanvas {
+            z-index: 5;
+            pointer-events: none;
+            cursor: none !important;
+        }
+
+        /* Retro CRT-skärmseffekt */
+        .crt-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 6px 100%;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0.45;
+        }
+
+        /* ==========================================================================
+           2. HUD-ELEMENT (SPELSKÄRM)
+           ========================================================================== */
+        #hud-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: calc(100% - 40px);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .stat-box {
+            padding: 10px 18px;
+            border: 3px solid var(--gold);
+            background: rgba(5, 0, 10, 0.85);
+            font-size: 18px;
+            border-radius: 10px;
+            text-shadow: 2px 2px #000;
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.25);
+            pointer-events: auto;
+        }
+
+        #boss-health-widget {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40%;
+            min-width: 300px;
+            background: rgba(5, 0, 10, 0.9);
+            border: 4px solid #ff0033;
+            border-radius: 14px;
+            padding: 10px 15px;
+            z-index: 12;
+            box-shadow: 0 0 25px rgba(255, 0, 51, 0.45);
+            text-align: center;
+        }
+
+        #boss-name {
+            font-size: 20px;
+            color: #ff0033;
+            text-shadow: 2px 2px 0 black;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+
+        .health-bar-bg {
+            width: 100%;
+            height: 16px;
+            background: #1a0005;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 2px solid #52000c;
+        }
+
+        .health-bar-fill {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #ff0033 0%, #ff6600 100%);
+            box-shadow: 0 0 10px #ff0033;
+            transition: width 0.1s ease;
+        }
+
+        #boss-part-status {
+            font-family: 'VT323', monospace;
+            font-size: 14px;
+            color: var(--gold);
+            margin-top: 5px;
+            text-transform: uppercase;
+        }
+
+        /* Spelarens hälsa i botten */
+        #player-health-widget {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            width: 250px;
+            background: rgba(5, 0, 10, 0.9);
+            border: 3px solid var(--primary);
+            border-radius: 12px;
+            padding: 10px;
+            z-index: 10;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.35);
+        }
+
+        #player-shield-title {
+            font-size: 16px;
+            color: var(--primary);
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* LJUD & MUSIK CONTROL PANEL (HUD) */
+        #volume-panel {
+            position: absolute;
+            top: 180px;
+            right: 20px;
+            background: rgba(5, 0, 10, 0.95);
+            border: 3px solid var(--gold);
+            border-radius: 14px;
+            padding: 14px;
+            z-index: 100;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 12px;
+            pointer-events: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 200px;
+            box-shadow: 0 0 25px rgba(255, 204, 0, 0.3);
+        }
+
+        /* ==========================================================================
+           3. STARTSKÄRM & SPRÅKVAL
+           ========================================================================== */
+        #start-screen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 500;
+            background: rgba(5, 0, 10, 0.97);
+            padding: 35px;
+            border: 8px solid var(--gold);
+            border-radius: 30px;
+            text-align: center;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 0 40px rgba(130, 0, 255, 0.5);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        #start-screen h1 {
+            font-size: 44px;
+            color: var(--gold);
+            -webkit-text-stroke: 2px black;
+            margin-top: 0;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 0px #000;
+        }
+
+        #start-screen h2 {
+            font-size: 22px;
+            color: #ff0033;
+            margin-bottom: 25px;
+            font-family: 'VT323', monospace;
+            letter-spacing: 2px;
+        }
+
+        .language-selector-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin: 15px 0 25px 0;
+        }
+
+        .flag-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            background: #120024;
+            border: 3px solid var(--kamek-glow);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--gold);
+            font-size: 12px;
+            font-weight: bold;
+            font-family: 'Luckiest Guy', sans-serif;
+        }
+
+        .flag-button:hover {
+            background: #250044;
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .flag-button svg {
+            width: 40px;
+            height: 26px;
+            border-radius: 4px;
+            margin-bottom: 4px;
+            border: 1.5px solid var(--gold);
+        }
+
+        input#playerName {
+            padding: 10px;
+            font-size: 20px;
+            border-radius: 10px;
+            border: 4px solid var(--kamek-glow);
+            text-align: center;
+            width: 80%;
+            background: #120024;
+            color: white;
+            font-family: 'Luckiest Guy';
+            margin-top: 5px;
+        }
+
+        .btn-start {
+            font-family: 'Luckiest Guy', cursive;
+            background: #00ff00;
+            font-size: 26px;
+            padding: 15px 40px;
+            border: 4px solid black;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #00aa00;
+            transition: transform 0.1s;
+        }
+        .btn-start:active { transform: translateY(5px); box-shadow: none; }
+
+        .btn-secondary {
+            font-family: 'Luckiest Guy', cursive;
+            background: #00ccff;
+            font-size: 18px;
+            padding: 8px 20px;
+            border: 3px solid black;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #0088cc;
+            margin-top: 10px;
+        }
+
+        /* ==========================================================================
+           4. SENSOR-WIDGETS (KAMERA & MIC)
+           ========================================================================== */
+        #kamek-cam-widget {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 150px;
+            height: 110px;
+            background: #000;
+            border: 3px solid var(--kamek-glow);
+            border-radius: 12px;
+            overflow: hidden;
+            z-index: 99;
+            box-shadow: 0 0 15px rgba(130,0,255,0.4);
+        }
+
+        #kamek-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        #kamek-cam-off {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #0c0017;
+            color: var(--gold);
+        }
+
+        #kamek-cam-off p {
+            margin: 5px 0 0 0;
+            font-family: 'VT323', monospace;
+            font-size: 12px;
+        }
+
+        #kamek-mic-widget {
+            position: fixed;
+            bottom: 20px;
+            left: 185px;
+            width: 60px;
+            height: 60px;
+            background: rgba(12,0,23,0.9);
+            border: 2px solid #00ccff;
+            border-radius: 50%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 99;
+        }
+
+        .kamek-bars {
+            display: flex;
+            align-items: flex-end;
+            height: 18px;
+            gap: 2px;
+        }
+
+        .k-bar {
+            width: 3px;
+            background: #00ccff;
+            height: 3px;
+            border-radius: 1px;
+            transition: height 0.05s;
+        }
+
+        /* ==========================================================================
+           5. DIAGNOSTIK-SKÄRM (UPPSTART)
+           ========================================================================== */
+        #diagnostic-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #040008;
+            z-index: 2000000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-family: 'VT323', monospace;
+            box-sizing: border-box;
+            padding: 40px;
+            border: 10px solid var(--kamek-glow);
+        }
+
+        #diag-log {
+            width: 100%;
+            max-width: 550px;
+            font-size: 24px;
+            text-align: left;
+            line-height: 1.8;
+        }
+
+        /* ==========================================================================
+           6. LÅSNINGSSKÄRMAR (KAMEK LOCKDOWNS)
+           ========================================================================== */
+        .lockdown-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(40, 0, 75, 0.98);
+            z-index: 1000000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            box-sizing: border-box;
+            color: var(--gold);
+            border: 15px solid var(--danger);
+            text-align: center;
+        }
+
+        .lockdown-overlay svg {
+            width: 150px;
+            height: 150px;
+            border: 6px solid var(--danger);
+            background: #110022;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .lockdown-overlay p {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 18px;
+            max-width: 600px;
+            line-height: 1.6;
+            color: white;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px dashed var(--gold);
+            margin-bottom: 20px;
+        }
+
+        .lockdown-overlay button {
+            padding: 12px 35px;
+            font-family: 'Luckiest Guy', cursive;
+            background: var(--gold);
+            color: black;
+            font-size: 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #b89500;
+        }
+
+        /* ==========================================================================
+           7. TOAST NOTIFIKATIONER
+           ========================================================================== */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: flex-end;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: rgba(5, 0, 10, 0.95);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin-top: 8px;
+            border: 2px solid var(--gold);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            animation: toastSlideIn 0.3s ease-out forwards;
+        }
+
+        @keyframes toastSlideIn {
+            from { transform: translateX(120%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* ==========================================================================
+           8. MANUAL MODAL (REGLER)
+           ========================================================================== */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100000;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.94);
+            backdrop-filter: blur(8px);
+            overflow-y: auto;
+            padding: 40px 0;
+        }
+
+        .modal-content {
+            background-image: linear-gradient(180deg, #05000a 0%, #110022 100%);
+            margin: auto;
+            padding: 30px;
+            border: 5px solid var(--kamek-glow);
+            width: 90%;
+            max-width: 800px;
+            border-radius: 20px;
+            color: #ffffff;
+            box-shadow: 0 0 50px rgba(130, 0, 255, 0.6);
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        .medical-warning {
+            color: var(--gold);
+            font-size: 15px;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 12px;
+            border: 2px solid var(--gold);
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        /* ==========================================================================
+           9. RADIO SPELARE (BOOMBOX)
+           ========================================================================== */
+        #radio-container {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            width: 70px;
+            cursor: pointer;
+            z-index: 10001;
+            transition: transform 0.2s ease;
+        }
+        #radio-container:hover { transform: scale(1.1); }
+        #radio-cross {
+            display: none;
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 110%; height: 5px;
+            background-color: var(--danger);
+            transform: translate(-50%, -50%) rotate(45deg);
+            box-shadow: 0 0 5px black;
+        }
+        .radio-muted #radio-cross { display: block; }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <!-- CRT TV linjefilter -->
+    <div class="crt-overlay"></div>
+
+    <!-- UPPSTARTS DIAGNOSTIK -->
+    <div id="diagnostic-screen">
+        <h1 style="font-size: 40px; color: var(--gold); margin-bottom: 25px; text-shadow: 0 0 10px var(--gold); text-align: center;">STATION 24 - BOSS MODULE CHECK v5.0</h1>
+        <div id="diag-log">
+            <p id="diag-ram">Checking physical memory (RAM)...</p>
+            <p id="diag-cpu" style="display:none;">Checking CPU core counts...</p>
+            <p id="diag-os" style="display:none;">Verifying OS architecture security...</p>
+            <p id="diag-disk" style="display:none;">Scanning local HDD sector capacity...</p>
+        </div>
+    </div>
+
+    <!-- TOAST MEDDELANDEN -->
+    <div id="toast-container"></div>
+
+    <!-- HUD / REGLAGE -->
+    <div id="hud-container">
+        <div class="stat-box" style="border-color: var(--primary);">
+            <span id="score-label">SCORE</span>: <span id="score-display">0</span>
+        </div>
+        <div class="stat-box" style="border-color: #00ccff;">
+            <span id="mag-label">AMMO</span>: <span id="ammo-display">30 / 120</span>
+        </div>
+        <button class="stat-box" style="border-color: var(--kamek-glow); background: #1a0033; color: var(--gold); cursor: pointer;" onclick="location.href='index3.html'">
+            ↩ <span id="quit-label">AVBRYT</span>
+        </button>
+    </div>
+
+    <!-- GIGANTISK BOSS HÄLSOMÄTARE (TOPPEN) -->
+    <div id="boss-health-widget">
+        <div id="boss-name">N. GIN MECHA-STRIKER</div>
+        <div class="health-bar-bg">
+            <div class="health-bar-fill" id="boss-hp-bar"></div>
+        </div>
+        <div id="boss-part-status">ACTIVE COMPONENT: SHOULDER ARTILLERY</div>
+    </div>
+
+    <!-- SPELARENS INTEGRITET (BOTTEN-HÖGER) -->
+    <div id="player-health-widget">
+        <div id="player-shield-title">
+            <span id="shield-label">INTEGRITY (SHIELD)</span>
+            <span><span id="player-hp-display">100</span>%</span>
+        </div>
+        <div class="health-bar-bg" style="border-color: #005544; background: #001a14;">
+            <div class="health-bar-fill" id="player-hp-bar" style="background: linear-gradient(90deg, #00ffcc 0%, #00ff66 100%); box-shadow: 0 0 10px var(--primary); width: 100%;"></div>
+        </div>
+    </div>
+
+    <!-- FLYGANDE LJUD- OCH VOLYMPANEL -->
+    <div id="volume-panel" style="display: none;">
+        <div style="font-family: 'Luckiest Guy'; color: var(--gold); font-size: 14px; text-align: center; margin-bottom: 4px;" id="sound-panel-title">LJUDINSTÄLLNINGAR</div>
+        
+        <!-- MUSIK -->
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; color: white;">
+                <span id="vol-music-label">MUSIK</span>
+                <button id="mute-music-btn" onclick="window.toggleMusicMute()" style="background: var(--kamek-glow); border: none; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold;">MUTE</button>
+            </div>
+            <input type="range" id="music-volume-slider" min="0" max="1" step="0.05" value="0.5" oninput="window.changeMusicVolume(this.value)" style="width: 100%; accent-color: var(--kamek-glow); cursor: pointer;">
+        </div>
+
+        <!-- EFFEKTER -->
+        <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 5px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; color: white;">
+                <span id="vol-sfx-label">EFFEKTER (SFX)</span>
+                <button id="mute-sfx-btn" onclick="window.toggleSfxMute()" style="background: var(--primary); border: none; color: black; padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold;">MUTE</button>
+            </div>
+            <input type="range" id="sfx-volume-slider" min="0" max="1" step="0.05" value="0.6" oninput="window.changeSfxVolume(this.value)" style="width: 100%; accent-color: var(--primary); cursor: pointer;">
+        </div>
+    </div>
+
+    <!-- STARTSKÄRM / LOBBY -->
+    <div id="start-screen">
+        <h1>N. GIN BOSS MODE</h1>
+        <h2>3D RETRO SPACE ENGAGEMENT</h2>
+
+        <!-- Språkval med SVG flaggor -->
+        <div class="language-selector-grid">
+            <button class="flag-button" onclick="window.setLanguage('sv')" title="Svenska">
+                <svg viewBox="0 0 16 10">
+                    <rect width="16" height="10" fill="#006aa7"/>
+                    <rect width="2" height="10" x="5" fill="#fecc00"/>
+                    <rect width="16" height="2" y="4" fill="#fecc00"/>
+                </svg>
+                <span>Svenska</span>
+            </button>
+            <button class="flag-button" onclick="window.setLanguage('en')" title="English">
+                <svg viewBox="0 0 50 30">
+                    <clipPath id="t"><path d="M0,0 v30 h50 v-30 z"/></clipPath>
+                    <path d="M0,0 L50,30 M50,0 L0,30" stroke="#fff" stroke-width="6" clip-path="url(#t)"/>
+                    <path d="M0,0 L50,30 M50,0 L0,30" stroke="#c8102e" stroke-width="4" clip-path="url(#t)"/>
+                    <path d="M25,0 v30 M0,15 h50" stroke="#fff" stroke-width="10"/>
+                    <path d="M25,0 v30 M0,15 h50" stroke="#c8102e" stroke-width="6"/>
+                </svg>
+                <span>English</span>
+            </button>
+            <button class="flag-button" onclick="window.setLanguage('da')" title="Dansk">
+                <svg viewBox="0 0 37 28">
+                    <rect width="37" height="28" fill="#c8102e"/>
+                    <rect width="4" height="28" x="12" fill="#fff"/>
+                    <rect width="37" height="4" y="12" fill="#fff"/>
+                </svg>
+                <span>Dansk</span>
+            </button>
+            <button class="flag-button" onclick="window.setLanguage('no')" title="Norsk">
+                <svg viewBox="0 0 22 16">
+                    <rect width="22" height="16" fill="#ba0c2f"/>
+                    <rect width="4" height="16" x="6" fill="#fff"/>
+                    <rect width="22" height="4" y="6" fill="#fff"/>
+                    <rect width="2" height="16" x="7" fill="#00205b"/>
+                    <rect width="22" height="2" y="7" fill="#00205b"/>
+                </svg>
+                <span>Norsk</span>
+            </button>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="playerName" id="name-label" style="color: white; display: block; margin-bottom: 5px;">SKRIV DITT NAMN:</label>
+            <input type="text" id="playerName" placeholder="Skriv här..." maxlength="12">
+        </div>
+
+        <!-- INSTÄLLNINGAR FÖR WEBBCAM OCH MIKROFON (AV SOM STANDARD) -->
+        <div style="margin: 20px 0; background: rgba(130, 0, 255, 0.15); padding: 15px; border-radius: 15px; border: 2px dashed var(--kamek-glow); text-align: left;">
+            <h3 style="margin-top: 0; color: var(--gold); text-align: center; font-size: 16px;" id="sensors-title">TURNERINGS-SENSORER (VALFRITT)</h3>
+            <div style="display: flex; flex-direction: column; gap: 10px; font-family: 'Montserrat', sans-serif; font-size: 13px;">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                    <input type="checkbox" id="use-camera-checkbox" style="width: 18px; height: 18px; accent-color: var(--kamek-glow);">
+                    <span id="label-use-camera">Aktivera Webbkamera (Face Tracking)</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                    <input type="checkbox" id="use-mic-checkbox" style="width: 18px; height: 18px; accent-color: var(--kamek-glow);">
+                    <span id="label-use-mic">Aktivera Mikrofon (Scream Attack)</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="medical-warning" id="medical-warning-text">
+            ⚠️ MEDICINSK VARNING: Spelet innehåller skakningar och stroboskopeffekter i 3D-rymden. Rekommenderas ej för personer med epilepsi.
+        </div>
+
+        <button class="btn-start" id="start-btn" onclick="window.startGame()">START BOSS FIGHT</button>
+        <br>
+        <button class="btn-secondary" id="rules-btn" onclick="window.toggleRules(true)">INSTRUKTIONER</button>
+    </div>
+
+    <!-- BOOMBOX (RADIO) -->
+    <div id="radio-container" onclick="window.toggleMusic(event)">
+        <svg viewBox="0 0 100 60" style="background:#1a1a1a; border-radius:10px; border:3px solid var(--gold);">
+            <rect x="5" y="5" width="90" height="15" fill="#333" rx="3" />
+            <circle cx="20" cy="40" r="12" fill="#444" stroke="#fff" stroke-width="2"/>
+            <circle cx="20" cy="40" r="4" fill="#000" />
+            <circle cx="80" cy="40" r="12" fill="#444" stroke="#fff" stroke-width="2"/>
+            <circle cx="80" cy="40" r="4" fill="#000" />
+            <rect x="38" y="32" width="24" height="16" fill="#111" stroke="#555" rx="2"/>
+            <line x1="42" y1="40" x2="58" y2="40" stroke="var(--gold)" stroke-width="3"/>
+            <rect x="15" y="9" width="70" height="7" fill="#00ffcc" opacity="0.8"/>
+            <line x1="50" y1="8" x2="50" y2="17" stroke="red" stroke-width="2"/>
+        </svg>
+        <div id="radio-cross"></div>
+    </div>
+
+    <!-- MANUAL MODAL -->
+    <div id="rules-modal" class="modal">
+        <div class="modal-content">
+            <h1 id="manual-title" style="color: var(--gold); font-family: 'Luckiest Guy'; font-size: 3em; text-align: center; margin-top: 0; text-shadow: 3px 3px 0px #000;">STRIDSOPERATÖR: N. GIN PROTOKOLLET</h1>
+            
+            <div class="medical-warning" id="manual-warning-text">
+                ⚠️ MEDICINSK VARNING: Innehåller kraftiga explosioner och 3D-laserblixtar.
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: left; margin-bottom: 25px;">
+                <div style="background: rgba(130, 0, 255, 0.1); padding: 15px; border-radius: 10px; border: 1px solid var(--kamek-glow);">
+                    <h3 id="controls-title" style="color: var(--gold); border-bottom: 2px solid var(--gold); margin-top: 0;">🎮 KONTROLLER</h3>
+                    <p id="controls-desc" style="font-size: 14px; margin: 0;">
+                        <strong>[W, A, S, D]</strong> eller <strong>Piltangenter</strong>: Flyg upp/vänster/ner/höger för att ducka lasrar.<br>
+                        <strong>Musen</strong>: Sikta siktet mot bossens lysande delar.<br>
+                        <strong>Vänsterklick</strong>: Skjut laser.<br>
+                        <strong>[R]</strong>: Ladda om vapensystemen.
+                    </p>
+                </div>
+                <div style="background: rgba(0, 255, 204, 0.05); padding: 15px; border-radius: 10px; border: 1px solid var(--primary);">
+                    <h3 id="boss-stages-title" style="color: var(--primary); border-bottom: 2px solid var(--primary); margin-top: 0;">⚙️ MECH STRATEGIPLAN</h3>
+                    <p id="boss-stages-desc" style="font-size: 14px; margin: 0;">
+                        <strong>FAS 1:</strong> Förstör de gula missil-poddarna på axlarna.<br>
+                        <strong>FAS 2:</strong> Undvik gatling-lasrarna som dras tvärs över skärmen och skjut armlederna.<br>
+                        <strong>FAS 3:</strong> Centralplåten exploderar! Skjut ner kärnan innan dess megaplasma-kanon utplånar ditt skepp.
+                    </p>
+                </div>
+            </div>
+
+            <button onclick="window.toggleRules(false)" class="btn-start" style="width: 100%; box-shadow: 0 5px 0 #b89500; background: var(--gold); color: black;">
+                BEKRÄFTA CODES & KÖR!
+            </button>
+        </div>
+    </div>
+
+    <!-- KAMEK SENSORER -->
+    <div id="kamek-cam-widget">
+        <video id="kamek-video" autoplay playsinline muted></video>
+        <div id="kamek-cam-off">
+            <svg viewBox="0 0 24 24" width="30" height="30" fill="var(--gold)">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+            </svg>
+            <p id="cam-off-label">CAMERA FEED LOCK</p>
+        </div>
+    </div>
+    <div id="kamek-mic-widget">
+        <div class="kamek-bars">
+            <div class="k-bar"></div><div class="k-bar"></div>
+            <div class="k-bar"></div><div class="k-bar"></div>
+        </div>
+    </div>
+
+    <!-- LOCKDOWN OVERLAYS -->
+    <div id="lockdown-overlay" class="lockdown-overlay">
+        <svg viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="40" fill="#2d0052"/>
+            <polygon points="20,40 50,5 80,40" fill="#8200ff" stroke="#fff" stroke-width="2"/>
+            <ellipse cx="50" cy="40" rx="30" ry="6" fill="#00ffcc"/>
+            <polygon points="35,55 45,60 35,62" fill="yellow"/>
+            <polygon points="65,55 55,60 65,62" fill="yellow"/>
+            <circle cx="40" cy="58" r="2" fill="red"/>
+            <circle cx="60" cy="58" r="2" fill="red"/>
+            <path d="M 40,75 Q 50,65 60,75" stroke="#ff0033" stroke-width="4" fill="none"/>
+        </svg>
+        <h1 id="lockdown-title">CHEAT DETECTED!</h1>
+        <p id="lockdown-msg">System locked.</p>
+        <button onclick="window.location.reload()">RESTART TERMINAL</button>
+    </div>
+
+    <!-- CANVAS-SKÄRMAR -->
+    <canvas id="gameCanvas"></canvas>
+    <!-- Speciell pixel-HUD-canvas för att rita retro-siktet på pixel-nivå -->
+    <canvas id="hudCanvas"></canvas>
+
+    <!-- ==========================================================================
+       10. SAMMANSLUTET SPRÅKSYSTEM & SPELMOTOR
+       ========================================================================== -->
+    <script>
+        // --- SÄKER wrapper för LocalStorage för att förebygga krascher i sandlådor ---
+        const safeStorage = {
+            _data: {},
+            getItem: function(key) {
+                try { return window.localStorage.getItem(key); } catch (e) { return this._data[key] || null; }
+            },
+            setItem: function(key, value) {
+                try { window.localStorage.setItem(key, value); } catch (e) { this._data[key] = String(value); }
+            }
+        };
+
+        // --- TRANSLATION DATA ---
+        const translations = {
+            sv: {
+                score: "POÄNG",
+                ammo: "MAGASIN",
+                player_name: "SKRIV DITT NAMN:",
+                placeholder_name: "Gäst...",
+                medical_warning: "⚠️ MEDICINSK VARNING: Spelet innehåller skakningar och stroboskopeffekter i 3D-rymden. Rekommenderas ej för personer med epilepsi.",
+                start_game: "STARTA STRIDEN",
+                instructions: "INSTRUKTIONER",
+                quit_label: "AVBRYT",
+                shield_label: "INTEGRITET (SKÖLD)",
+                camera_off_label: "KAMERA INAKTIV",
+                reloading: "🔄 LADDAR OM VAPENSYSTEM...",
+                reloaded_ready: "✅ STRIDSREDO!",
+                laser_hot: "⚠️ SENSORVÄRME KRITISK!",
+                lockdown_title: "TERMINAL LÅST!",
+                escape_locked: "ESCAPE ÄR SPÄRRAT PÅ LAN!",
+                devtools_forbidden: "DEVTOOLS FÖRBJUDET! Hacker-fasoner loggade.",
+                lost_focus: "INGEN FUSKPAUS TILLÅTEN! Kamek attackerar.",
+                tab_switch_detected: "FLIKBYTE DETEKTERAT! Kamek ser allt.",
+                trackpad_lockdown: "SLUTA SMEKA DIN LAPTOP! 🚫\n\nKamek hånar din styrplatta: 'NYEHEHEHE!'\nDu måste ha en riktig datormus för att rikta laserartilleriet på LAN:et!",
+                ups_warning: "⚠️ STRÖMAVBROTT / NÖDSTRÖM UPS REDO!",
+                
+                good_luck: "MÅ KAOS VARA MED DIG, {name}!",
+                stage1_msg: "FAS 1: Skjut ner båda axelmissil-poddarna!",
+                stage2_msg: "FAS 2: Se upp för laser-svepen! Skjut gatlingarmarna!",
+                stage3_msg: "FAS 3: BRÖSTPLÅTEN REVENGERAD! Skjut kärnan nu!",
+                victory_msg: "🏆 KAOS SEGER! Du förintade N. Gins Mecha!",
+                defeat_msg: "💀 DITT SKEPP BLEV RUMSDAMM!",
+                
+                diag_ram: "Analyserar fysiskt arbetsminne (RAM)...",
+                diag_cpu: "Söker efter processorkärnor (i5/Ryzen 5)...",
+                diag_os: "Kontrollerar operativsystemets säkerhetsarkitektur...",
+                diag_disk: "Skannar efter ledigt lagringsutrymme på HDD...",
+                diag_ok: "OK!",
+                diag_fail: "MISLYCKADES!",
+                device_hw_ram_fail: "KATASTROFAL BRIST: För lite RAM-minne! 💥\nN. Gin Boss Mode kräver minst 4GB RAM för att inte krascha webbläsaren.",
+                device_hw_cpu_cores_fail: "CPU-MISSLYKKANDE: För få fysiska processorkärnor! 🚴\nMinst 4 trådar krävs.",
+                device_hw_os_linux: "HACKER LOCKDOWN: Linux (Pingvinsystem) spärrat i turneringszonen!",
+                device_hw_os_chromeos: "SKOLDATOR BANNAD: ChromeOS upptäckt! Gör läxorna istället.",
+                device_hw_storage_fail: "HDD INTEGRITETSFEL: Ledigt utrymme kritiskt lågt!",
+                device_mobile: "MOBIL DETEKTERAD! 🚫\nDetta 3D-rymdslag kräver mus, tangentbord och äkta prestanda. Kasta telefonen!",
+                device_tablet: "SURFPLATTA UPPTÄCKT! 👶\nGå och titta på barn-tv istället för å flyga stridsskepp!",
+                device_smarttv: "SMART-TV UPPTÄCKT! 📺\nDin TV-processor är en brödrost. Återgå till att se på kattklipp.",
+                device_console: "KONSOL DETEKTERAD! Spelet styrs med tangentbord och mus.",
+                device_car: "BILSKÄRM DETEKTERAD! 🚗\nTesla-piloter rekommenderas att hålla ögonen på vägen innan Kamek kraschar autopiloten!",
+                device_refrigerator: "SMART KYLSKÅP DETEKTERAD! 🧊\nFörsöker du spela arkad på kylskåpsdörren? Stäng mjölkpaketet!",
+                device_smartwatch: "SMARTKLOCKA DETEKTERAD! ⌚\nSkärmen är mindre än en enkrona, skaffa ett mikroskop.",
+                device_smarthome: "SMART HEM-SKÄRM DETEKTERAD! Kamek skrattar ihjäl sig åt din termostat.",
+                device_unknown: "OKÄND TEKNOLOGI DETEKTERAD!",
+
+                manual_title: "STRIDSOPERATÖR: N. GIN PROTOKOLLET",
+                manual_warning_text: "⚠️ MEDICINSK VARNING: Innehåller kraftiga explosioner och 3D-laserblixtar.",
+                controls_title: "🎮 KONTROLLER",
+                controls_desc: "<strong>[W, A, S, D]</strong> eller <strong>Piltangenter</strong>: Flyg upp/vänster/ner/höger för att ducka lasrar.<br><strong>Musen</strong>: Sikta siktet mot bossens lysande delar.<br><strong>Vänsterklick</strong>: Skjut laser.<br><strong>[R]</strong>: Ladda om vapensystemen.",
+                boss_stages_title: "⚙️ MECH STRATEGIPLAN",
+                boss_stages_desc: "<strong>FAS 1:</strong> Förstör de gula missil-poddarna på axlarna.<br><strong>FAS 2:</strong> Undvik gatling-lasrarna som dras tvärs över skärmen och skjut armlederna.<br><strong>FAS 3:</strong> Centralplåten exploderar! Skjut kärnan nu.",
+
+                sensors_title: "TURNERINGS-SENSORER (VALFRITT)",
+                label_use_camera: "Aktivera Webbkamera (Face Tracking)",
+                label_use_mic: "Aktivera Mikrofon (Scream Attack)",
+                sound_panel_title: "LJUDINSTÄLLNINGAR",
+                vol_music_label: "MUSIK",
+                vol_sfx_label: "EFFEKTER (SFX)",
+                now_playing: "🎵 SPELAR NU",
+                music_muted: "Musik avstängd 🔇",
+                music_unmuted: "Musik aktiverad 🔊",
+                sfx_muted: "Effekter avstängda 🔇",
+                sfx_unmuted: "Effekter aktiverade 🔊"
+            },
+            en: {
+                score: "SCORE",
+                ammo: "AMMO",
+                player_name: "ENTER YOUR NAME:",
+                placeholder_name: "Guest...",
+                medical_warning: "⚠️ MEDICAL WARNING: This game contains shaking and strobe effects in 3D space. Not recommended for people with epilepsy.",
+                start_game: "START BOSS FIGHT",
+                instructions: "INSTRUCTIONS",
+                quit_label: "QUIT",
+                shield_label: "SHIELD INTEGRITY",
+                camera_off_label: "CAMERA LOCKED",
+                reloading: "🔄 RELOADING WEAPON SYSTEMS...",
+                reloaded_ready: "✅ COMBAT READY!",
+                laser_hot: "⚠️ SENSOR HEAT CRITICAL!",
+                lockdown_title: "TERMINAL LOCKED!",
+                escape_locked: "ESCAPE IS BLOCKED ON LAN!",
+                devtools_forbidden: "DEVTOOLS FORBIDDEN! Hack attempt logged.",
+                lost_focus: "NO CHEAT PAUSING ALLOWED! Kamek is attacking.",
+                tab_switch_detected: "TAB SWITCH DETECTED! Kamek is watching.",
+                trackpad_lockdown: "STOP STROKING YOUR LAPTOP! 🚫\n\nKamek mocks your trackpad: 'NYEHEHEHE!'\nYou must connect a real mouse to guide the tactical laser cannons on this LAN!",
+                ups_warning: "⚠️ POWER OUTAGE / EMERGENCY UPS ARMED!",
+                
+                good_luck: "MAY CHAOS BE WITH YOU, {name}!",
+                stage1_msg: "STAGE 1: Shoot down both shoulder missile pods!",
+                stage2_msg: "STAGE 2: Dodge the laser sweeps! Target the gatling joints!",
+                stage3_msg: "STAGE 3: HULL BREACHED! Strike the fusions core now!",
+                victory_msg: "🏆 VICTORY ACHIEVED! You obliterated N. Gin's Mech!",
+                defeat_msg: "💀 YOUR VESSEL SHATTERED INTO SPACE DUST!",
+                
+                diag_ram: "Analyzing physical memory (RAM)...",
+                diag_cpu: "Looking for processor core counts (i5/Ryzen 5)...",
+                diag_os: "Verifying OS architecture security...",
+                diag_disk: "Scanning available space on HDD...",
+                diag_ok: "PASSED!",
+                diag_fail: "FAILED!",
+                device_hw_ram_fail: "CRITICAL FAILURE: Too little RAM! 💥\nN. Gin Boss Mode requires at least 4GB RAM to prevent browser panic.",
+                device_hw_cpu_cores_fail: "CPU FAILURE: Too few processor cores! 🚴\nAt least 4 execution threads required.",
+                device_hw_os_linux: "HACKER LOCKDOWN: Linux (Penguin OS) prohibited in the tournament grid!",
+                device_hw_os_chromeos: "SCHOOL LAPTOP BANNED: ChromeOS detected! Do your homework.",
+                device_hw_storage_fail: "HDD INTEGRITY FAULT: Critical low storage space!",
+                device_mobile: "MOBILE DETECTED! 🚫\nThis 3D space engagement requires a mouse, keyboard, and real power. Ditch the phone!",
+                device_tablet: "TABLET DETECTED! 👶\nGo watch cartoons instead of trying to pilot interceptors!",
+                device_smarttv: "SMART TV DETECTED! 📺\nYour TV chip is a toaster. Go back to watching cat videos.",
+                device_console: "CONSOLE DETECTED! Input keyboard and mouse to play.",
+                device_car: "CAR SCREEN DETECTED! 🚗\nTesla drivers are recommended to keep eyes on the road before Kamek crashes autopilot!",
+                device_refrigerator: "SMART FRIDGE DETECTED! 🧊\nTrying to play arcade games on the door? Go close the milk carton!",
+                device_smartwatch: "SMARTWATCH DETECTED! ⌚\nThe screen is smaller than a coin, go get a microscope.",
+                device_smarthome: "SMART HOME DISPLAY DETECTED! Kamek laughs at your smart thermostat.",
+                device_unknown: "UNKNOWN TECHNOLOGY DETECTED!",
+
+                manual_title: "COMBAT OPERATOR: THE N. GIN PROTOCOL",
+                manual_warning_text: "⚠️ MEDICAL WARNING: Contains intense explosions and 3D laser flashes.",
+                controls_title: "🎮 CONTROLS",
+                controls_desc: "<strong>[W, A, S, D]</strong> or <strong>Arrow keys</strong>: Fly up/left/down/right to evade lasers.<br><strong>Mouse</strong>: Aim the reticle at the flashing components.<br><strong>Left Click</strong>: Fire laser.<br><strong>[R]</strong>: Reload weapon systems.",
+                boss_stages_title: "⚙️ MECH STRATEGY PLAN",
+                boss_stages_desc: "<strong>STAGE 1:</strong> Destroy the yellow missile pods on the shoulders.<br><strong>STAGE 2:</strong> Dodge the laser sweeps moving across the screen. Shoot the arm joints.<br><strong>STAGE 3:</strong> Central plating explodes! Strike the fusions core now.",
+
+                sensors_title: "TOURNAMENT SENSORS (OPTIONAL)",
+                label_use_camera: "Enable Webcam (Face Tracking)",
+                label_use_mic: "Enable Microphone (Scream Attack)",
+                sound_panel_title: "SOUND SETTINGS",
+                vol_music_label: "MUSIC",
+                vol_sfx_label: "EFFECTS (SFX)",
+                now_playing: "🎵 NOW PLAYING",
+                music_muted: "Music muted 🔇",
+                music_unmuted: "Music unmuted 🔊",
+                sfx_muted: "SFX muted 🔇",
+                sfx_unmuted: "SFX unmuted 🔊"
+            },
+            da: {
+                score: "SCORE",
+                ammo: "MAGASIN",
+                player_name: "SKRIV DIT NAVN:",
+                placeholder_name: "Gæst...",
+                medical_warning: "⚠️ MEDICINSK ADVARSEL: Spillet indeholder rystelser og stroboskopeffekter i 3D-rummet. Anbefales ikke til personer med epilepsi.",
+                start_game: "START STRIDEN",
+                instructions: "INSTRUKTIONER",
+                quit_label: "AVBRYD",
+                shield_label: "INTEGRITET (SKJOLD)",
+                camera_off_label: "KAMERA DEAKTIVERET",
+                reloading: "🔄 GENOPLADER VÅBENSYSTEM...",
+                reloaded_ready: "✅ STRIDSREDO!",
+                laser_hot: "⚠️ SENSORVARME KRITISK!",
+                lockdown_title: "TERMINAL LÅST!",
+                escape_locked: "ESCAPE ER BLOKERET PÅ LAN!",
+                devtools_forbidden: "DEVTOOLS FORBUDT! Hacker-forsøg logget.",
+                lost_focus: "TERMINAL MISTER FOKUS! Ingen fuskpause tilladt.",
+                tab_switch_detected: "SKIFT AF FANE DETEKTERET! ...",
+                trackpad_lockdown: "STOP MED AT AE DIN BÆRBARE! 🚫\n\nKamek håner din berøringsplade: 'NYEHEHEHE!'\nDu skal have en rigtig mus til at styre laseren!",
+                ups_warning: "⚠️ STRØMAFBRYDELSE! UPS NØDSTRØM KLAR!",
+                
+                good_luck: "HELD OG LYKKE, {name}!",
+                stage1_msg: "FAS 1: Skyd begge skuldermissil-puder ned!",
+                stage2_msg: "FAS 2: Pas på laser-fejene! Skyd armleddene!",
+                stage3_msg: "FAS 3: BRYSTPLADEN SPRÆNGE! Skyd kernen nu!",
+                victory_msg: "🏆 SEJR! Du destruerede N. Gins Mecha!",
+                defeat_msg: "💀 DIT SKIB BLEV TIL RUMSTØV!",
+                
+                diag_ram: "Analyserer fysisk arbejdshukommelse (RAM)...",
+                diag_cpu: "Søger efter processorkerner (i5/Ryzen 5)...",
+                diag_os: "Kontrollerer operativsystemets sikkerhetsarkitektur...",
+                diag_disk: "Scanner efter ledig lagerplads på HDD...",
+                diag_ok: "GODKENDT!",
+                diag_fail: "MISLYKKEDES!",
+                device_hw_ram_fail: "KATASTROFAL FEJL: For litt RAM! 💥\nMindst 4GB RAM kræves.",
+                device_hw_cpu_cores_fail: "CPU FEJL: For få processorkerner! 🚴",
+                device_hw_os_linux: "SIKKERHEDS LOCKDOWN: Linux spærret i turneringen!",
+                device_hw_os_chromeos: "SKOLECOMPUTER BANDLYST: ChromeOS detekteret! Lav lektier i stedet.",
+                device_hw_storage_fail: "HDD PLADS CRITICAL LOW!",
+                device_mobile: "MOBIL DETEKTERET! 🚫\nKrav om mus, tastatur og strøm. Smid telefonen!",
+                device_tablet: "TABLET DETEKTERET! 👶\nGå over og se Gurli Gris i stedet.",
+                device_smarttv: "SMART-TV DETEKTERET! 📺\nDin processor er en brødrister. Se kattevideoer i stedet.",
+                device_console: "KONSOL DETEKTERET!",
+                device_car: "BILSKÆRM DETEKTERET! 🚗 Hold øjnene på vejen!",
+                device_refrigerator: "SMART KØLESKAB DETEKTERET! 🧊 Gå hen og luk mælken!",
+                device_smartwatch: "SMARTWATCH DETEKTERET! Skaff et mikroskop.",
+                device_smarthome: "SMART HJEM DETEKTERET!",
+                device_unknown: "UKENDT TEKNOLOGI DETEKTERET!",
+
+                manual_title: "STRIDSOPERATØR: N. GIN PROTOKOLLET",
+                manual_warning_text: "⚠️ MEDICINSK ADVARSEL: Indeholder kraftige ekspektioner og 3D-laserglimt.",
+                controls_title: "🎮 KONTROLLER",
+                controls_desc: "<strong>[W, A, S, D]</strong> eller <strong>Piltaster</strong>: Flyv op/venstre/ned/højre for at undvige.<br><strong>Musen</strong>: Sigt mod de blinkende svage punkter.<br><strong>Venstreklik</strong>: Skyd laser.<br><strong>[R]</strong>: Genoplad.",
+                boss_stages_title: "⚙️ MECH STRATEGIPLAN",
+                boss_stages_desc: "<strong>FAS 1:</strong> Skyd skuldermissil-puderne.<br><strong>FAS 2:</strong> Undvig de vandrette laser-svep. Skyd armleddene.<br><strong>FAS 3:</strong> Brystpladen sprænges! Skyd kernen nu.",
+
+                sensors_title: "TURNERINGS-SENSORER (VALGFRIT)",
+                label_use_camera: "Aktivér Webkamera (Face Tracking)",
+                label_use_mic: "Aktivér Mikrofon (Scream Attack)",
+                sound_panel_title: "LYDINDSTILLINGER",
+                vol_music_label: "MUSIK",
+                vol_sfx_label: "EFFEKTER (SFX)",
+                now_playing: "🎵 SPILLER NU",
+                music_muted: "Musik dæmpet 🔇",
+                music_unmuted: "Musik aktiveret 🔊",
+                sfx_muted: "Effekter dæmpet 🔇",
+                sfx_unmuted: "Effekter aktiveret 🔊"
+            },
+            no: {
+                score: "POENG",
+                ammo: "MAGASIN",
+                player_name: "SKRIV DITT NAVN:",
+                placeholder_name: "Gjest...",
+                medical_warning: "⚠️ MEDISINSK ADVARSEL: Spillet inneholder rystelser og stroboskopeffekter i 3D-rymden. Anbefales ikke for personer med epilepsi.",
+                start_game: "START STRIDEN",
+                instructions: "INSTRUKSJONER",
+                quit_label: "AVBRYT",
+                shield_label: "INTEGRITET (SKJOLD)",
+                camera_off_label: "KAMERA DEAKTIVERT",
+                reloading: "🔄 LADER OM VÅBENSYSTEM...",
+                reloaded_ready: "✅ STRIDSKLAR!",
+                laser_hot: "⚠️ SENSORVARME KRITISK!",
+                lockdown_title: "TERMINAL LÅST!",
+                escape_locked: "ESCAPE ER SPERRET PÅ LAN!",
+                devtools_forbidden: "DEVTOOLS ER FORBUDT! Hacker-forsøk logget.",
+                lost_focus: "TERMINAL MISTER FOKUS! Juksing ikke tillatt.",
+                tab_switch_detected: "FANEBYTTE OPPDAGET! Kamek ser alt.",
+                trackpad_lockdown: "SLUTT Å STRYKE LAPTOPPEN DIN! 🚫\n\nKamek ler av den klumpete styreflaten din: 'NYEHEHEHE!'\nDu må koble til en ekte datamus for å sikte laseren på LAN-et!",
+                ups_warning: "⚠️ STRØMBRUDD! UPS NØDSTRØM SIKRET!",
+                
+                good_luck: "LYKKE TIL, {name}!",
+                stage1_msg: "FAS 1: Skyt ned begge skuldermissil-poddene!",
+                stage2_msg: "FAS 2: Pass deg for lasersveipene! Skyt armleddene!",
+                stage3_msg: "FAS 3: BRYSTPLATINGEN EXPLODERER! Skyt kjernen nå!",
+                victory_msg: "🏆 SEIER! Du tilintetgjorde N. Gins Mecha!",
+                defeat_msg: "💀 SKIPET DITT BLE TIL ROMSTØV!",
+                
+                diag_ram: "Analyserer fysisk minne (RAM)...",
+                diag_cpu: "Søker etter prosessorkjerner (i5/Ryzen 5)...",
+                diag_os: "Verifiserer operativsystemets sikkerhetsarkitektur...",
+                diag_disk: "Skanner etter ledig diskplass på HDD...",
+                diag_ok: "GODKJENT!",
+                diag_fail: "MISLYKTES!",
+                device_hw_ram_fail: "KATASTROFAL MANGLER: For lite RAM! 💥\nMin. 4GB RAM kreves.",
+                device_hw_cpu_cores_fail: "CPU MISSLYKKING: For få prosessorkjerner! 🚴",
+                device_hw_os_linux: "SIKKERHETS LOCKDOWN: Linux spærret i turneringen!",
+                device_hw_os_chromeos: "SKOLE-PC BANNLYST: ChromeOS oppdaget! Gjør lekser isteden.",
+                device_hw_storage_fail: "HDD-FEIL: Diskplass kritisk lav!",
+                device_mobile: "MOBIL OPPDAGET! 🚫\nKrever mus, tastatur og stabil strøm. Kast telefonen!",
+                device_tablet: "NETTBRETT OPPDAGET! 👶\nGå og se på Fantorangen isteden.",
+                device_smarttv: "SMART-TV OPPDAGET! 📺\nProsessoren din er en brødrister. Se kattevideoer isteden.",
+                device_console: "KONSOL DETEKTERT!",
+                device_car: "BILSKJERM OPPDAGET! 🚗 Hold øynene på vejen!",
+                device_refrigerator: "SMART KJØLESKAP OPPDAGET! 🧊 Gå og lukk melken!",
+                device_smartwatch: "SMARTKLOKKE OPPDAGET! Skaff et mikroskop.",
+                device_smarthome: "SMART HJEM-SKJERM DETEKTERT!",
+                device_unknown: "UKJENT TEKNOLOGI OPPDAGET!",
+
+                manual_title: "STRIDSOPERATÖR: N. GIN PROTOKOLLET",
+                manual_warning_text: "⚠️ MEDISINSK ADVARSEL: Inneholder kraftige explosions og 3D-laserglimt.",
+                controls_title: "🎮 KONTROLLER",
+                controls_desc: "<strong>[W, A, S, D]</strong> eller <strong>Piltaster</strong>: Fly opp/venstre/ned/høyre for å unnvike lasersveip.<br><strong>Musen</strong>: Sikt mot de blinkende sårbare punktene.<br><strong>Venstreklikkt</strong>: Skyt laser.<br><strong>[R]</strong>: Lader om våpensystemet.",
+                boss_stages_title: "⚙️ MECH STRATEGIPLAN",
+                boss_stages_desc: "<strong>FAS 1:</strong> Skyt skuldermissil-poddene.<br><strong>FAS 2:</strong> Unnvike de gigantiske lasersveipene. Skyt armleddene.<br><strong>FAS 3:</strong> Sentralplaten sprenges! Skyt kjernen nå.",
+
+                sensors_title: "TURNERINGS-SENSORER (VALGFRIT)",
+                label_use_camera: "Aktiver Webkamera (Face Tracking)",
+                label_use_mic: "Aktiver Mikrofon (Scream Attack)",
+                sound_panel_title: "LYDINNSTILLINGER",
+                vol_music_label: "MUSIKK",
+                vol_sfx_label: "EFFEKTER (SFX)",
+                now_playing: "🎵 SPILLER NÅ",
+                music_muted: "Musikk dempet 🔇",
+                music_unmuted: "Musikk aktiv 🔊",
+                sfx_muted: "Effekter dempet 🔇",
+                sfx_unmuted: "Effekter aktive 🔊"
+            }
+        };
+
+        // Standard språk
+        let currentLang = localStorage.getItem('gameLanguage');
+        if (!translations[currentLang]) {
+            const browserLang = navigator.language.slice(0, 2);
+            currentLang = translations[browserLang] ? browserLang : 'en';
+            localStorage.setItem('gameLanguage', currentLang);
+        }
+
+        function t(key) {
+            return translations[currentLang]?.[key] || translations['en']?.[key] || key;
+        }
+
+        function setLanguage(lang) {
+            if (translations[lang]) {
+                currentLang = lang;
+                safeStorage.setItem('gameLanguage', lang);
+                initializeUIText();
+                showToast(t('lang_changed') || "🌐 LANGUAGE SET!", "var(--primary)");
+            }
+        }
+        window.setLanguage = setLanguage;
+
+        function initializeUIText() {
+            document.getElementById('name-label').textContent = t('player_name');
+            document.getElementById('playerName').placeholder = t('placeholder_name');
+            document.getElementById('medical-warning-text').textContent = t('medical_warning');
+            document.getElementById('start-btn').textContent = t('start_game');
+            document.getElementById('rules-btn').textContent = t('instructions');
+            document.getElementById('quit-label').textContent = t('quit_label');
+            
+            // HUD
+            document.getElementById('score-label').textContent = t('score');
+            document.getElementById('mag-label').textContent = t('ammo');
+            document.getElementById('shield-label').textContent = t('shield_label');
+            document.getElementById('cam-off-label').textContent = t('camera_off_label');
+
+            // Lockdown/Anti-cheat
+            document.getElementById('lockdown-title').textContent = t('lockdown_title');
+
+            // Manual
+            document.getElementById('manual-title').textContent = t('manual_title');
+            document.getElementById('manual-warning-text').textContent = t('manual_warning_text');
+            document.getElementById('controls-title').textContent = t('controls_title');
+            document.getElementById('controls-desc').innerHTML = t('controls_desc');
+            document.getElementById('boss-stages-title').textContent = t('boss-stages-title');
+            document.getElementById('boss-stages-desc').innerHTML = t('boss-stages-desc');
+
+            // Ljud & Sensorer
+            document.getElementById('sensors-title').textContent = t('sensors_title');
+            document.getElementById('label-use-camera').textContent = t('label_use_camera');
+            document.getElementById('label-use-mic').textContent = t('label_use_mic');
+            document.getElementById('sound-panel-title').textContent = t('sound_panel_title');
+            document.getElementById('vol-music-label').textContent = t('vol_music_label');
+            document.getElementById('vol-sfx-label').textContent = t('vol_sfx_label');
+        }
+
+        // --- PROCEDURIELL LJUD-OCH MUSIKSYNT (Web Audio API) ---
+        class SoundEngine {
+            constructor() {
+                this.ctx = null;
+                this.musicInterval = null;
+                this.step = 0;
+                this.musicVolume = 0.5; // Standard volym
+                this.sfxVolume = 0.6;   // Standard ljudeffektvolym
+                this.isMusicMuted = false;
+                this.isSfxMuted = false;
+                this.currentSongIndex = 0;
+                this.audioElement = null;
+
+                // Definiera de exakta lokala MP3-sökvägarna från din "music/"-mapp
+                const rawPaths = [
+                    'music/you_spin_me_round.mp3',
+                    'music/cotton_eye_joe.mp3',
+                    'music/rhythm_is_a_dancer.mp3',
+                    'music/never_going_home_tonight.mp3',
+                    'music/ma_baker.mp3',
+                    'music/sandstorm.mp3',
+                    'music/scooter.mp3',
+                    'music/the_logical_song.mp3',
+                    'music/this_is_the_way.mp3',
+                    'music/titanium.mp3',
+                    'music/what_is_love.mp3',
+                    'music/blue.mp3',
+                    'music/du_hast.mp3',
+                    'music/bowsers_galaxy.mp3',
+                    'music/gerudo_valley.mp3',
+                    'music/gusty_garden.mp3',
+                    'music/coconut_mall.mp3',
+                    'music/pokemon_main.mp3',
+                    'music/mario64_slider.mp3',
+                    'music/mk64_rr.mp3',
+                    'music/mk64_raceway.mp3',
+                    'music/strong_enough.mp3',
+                    'music/the_business.mp3',
+                    'music/animals.mp3',
+                    'music/set_the_world_on_fire.mp3',
+                    'music/better_off_alone.mp3',
+                    'music/boom_boom_boom.mp3',
+                    'music/faded.mp3',
+                    'music/here_i_go_again.mp3',
+                    'music/the_trooper.mp3',
+                    'music/everytime_we_touch.mp3',
+                    'music/my_system.mp3',
+                    'music/gs.mp3',
+                    'music/we_like_to_party.mp3',
+                    'music/when_we_were_young.mp3',
+                    'music/billie_jean.mp3',
+                    'music/be_my_lover.mp3'
+                ];
+
+                // Bygg spellistan dynamiskt och formatera namnen vackert för HUD/Toasts
+                this.playlist = rawPaths.map(path => {
+                    let name = path.split('/').pop().replace('.mp3', '');
+                    
+                    // Särskild hantering för förkortningar för en lyxigare visuell upplevelse
+                    if (name === 'gs') {
+                        name = "GoldenEye 007 - Temple";
+                    } else if (name === 'mk64_rr') {
+                        name = "Mario Kart 64 - Rainbow Road";
+                    } else if (name === 'mk64_raceway') {
+                        name = "Mario Kart 64 - Raceway Theme";
+                    } else if (name === 'mario64_slider') {
+                        name = "Super Mario 64 - Slider Theme";
+                    } else if (name === 'bowsers_galaxy') {
+                        name = "Super Mario Galaxy - Bowser Battle";
+                    } else if (name === 'gusty_garden') {
+                        name = "Super Mario Galaxy - Gusty Garden";
+                    } else {
+                        // Ersätt understreck med mellanslag och gör första bokstaven i varje ord stor
+                        name = name.split('_')
+                            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                            .join(' ');
+                    }
+
+                    return {
+                        name: name,
+                        url: path
+                    };
+                });
+
+                // Välj en slumpmässig startlåt direkt i konstruktorn
+                this.currentSongIndex = Math.floor(Math.random() * this.playlist.length);
+            }
+
+            init() {
+                if (this.ctx) return;
+                this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+                // Initiera HTML5 Audio Element för att strömma original MP3 filer
+                this.audioElement = new Audio();
+                this.audioElement.loop = false; // Automatisk rotation till nästa spår efter slut
+
+                this.audioElement.addEventListener('ended', () => {
+                    this.nextTrack();
+                });
+
+                this.audioElement.addEventListener('error', (e) => {
+                    console.warn("Kunde inte spela lokal MP3 (" + this.playlist[this.currentSongIndex].url + "), hoppar vidare...", e);
+                    setTimeout(() => {
+                        this.nextTrack();
+                    }, 800);
+                });
+            }
+
+            // Laser-effekt (Snabb pitch-svep neråt genererad proceduriellt)
+            playLaser() {
+                if (!this.ctx) return;
+                const effVol = this.isSfxMuted ? 0 : this.sfxVolume;
+                if (effVol <= 0) return;
+
+                let osc = this.ctx.createOscillator();
+                let gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.15 * effVol, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.15);
+            }
+
+            // Explosion (Vitt brus + lågpassfilter + dämpning)
+            playExplosion() {
+                if (!this.ctx) return;
+                const effVol = this.isSfxMuted ? 0 : this.sfxVolume;
+                if (effVol <= 0) return;
+
+                let bufferSize = this.ctx.sampleRate * 0.4; // 0.4 sekunder
+                let buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                let data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+                let noiseNode = this.ctx.createBufferSource();
+                noiseNode.buffer = buffer;
+
+                let filter = this.ctx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(400, this.ctx.currentTime);
+                filter.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 0.4);
+
+                let gain = this.ctx.createGain();
+                gain.gain.setValueAtTime(0.3 * effVol, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.4);
+
+                noiseNode.connect(filter);
+                filter.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                noiseNode.start();
+                noiseNode.stop(this.ctx.currentTime + 0.4);
+            }
+
+            // Skada på spelaren (skärande fyrkantsvåg)
+            playPlayerHit() {
+                if (!this.ctx) return;
+                const effVol = this.isSfxMuted ? 0 : this.sfxVolume;
+                if (effVol <= 0) return;
+
+                let osc = this.ctx.createOscillator();
+                let gain = this.ctx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(50, this.ctx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.2 * effVol, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.2);
+            }
+
+            // Ladda om vapen
+            playReload() {
+                if (!this.ctx) return;
+                const effVol = this.isSfxMuted ? 0 : this.sfxVolume;
+                if (effVol <= 0) return;
+
+                // Klick 1
+                let osc1 = this.ctx.createOscillator();
+                let gain1 = this.ctx.createGain();
+                osc1.frequency.setValueAtTime(1200, this.ctx.currentTime);
+                gain1.gain.setValueAtTime(0.1 * effVol, this.ctx.currentTime);
+                gain1.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
+                osc1.connect(gain1); gain1.connect(this.ctx.destination);
+                osc1.start(); osc1.stop(this.ctx.currentTime + 0.05);
+
+                // Klick 2 efter 0.2 sek
+                setTimeout(() => {
+                    if (!this.ctx || this.isSfxMuted) return;
+                    let osc2 = this.ctx.createOscillator();
+                    let gain2 = this.ctx.createGain();
+                    osc2.frequency.setValueAtTime(900, this.ctx.currentTime);
+                    gain2.gain.setValueAtTime(0.1 * effVol, this.ctx.currentTime);
+                    gain2.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
+                    osc2.connect(gain2); gain2.connect(this.ctx.destination);
+                    osc2.start(); osc2.stop(this.ctx.currentTime + 0.05);
+                }, 200);
+            }
+
+            // Roterar till en helt slumpmässig MP3-låt i spellistan (undviker att spela samma låt direkt igen)
+            nextTrack() {
+                if (this.playlist.length > 1) {
+                    let nextIndex;
+                    do {
+                        nextIndex = Math.floor(Math.random() * this.playlist.length);
+                    } while (nextIndex === this.currentSongIndex);
+                    this.currentSongIndex = nextIndex;
+                } else {
+                    this.currentSongIndex = 0;
+                }
+                this.stopMusic();
+                this.startMusic();
+            }
+
+            // Spelar upp de riktiga lokala MP3-filerna i bakgrunden
+            startMusic() {
+                this.init();
+                if (!this.audioElement) return;
+
+                const activeSong = this.playlist[this.currentSongIndex];
+                showToast(`${t('now_playing')}: ${activeSong.name}`, "var(--gold)");
+
+                this.audioElement.src = activeSong.url;
+                this.audioElement.volume = this.isMusicMuted ? 0 : this.musicVolume;
+                
+                // Spela upp spåret (fångar säkerhetsfel om användarinteraktion saknas)
+                this.audioElement.play().catch(err => {
+                    console.log("Musikuppspelning avvaktar interaktion.");
+                });
+            }
+
+            stopMusic() {
+                if (this.audioElement) {
+                    this.audioElement.pause();
+                }
+            }
+        }
+
+        const audio = new SoundEngine();
+
+        // --- EXPORT GLOBAL AUDIO SETTINGS SYSTEM ---
+        window.changeMusicVolume = function(val) {
+            audio.musicVolume = parseFloat(val);
+            if (audio.audioElement) {
+                audio.audioElement.volume = audio.isMusicMuted ? 0 : audio.musicVolume;
+            }
+        };
+
+        window.changeSfxVolume = function(val) {
+            audio.sfxVolume = parseFloat(val);
+        };
+
+        window.toggleMusicMute = function() {
+            audio.isMusicMuted = !audio.isMusicMuted;
+            const btn = document.getElementById('mute-music-btn');
+            if (audio.isMusicMuted) {
+                btn.innerText = "UNMUTE";
+                btn.style.background = "#555";
+                showToast(t('music_muted'), "var(--danger)");
+            } else {
+                btn.innerText = "MUTE";
+                btn.style.background = "var(--kamek-glow)";
+                showToast(t('music_unmuted'), "var(--primary)");
+            }
+            if (audio.audioElement) {
+                audio.audioElement.volume = audio.isMusicMuted ? 0 : audio.musicVolume;
+            }
+        };
+
+        window.toggleSfxMute = function() {
+            audio.isSfxMuted = !audio.isSfxMuted;
+            const btn = document.getElementById('mute-sfx-btn');
+            if (audio.isSfxMuted) {
+                btn.innerText = "UNMUTE";
+                btn.style.background = "#555";
+                btn.style.color = "white";
+                showToast(t('sfx_muted'), "var(--danger)");
+            } else {
+                btn.innerText = "MUTE";
+                btn.style.background = "var(--primary)";
+                btn.style.color = "black";
+                showToast(t('sfx_unmuted'), "var(--primary)");
+            }
+        };
+
+        // --- RETRO RADIO (BOOMBOX) KLICK-PANEL ---
+        function toggleVolumePanel(e) {
+            if (e) e.stopPropagation();
+            const panel = document.getElementById('volume-panel');
+            if (panel.style.display === 'none' || panel.style.display === '') {
+                panel.style.display = 'flex';
+                showToast("🔊 KONTROLLPANEL ÖPPNAD", "var(--gold)");
+            } else {
+                panel.style.display = 'none';
+                showToast("🔈 KONTROLLPANEL STÄNGD", "#888");
+            }
+            
+            // Vid klick roterar vi direkt till nästa episka slumpmässiga spår på LAN:et
+            if (gameState === 'PLAYING') {
+                audio.nextTrack();
+            }
+        }
+        window.toggleMusic = toggleVolumePanel; // Ersätter gamla boombox-trigger med panel-visare och skip-spår
+
+        // --- TOASTS ---
+        function showToast(text, color) {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const div = document.createElement('div');
+            div.className = 'toast';
+            div.style.borderColor = color;
+            div.innerText = text;
+            container.appendChild(div);
+            setTimeout(() => {
+                div.style.transition = "opacity 0.5s ease, transform 0.5s ease";
+                div.style.opacity = 0;
+                div.style.transform = "translateX(20px)";
+                setTimeout(() => div.remove(), 500);
+            }, 3000);
+        }
+
+        // --- TILLSTÅNDSVARIABLER BOSS FIGHT ---
+        let gameState = 'START';
+        let score = 0;
+        let ammoInMag = 30;
+        let magSize = 30;
+        let ammoReserve = 120;
+        let isReloading = false;
+        let playerHealth = 100;
+        let bossHealth = 100;
+        let bossStage = 1; // 1: Axel-poddar, 2: Lasergatlings, 3: Fusionskärna
+        let currentPlayerName = "Gäst";
+
+        // Stridsflygarens position (3D viewport plan)
+        let flight = { x: 0, y: -8, z: 12 }; // Målposition i 3D
+        let shipMesh = null;
+        let mousePx = { x: window.innerWidth / 2, y: window.innerHeight / 2 }; // Pixelsiktets position
+
+        // Spelfysik-objekt
+        let laserBeams = [];  // Spelarens skott
+        let bossProjectiles = []; // Bossens skott
+        let explosionParticles = [];
+
+        // --- BOSS FIGHT KOLLISIONSPUNKTER ---
+        let bossComponents = {
+            leftShoulder:  { x: -9,  y: 7,  z: -40, hp: 20, active: true, flashing: 0, size: 4 },
+            rightShoulder: { x: 9,   y: 7,  z: -40, hp: 20, active: true, flashing: 0, size: 4 },
+            leftArm:       { x: -14, y: -2, z: -40, hp: 25, active: false, flashing: 0, size: 3.5 },
+            rightArm:      { x: 14,  y: -2, z: -40, hp: 25, active: false, flashing: 0, size: 3.5 },
+            powerCore:     { x: 0,   y: 2,  z: -40, hp: 50, active: false, flashing: 0, size: 5 }
+        };
+
+        // --- SENSOR OCH TURNERINGSSÄKERHET ---
+        async function initKamekMedia(useCam, useMic) {
+            try {
+                if (!useCam && !useMic) {
+                    // Om båda är avstängda, dölj eller lås widgetarna helt
+                    document.getElementById('kamek-cam-widget').style.display = 'none';
+                    document.getElementById('kamek-mic-widget').style.display = 'none';
+                    return;
+                }
+
+                // Begär endast media-strömmar om användaren uttryckligen har markerat kryssrutorna i inställningarna
+                const constraints = { video: useCam, audio: useMic };
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                
+                if (useCam) {
+                    document.getElementById('kamek-cam-widget').style.display = 'block';
+                    const v = document.getElementById('kamek-video');
+                    v.srcObject = stream;
+                    v.style.display = 'block';
+                    document.getElementById('kamek-cam-off').style.display = 'none';
+                } else {
+                    document.getElementById('kamek-cam-widget').style.display = 'none';
+                }
+
+                if (useMic) {
+                    document.getElementById('kamek-mic-widget').style.display = 'flex';
+                    setupMicBars(stream);
+                } else {
+                    document.getElementById('kamek-mic-widget').style.display = 'none';
+                }
+            } catch (e) {
+                console.warn("Sensortillgång nekad, blockerad eller otillgänglig.");
+            }
+        }
+
+        function setupMicBars(stream) {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const src = audioCtx.createMediaStreamSource(stream);
+            const ana = audioCtx.createAnalyser();
+            ana.fftSize = 32;
+            src.connect(ana);
+            const data = new Uint8Array(ana.frequencyBinCount);
+            const bars = document.querySelectorAll('.k-bar');
+            function update() {
+                ana.getByteFrequencyData(data);
+                bars.forEach((b, i) => {
+                    let h = Math.max(3, (data[i]/255)*20);
+                    b.style.height = h + "px";
+                });
+                requestAnimationFrame(update);
+            }
+            update();
+        }
+
+        // --- THREE.JS RYMDSIMULERING (SCENE SETUP) ---
+        let scene, camera, renderer, starfield;
+        let bossGroup, bossMaterials = {};
+        let hudCanvas, hudCtx;
+
+        function init3D() {
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x05000a, 0.015);
+
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 0, 20);
+
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('gameCanvas'), antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            // Setup 2D HUD Canvas för siktet
+            hudCanvas = document.getElementById('hudCanvas');
+            hudCanvas.width = window.innerWidth;
+            hudCanvas.height = window.innerHeight;
+            hudCtx = hudCanvas.getContext('2d');
+
+            // Ljus
+            const ambLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambLight);
+
+            const dirLight = new THREE.DirectionalLight(0x00ffcc, 1.2);
+            dirLight.position.set(5, 15, 20);
+            scene.add(dirLight);
+
+            // Stjärnfält (Partiklar)
+            const starCount = 1000;
+            const starGeo = new THREE.BufferGeometry();
+            const starPos = new Float32Array(starCount * 3);
+            for (let i = 0; i < starCount * 3; i += 3) {
+                starPos[i] = (Math.random() - 0.5) * 150;
+                starPos[i + 1] = (Math.random() - 0.5) * 100;
+                starPos[i + 2] = -Math.random() * 200;
+            }
+            starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+            const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.5, sizeAttenuation: true });
+            starfield = new THREE.Points(starGeo, starMat);
+            scene.add(starfield);
+
+            // --- RITA SPELARENS COCKPIT/STRIDSSKEPP IN SENE ---
+            const shipGroup = new THREE.Group();
+            
+            // Cockpit (Huvudskrov)
+            const bodyGeo = new THREE.ConeGeometry(1, 4, 4);
+            bodyGeo.rotateX(Math.PI / 2);
+            const bodyMat = new THREE.MeshStandardMaterial({ color: 0x222233, roughness: 0.2, metalness: 0.8 });
+            const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
+            shipGroup.add(bodyMesh);
+
+            // Vingar (Sleek sci-fi look)
+            const wingGeo = new THREE.BoxGeometry(3.5, 0.2, 1.5);
+            const wingMat = new THREE.MeshStandardMaterial({ color: 0x00ffcc, emissive: 0x003322 });
+            const wingMesh = new THREE.Mesh(wingGeo, wingMat);
+            wingMesh.position.set(0, -0.3, 0);
+            shipGroup.add(wingMesh);
+
+            // Propellermotor/Blaster i baken (Lysande partikel/cylinder)
+            const engineGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.8, 8);
+            engineGeo.rotateX(Math.PI/2);
+            const engineMat = new THREE.MeshStandardMaterial({ color: 0xff00cc, emissive: 0xff0088 });
+            const engineMesh = new THREE.Mesh(engineGeo, engineMat);
+            engineMesh.position.set(0, 0, 2);
+            shipGroup.add(engineMesh);
+
+            shipMesh = shipGroup;
+            shipMesh.position.set(flight.x, flight.y, flight.z);
+            scene.add(shipMesh);
+
+            // --- REKONSTRUERA N. GIN MECHA BOSS (Three.js Hierarki) ---
+            bossGroup = new THREE.Group();
+            bossGroup.position.set(0, 0, -40); // Bossen står stadigt på Z=-40
+
+            // Central Chest / Chassi
+            bossMaterials.chest = new THREE.MeshStandardMaterial({ color: 0x444455, roughness: 0.5, metalness: 0.7 });
+            const chestGeo = new THREE.BoxGeometry(12, 10, 8);
+            const chestMesh = new THREE.Mesh(chestGeo, bossMaterials.chest);
+            bossGroup.add(chestMesh);
+
+            // N. Gin Cockpit / Huvud
+            const headGeo = new THREE.SphereGeometry(2.5, 16, 16);
+            bossMaterials.head = new THREE.MeshStandardMaterial({ color: 0x110022, roughness: 0.1, metalness: 0.9, emissive: 0x220033 });
+            const headMesh = new THREE.Mesh(headGeo, bossMaterials.head);
+            headMesh.position.set(0, 6.5, 0);
+            bossGroup.add(headMesh);
+
+            // Axelartilleri Vänster (Missilpodd)
+            bossMaterials.leftShoulder = new THREE.MeshStandardMaterial({ color: 0xffcc00, roughness: 0.4 });
+            const sGeo = new THREE.BoxGeometry(4, 3, 5);
+            const sLeftMesh = new THREE.Mesh(sGeo, bossMaterials.leftShoulder);
+            sLeftMesh.position.set(bossComponents.leftShoulder.x, bossComponents.leftShoulder.y, 0);
+            bossGroup.add(sLeftMesh);
+
+            // Axelartilleri Höger (Missilpodd)
+            bossMaterials.rightShoulder = new THREE.MeshStandardMaterial({ color: 0xffcc00, roughness: 0.4 });
+            const sRightMesh = new THREE.Mesh(sGeo, bossMaterials.rightShoulder);
+            sRightMesh.position.set(bossComponents.rightShoulder.x, bossComponents.rightShoulder.y, 0);
+            bossGroup.add(sRightMesh);
+
+            // Lasergatling Vänster Arm
+            bossMaterials.leftArm = new THREE.MeshStandardMaterial({ color: 0x555566, metalness: 0.9 });
+            const armGeo = new THREE.CylinderGeometry(1, 1, 8, 8);
+            armGeo.rotateX(Math.PI/4); // Lite aggressiv vinkel
+            const armLeft = new THREE.Mesh(armGeo, bossMaterials.leftArm);
+            armLeft.position.set(bossComponents.leftArm.x, bossComponents.leftArm.y, 0);
+            bossGroup.add(armLeft);
+
+            // Lasergatling Höger Arm
+            bossMaterials.rightArm = new THREE.MeshStandardMaterial({ color: 0x555566, metalness: 0.9 });
+            const armRight = new THREE.Mesh(armGeo, bossMaterials.rightArm);
+            armRight.position.set(bossComponents.rightArm.x, bossComponents.rightArm.y, 0);
+            bossGroup.add(armRight);
+
+            // Bröstplåt (Döljer fusionskärnan initialt)
+            bossMaterials.chestPlate = new THREE.MeshStandardMaterial({ color: 0x8200ff, roughness: 0.3 });
+            const plateGeo = new THREE.BoxGeometry(6, 6, 2);
+            const plateMesh = new THREE.Mesh(plateGeo, bossMaterials.chestPlate);
+            plateMesh.position.set(0, 2, 4.5);
+            plateMesh.name = "chestPlate";
+            bossGroup.add(plateMesh);
+
+            // Lysande Fusionskärna (Inuti bröstet)
+            bossMaterials.powerCore = new THREE.MeshStandardMaterial({ color: 0xff0033, emissive: 0xff0000 });
+            const coreGeo = new THREE.SphereGeometry(2.5, 16, 16);
+            const coreMesh = new THREE.Mesh(coreGeo, bossMaterials.powerCore);
+            coreMesh.position.set(0, 2, 2);
+            bossGroup.add(coreMesh);
+
+            scene.add(bossGroup);
+        }
+
+        // --- SKAPA LASER STRÅLAR (3D RYMDFYSIK & EXACT AIMING) ---
+        function firePlayerLaser() {
+            if (isReloading) {
+                audio.playPlayerHit();
+                return;
+            }
+            if (ammoInMag <= 0) {
+                showToast("RELOAD [R] NOW!", "red");
+                audio.playPlayerHit();
+                return;
+            }
+
+            ammoInMag--;
+            updateAmmoHUD();
+            audio.playLaser();
+
+            // Raycasting för att omvandla 2D muspekare till exakt 3D-målpunkt på Z=-40 planet
+            const nx = (mousePx.x / window.innerWidth) * 2 - 1;
+            const ny = -(mousePx.y / window.innerHeight) * 2 + 1;
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(new THREE.Vector2(nx, ny), camera);
+
+            // Skapa ett fiktivt matematiskt plan vid bossens djup (Z = -40)
+            const planeZ = new THREE.Plane(new THREE.Vector3(0, 0, 1), 40);
+            const targetPoint = new THREE.Vector3();
+            
+            if (!raycaster.ray.intersectPlane(planeZ, targetPoint)) {
+                // Fallback om raycasting misslyckas
+                targetPoint.set(nx * 22, ny * 15, -40);
+            }
+
+            // Skjut dubbla lasrar från vingändarna
+            [-1.5, 1.5].forEach(offsetX => {
+                const geo = new THREE.CylinderGeometry(0.1, 0.1, 4, 4);
+                geo.rotateX(Math.PI/2);
+                const mat = new THREE.MeshBasicMaterial({ color: 0x00ffcc });
+                const mesh = new THREE.Mesh(geo, mat);
+                
+                // Starta vid skeppets vingar
+                mesh.position.set(shipMesh.position.x + offsetX, shipMesh.position.y, shipMesh.position.z - 2);
+                
+                // Beräkna riktning spikrakt mot 3D-punkten under siktet
+                const dir = new THREE.Vector3().subVectors(targetPoint, mesh.position).normalize();
+
+                scene.add(mesh);
+                laserBeams.push({ mesh, dir, speed: 2.8 });
+            });
+        }
+
+        function reload() {
+            if (isReloading || ammoInMag === magSize || ammoReserve <= 0) return;
+            isReloading = true;
+            showToast(t('reloading'), "white");
+            audio.playReload();
+            setTimeout(() => {
+                let needed = magSize - ammoInMag;
+                let reloaded = Math.min(needed, ammoReserve);
+                ammoInMag += reloaded;
+                ammoReserve -= reloaded;
+                isReloading = false;
+                updateAmmoHUD();
+                showToast(t('reloaded_ready'), "lime");
+            }, 1200);
+        }
+
+        function updateAmmoHUD() {
+            document.getElementById('ammo-display').innerText = `${ammoInMag} / ${ammoReserve}`;
+        }
+
+        // --- SPEL-INPUTS ---
+        let keys = {};
+        window.addEventListener('keydown', e => {
+            keys[e.key.toLowerCase()] = true;
+            if (e.key.toLowerCase() === 'r') reload();
+            if (e.key.toLowerCase() === 'escape') {
+                triggerLockdown(t('escape_locked'));
+            }
+        });
+        window.addEventListener('keyup', e => {
+            keys[e.key.toLowerCase()] = false;
+        });
+
+        // Mus rörelse för pixelsiktet
+        window.addEventListener('mousemove', e => {
+            if (gameState !== 'PLAYING') return;
+            mousePx.x = e.clientX;
+            mousePx.y = e.clientY;
+        });
+
+        window.addEventListener('mousedown', () => {
+            if (gameState === 'PLAYING') firePlayerLaser();
+        });
+
+        // Hjälpfunktion för att konvertera 3D-rumskoordinater till 2D-skärmkoordinater (pixlar)
+        function toScreenPosition(vector3) {
+            const vector = vector3.clone();
+            vector.project(camera);
+            const x = (vector.x * .5 + .5) * window.innerWidth;
+            const y = (-(vector.y * .5) + .5) * window.innerHeight;
+            return { x, y };
+        }
+
+        // --- RITA RETRO-SIKTET FRÅN BASE DEFENSE ---
+        function drawRetroSight() {
+            if (gameState !== 'PLAYING') {
+                hudCtx.clearRect(0, 0, hudCanvas.width, hudCanvas.height);
+                return;
+            }
+
+            hudCtx.clearRect(0, 0, hudCanvas.width, hudCanvas.height);
+
+            // Kontrollera om siktet vilar över en aktiv, sårbar del på bossen
+            let isOverTarget = false;
+            for (let key in bossComponents) {
+                const comp = bossComponents[key];
+                if (comp.active) {
+                    const compPos = new THREE.Vector3(comp.x, comp.y, comp.z);
+                    // Lägg till boss-gruppens aktuella bobbing-rörelse för perfekt precision
+                    compPos.add(bossGroup.position);
+                    
+                    const screenPos = toScreenPosition(compPos);
+                    const dist = Math.hypot(mousePx.x - screenPos.x, mousePx.y - screenPos.y);
+                    
+                    // Anpassat träffområde i pixlar baserat på komponentens 3D-storlek
+                    if (dist < 45) {
+                        isOverTarget = true;
+                        break;
+                    }
+                }
+            }
+
+            // Välj färg (röd vid lås, annars neongrön)
+            const color = isOverTarget ? "red" : "lime";
+            hudCtx.strokeStyle = color;
+            hudCtx.lineWidth = 4;
+
+            // Rita den yttre hårkorsringen
+            hudCtx.beginPath();
+            hudCtx.arc(mousePx.x, mousePx.y, 25, 0, Math.PI * 2);
+            hudCtx.stroke();
+
+            // Rita horisontella och vertikala krysslinjer (precis som i Base Defense)
+            hudCtx.beginPath();
+            hudCtx.moveTo(mousePx.x - 40, mousePx.y);
+            hudCtx.lineTo(mousePx.x + 40, mousePx.y);
+            hudCtx.moveTo(mousePx.x, mousePx.y - 40);
+            hudCtx.lineTo(mousePx.x, mousePx.y + 40);
+            hudCtx.stroke();
+
+            // Liten centrerad neondot
+            hudCtx.fillStyle = color;
+            hudCtx.beginPath();
+            hudCtx.arc(mousePx.x, mousePx.y, 3, 0, Math.PI * 2);
+            hudCtx.fill();
+        }
+
+        // --- EXTREMT PRESTIGE 3D EXPLOSIONS PARTIKLAR ---
+        function create3DExplosion(x, y, z, color, count = 15) {
+            audio.playExplosion();
+            for (let i = 0; i < count; i++) {
+                const geo = new THREE.BoxGeometry(0.4, 0.4, 0.4);
+                const mat = new THREE.MeshBasicMaterial({ color: color });
+                const mesh = new THREE.Mesh(geo, mat);
+                mesh.position.set(x, y, z);
+                
+                const vel = new THREE.Vector3(
+                    (Math.random() - 0.5) * 1.5,
+                    (Math.random() - 0.5) * 1.5,
+                    (Math.random() - 0.5) * 1.5
+                );
+                scene.add(mesh);
+                explosionParticles.push({ mesh, vel, life: 1.0 });
+            }
+        }
+
+        // --- SKADA OCH BOSS ATTAKLOGIK ---
+        let lastAttackTime = 0;
+        function executeBossAttacks() {
+            let now = Date.now();
+            if (now - lastAttackTime < (2200 - (bossStage * 400))) {
+                return;
+            }
+            lastAttackTime = now;
+
+            // FAS 1: Missiler från axel-poddar (Målsökande 3D röda klot)
+            if (bossStage === 1) {
+                if (bossComponents.leftShoulder.active) {
+                    spawnBossProjectile(bossComponents.leftShoulder.x, bossComponents.leftShoulder.y, 'missile');
+                }
+                if (bossComponents.rightShoulder.active) {
+                    spawnBossProjectile(bossComponents.rightShoulder.x, bossComponents.rightShoulder.y, 'missile');
+                }
+            }
+            // FAS 2: Lasergatling (Supersnabba skott som sveper horisontellt)
+            else if (bossStage === 2) {
+                if (bossComponents.leftArm.active) {
+                    spawnBossProjectile(bossComponents.leftArm.x, bossComponents.leftArm.y, 'laser');
+                }
+                if (bossComponents.rightArm.active) {
+                    spawnBossProjectile(bossComponents.rightArm.x, bossComponents.rightArm.y, 'laser');
+                }
+            }
+            // FAS 3: Mega fusionskärna blottad (Explosiv eld-orkan)
+            else if (bossStage === 3) {
+                spawnBossProjectile(0, 2, 'mega-plasma');
+            }
+        }
+
+        function spawnBossProjectile(bx, by, type) {
+            const geo = type === 'missile' ? new THREE.SphereGeometry(0.8, 8, 8) : new THREE.CylinderGeometry(0.2, 0.2, 3, 4);
+            if (type === 'laser') geo.rotateX(Math.PI/2);
+            
+            let color = 0xff0033;
+            if (type === 'mega-plasma') {
+                color = 0x8200ff;
+                geo.scale(2, 2, 2);
+            }
+
+            const mat = new THREE.MeshBasicMaterial({ color: color });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(bx, by, -40); // Startar vid bossen
+            scene.add(mesh);
+
+            // Beräkna vektor rakt mot spelarens flygplan
+            const dir = new THREE.Vector3(shipMesh.position.x - bx, shipMesh.position.y - by, shipMesh.position.z - (-40));
+            dir.normalize();
+
+            bossProjectiles.push({ mesh, dir, type, speed: type === 'laser' ? 1.5 : 0.8 });
+        }
+
+        // --- HUVUD SPEL-LOOP (RITNING OCH FYSIK KONTROLL) ---
+        let clock = new THREE.Clock();
+
+        function updateGame() {
+            if (gameState !== 'PLAYING') return;
+
+            let delta = clock.getDelta();
+
+            // 1. Spelarens rörelse via WASD / Piltangenter
+            const speed = 12 * delta;
+            if (keys['w'] || keys['arrowup'])    flight.y = Math.min(8, flight.y + speed);
+            if (keys['s'] || keys['arrowdown'])  flight.y = Math.max(-8, flight.y - speed);
+            if (keys['a'] || keys['arrowleft'])  flight.x = Math.max(-12, flight.x - speed);
+            if (keys['d'] || keys['arrowright']) flight.x = Math.min(12, flight.x + speed);
+
+            // Flytta skeppet mjukt mot målpositionen (tröghet)
+            shipMesh.position.lerp(new THREE.Vector3(flight.x, flight.y, flight.z), 0.1);
+            
+            // Luta skeppet i svängarna för extrem rymdkänsla!
+            shipMesh.rotation.z = -(shipMesh.position.x - flight.x) * 0.4;
+            shipMesh.rotation.x = (shipMesh.position.y - flight.y) * 0.4;
+
+            // Flytta stjärnorna mot spelaren för hastighetskänsla
+            const positions = starfield.geometry.attributes.position.array;
+            for (let i = 2; i < positions.length; i += 3) {
+                positions[i] += 40 * delta; // Flyg framåt!
+                if (positions[i] > 10) {
+                    positions[i] = -200; // Återställ i djupet
+                }
+            }
+            starfield.geometry.attributes.position.needsUpdate = true;
+
+            // 2. Flytta och hantera spelarens lasrar (Z-riktning)
+            for (let i = laserBeams.length - 1; i >= 0; i--) {
+                const laser = laserBeams[i];
+                laser.mesh.position.addScaledVector(laser.dir, laser.speed);
+
+                // Kontrollera träff på boss-komponenterna
+                let hitSomething = false;
+                for (let key in bossComponents) {
+                    const comp = bossComponents[key];
+                    if (comp.active) {
+                        // Kollisionsdetektering i 3D
+                        let dist = laser.mesh.position.distanceTo(new THREE.Vector3(comp.x, comp.y, comp.z));
+                        if (dist < comp.size) {
+                            hitSomething = true;
+                            comp.hp--;
+                            comp.flashing = 5; // Visuell flash effekt
+
+                            // Explosion partiklar
+                            create3DExplosion(laser.mesh.position.x, laser.mesh.position.y, laser.mesh.position.z, 0xffcc00);
+
+                            // Om komponenten exploderar helt
+                            if (comp.hp <= 0) {
+                                comp.active = false;
+                                score += 2000;
+                                document.getElementById('score-display').innerText = score;
+                                create3DExplosion(comp.x, comp.y, comp.z, 0xff0033, 40);
+                                checkBossStageTransitions();
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                if (hitSomething || laser.mesh.position.z < -60) {
+                    scene.remove(laser.mesh);
+                    laserBeams.splice(i, 1);
+                }
+            }
+
+            // 3. Flytta och hantera bossens inkommande projektiler (Z-riktning framåt)
+            for (let i = bossProjectiles.length - 1; i >= 0; i--) {
+                const proj = bossProjectiles[i];
+                proj.mesh.position.addScaledVector(proj.dir, proj.speed);
+
+                // Målsökningseffekt för FAS 1 Missiler
+                if (proj.type === 'missile' && proj.mesh.position.z < -10) {
+                    // Justera riktning svagt mot spelarens aktuella läge
+                    const targetDir = new THREE.Vector3(shipMesh.position.x - proj.mesh.position.x, shipMesh.position.y - proj.mesh.position.y, shipMesh.position.z - proj.mesh.position.z);
+                    targetDir.normalize();
+                    proj.dir.lerp(targetDir, 0.04);
+                }
+
+                // Kolla träff på spelaren (vid Z plan runt 12)
+                let playerDist = proj.mesh.position.distanceTo(shipMesh.position);
+                if (playerDist < 2.0) {
+                    // Spelaren tar skada
+                    let dmg = proj.type === 'mega-plasma' ? 30 : 12;
+                    playerHealth = Math.max(0, playerHealth - dmg);
+                    audio.playPlayerHit();
+                    updatePlayerHP();
+                    showToast(`⚠️ SHIELD DAMAGE! -${dmg}%`, "var(--danger)");
+
+                    // Skaka kameran för episk inlevelse!
+                    camera.position.x = (Math.random() - 0.5) * 1.5;
+                    camera.position.y = (Math.random() - 0.5) * 1.5;
+
+                    // Ta bort skottet
+                    scene.remove(proj.mesh);
+                    bossProjectiles.splice(i, 1);
+
+                    if (playerHealth <= 0) {
+                        endGame(false);
+                    }
+                    continue;
+                }
+
+                // Ta bort om den flyger förbi
+                if (proj.mesh.position.z > 20) {
+                    scene.remove(proj.mesh);
+                    bossProjectiles.splice(i, 1);
+                }
+            }
+
+            // Snabbt återställ kamerans skakning mjukt
+            camera.position.lerp(new THREE.Vector3(0, 0, 20), 0.1);
+
+            // 4. Animera explosionspartiklar
+            for (let i = explosionParticles.length - 1; i >= 0; i--) {
+                const p = explosionParticles[i];
+                p.mesh.position.add(p.vel);
+                p.life -= 2 * delta;
+                p.mesh.scale.setScalar(p.life);
+                if (p.life <= 0) {
+                    scene.remove(p.mesh);
+                    explosionParticles.splice(i, 1);
+                }
+            }
+
+            // 5. Animera bossens visuella skade-blinkning (Gula flashen)
+            updateBossVisuals();
+
+            // 6. Kör boss-attackmönster
+            executeBossAttacks();
+        }
+
+        function updateBossVisuals() {
+            // Axelpod-blinkningar vid skada
+            if (bossComponents.leftShoulder.flashing > 0) {
+                bossComponents.leftShoulder.flashing--;
+                bossMaterials.leftShoulder.color.setHex(0xff0000);
+            } else {
+                bossMaterials.leftShoulder.color.setHex(bossComponents.leftShoulder.active ? 0xffcc00 : 0x22222d);
+            }
+
+            if (bossComponents.rightShoulder.flashing > 0) {
+                bossComponents.rightShoulder.flashing--;
+                bossMaterials.rightShoulder.color.setHex(0xff0000);
+            } else {
+                bossMaterials.rightShoulder.color.setHex(bossComponents.rightShoulder.active ? 0xffcc00 : 0x22222d);
+            }
+
+            // Armledsblixtar
+            if (bossComponents.leftArm.flashing > 0) {
+                bossComponents.leftArm.flashing--;
+                bossMaterials.leftArm.color.setHex(0xff0000);
+            } else {
+                bossMaterials.leftArm.color.setHex(bossComponents.leftArm.active ? 0x00ffcc : 0x11111a);
+            }
+
+            if (bossComponents.rightArm.flashing > 0) {
+                bossComponents.rightArm.flashing--;
+                bossMaterials.rightArm.color.setHex(0xff0000);
+            } else {
+                bossMaterials.rightArm.color.setHex(bossComponents.rightArm.active ? 0x00ffcc : 0x11111a);
+            }
+
+            // Kärnan-blixtar
+            if (bossComponents.powerCore.flashing > 0) {
+                bossComponents.powerCore.flashing--;
+                bossMaterials.powerCore.color.setHex(0xffffff);
+            } else {
+                bossMaterials.powerCore.color.setHex(bossComponents.powerCore.active ? 0xff0033 : 0x050505);
+            }
+
+            // Svag animation för armarna
+            if (gameState === 'PLAYING') {
+                bossGroup.position.y = Math.sin(Date.now() / 400) * 0.8;
+                bossGroup.rotation.y = Math.sin(Date.now() / 800) * 0.05;
+            }
+        }
+
+        function updatePlayerHP() {
+            document.getElementById('player-hp-display').innerText = playerHealth;
+            document.getElementById('player-hp-bar').style.width = playerHealth + '%';
+        }
+
+        // --- FAS TRANSITIONER (KATASTROF MECHA COLLAPSE) ---
+        function checkBossStageTransitions() {
+            // Beräkna total HP kvar på aktiva komponenter
+            let totalMax = 140; // 20+20 + 25+25 + 50
+            let currentLeft = 0;
+            for (let key in bossComponents) {
+                if (bossComponents[key].active) {
+                    currentLeft += bossComponents[key].hp;
+                }
+            }
+            bossHealth = Math.round((currentLeft / totalMax) * 100);
+            document.getElementById('boss-hp-bar').style.width = bossHealth + '%';
+
+            // Fas 1 klar? Aktivera Fas 2 (Lasergatlings)
+            if (bossStage === 1 && !bossComponents.leftShoulder.active && !bossComponents.rightShoulder.active) {
+                bossStage = 2;
+                bossComponents.leftArm.active = true;
+                bossComponents.rightArm.active = true;
+                
+                showToast(t('stage2_msg'), "#00ccff");
+                document.getElementById('boss-part-status').innerText = "ACTIVE COMPONENT: SWEEP GATLING LASERS";
+                create3DExplosion(0, 5, -40, 0x00ffcc, 30);
+            }
+            // Fas 2 klar? Aktivera Fas 3 (Power Core)
+            else if (bossStage === 2 && !bossComponents.leftArm.active && !bossComponents.rightArm.active) {
+                bossStage = 3;
+                bossComponents.powerCore.active = true;
+                
+                // Explodera bort bröstplåten i Three.js scenen!
+                const p = bossGroup.getObjectByName("chestPlate");
+                if (p) bossGroup.remove(p);
+
+                showToast(t('stage3_msg'), "var(--danger)");
+                document.getElementById('boss-part-status').innerText = "ACTIVE COMPONENT: POWER CORE EXPOSED";
+                create3DExplosion(0, 2, -35, 0xff0033, 50);
+            }
+            // Fas 3 klar? Boss död!
+            else if (bossStage === 3 && !bossComponents.powerCore.active) {
+                endGame(true);
+            }
+        }
+
+        // --- STRIDSLUT ---
+        function endGame(victory) {
+            gameState = 'GAMEOVER';
+            audio.stopMusic();
+
+            if (victory) {
+                create3DExplosion(0, 0, -40, 0x8200ff, 100);
+                showToast(t('victory_msg'), "gold");
+                score += 50000; // Massiv LAN-vinstbonus!
+                document.getElementById('score-display').innerText = score;
+            } else {
+                create3DExplosion(shipMesh.position.x, shipMesh.position.y, shipMesh.position.z, 0x00ffcc, 50);
+                scene.remove(shipMesh);
+                showToast(t('defeat_msg'), "red");
+            }
+
+            // Spara highscore lokalt
+            saveHighScore(currentPlayerName, score);
+
+            setTimeout(() => {
+                document.getElementById('start-screen').style.display = 'block';
+            }, 3000);
+        }
+
+        function saveHighScore(name, sVal) {
+            let scores = JSON.parse(safeStorage.getItem('bossHighScores')) || [];
+            scores.push({ name: name, score: sVal });
+            scores.sort((a, b) => b.score - a.score);
+            scores = scores.slice(0, 3);
+            safeStorage.setItem('bossHighScores', JSON.stringify(scores));
+        }
+
+        // --- THREE.JS ANIMATION LOOP ---
+        function animate() {
+            updateGame();
+            drawRetroSight(); // Uppdaterar pixelsiktets position och kollisionsfärger
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+
+        // --- TRACKPAD OCH MUSKRAV ---
+        window.addEventListener('wheel', (e) => {
+            const isTrackpad = !Number.isInteger(e.deltaY) || (Math.abs(e.deltaY) > 0 && Math.abs(e.deltaY) < 20);
+            if (isTrackpad && gameState === 'PLAYING') {
+                triggerLockdown(t('trackpad_lockdown'));
+            }
+        }, { passive: false });
+
+        function triggerLockdown(reason) {
+            gameState = 'LOCKDOWN';
+            audio.stopMusic();
+            const ov = document.getElementById('lockdown-overlay');
+            if (ov) {
+                ov.style.display = 'flex';
+                document.getElementById('lockdown-msg').innerText = reason;
+            }
+        }
+
+        // --- STARTA STRIDEN (LOBBY TRIGGER) ---
+        function startGame() {
+            // Fullscreen begäran för ultimat LAN-inlevelse
+            const docElm = document.documentElement;
+            if (docElm.requestFullscreen) { docElm.requestFullscreen().catch(() => {}); }
+
+            const nameInput = document.getElementById('playerName');
+            currentPlayerName = nameInput.value.trim() || "Gäst";
+
+            document.getElementById('start-screen').style.display = 'none';
+            
+            // Återställ tillstånd
+            playerHealth = 100;
+            bossHealth = 100;
+            bossStage = 1;
+            score = 0;
+            ammoInMag = magSize;
+            ammoReserve = 120;
+            gameState = 'PLAYING';
+
+            // Återställ mecha-komponenter
+            bossComponents.leftShoulder.hp = 20;  bossComponents.leftShoulder.active = true;
+            bossComponents.rightShoulder.hp = 20; bossComponents.rightShoulder.active = true;
+            bossComponents.leftArm.hp = 25;       bossComponents.leftArm.active = false;
+            bossComponents.rightArm.hp = 25;      bossComponents.rightArm.active = false;
+            bossComponents.powerCore.hp = 50;     bossComponents.powerCore.active = false;
+
+            // Återställ scenobjekt om nödvändigt
+            bossProjectiles.forEach(p => scene.remove(p.mesh));
+            laserBeams.forEach(l => scene.remove(l.mesh));
+            bossProjectiles = [];
+            laserBeams = [];
+
+            // Lägg tillbaka bröstplåt om den skjutits bort
+            if (!bossGroup.getObjectByName("chestPlate")) {
+                const plateGeo = new THREE.BoxGeometry(6, 6, 2);
+                const plateMesh = new THREE.Mesh(plateGeo, bossMaterials.chestPlate);
+                plateMesh.position.set(0, 2, 4.5);
+                plateMesh.name = "chestPlate";
+                bossGroup.add(plateMesh);
+            }
+
+            if (!scene.getObjectById(shipMesh.id)) {
+                scene.add(shipMesh);
+            }
+            shipMesh.position.set(0, -8, 12);
+            flight.x = 0; flight.y = -8;
+
+            updatePlayerHP();
+            updateAmmoHUD();
+            document.getElementById('score-display').innerText = "0";
+            document.getElementById('boss-hp-bar').style.width = '100%';
+            document.getElementById('boss-part-status').innerText = "ACTIVE COMPONENT: SHOULDER ARTILLERY";
+
+            audio.init();
+            audio.startMusic();
+
+            // Läs inställningarna för kamera & mikrofon från lobby UI-checkboxar
+            const useCam = document.getElementById('use-camera-checkbox').checked;
+            const useMic = document.getElementById('use-mic-checkbox').checked;
+            initKamekMedia(useCam, useMic); // Aktivera endast sensorer om användaren vill
+
+            showToast(t('good_luck').replace('{name}', currentPlayerName.toUpperCase()), "lime");
+            showToast(t('stage1_msg'), "var(--gold)");
+        }
+        window.startGame = startGame;
+
+        function toggleRules(show) {
+            document.getElementById('rules-modal').style.display = show ? 'block' : 'none';
+        }
+        window.toggleRules = toggleRules;
+
+        // --- ENHETSSPECIFIKA HÅN OCH BLOCKERINGAR ---
+        function triggerDeviceLockdown(deviceType) {
+            gameState = 'LOCKDOWN';
+            audio.stopMusic();
+            document.getElementById('diagnostic-screen').style.display = 'none';
+            triggerLockdown(t('device_' + deviceType));
+        }
+
+        // --- HÅRDVARUDIAGNOSTIK (Uppo-start) ---
+        function runDiagnostics() {
+            document.getElementById('diag-ram').innerHTML = t('diag_ram');
+            document.getElementById('diag-cpu').innerHTML = t('diag_cpu');
+            document.getElementById('diag-os').innerHTML = t('diag_os');
+            document.getElementById('diag-disk').innerHTML = t('diag_disk');
+
+            let ua = navigator.userAgent;
+            let w = window.innerWidth;
+            let h = window.innerHeight;
+
+            // Fas 1: RAM-test
+            setTimeout(() => {
+                if (navigator.deviceMemory && navigator.deviceMemory < 4) {
+                    document.getElementById('diag-ram').innerHTML = t('diag_ram') + " <span style='color:red; font-weight:bold;'>" + t('diag_fail') + "</span>";
+                    setTimeout(() => triggerDeviceLockdown("hw_ram_fail"), 1000);
+                    return;
+                }
+                document.getElementById('diag-ram').innerHTML = t('diag_ram') + " <span style='color:#00ff00; font-weight:bold;'>" + t('diag_ok') + "</span>";
+                document.getElementById('diag-cpu').style.display = "block";
+
+                // Fas 2: CPU-test
+                setTimeout(() => {
+                    if (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4) {
+                        document.getElementById('diag-cpu').innerHTML = t('diag_cpu') + " <span style='color:red; font-weight:bold;'>" + t('diag_fail') + "</span>";
+                        setTimeout(() => triggerDeviceLockdown("hw_cpu_cores_fail"), 1000);
+                        return;
+                    }
+                    document.getElementById('diag-cpu').innerHTML = t('diag_cpu') + " <span style='color:#00ff00; font-weight:bold;'>" + t('diag_ok') + "</span>";
+                    document.getElementById('diag-os').style.display = "block";
+
+                    // Fas 3: OS Arkitektur och Platsförbud
+                    setTimeout(() => {
+                        let osType = "desktop";
+                        if (w < 280 || h < 280 || /Watch|WearOS|Pebble|Gear/i.test(ua)) {
+                            osType = "smartwatch";
+                        } else if (/Refrigerator|SmartFridge|LG\s?Fridge|Samsung\s?Fridge|ScreeneFridge/i.test(ua)) {
+                            osType = "refrigerator";
+                        } else if (/Tesla|Model\s(S|3|X|Y)|CarPlay|Android\s?Auto/i.test(ua)) {
+                            osType = "car";
+                        } else if (/iPad|PlayBook|Kindle|Silk/i.test(ua) || (/Android/i.test(ua) && !/Mobile/i.test(ua))) {
+                            osType = "tablet";
+                        } else if (/Mobile|iPhone|Android|Windows\sPhone/i.test(ua)) {
+                            osType = "mobile";
+                        }
+
+                        if (osType !== "desktop") {
+                            document.getElementById('diag-os').innerHTML = t('diag_os') + " <span style='color:red; font-weight:bold;'>" + t('diag_fail') + "</span>";
+                            setTimeout(() => triggerDeviceLockdown(osType), 1000);
+                            return;
+                        }
+
+                        // Linux-spärr på LAN
+                        if (/Linux/i.test(ua) && !/Android|CrOS|SteamOS/i.test(ua)) {
+                            document.getElementById('diag-os').innerHTML = t('diag_os') + " <span style='color:red; font-weight:bold;'>" + t('diag_fail') + "</span>";
+                            setTimeout(() => triggerDeviceLockdown("hw_os_linux"), 1000);
+                            return;
+                        }
+
+                        document.getElementById('diag-os').innerHTML = t('diag_os') + " <span style='color:#00ff00; font-weight:bold;'>" + t('diag_ok') + "</span>";
+                        document.getElementById('diag-disk').style.display = "block";
+
+                        // Fas 4: Diskutrymme
+                        setTimeout(() => {
+                            document.getElementById('diag-disk').innerHTML = t('diag_disk') + " <span style='color:#00ff00; font-weight:bold;'>" + t('diag_ok') + "</span>";
+                            setTimeout(() => {
+                                document.getElementById('diagnostic-screen').style.display = 'none';
+                            }, 500);
+                        }, 400);
+
+                    }, 400);
+                }, 400);
+            }, 400);
+        }
+
+        window.onload = function() {
+            initializeUIText();
+            runDiagnostics();
+            init3D();
+            animate();
+        };
+
+        // Anpassa 3D-vyn och HUD-vyn vid storleksändring
+        window.addEventListener('resize', () => {
+            if (camera && renderer && hudCanvas) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                hudCanvas.width = window.innerWidth;
+                hudCanvas.height = window.innerHeight;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STATION 24 - HANGMAN PROTOCOL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<script>
+// --- KAMEK ELITE SYSTEM & HARDWARE PURGE ---
+(function() {
+    var ua = navigator.userAgent.toLowerCase();
+    var reason = "";
+    var mockery = "";
+
+    var isIE = !!document.documentMode || ua.indexOf("msie") > -1 || ua.indexOf("trident") > -1;
+    var isOldEdge = ua.indexOf("edge/") > -1; 
+    var isSafari = ua.indexOf("safari") > -1 && ua.indexOf("chrome") === -1;
+    var isOldSafari = false;
+
+    if (isSafari) {
+        var safariVerMatch = ua.match(/version\/(\d+)/);
+        if (safariVerMatch && parseInt(safariVerMatch[1]) < 16) isOldSafari = true;
+    }
+
+    if (isIE) {
+        reason = "INTERNET_EXPLORER_GRAVSKÄNDNING";
+        mockery = "Internet Explorer har gått i graven. Vänligen byt till en annan webbläsare! Allvarligt talat, Operatör PSL631 kan praktiskt taget höra ditt 56k-modem skrika av smärta.";
+    } else if (isOldEdge) {
+        reason = "LEGACY_EDGE_SKROTAD";
+        mockery = "Kör du gamla Edge? Den där webbläsaren dog snabbare än en Goomba under en känga! Installera en webbläsare med en Axolotl-motor (Chromium) innan Kamek förvandlar din dator till ett askfat.";
+    } else if (isOldSafari) {
+        reason = "STENÅLDERS_SAFARI";
+        mockery = "Din Safari-version är så gammal att den fortfarande tror att Steve Jobs lever. Uppdatera din frukt eller bli raderad!";
+    }
+
+    var isMobile = /iphone|ipod|android|blackberry|iemobile/i.test(ua);
+    var isTablet = /ipad|playbook|silk/i.test(ua) || (navigator.maxTouchPoints > 0 && ua.indexOf("macintosh") > -1);
+    var isVR = /oculus|quest|pico|vive/i.test(ua);
+    var isWatch = /watch|wearable/i.test(ua);
+    var isSmartHome = /tizen|web0s|googletv|appletv|smarttv|hbbtv/i.test(ua);
+
+    if (isVR) {
+        reason = "VR_CYKLOP_DETEKTERAD";
+        mockery = "Ta av dig cyklopögonen! Man kan inte rensa virus i 3D när man ser ut som en förvirrad dykare. Station 24 kräver en platt skärm och en riktig mus!";
+    } else if (isWatch) {
+        reason = "MIKRO_ENHET_UPPTÄCKT";
+        mockery = "En smartklocka?! Din skärm är mindre än Kameks tånagel. Försök inte ens infiltrera matrisen med en handledsmanick!";
+    } else if (isSmartHome) {
+        reason = "SOFFPOTATIS_ANOMALI";
+        mockery = "Din TV/Smart-enhet är inte en godkänd kommandocentral! Att rensa virus med en fjärrkontroll är som att äta soppa med gaffel.";
+    } else if (ua.indexOf("tesla") > -1 || ua.indexOf("carbrowser") > -1) {
+        reason = "RULLANDE_TRAFIKFARA";
+        mockery = "SLÅ AV MOTORN! Din Tesla är inte en matte-stuga. Händerna på ratten innan du krockar in i stordatormatrisen!";
+    } else if (isTablet) {
+        reason = "KLADDIGA_FINGRAR";
+        mockery = "Sluta kladda på skärmen! En padda är en leksak. Station 24 Protocol kräver en riktig mus!";
+    } else if (isMobile) {
+        reason = "MOBIL_TERMINAL";
+        mockery = "Din skärm är för liten för den här nivån av intelligens. Station 24 är inte ett mobilspel för Goombas!";
+    }
+
+    var isWindows = ua.indexOf("windows nt") > -1;
+    var isMac = ua.indexOf("mac os x") > -1 && !isTablet;
+    var isChromeOS = ua.indexOf("cros") > -1;
+
+    if (isChromeOS) {
+        reason = "CHROME_OS_SKROTAD";
+        mockery = "En Chromebook? Det är som att försöka vinna ett Formel 1-lopp med en trampbil. Kamek accepterar endast riktiga operativsystem!";
+    } else if (isWindows) {
+        var winVer = parseFloat(ua.split("windows nt ")[1]);
+        if (winVer < 10.0) {
+            reason = "WINDOWS_FOSSIL";
+            mockery = "Windows " + (winVer < 6.2 ? "7" : "8") + "? Din dator hör hemma på ett museum, inte i Station 24!";
+        }
+    } else if (isMac) {
+        var macVerMatch = ua.match(/mac os x (\d+)[_.](\d+)/);
+        if (macVerMatch) {
+            var major = parseInt(macVerMatch[1]);
+            if (major < 15) {
+                reason = "RUTTEN_FRUKT";
+                mockery = "macOS " + major + "? Sequoia (15.0) är minimum för att exekvera dessa algoritmer. Uppdatera eller bli raderad!";
+            }
+        }
+    }
+
+    if (reason !== "") {
+        document.documentElement.innerHTML = ""; 
+        window.onload = function() {
+            var h = '<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#1a0000;color:#fff;z-index:9999999;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:40px;font-family:Arial, sans-serif;border:15px double #ff0000;box-sizing:border-box;">';
+            h += '<img src="kamek.jfif" style="width:180px;border-radius:30px;border:5px solid #ffcc00;margin-bottom:20px;filter:drop-shadow(0 0 15px #ff0000);">';
+            h += '<h1 style="font-size:42px;color:#ff0000;margin:10px 0;font-weight:900;">[ ÅTKOMST NEKAD ]</h1>';
+            h += '<div style="background:rgba(0,0,0,0.4);padding:40px;border-radius:30px;max-width:800px;border:2px solid #ffcc00;">';
+            h += '<p style="font-size:26px;color:#ffcc00;margin-bottom:20px;font-weight:bold;">Kamek hånar din utrustning:</p>';
+            h += '<p style="font-size:32px;line-height:1.4;font-style:italic;">"' + mockery + '"</p>';
+            h += '</div>';
+            h += '<p style="margin-top:50px;opacity:0.5;font-family:monospace;">SYSTEM_ERROR: ' + reason + '</p></div>';
+            document.body.innerHTML = h;
+            if (window.stop) window.stop();
+        };
+        throw new Error("Lockdown: System integrity check failed.");
+    }
+})();
+</script>
+
+    <div id="game-ui">
+        <div class="stat-box"><span id="lbl-clock">🕒 TID:</span> <span id="clock">00:00</span></div>
+        <div class="stat-box"><span id="lbl-streak">🔥 STREAK:</span> <span id="streak">0</span></div>
+    </div>
+
+    <div id="start-screen">
+        <h1 id="main-title">STATION 24: HANGMAN</h1>
+
+        <div class="language-selector" style="display: flex; gap: 15px; justify-content: center; margin-bottom: 20px;">
+    
+    <button onclick="updateUILanguage('sv')" title="Svenska" style="background:none; border:none; cursor:pointer;">
+        <svg width="40" height="28" viewBox="0 0 16 10">
+            <rect width="16" height="10" fill="#006aa7"/>
+            <rect width="2" height="10" x="5" fill="#fecc00"/>
+            <rect width="16" height="2" y="4" fill="#fecc00"/>
+        </svg>
+    </button>
+
+    <button onclick="updateUILanguage('da')" title="Dansk" style="background:none; border:none; cursor:pointer;">
+        <svg width="40" height="28" viewBox="0 0 37 28">
+            <rect width="37" height="28" fill="#c8102e"/>
+            <rect width="4" height="28" x="12" fill="#fff"/>
+            <rect width="37" height="4" y="12" fill="#fff"/>
+        </svg>
+    </button>
+
+    <button onclick="updateUILanguage('no')" title="Norsk" style="background:none; border:none; cursor:pointer;">
+        <svg width="40" height="28" viewBox="0 0 22 16">
+            <rect width="22" height="16" fill="#ba0c2f"/>
+            <rect width="4" height="16" x="6" fill="#fff"/>
+            <rect width="22" height="4" y="6" fill="#fff"/>
+            <rect width="2" height="16" x="7" fill="#00205b"/>
+            <rect width="22" height="2" y="7" fill="#00205b"/>
+        </svg>
+    </button>
+
+    <button onclick="updateUILanguage('en')" title="English" style="background:none; border:none; cursor:pointer;">
+        <svg width="40" height="28" viewBox="0 0 60 30">
+            <rect width="60" height="30" fill="#00247d"/>
+            <path d="M0 0 L60 30 M60 0 L0 30" stroke="#fff" stroke-width="6"/>
+            <path d="M0 0 L60 30 M60 0 L0 30" stroke="#cf142b" stroke-width="4"/>
+            <rect width="60" height="10" y="10" fill="#fff"/>
+            <rect width="60" height="6" y="12" fill="#cf142b"/>
+            <rect width="10" height="30" x="25" fill="#fff"/>
+            <rect width="6" height="30" x="27" fill="#cf142b"/>
+        </svg>
+    </button>
+</div>
+        
+        <p class="sub-header" id="sub-verification">--- IDENTITY VERIFICATION REQUIRED ---</p>
+        
+        <input type="text" id="playerName" placeholder="Alias..." maxlength="12">
+        
+        <div class="menu-buttons">
+            <button id="btn-how" class="btn-main btn-info" onclick="openInfo()">❓ HUR SPELAR JAG?</button>
+            <button id="btn-media" class="btn-main btn-settings" onclick="openPopup()">🎥 MEDIA SETUP</button>
+            <button id="startButton" class="btn-main btn-start" onclick="beginGame()">STARTA PROTOKOLL</button>
+        </div>
+
+        <div id="leaderboard-mini">
+            <h3 id="lbl-lb-title" style="font-family:'Luckiest Guy'; color:#ffcc00;">TOPPLISTA (STREAKS)</h3>
+            <div id="leaderboard-content" style="font-family:'Montserrat'; font-size:14px;">Inga poäng än...</div>
+        </div>
+    </div>
+
+    <div id="game-container">
+        <div id="category-display"><span id="lbl-category">ÄMNE:</span> <span id="cat-name">-</span></div>
+        
+        <canvas id="hangmanCanvas" width="400" height="350"></canvas>
+        
+        <div id="word-display">_ _ _ _</div>
+        
+        <div id="alphabet"></div>
+        
+        <p id="message"></p>
+        
+        <button id="next-btn" class="btn-main btn-start" style="display:none;" onclick="resetGame()">VIDARE ➔</button>
+    </div>
+
+    <div id="kamek-widgets">
+        <div id="k-cam-box">
+            <div id="k-rec">● REC</div>
+            <video id="k-video" autoplay playsinline muted></video>
+            <div id="k-off">
+                <img src="kamek.jfif" alt="Kamek" onerror="this.style.display='none'">
+                <p id="lbl-cam-off">KAMERA AV</p>
+            </div>
+        </div>
+
+        <div id="k-mic-box">
+            <div class="mic-bars-container" id="bars">
+                <div class="kb"></div><div class="kb"></div>
+                <div class="kb"></div><div class="kb"></div>
+            </div>
+            <span id="lbl-mic-live">MIC LIVE</span>
+        </div>
+    </div>
+
+    <div id="modal" class="modal-overlay">
+        <div class="popup-content">
+            <button class="close-x" onclick="closePopup()">X</button>
+            <h2 id="lbl-modal-title">SÄKERHETSKONTROLL</h2>
+            <p id="lbl-modal-desc" style="font-size: 14px; margin-bottom: 20px;">Aktivera hårdvara för turneringen:</p>
+            
+            <div class="toggle-group">
+                <button id="t-cam" class="btn-toggle off" onclick="toggleMedia('cam')">📸 KAMERA: AV</button>
+                <button id="t-mic" class="btn-toggle off" onclick="toggleMedia('mic')">🎤 MIKROFON: AV</button>
+            </div>
+            
+            <button id="btn-modal-confirm" class="btn-main btn-save" onclick="closePopup()">BEKRÄFTA INSTÄLLNINGAR</button>
+        </div>
+    </div>
+
+    <div id="info-modal" class="modal-overlay">
+        <div class="popup-content info-content">
+            <button class="close-x" onclick="closeInfo()">X</button>
+            <h2 id="lbl-info-title" style="color: var(--gold); font-size: 32px;">PROTOKOLL-INSTRUKTIONER</h2>
+            
+            <div class="info-scroll-area">
+                <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid #555; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <strong id="lbl-info-profile">📝 SENSORISK PROFIL:</strong> <span id="lbl-info-profile-desc">Minimal belastning. Fokus på text och logik.</span>
+                </div>
+                <section>
+                    <h3 id="lbl-info-rules-title">🎮 SPELREGLER</h3>
+                    <p id="lbl-info-rules-desc">Din uppgift är att rädda besättningen genom att gissa rätt ord. Du har 6 försök på dig innan gubben hängs och din streak nollställs.</p>
+                </section>
+
+                <section class="warning-box">
+                    <h3 id="lbl-info-warn-title">⚠️ SENSORY WARNING (SINNEN)</h3>
+                    <p id="lbl-info-warn-desc">Spelet innehåller **höga ljud** (tutor, tromboner och skratt) samt **blinkande effekter**. Om du är känslig för plötsliga ljud, sänk volymen innan du startar.</p>
+                </section>
+
+                <section>
+                    <h3 id="lbl-info-cheat-title">🛡️ KAMEK ANTI-CHEAT</h3>
+                    <ul id="lbl-info-cheat-list">
+                        <li><strong>INGEN STYRPLATTA:</strong> Du måste använda en riktig datormus. Styrplattor (trackpads) triggar systemlåsning.</li>
+                        <li><strong>FLIK-VAKT:</strong> Om du byter flik eller minimerar fönstret under spel tolkas det som fusk-googling.</li>
+                        <li><strong>INGEN INSPEKTION:</strong> F12 och högerklick är blockerade. Försök till intrång låser terminalen permanent.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3 id="lbl-info-tournament-title">🏆 TURNERING & STREAK</h3>
+                    <p id="lbl-info-tournament-desc">Varje löst ord ökar din streak. Din streak sparas i topplistan endast om du dör "ärligt". Om Kamek låser spelet pga fusk eller hårdvarufel ogiltigförklaras din poäng.</p>
+                </section>
+            </div>
+
+            <button id="btn-info-close" class="btn-main btn-start" onclick="closeInfo()">JAG FÖRSTÅR</button>
+        </div>
+    </div>
+
+    <div id="audio-interface" style="position: fixed; bottom: 20px; right: 20px; z-index: 99999; cursor: pointer; user-select: none;">
+        <div id="boombox-container" style="position: relative; width: 80px; height: 80px;">
+            <img src="bandspelare.jfif" id="boombox-img" alt="Musik" style="width: 100%; height: 100%; border-radius: 12px; border: 3px solid #ffcc00; box-shadow: 0 0 20px rgba(0,0,0,0.8); opacity: 0.5; transform: scale(0.9); transition: all 0.3s;">
+            <div id="status-cross" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); border-radius: 12px;">
+                <span style="color: #ff0000; font-size: 60px; font-weight: bold; text-shadow: 2px 2px 4px #000;">✕</span>
+            </div>
+        </div>
+        <div id="track-info" style="position: absolute; bottom: 90px; right: 0; background: rgba(0,0,0,0.8); color: #ffcc00; padding: 5px 10px; border-radius: 5px; font-size: 12px; font-family: monospace; white-space: nowrap; display: none;">
+            SPELAR: INGET
+        </div>
+    </div>
+
+    <script src="hangman.js"></script>
+</body>
+</html>

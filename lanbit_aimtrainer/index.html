@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Aim Trainer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #ffcc00;
+            font-family: 'Luckiest Guy', cursive;
+            text-align: center;
+            overflow: hidden;
+            margin: 0;
+            user-select: none;
+            transition: box-shadow 0.2s;
+        }
+        
+        /* Blinkande röd ram vid tidsbrist */
+        .time-warning { box-shadow: inset 0 0 50px rgba(255, 0, 0, 0.7); animation: blink 1s infinite; }
+        .time-critical { box-shadow: inset 0 0 80px rgba(255, 0, 0, 1); animation: blink 0.4s infinite; }
+        
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        #ui {
+            padding: 15px;
+            font-size: 28px;
+            background: #222;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-bottom: 4px solid #ffcc00;
+        }
+        
+        /* SPELOMRÅDET MED LANBIT BAKGRUND */
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 70vh;
+            background-color: #000;
+            background-image: url('lanbit_bg.jfif'); /* LANBIT bakgrund */
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            cursor: crosshair;
+        }
+        
+        .target {
+            position: absolute;
+            width: 55px;
+            height: 55px;
+            background-color: #ffcc00;
+            border-radius: 50%;
+            border: 4px solid #fff;
+            box-shadow: 0 0 20px #ffcc00;
+            z-index: 10;
+        }
+        #leaderboard {
+            background: #333;
+            color: #fff;
+            padding: 20px;
+            width: 320px;
+            margin: 10px auto;
+            border-radius: 10px;
+            border: 3px solid #ffcc00;
+        }
+        button {
+            padding: 10px 25px;
+            font-size: 22px;
+            font-family: 'Luckiest Guy', cursive;
+            background: #ffcc00;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button:hover { background: #fff; transform: scale(1.1); }
+        .shake { animation: shake 0.2s; }
+        @keyframes shake {
+            0% { transform: translate(2px, 2px); }
+            50% { transform: translate(-4px, 3px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        /* KAMEK ANTI-CHEAT OVERLAY */
+        #kamek-overlay {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60%; /* Täck delvis */
+            height: 60%;
+            background-image: url('kamek.jfif'); /* Uppdaterad till .jfif */
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 100;
+            display: none;
+            opacity: 0.9;
+        }
+        #kamek-text {
+            position: absolute;
+            bottom: -50px; left: 50%;
+            transform: translateX(-50%);
+            font-size: 80px;
+            color: #ff0000;
+            text-shadow: 4px 4px #000;
+            width: 100%;
+        }
+        #kamek-comment {
+            position: absolute;
+            top: -60px; left: 50%;
+            transform: translateX(-50%);
+            font-size: 40px;
+            color: #fff;
+            text-shadow: 2px 2px #000;
+            width: 100%;
+            background: rgba(0,0,0,0.7);
+            padding: 10px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body onclick="playMiss(event)">
+<script>
+// --- KAMEK ELITE SYSTEM & HARDWARE PURGE ---
+(function() {
+    var ua = navigator.userAgent.toLowerCase();
+    var reason = "";
+    var mockery = "";
+
+    // --- 1. WEBBLÄSAR-KONTROLL (Fossila motorer & Legacy Edge) ---
+    var isIE = !!document.documentMode || ua.indexOf("msie") > -1 || ua.indexOf("trident") > -1;
+    var isOldEdge = ua.indexOf("edge/") > -1; // Gamla Edge (EdgeHTML)
+    var isSafari = ua.indexOf("safari") > -1 && ua.indexOf("chrome") === -1;
+    var isOldSafari = false;
+
+    if (isSafari) {
+        var safariVerMatch = ua.match(/version\/(\d+)/);
+        if (safariVerMatch && parseInt(safariVerMatch[1]) < 16) isOldSafari = true;
+    }
+
+    if (isIE) {
+        reason = "INTERNET_EXPLORER_GRAVSKÄNDNING";
+        mockery = "Internet Explorer har gått i graven. Vänligen byt till en annan webbläsare! Allvarligt talat, Operatör PSL631 kan praktiskt taget höra ditt 56k-modem skrika av smärta.";
+    } else if (isOldEdge) {
+        reason = "LEGACY_EDGE_SKROTAD";
+        mockery = "Kör du gamla Edge? Den där webbläsaren dog snabbare än en Goomba under en känga! Installera en webbläsare med en riktig motor (Chromium) innan Kamek förvandlar din dator till ett askfat.";
+    } else if (isOldSafari) {
+        reason = "STENÅLDERS_SAFARI";
+        mockery = "Din Safari-version är så gammal att den fortfarande tror att Steve Jobs lever. Uppdatera din frukt eller bli raderad!";
+    }
+
+    // 2. HÅRDVARU-KONTROLL (Enheter som ej stödjs)
+    var isMobile = /iphone|ipod|android|blackberry|iemobile/i.test(ua);
+    var isTablet = /ipad|playbook|silk/i.test(ua) || (navigator.maxTouchPoints > 0 && ua.indexOf("macintosh") > -1);
+    var isVR = /oculus|quest|pico|vive/i.test(ua);
+    var isWatch = /watch|wearable/i.test(ua);
+    var isSmartHome = /tizen|web0s|googletv|appletv|smarttv|hbbtv/i.test(ua);
+
+    if (isVR) {
+        reason = "VR_CYKLOP_DETEKTERAD";
+        mockery = "Ta av dig cyklopögonen! Man kan inte rensa virus i 3D när man ser ut som en förvirrad dykare. Station 24 kräver en platt skärm och en riktig mus!";
+    } else if (isWatch) {
+        reason = "MIKRO_ENHET_UPPTÄCKT";
+        mockery = "En smartklocka?! Din skärm är mindre än Kameks tånagel. Försök inte ens infiltrera matrisen med en handledsmanick!";
+    } else if (isSmartHome) {
+        reason = "SOFFPOTATIS_ANOMALI";
+        mockery = "Din TV/Smart-enhet är inte en godkänd kommandocentral! Att rensa virus med en fjärrkontroll är som att äta soppa med gaffel.";
+    }else if (ua.indexOf("tesla") > -1 || ua.indexOf("carbrowser") > -1) {
+        reason = "RULLANDE_TRAFIKFARA";
+        mockery = "SLÅ AV MOTORN! Din Tesla är inte en matte-stuga. Händerna på ratten innan du krockar in i stordatormatrisen!";
+    } else if (ua.indexOf("smarttv") > -1 || ua.indexOf("tizen") > -1 || ua.indexOf("web0s") > -1) {
+        reason = "SOFFPOTATIS_ANOMALI";
+        mockery = "Soffan är inte en godkänd kommandocentral! Gå upp och hämta en riktig terminal!";
+    } else if (ua.indexOf("playstation") > -1 || ua.indexOf("xbox") > -1 || ua.indexOf("nintendo") > -1) {
+        reason = "KONSOL_BONDE";
+        mockery = "Gå tillbaka till din handkontroll och din auto-aim, din lilla konsol-bonde! Station 24 kräver mekanisk precision.";
+    } else if (isTablet) {
+        reason = "KLADDIGA_FINGRAR";
+        mockery = "Sluta kladda på skärmen! En padda är en leksak. Station 24 Protocol kräver en riktig mus!";
+    } else if (isMobile) {
+        reason = "MOBIL_TERMINAL";
+        mockery = "Din skärm är för liten för den här nivån av intelligens. Station 24 är inte ett mobilspel för Goombas!";
+    }
+
+    // 3. OS-KONTROLL (Elite Versions Only)
+    var isWindows = ua.indexOf("windows nt") > -1;
+    var isMac = ua.indexOf("mac os x") > -1 && !isTablet;
+    var isChromeOS = ua.indexOf("cros") > -1;
+
+    if (isChromeOS) {
+        reason = "CHROME_OS_SKROTAT";
+        mockery = "En Chromebook? Det är som att försöka vinna ett Formel 1-lopp med en trampbil. Kamek accepterar endast riktiga operativsystem!";
+    } else if (isWindows) {
+        var winVer = parseFloat(ua.split("windows nt ")[1]);
+        if (winVer < 10.0) {
+            reason = "WINDOWS_FOSSIL";
+            mockery = "Windows " + (winVer < 6.2 ? "7" : "8") + "? Din dator hör hemma på ett museum, inte i Station 24!";
+        }
+    } else if (isMac) {
+        var macVerMatch = ua.match(/mac os x (\d+)[_.](\d+)/);
+        if (macVerMatch) {
+            var major = parseInt(macVerMatch[1]);
+            if (major < 15) {
+                reason = "RUTTEN_FRUKT";
+                mockery = "macOS " + major + "? Sequoia (15.0) är minimum för att exekvera dessa algoritmer. Uppdatera eller bli raderad!";
+            }
+        }
+    }
+
+    // --- EXECUTE LOCKDOWN ---
+    if (reason !== "") {
+        document.documentElement.innerHTML = ""; 
+        window.onload = function() {
+            var h = '<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#1a0000;color:#fff;z-index:9999999;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:40px;font-family:Arial, sans-serif;border:15px double #ff0000;box-sizing:border-box;">';
+            h += '<img src="kamek.jfif" style="width:180px;border-radius:30px;border:5px solid #ffcc00;margin-bottom:20px;filter:drop-shadow(0 0 15px #ff0000);">';
+            h += '<h1 style="font-size:42px;color:#ff0000;margin:10px 0;font-weight:900;">[ ÅTKOMST NEKAD ]</h1>';
+            h += '<div style="background:rgba(0,0,0,0.4);padding:40px;border-radius:30px;max-width:800px;border:2px solid #ffcc00;">';
+            h += '<p style="font-size:26px;color:#ffcc00;margin-bottom:20px;font-weight:bold;">Kamek hånar din utrustning:</p>';
+            h += '<p style="font-size:32px;line-height:1.4;font-style:italic;">"' + mockery + '"</p>';
+            h += '</div>';
+            h += '<p style="margin-top:50px;opacity:0.5;font-family:monospace;">SYSTEM_ERROR: ' + reason + '</p></div>';
+            document.body.innerHTML = h;
+            if (window.stop) window.stop();
+        };
+        throw new Error("Lockdown: System integrity check failed.");
+    }
+})();
+</script>
+
+    <div id="ui">
+        <div>POÄNG: <span id="score" style="color:#fff">0</span></div>
+        <button id="start-btn" onclick="startGame()">STARTA!</button>
+        <div>TID: <span id="timer" style="color:#ff4444">45</span>s</div>
+    </div>
+
+    <div id="game-container">
+        <div id="kamek-overlay">
+            <div id="kamek-comment">Sluta klicka blint!</div> <div id="kamek-text">FUSKARE!</div>
+        </div>
+
+        <div id="start-screen" style="padding-top: 80px;">
+            <h1 style="font-size: 90px; margin: 0; text-shadow: 4px 4px #000;">Aim Trainer</h1>
+            <div id="leaderboard" style="opacity: 0.9;">
+                <h3 style="color:#ffcc00; margin-top:0;">🏆 TOPPLISTA</h3>
+                <div id="highscores">Inga resultat än...</div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="snd-hit" src="pling.mp3"></audio>
+    <audio id="snd-miss" src="boooop.mp3"></audio>
+    <audio id="snd-sad" src="sad_trombone.mp3"></audio>
+    <audio id="snd-loser" src="mk64_loser.wav"></audio>
+    <audio id="snd-kamek" src="kamek.mp3"></audio>
+    <audio id="snd-yay" src="yay.mp3"></audio>
+
+    <script>
+        let score = 0;
+        let timeLeft = 45;
+        let gameActive = false;
+        let missCount = 0; // Räknare för missar
+        const container = document.getElementById('game-container');
+        const scoreEl = document.getElementById('score');
+        const timerEl = document.getElementById('timer');
+        const kamek = document.getElementById('kamek-overlay');
+        const kamekComment = document.getElementById('kamek-comment');
+
+        // Hånfulla kommentarer när Kamek dyker upp
+        const mocks = [
+            "Sluta klicka blint, amatör!",
+            "Kamek ser dina fuskförsök!",
+            "Min farmor klickar snabbare än dig!",
+            "Varför ens försöka när du missar så mycket?",
+            "DNF väntar runt hörnet för dig!",
+            "Incheckningen godkänner inte dina stats!",
+            "Ska jag ringa Bro2012 så han kan visa hur man gör?"
+        ];
+
+        function playSnd(id) {
+            const s = document.getElementById(id);
+            if (s) {
+                s.currentTime = 0;
+                s.play().catch(e => console.warn("Ljudblockerat"));
+            }
+        }
+
+        function playMiss(e) {
+            if (!gameActive || e.target.className === 'target') return;
+            missCount++;
+            playSnd('snd-miss');
+            document.body.classList.add('shake');
+            setTimeout(() => document.body.classList.remove('shake'), 200);
+
+            // Trigger Kamek om de klickar fel mer än 3 gånger
+            if (missCount > 3) {
+                kamek.style.display = 'block';
+                // Välj en slumpmässig hånfull kommentar
+                kamekComment.innerText = mocks[Math.floor(Math.random() * mocks.length)];
+                playSnd('snd-kamek'); // Kameks skratt spelas när han dyker upp
+                missCount = 0; // Reset räknare
+                setTimeout(() => kamek.style.display = 'none', 2000); // Täck i 2s
+            }
+        }
+
+        function startGame() {
+            score = 0; timeLeft = 45; gameActive = true; missCount = 0;
+            scoreEl.innerText = score;
+            document.body.classList.remove('time-warning', 'time-critical');
+            document.getElementById('start-btn').style.visibility = 'hidden';
+            container.innerHTML = '';
+            // Lägg tillbaka Kamek overlay då innerHTML raderar allt
+            container.appendChild(kamek);
+            kamek.style.display = 'none';
+            spawnTarget();
+
+            const timerInterval = setInterval(() => {
+                timeLeft--;
+                timerEl.innerText = timeLeft;
+
+                // Tidsbaserad stress
+                if (timeLeft <= 10 && timeLeft > 5) {
+                    document.body.classList.add('time-warning');
+                } else if (timeLeft <= 5) {
+                    document.body.classList.remove('time-warning');
+                    document.body.classList.add('time-critical');
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function spawnTarget() {
+            if (!gameActive || kamek.style.display === 'block') return; // Inga prickar under Kamek
+            const oldTargets = container.getElementsByClassName('target');
+            while(oldTargets.length > 0){ oldTargets[0].parentNode.removeChild(oldTargets[0]); }
+
+            const target = document.createElement('div');
+            target.className = 'target';
+            const x = Math.random() * (window.innerWidth - 80);
+            const y = Math.random() * (window.innerHeight * 0.7 - 80);
+            target.style.left = x + 'px'; target.style.top = y + 'px';
+            target.onclick = (e) => {
+                e.stopPropagation();
+                score++; scoreEl.innerText = score;
+                missCount = 0; // Reset missar vid lyckad träff
+                playSnd('snd-hit');
+                spawnTarget();
+            };
+            container.appendChild(target);
+        }
+
+        function endGame() {
+            gameActive = false;
+            document.body.classList.remove('time-warning', 'time-critical');
+            let soundToPlay = 'snd-sad';
+            let comment = "PINSAMT LÅNGSAMT!";
+
+            if (score >= 60) { soundToPlay = 'snd-yay'; comment = "LEGENDARISK PRECISION!"; }
+            else if (score >= 40) { soundToPlay = 'snd-kamek'; comment = "KAMEK ÄR IMPONERAD!"; }
+            else if (score >= 20) { soundToPlay = 'snd-loser'; comment = "OK FÖR EN AMATÖR... "; }
+
+            playSnd(soundToPlay);
+            saveScore(score);
+
+            container.innerHTML = `
+                <div style="margin-top:50px; background: rgba(0,0,0,0.6); display:inline-block; padding: 20px; border-radius: 10px;">
+                    <h1 style="color:#ff4444; font-size:80px; margin:0; text-shadow: 2px 2px #000;">SLUT!</h1>
+                    <h2 style="font-size:40px; text-shadow: 2px 2px #000;">DU KLICKADE ${score} GÅNGER</h2>
+                    <p style="font-size:30px; color:#fff; text-shadow: 2px 2px #000;">${comment}</p>
+                    <div id="leaderboard" style="margin: 20px auto; opacity: 1;">
+                         <h3 style="color:#ffcc00; margin:0;">🏆 TOPPLISTA</h3>
+                         <div id="end-highscores"></div>
+                    </div>
+                    <button onclick="location.reload()">TILL MENYN</button>
+                </div>`;
+            updateLeaderboardUI('end-highscores');
+            document.getElementById('start-btn').style.visibility = 'visible';
+        }
+
+        function saveScore(newScore) {
+            let scores = JSON.parse(localStorage.getItem('aimScores')) || [];
+            scores.push(newScore);
+            scores.sort((a, b) => b - a);
+            scores = scores.slice(0, 5);
+            localStorage.setItem('aimScores', JSON.stringify(scores));
+        }
+
+        function updateLeaderboardUI(id = 'highscores') {
+            const scores = JSON.parse(localStorage.getItem('aimScores')) || [];
+            const el = document.getElementById(id);
+            if (!el || scores.length === 0) return;
+            el.innerHTML = scores.map((s, i) => `<div>#${i+1}: ${s} KLIKS</div>`).join('');
+        }
+
+        window.onload = () => updateLeaderboardUI('highscores');
+    </script>
+</body>
+<noscript>
+    <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+                background: #000; color: #ff0000; z-index: 9999; 
+                display: flex; flex-direction: column; justify-content: center; align-items: center;
+                font-family: 'Luckiest Guy', cursive; text-align: center; padding: 20px;">
+        
+        <h1 style="font-size: 80px; margin-bottom: 20px;">SYSTEMFEL!</h1>
+        <p style="font-size: 30px; color: #fff;">
+            Operatör Psl631 här. Det verkar som att du försöker köra ett 
+            <br>turneringsspel med JavaScript avstängt... 
+        </p>
+        <div style="background: #333; padding: 20px; border: 5px dashed #ff0000; margin-top: 20px;">
+            <p style="font-size: 24px;">
+                "Är du en tidsresenär från 1994 eller har du bara 
+                <br>glömt att godkänna min kontroll?"
+            </p>
+        </div>
+        <p style="font-size: 26px; margin-top: 30px; color: #ffcc00;">
+            AKTIVERA JAVASCRIPT ELLER BLI UTKASTAD FRÅN TULLEN (DNF)!
+        </p>
+        <img src="kamek.jfif" style="width: 200px; margin-top: 20px; border: 3px solid #ff0000;">
+    </div>
+</noscript>
+</html>

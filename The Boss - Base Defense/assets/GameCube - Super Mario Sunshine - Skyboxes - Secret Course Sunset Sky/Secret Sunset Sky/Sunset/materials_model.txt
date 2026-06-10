@@ -1,0 +1,45 @@
+_mat1
+=====
+  Textures:
+    - P_sun_core1ss
+        Center: 0, 0
+        Scale: 2, 2
+    - P_ms_indwp2sun_ia
+        Offset: 0.705000102519989, 0.10000000149011612
+        Center: 0.5, 0.5
+        Scale: 0.302734375, 4.3408203125
+
+  Ambient Colors:
+    - 50, 50, 50, 50
+
+  Constant Colors:
+    - 255, 193, 94, 255
+
+  Material Colors:
+    - 255, 255, 240, 255
+    - 255, 255, 240, 255
+
+  Color Registers:
+    - 246, 141, 125, 255
+
+
+
+_mat24
+======
+  Textures:
+    - P_ms_radgrad_i
+        Scale: 1.4892578125, 1.4892578125
+
+  Ambient Colors:
+    - 50, 50, 50, 50
+
+  Constant Colors:
+    - 163, 78, 15, 255
+    - 246, 131, 33, 255
+
+  Material Colors:
+    - 178, 178, 178, 30
+    - 178, 178, 178, 30
+
+  Color Registers:
+    - 218, 214, 206, 255

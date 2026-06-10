@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Keyboard Warrior - Station 24</title>
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #000;
+            color: #ff0;
+            font-family: Arial, sans-serif; /* Standard för dialog/allmänt */
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* Luckiest Guy för rubriker */
+        h1, h2, .header-font {
+            font-family: 'Luckiest Guy', cursive;
+            letter-spacing: 2px;
+        }
+
+        #game-container {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            border: 4px solid #ff0;
+            background-image: url('lanbit_bg.jfif');
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 0 20px #ff0;
+        }
+
+        #bg-overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1;
+        }
+
+        /* KAMEK LILA SKÄRM (FUSK-SKYDD) */
+        #kamek-foul {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #800080; /* Lila */
+            color: #fff;
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .word {
+            position: absolute; 
+            font-family: 'Courier New', Courier, monospace; /* Typsnitt för fallande ord */
+            font-size: 28px; 
+            font-weight: bold;
+            white-space: nowrap; 
+            color: #fff; 
+            z-index: 5;
+            text-shadow: 2px 2px 4px #000;
+        }
+
+        #start-screen, #game-over {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            text-align: center;
+        }
+
+        .terminal-box { border: 3px solid #ff0; padding: 30px; background: #000; }
+
+        input, .start-input {
+            background: #222;
+            border: 2px solid #ff0; 
+            color: #ff0;
+            font-size: 24px; 
+            padding: 10px; 
+            text-align: center;
+            outline: none;
+            font-family: Arial, sans-serif;
+        }
+
+        #health-container {
+            position: absolute;
+            top: 10px; left: 10px; width: 250px; height: 25px;
+            border: 2px solid #ff0; background: #000; z-index: 10;
+        }
+
+        #health-bar { width: 100%; height: 100%; background: #0f0; transition: width 0.2s; }
+
+        #stats {
+            position: absolute;
+            top: 10px; right: 10px; text-align: right;
+            z-index: 10; font-weight: bold;
+        }
+
+        button {
+            background: #ff0; border: none; padding: 10px 25px;
+            font-family: 'Luckiest Guy', cursive; font-size: 20px; cursor: pointer;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;"> <div id="kamek-foul">
+        <h1 style="font-size: 80px;">DNF</h1>
+        <p style="font-size: 30px; font-family: Arial;">KAMEK SER DITT FUSK!</p>
+        <p>SYSTEMET LÅST - KONTAKTA OPERATÖR Psl631</p>
+    </div>
+
+    <div id="game-container">
+        <div id="bg-overlay"></div>
+
+        <div id="start-screen">
+            <div class="terminal-box">
+                <h2 style="color: #ff0;">STATION 24 TERMINAL</h2>
+                <p style="font-family: Arial;">ANGE ANROPSSIGNAL (ALIAS):</p>
+                <input type="text" id="player-name" class="start-input" placeholder="Ditt namn..." maxlength="15"><br><br>
+                <button id="start-button">STARTA SYSTEMET</button>
+                <p style="font-size: 12px; color: #aaa; margin-top: 10px;">(Lämnas tomt = GÄST, inga poäng räknas)</p>
+            </div>
+        </div>
+
+        <div id="health-container"><div id="health-bar"></div></div>
+
+        <div id="stats">
+            <span id="display-name" style="color:#0f0; font-family:'Luckiest Guy';">ANONYM</span><br>
+            <span style="font-family: Arial;">Poäng: <span id="score">0</span></span><br>
+            <span style="font-family: Arial;">Level: <span id="level">1</span></span>
+        </div>
+        
+        <div id="game-over" style="display:none;">
+            <h1 style="color: #f00; font-size: 50px;">SYSTEM CRASHED!</h1>
+            <p style="font-size: 20px;">OPERATÖR: <span id="final-name" style="font-family:'Luckiest Guy';"></span></p>
+            <p style="font-size: 32px;">POÄNG: <span id="final-score">0</span></p>
+            <button onclick="location.reload()">FÖRSÖK IGEN</button>
+        </div>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <input type="text" id="word-input" autocomplete="off" placeholder="VÄNTAR..." disabled>
+    </div>
+
+    <audio id="snd-pling" src="pling.mp3"></audio>
+    <audio id="snd-boooop" src="boooop.mp3"></audio>
+    <audio id="snd-damage" src="denied.wav"></audio>
+    <audio id="snd-trombone" src="sad_trombone.mp3"></audio>
+    <audio id="snd-kamek" src="kamek_laugh.mp3"></audio> <script>
+        const container = document.getElementById('game-container');
+        const input = document.getElementById('word-input');
+        const scoreElement = document.getElementById('score');
+        const levelElement = document.getElementById('level');
+        const healthBar = document.getElementById('health-bar');
+        const gameOverScreen = document.getElementById('game-over');
+        const startScreen = document.getElementById('start-screen');
+        const playerNameInput = document.getElementById('player-name');
+        const startBtn = document.getElementById('start-button');
+        const displayName = document.getElementById('display-name');
+        const kamekScreen = document.getElementById('kamek-foul');
+
+        const words = ["JAVASCRIPT", "STATION24", "LANBIT", "LOCOMOTIVE", "EMULATOR", "PARKOUR", "MINECRAFT", "COMPILER", "KAMEK", "BOWSER", "SIGNAL", "NETWORK", "LATENCY", "DATABASE", "BINARY", "SWITCH", "FIREWALL", "CORE", "KERNEL", "BANDWIDTH", "TRAIN", "OPERATOR"];
+
+        let score = 0, level = 1, speed = 1.2, health = 100, activeWords = [], gameActive = false, playerAlias = "GÄST";
+
+        // --- KAMEK SÄKERHETSPROTOKOLL ---
+        function triggerKamek() {
+            gameActive = false;
+            kamekScreen.style.display = 'flex';
+            document.getElementById('snd-kamek').play();
+            console.log("KAMEK DETECTED FOUL PLAY: LOCKING SYSTEM");
+        }
+
+        // Fusk-triggers: Tappa fokus, högerklick (via HTML), Inspektera (F12)
+        window.addEventListener('blur', triggerKamek);
+        window.addEventListener('keydown', (e) => {
+            if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I") || e.key === "Escape") {
+                triggerKamek();
+            }
+        });
+
+        startBtn.onclick = () => {
+            playerAlias = playerNameInput.value.trim() || "GÄST";
+            displayName.innerText = playerAlias.toUpperCase();
+            startScreen.style.display = 'none';
+            input.disabled = false;
+            input.placeholder = "SKRIV HÄR...";
+            input.focus();
+            gameActive = true;
+            spawnWord();
+            update();
+        };
+
+        function takeDamage() {
+            if (!gameActive) return;
+            health -= 15;
+            document.getElementById('snd-damage').play();
+            updateHealthBar();
+            if (health <= 0) endGame();
+        }
+
+        function updateHealthBar() {
+            healthBar.style.width = Math.max(0, health) + "%";
+            healthBar.style.backgroundColor = health > 50 ? "#0f0" : (health > 25 ? "#ff0" : "#f00");
+        }
+
+        function spawnWord() {
+            if (!gameActive) return;
+            const wordDiv = document.createElement('div');
+            wordDiv.className = 'word';
+            const wordText = words[Math.floor(Math.random() * words.length)];
+            wordDiv.innerText = wordText;
+            wordDiv.style.left = (Math.random() * (container.offsetWidth - 200) + 20) + "px";
+            wordDiv.style.top = "0px";
+            container.appendChild(wordDiv);
+            activeWords.push({ element: wordDiv, top: 0, text: wordText });
+            
+            setTimeout(spawnWord, Math.max(400, 2000 - (level * 150)));
+        }
+
+        function update() {
+            if (!gameActive) return;
+            for (let i = 0; i < activeWords.length; i++) {
+                let w = activeWords[i];
+                w.top += speed;
+                w.element.style.top = w.top + "px";
+                if (w.top > container.offsetHeight - 40) {
+                    container.removeChild(w.element);
+                    activeWords.splice(i, 1);
+                    i--;
+                    takeDamage();
+                }
+            }
+            requestAnimationFrame(update);
+        }
+
+        function endGame() {
+            gameActive = false;
+            gameOverScreen.style.display = 'flex';
+            document.getElementById('final-name').innerText = playerAlias.toUpperCase();
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('snd-trombone').play();
+            input.disabled = true;
+        }
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && gameActive) {
+                const typed = input.value.toUpperCase().trim();
+                const idx = activeWords.findIndex(w => w.text === typed);
+                
+                if (idx !== -1) {
+                    document.getElementById('snd-pling').play();
+                    container.removeChild(activeWords[idx].element);
+                    activeWords.splice(idx, 1);
+                    score += 10;
+                    scoreElement.innerText = score;
+                    input.value = "";
+                    health = Math.min(100, health + 2);
+                    updateHealthBar();
+                    if (score % 100 === 0) { level++; levelElement.innerText = level; speed += 0.2; }
+                } else { 
+                    document.getElementById('snd-boooop').play();
+                    input.value = ""; 
+                }
+            }
+        });
+    </script>
+</body>
+</html>

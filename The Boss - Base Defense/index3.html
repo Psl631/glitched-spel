@@ -1,0 +1,3663 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Station 24 - Base Defense ULTRA</title>
+    <!-- Google Fonts för rätt retro/arkadkänsla -->
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=VT323&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ==========================================================================
+           1. GRUNDLÄGGANDE STYLING & STRÖM-DESIGN
+           ========================================================================== */
+        :root {
+            --primary: #00ffcc;
+            --gold: #ffcc00;
+            --kamek-glow: #8200ff;
+            --danger: #ff0033;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #05000a;
+            font-family: 'Luckiest Guy', cursive;
+            user-select: none;
+        }
+
+        body {
+            background-image: radial-gradient(circle, #110022 0%, #05000a 100%);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.4); 
+            cursor: none;
+        }
+
+        /* ==========================================================================
+           2. HUD & STATUSBOXAR (SPELSKÄRMEN)
+           ========================================================================== */
+        #ui-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: calc(100% - 40px);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            pointer-events: none;
+            color: white;
+            z-index: 10;
+        }
+
+        .stat-box {
+            padding: 12px 20px;
+            border: 4px solid var(--gold);
+            background: rgba(5, 0, 10, 0.9);
+            font-size: 20px;
+            border-radius: 12px;
+            text-shadow: 2px 2px #000;
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.2);
+            pointer-events: auto;
+        }
+
+        /* UPS & STRÖMINSTATOR-WIDGET */
+        #power-status-widget {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-color: #00ff00;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
+        }
+
+        /* ==========================================================================
+           PLAYLIST SELECTION SYSTEM SWITCHES
+           ========================================================================== */
+        .playlist-container {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #331155;
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .track-selection-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-family: sans-serif;
+            font-size: 13px;
+            color: #ddd;
+            cursor: pointer;
+        }
+        .track-selection-row:last-child {
+            border-bottom: none;
+        }
+        .track-selection-row input[type="checkbox"] {
+            accent-color: var(--primary);
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        .track-meta-effect {
+            font-size: 11px;
+            color: var(--gold);
+            margin-left: auto;
+            font-style: italic;
+        }
+
+        .power-pulse {
+            width: 12px;
+            height: 12px;
+            background-color: #00ff00;
+            border-radius: 50%;
+            animation: pulse-green 1s infinite;
+        }
+
+        @keyframes pulse-green {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes pulse-red {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* ==========================================================================
+           3. STARTSKÄRM & FLAGGMENY
+           ========================================================================== */
+        #start-screen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 500;
+            background: rgba(5, 0, 10, 0.97);
+            padding: 40px;
+            border: 8px solid var(--gold);
+            border-radius: 30px;
+            text-align: center;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 0 40px rgba(130, 0, 255, 0.4);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* Snygg scrollbar för startskärmen */
+        #start-screen::-webkit-scrollbar {
+            width: 8px;
+        }
+        #start-screen::-webkit-scrollbar-thumb {
+            background: var(--kamek-glow);
+            border-radius: 4px;
+        }
+
+        #start-screen h1 {
+            font-size: 52px;
+            color: var(--gold);
+            -webkit-text-stroke: 2px black;
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 0px #000;
+        }
+
+        /* SPRÅKVAL MED VEKTORFLAGGOR */
+        .language-selector-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin: 15px 0 25px 0;
+        }
+
+        .flag-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            background: #120024;
+            border: 3px solid var(--kamek-glow);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--gold);
+            font-size: 13px;
+            font-weight: bold;
+            font-family: 'Luckiest Guy', sans-serif;
+        }
+
+        .flag-button:hover {
+            background: #250044;
+            border-color: var(--primary);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+        }
+
+        .flag-button svg {
+            width: 45px;
+            height: 30px;
+            border-radius: 4px;
+            margin-bottom: 6px;
+            border: 2px solid var(--gold);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        /* INPUT & KNAPPAR */
+        input#playerName {
+            padding: 12px;
+            font-size: 22px;
+            border-radius: 10px;
+            border: 4px solid var(--kamek-glow);
+            text-align: center;
+            width: 80%;
+            background: #120024;
+            color: white;
+            font-family: 'Luckiest Guy';
+            margin-top: 5px;
+        }
+
+        input#playerName:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
+        }
+
+        .btn-start, .btn-info, .open-settings-btn {
+            font-family: 'Luckiest Guy', cursive;
+            border: 4px solid black;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .btn-start { 
+            background: #00ff00; 
+            font-size: 28px; 
+            padding: 15px 40px; 
+            box-shadow: 0 5px 0 #00aa00;
+        }
+        .btn-start:active { transform: translateY(5px); box-shadow: none; }
+
+        .btn-info { 
+            background: #00ccff; 
+            font-size: 20px; 
+            padding: 10px 25px; 
+            color: white; 
+            box-shadow: 0 4px 0 #0088cc;
+        }
+        .btn-info:active { transform: translateY(4px); box-shadow: none; }
+
+        .open-settings-btn {
+            background: #1a0033;
+            color: var(--gold);
+            border-color: var(--kamek-glow);
+            font-size: 16px;
+            padding: 8px 18px;
+        }
+
+        /* ==========================================================================
+           4. STROBOSKOP & VISUELLA EFFEKTER
+           ========================================================================== */
+        #strobe-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 15000;
+            display: none;
+        }
+
+        .strobe-attack {
+            display: block !important;
+            animation: sudden-strobe 0.12s infinite;
+        }
+
+        @keyframes sudden-strobe {
+            0% { background-color: rgba(255, 255, 255, 0); }
+            25% { background-color: rgba(255, 255, 255, 0.4); }
+            50% { background-color: rgba(130, 0, 255, 0.3); } /* Kameks lila signatursken */
+            100% { background-color: rgba(0, 0, 0, 0); }
+        }
+
+        /* ==========================================================================
+           5. BANNER-NOTISER (TOASTS)
+           ========================================================================== */
+        #toast-container {
+            position: fixed; 
+            bottom: 20px; 
+            right: 20px; 
+            z-index: 99999;
+            display: flex; 
+            flex-direction: column-reverse;
+            align-items: flex-end;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: rgba(5, 0, 10, 0.95); 
+            color: white; 
+            padding: 12px 25px;
+            border-radius: 10px; 
+            margin-top: 10px;
+            border: 2px solid var(--gold);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            animation: toastSlideIn 0.4s ease-out forwards;
+        }
+
+        @keyframes toastSlideIn {
+            from { transform: translateX(120%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .toast.fade-out {
+            animation: toastFadeOut 0.5s ease-in forwards;
+        }
+
+        @keyframes toastFadeOut {
+            from { opacity: 1; transform: translateX(0); }
+            to { opacity: 0; transform: translateX(20px); }
+        }
+
+        /* ==========================================================================
+           6. INSTRUKTIONER MODAL
+           ========================================================================== */
+        .modal {
+            display: none; 
+            position: fixed;
+            z-index: 100000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(10px);
+            overflow-y: auto; 
+            padding: 40px 0;
+        }
+
+        .modal-content {
+            background: #0a0a0f !important; 
+            background-image: linear-gradient(180deg, #05000a 0%, #110022 100%) !important;
+            margin: auto;
+            padding: 40px;
+            border: 5px solid var(--kamek-glow);
+            width: 90%;
+            max-width: 900px;
+            border-radius: 25px;
+            color: #ffffff !important;
+            box-shadow: 0 0 60px rgba(130, 0, 255, 0.5);
+            position: relative;
+            font-family: Arial, sans-serif; /* Tvingar Arial i hela rutan */
+            line-height: 1.6;
+        }
+
+        .modal-content h1, .modal-content h3 {
+            font-family: 'Luckiest Guy', cursive;
+        }
+
+        /* Purple Scrollbar */
+        .modal::-webkit-scrollbar {
+            width: 12px;
+        }
+        .modal::-webkit-scrollbar-track {
+            background: #050505;
+        }
+        .modal::-webkit-scrollbar-thumb {
+            background: var(--kamek-glow);
+            border: 3px solid #050505;
+            border-radius: 10px;
+        }
+
+        /* ==========================================================================
+           7. MEDIA- & HÅNDKONTROLL POPUP
+           ========================================================================== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 20000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .popup-content {
+            background: #0d001a;
+            border: 5px solid var(--kamek-glow);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            color: white;
+            position: relative;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 0 30px rgba(130,0,255,0.6);
+            animation: popupAnimation 0.3s ease-out;
+        }
+
+        @keyframes popupAnimation {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .close-popup {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--gold);
+            font-size: 24px;
+            cursor: pointer;
+            font-family: 'Luckiest Guy', cursive;
+        }
+
+        .toggle-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .btn-toggle {
+            font-family: 'Luckiest Guy', cursive;
+            font-size: 18px;
+            padding: 12px 20px;
+            border: 3px solid #333;
+            border-radius: 12px;
+            cursor: pointer;
+            min-width: 180px;
+            transition: all 0.2s;
+            color: white;
+        }
+
+        .btn-off {
+            background: #440000;
+            border-color: #ff0000;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
+        }
+
+        .btn-on {
+            background: #004400;
+            border-color: #00ff00;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-start-game {
+            width: 100%;
+            background: var(--gold);
+            color: black;
+            font-family: 'Luckiest Guy';
+            font-size: 26px;
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            border-bottom: 5px solid #b89500;
+        }
+
+        /* ==========================================================================
+           8. BOOMBOX (RADIO) KONTROLLER
+           ========================================================================== */
+        #radio-container {
+            position: fixed;
+            top: 100px; /* Sänkt från 20px för att aldrig krocka med HUD-raden */
+            right: 20px;
+            width: 80px;
+            height: auto;
+            cursor: pointer;
+            z-index: 10001;
+            transition: transform 0.2s ease;
+        }
+
+        #radio-container:hover {
+            transform: scale(1.1);
+        }
+
+        #radio-icon {
+            width: 100%;
+            display: block;
+            transition: filter 0.3s ease;
+        }
+
+        #radio-cross {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 110%;
+            height: 6px;
+            background-color: var(--danger);
+            box-shadow: 0 0 5px black;
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+
+        .radio-muted #radio-icon {
+            filter: grayscale(1) opacity(0.4);
+        }
+
+        .radio-muted #radio-cross {
+            display: block;
+        }
+
+        /* ==========================================================================
+           9. LEADERBOARD (TOPPLISTA)
+           ========================================================================== */
+        #leaderboard-container {
+            margin-top: 25px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 15px;
+            border: 2px solid var(--gold);
+        }
+
+        #leaderboard-table {
+            width: 100%;
+            color: white;
+            border-collapse: collapse;
+            font-family: Arial, sans-serif;
+        }
+
+        #leaderboard-table th {
+            color: var(--gold);
+            font-size: 14px;
+            border-bottom: 1px solid var(--gold);
+            padding-bottom: 5px;
+        }
+
+        #leaderboard-table td {
+            padding: 8px 5px;
+            font-size: 15px;
+        }
+
+        /* ==========================================================================
+           10. ANTICHEAT LOCKDOWN OVERLAY (KAMEK)
+           ========================================================================== */
+        #lockdown-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(40, 0, 75, 0.98);
+            z-index: 100000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 60px 20px;
+            overflow-y: auto;
+            box-sizing: border-box;
+            color: var(--gold);
+        }
+
+        #lockdown-overlay img {
+            width: 250px;
+            border: 8px solid var(--gold);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 25px rgba(255, 204, 0, 0.5);
+        }
+
+        #lockdown-overlay h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 0 black;
+        }
+
+        #lockdown-overlay p {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 18px;
+            text-align: center;
+            max-width: 600px;
+            line-height: 1.6;
+            color: white;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px dashed var(--gold);
+        }
+
+        #lockdown-overlay button {
+            margin-top: 25px;
+            padding: 15px 40px;
+            font-family: 'Luckiest Guy', cursive;
+            background: var(--gold);
+            color: black;
+            font-size: 24px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #b89500;
+        }
+        #lockdown-overlay button:active { transform: translateY(4px); box-shadow: none; }
+
+        .medical-warning {
+            color: var(--gold);
+            font-size: 18px;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.7); /* Svart halvgenomskinlig bakgrund för läsbarhet */
+            padding: 15px;
+            border: 2px solid var(--gold);
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+
+        /* ==========================================================================
+           11. HÄLSOMÄTARE - PLACERAD OVANFÖR KAMERAWIDGETEN
+           ========================================================================== */
+        #health-bar-widget {
+            position: fixed;
+            bottom: 160px; /* Perfekt placerad ovanför kamek-cam-widget (höjd 130px + 20px bottom = 150px) */
+            left: 20px;
+            width: 180px;
+            background: rgba(12, 0, 23, 0.95);
+            border: 3px solid var(--gold);
+            border-radius: 12px;
+            padding: 8px;
+            z-index: 10000;
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.3);
+            pointer-events: auto;
+            color: white;
+            box-sizing: border-box;
+        }
+
+        #health-bar-title {
+            font-family: 'VT323', monospace;
+            font-size: 16px;
+            margin-bottom: 4px;
+            text-shadow: 1px 1px black;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #health-bar-bg {
+            width: 100%;
+            height: 12px;
+            background: #111;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #444;
+        }
+
+        #health-bar-fill {
+            width: 100%;
+            height: 100%;
+            background: #00ff00;
+            transition: width 0.2s ease, background-color 0.2s ease;
+        }
+
+        #wall-status-label {
+            font-family: 'VT323', monospace;
+            font-size: 11px;
+            color: #00ff00;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        /* ==========================================================================
+           12. KAMEK SENSORWIDGETS (KAMERA, MIC & SPEECH) - NYTT SÄKRET GEMENSAMT STILBLOCK
+           ========================================================================== */
+        #kamek-cam-widget {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 180px;
+            height: 130px;
+            background: #000;
+            border: 3px solid var(--kamek-glow);
+            border-radius: 12px;
+            overflow: hidden;
+            z-index: 9999;
+            box-shadow: 0 0 15px rgba(130,0,255,0.4);
+            box-sizing: border-box;
+        }
+
+        #kamek-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        #kamek-cam-off { 
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column; 
+            justify-content: center;
+            align-items: center;
+            background: #0c0017;
+            color: var(--gold); 
+        }
+
+        #kamek-cam-off p {
+            margin: 5px 0 0 0;
+            font-family: 'VT323', monospace;
+            font-size: 14px;
+        }
+
+        #kamek-rec-dot { 
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            color: red;
+            font-family: Arial; 
+            font-weight: bold;
+            font-size: 12px;
+            display: none;
+            animation: k-blink 1s infinite;
+            z-index: 10005;
+        }
+
+        @keyframes k-blink {
+            50% { opacity: 0; }
+        }
+
+        #kamek-mic-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+            background: rgba(12,0,23,0.9);
+            border: 2px solid #00ccff;
+            border-radius: 50%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .kamek-bars {
+            display: flex;
+            align-items: flex-end;
+            height: 25px;
+            gap: 3px;
+        }
+
+        .k-bar {
+            width: 4px;
+            background: #00ccff;
+            height: 5px;
+            border-radius: 2px;
+            transition: height 0.05s;
+        }
+
+        #kamek-mic-widget span {
+            font-size: 9px;
+            color: #00ccff;
+            margin-top: 4px;
+            font-family: sans-serif;
+        }
+
+        /* ==========================================================================
+           13. INTERAKTIV CYBER-DIAGNOSTIK DIAGRAM (NYHET)
+           ========================================================================== */
+        #diagnostic-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #05000a;
+            z-index: 2000000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-family: 'VT323', monospace;
+            box-sizing: border-box;
+            padding: 40px;
+            border: 10px solid var(--kamek-glow);
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <!-- ==========================================================================
+       0. GAMMAL JS- KONTROLL ÖVERST (LEGACY BROWSER SHIELD)
+       ========================================================================== -->
+    <script>
+        (function() {
+            // Identifiera Internet Explorer
+            var isIE = /*@cc_on!@*/false || !!document.documentMode || navigator.userAgent.indexOf('MSIE') !== -1 || navigator.userAgent.indexOf('Trident') !== -1;
+            
+            // Identifiera äldre Safari (under version 13)
+            var isOldSafari = false;
+            var ua = navigator.userAgent;
+            if (ua.indexOf('Safari') !== -1 && ua.indexOf('Chrome') === -1) {
+                var match = ua.match(/Version\/(\d+)\./);
+                if (match && parseInt(match[1], 10) < 13) {
+                    isOldSafari = true;
+                }
+            }
+            
+            // Grundläggande funktionsdetektering (ES6-stöd, lokalt lagringsutrymme & ljud-API:er)
+            var isUnsupported = false;
+            var hasAudio = !!(window.AudioContext || window.webkitAudioContext);
+            var hasLocalStorage = false;
+            try {
+                // Vissa sandlådor blockerar åtkomst helt och kastar SecurityError direkt vid referens till window.localStorage
+                hasLocalStorage = typeof window.localStorage !== "undefined";
+            } catch (e) {
+                hasLocalStorage = true; // Tillåt sandlådor genom att falla tillbaka på safeStorage i spelet
+            }
+
+            if (!window.Promise || !window.fetch || !hasAudio || !hasLocalStorage) {
+                isUnsupported = true;
+            }
+
+            if (isIE || isOldSafari || isUnsupported) {
+                window.__legacy_browser_error = true;
+                
+                // Hitta språk för blockeringsskärmen
+                var lang = "en";
+                var browserLang = navigator.language || navigator.userLanguage;
+                if (browserLang) {
+                    var code = browserLang.slice(0, 2);
+                    if (["sv", "da", "no", "en"].indexOf(code) !== -1) {
+                        lang = code;
+                    }
+                }
+                
+                var messages = {
+                    sv: {
+                        ie: "INTERNET EXPLORER HAR GÅTT I GRAVEN! 🪦<br>Kamek säger: 'Sluta spela på ett digitalt museum!'",
+                        safari: "RUTTET ÄPPLE! 🍎<br>Din gamla Safari-webbläsare stöds inte av Station 24. Uppdatera din fruktkorg!",
+                        other: "DIN WEBBLÄSARE STÖDS EJ! 🚫<br>Uppgradera din retro-terminal till en modern webbläsare!"
+                    },
+                    en: {
+                        ie: "INTERNET EXPLORER IS DEAD! 🪦<br>Kamek says: 'Stop playing in a digital museum!'",
+                        safari: "ROTTEN APPLE! 🍎<br>Your old Safari browser is not supported by Station 24. Update your fruit basket!",
+                        other: "YOUR BROWSER IS NOT SUPPORTED! 🚫<br>Upgrade your retro terminal to a modern browser!"
+                    },
+                    da: {
+                        ie: "INTERNET EXPLORER ER GÅET I GRAVEN! 🪦<br>Kamek siger: 'Stop med at spille på et digitalt museum!'",
+                        safari: "RÅDDENT ÆBLE! 🍎<br>Din gamle Safari-browser understøttes ikke af Station 24. Opdater din frugtkurv!",
+                        other: "DIN BROWSER UNDERSTØTTES IKKE! 🚫<br>Opgrader din retro-terminal til en moderne browser!"
+                    },
+                    no: {
+                        ie: "INTERNET EXPLORER ER DØD OG BEGRAVET! 🪦<br>Kamek sier: 'Slutt å spille på et digitalt museum!'",
+                        safari: "RÅTTENT EPLE! 🍎<br>Din gamle Safari-nettleser støttes ikke av Station 24. Oppdater fruktkurven din!",
+                        other: "NETTLESEREN DIN STØTTES IKKE! 🚫<br>Oppgrader retroterminalen din til en moderne nettleser!"
+                    }
+                };
+                
+                var msg = messages[lang].other;
+                if (isIE) msg = messages[lang].ie;
+                else if (isOldSafari) msg = messages[lang].safari;
+
+                var blockerHtml = '<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#10001a;color:#ffcc00;font-family:sans-serif;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:20px;box-sizing:border-box;border:15px solid #ff0033;z-index:9999999;">' +
+                    '<h1 style="font-size:42px;margin:0 0 20px 0;color:#ff0033;font-weight:bold;letter-spacing:2px;font-family:sans-serif;">LEGACY BROWSER DETECTED</h1>' +
+                    '<div style="background:rgba(0,0,0,0.85);padding:40px;border-radius:20px;border:3px dashed #ffcc00;max-width:650px;font-size:24px;line-height:1.6;box-shadow:0 0 30px rgba(255,0,0,0.5);font-family:sans-serif;">' + msg + '</div>' +
+                    '</div>';
+
+                // Tvinga fram blockeringsgränssnittet direkt
+                document.write(blockerHtml);
+            }
+        })();
+    </script>
+
+    <!-- ==========================================================================
+       0.5 CYBER DIAGNOSTICS SCREEN (MÖTER SPELAREN DIREKT)
+       ========================================================================== -->
+    <div id="diagnostic-screen">
+        <h1 style="font-size: 48px; color: var(--gold); margin-bottom: 30px; text-shadow: 0 0 10px var(--gold); text-align: center;">STATION 24 - HARDWARE CHECK v4.2</h1>
+        <div id="diag-log" style="width: 100%; max-width: 550px; font-size: 26px; text-align: left; line-height: 1.8; font-family: monospace;">
+            <p id="diag-ram">Checking physical memory (RAM)...</p>
+            <p id="diag-cpu" style="display:none;">Checking CPU core counts...</p>
+            <p id="diag-os" style="display:none;">Verifying OS architecture security...</p>
+            <p id="diag-disk" style="display:none;">Scanning local HDD sector capacity...</p>
+        </div>
+    </div>
+
+    <!-- Medicinsk strobe-stoppare bakom allt -->
+    <div id="strobe-overlay"></div>
+
+    <!-- Toast system meddelanden -->
+    <div id="toast-container"></div>
+
+    <!-- ==========================================================================
+       A. SPEL HUD (ÖVERSTA MÄTARNA)
+       ========================================================================== -->
+    <div id="ui-container">
+        <div class="stat-box">
+            <span id="score-label">SCORE</span>: <span id="score">0</span>
+        </div>
+        <!-- EXTERN STRÖM & BATTERI UPS-STATUS -->
+        <div class="stat-box" id="power-status-widget">
+            <div class="power-pulse"></div>
+            <span id="power-label" style="color: #00ff00; font-family: 'VT323', monospace; font-size: 22px;">⚡ EXTERN STRÖM: OK (UPS REDO)</span>
+        </div>
+        <div class="stat-box" style="border-color: #00ccff;">
+            <span id="mag-label">MAG</span>: <span id="ammo-display">10 / 40</span>
+        </div>
+        <div id="wave-display" class="stat-box">
+            <span id="wave-label">WAVE</span> 1
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+       B. STARTSKÄRM / LOBBYMEDLEM
+       ========================================================================== -->
+    <div id="start-screen">
+        <h1>BASE DEFENSE ULTRA</h1>
+
+        <!-- Språkval med inbäddade vektorflaggor (SVG) -->
+        <div class="language-selector-grid">
+            <button class="flag-button" onclick="window.setLanguage('sv')" title="Svenska">
+                <!-- Sverige Flagga SVG -->
+                <svg viewBox="0 0 16 10">
+                    <rect width="16" height="10" fill="#006aa7"/>
+                    <rect width="2" height="10" x="5" fill="#fecc00"/>
+                    <rect width="16" height="2" y="4" fill="#fecc00"/>
+                </svg>
+                <span>Svenska</span>
+            </button>
+            <button class="flag-button" onclick="window.setLanguage('en')" title="English">
+                <!-- Storbritannien Union Jack SVG -->
+                <svg viewBox="0 0 50 30">
+                    <clipPath id="t">
+                        <path d="M0,0 v30 h50 v-30 z"/>
+                    </clipPath>
+                    <path d="M0,0 L50,30 M50,0 L0,30" stroke="#fff" stroke-width="6" clip-path="url(#t)"/>
+                    <path d="M0,0 L50,30 M50,0 L0,30" stroke="#c8102e" stroke-width="4" clip-path="url(#t)"/>
+                    <path d="M25,0 v30 M0,15 h50" stroke="#fff" stroke-width="10"/>
+                    <path d="M25,0 v30 M0,15 h50" stroke="#c8102e" stroke-width="6"/>
+                </svg>
+                <span>English</span>
+            </button>
+            <button class="flag-button" onclick="window.setLanguage('da')" title="Dansk">
+                <!-- Danmark Flagga SVG -->
+                <svg viewBox="0 0 37 28">
+                    <rect width="37" height="28" fill="#c8102e"/>
+                    <rect width="4" height="28" x="12" fill="#fff"/>
+                    <rect width="37" height="4" y="12" fill="#fff"/>
+                </svg>
+                <span>Dansk</span>
+            </button>
+            <button class="flag-button" onclick="window.setLanguage('no')" title="Norsk">
+                <!-- Norge Flagga SVG -->
+                <svg viewBox="0 0 22 16">
+                    <rect width="22" height="16" fill="#ba0c2f"/>
+                    <rect width="4" height="16" x="6" fill="#fff"/>
+                    <rect width="22" height="4" y="6" fill="#fff"/>
+                    <rect width="2" height="16" x="7" fill="#00205b"/>
+                    <rect width="22" height="2" y="7" fill="#00205b"/>
+                </svg>
+                <span>Norsk</span>
+            </button>
+        </div>
+        
+        <!-- Namninmatning -->
+        <div style="margin-bottom: 20px;">
+            <label for="playerName" id="name-label" style="color: white; display: block; margin-bottom: 5px;">SKRIV DITT NAMN:</label>
+            <input type="text" id="playerName" placeholder="Skriv här..." maxlength="12">
+        </div>
+        
+        <!-- Medicinsk varning i lobbyn -->
+        <div class="medical-warning" id="medical-warning-text">
+            ⚠️ MEDICINSK VARNING: Spelet innehåller intensiva stroboskopljus. Rekommenderas ej för personer med epilepsi.
+        </div>
+        
+        <!-- Huvudknappar -->
+        <button class="btn-start" id="start-btn" onclick="window.startGame()">START GAME</button>
+        <br><br>
+        
+        <button class="btn-info" id="instructions-btn" onclick="window.toggleInstructions(true)">INSTRUKTIONER</button>
+        <br><br>
+        <button class="open-settings-btn" id="settings-btn" onclick="window.openMediaPopup()">🎥 INSTÄLLNINGAR</button>
+        
+        <!-- Topplista -->
+        <div id="leaderboard-container">
+            <h2 id="leaderboard-title" style="font-family: Arial; font-size: 20px; margin: 10px 0; color: var(--gold);">🏆 TOPP-FÖRSVARARE</h2>
+            <table id="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th id="lb-rank">RANK</th>
+                        <th id="lb-name">NAMN</th>
+                        <th id="lb-score">SCORE</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    <!-- Highscores renderas här -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+       C. MEDIACONTROL MODAL (KAMERA/MIC & NYTT INTEGRERAT LJUD/INSTÄLLNINGS PANEL)
+       ========================================================================== -->
+    <div id="media-modal-overlay" class="modal-overlay">
+        <div class="popup-content" style="max-width: 560px;">
+            <button class="close-popup" onclick="window.closeMediaPopup()">X</button>
+            
+            <h1 id="media-control-title" style="font-family: 'Luckiest Guy'; font-size: 32px; color: var(--gold); text-shadow: 2px 2px 0 black; margin-bottom: 10px;">MEDIA & KONTROLL</h1>
+            
+            <div style="display: grid; grid-template-columns: 1fr; gap: 15px; text-align: left; margin: 15px 0;">
+                <!-- Sensorer (Turnering) Sektion -->
+                <div style="background: rgba(130, 0, 255, 0.1); padding: 15px; border-radius: 12px; border: 1.5px solid var(--kamek-glow);">
+                    <h3 id="sensor-section-title" style="color: var(--gold); margin: 0 0 10px 0; font-family: 'Luckiest Guy'; font-size: 20px; letter-spacing: 0.5px;">🧙‍♂️ SENSORER (TURNERING)</h3>
+                    <p id="media-control-desc" style="font-family: Arial, sans-serif; font-size: 13px; margin: 0 0 12px 0; color: #ddd;">Aktivera hårdvara för turneringen:</p>
+                    <div class="toggle-container" style="display: flex; gap: 12px; flex-wrap: wrap; margin: 0;">
+                        <button id="toggle-cam" class="btn-toggle btn-on" onclick="window.toggleMediaState('cam')" style="flex: 1; min-width: 120px; margin: 0; padding: 10px;">
+                            📸 <span id="camera-label">KAMERA</span>: <span id="status-cam">AV</span>
+                        </button>
+                        <button id="toggle-mic" class="btn-toggle btn-on" onclick="window.toggleMediaState('mic')" style="flex: 1; min-width: 120px; margin: 0; padding: 10px;">
+                            🎤 <span id="microphone-label">MIKROFON</span>: <span id="status-mic">AV</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Ljud & Radio Sektion (Integrerad inställningspanel) -->
+                <div style="background: rgba(0, 255, 204, 0.05); padding: 15px; border-radius: 12px; border: 1.5px solid var(--primary);">
+                    <h3 id="audio-section-title" style="color: var(--primary); margin: 0 0 10px 0; font-family: 'Luckiest Guy'; font-size: 20px; letter-spacing: 0.5px;">🔊 LJUD & RADIO</h3>
+                    
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 8px;">
+                        <span id="audio-toggle-label" style="font-family: Arial, sans-serif; font-size: 14px; font-weight: bold;">Musik</span>
+                        <button id="modal-toggle-music" class="btn-toggle btn-on" onclick="window.toggleMusic()" style="padding: 6px 15px; font-size: 13px; min-width: 80px; margin: 0;">
+                            PÅ
+                        </button>
+                    </div>
+
+                    <div style="margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; font-family: Arial, sans-serif; font-size: 13px; margin-bottom: 5px;">
+                            <span id="music-vol-label" style="font-weight: bold;">Musikvolym</span>
+                            <span id="music-vol-val" style="color: var(--primary); font-weight: bold;">30%</span>
+                        </div>
+                        <input type="range" id="music-volume-slider" min="0" max="100" value="30" oninput="window.setMusicVolume(this.value)" style="width: 100%; cursor: pointer; accent-color: var(--primary);">
+                    </div>
+
+                    <div>
+                        <div style="display: flex; justify-content: space-between; font-family: Arial, sans-serif; font-size: 13px; margin-bottom: 5px;">
+                            <span id="sfx-vol-label" style="font-weight: bold;">Ljudeffekter (SFX)</span>
+                            <span id="sfx-vol-val" style="color: var(--primary); font-weight: bold;">50%</span>
+                        </div>
+                        <input type="range" id="sfx-volume-slider" min="0" max="100" value="50" oninput="window.setSFXVolume(this.value)" style="width: 100%; cursor: pointer; accent-color: var(--primary);">
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-start-game" id="save-activate-btn" onclick="window.confirmAndStart()">SPARA & AKTIVERA</button>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+       D. MANUELL BOOMBOX / BANDSPELARE
+       ========================================================================== -->
+    <div id="radio-container" onclick="window.toggleMusic(event)">
+        <!-- Genererad modern radio-illustration i SVG för helt filoberoende design -->
+        <svg id="radio-icon" viewBox="0 0 100 60" style="background:#1a1a1a; border-radius:10px; border:3px solid var(--gold);">
+            <rect x="5" y="5" width="90" height="15" fill="#333" rx="3" />
+            <circle cx="20" cy="40" r="12" fill="#444" stroke="#fff" stroke-width="2"/>
+            <circle cx="20" cy="40" r="4" fill="#000" />
+            <circle cx="80" cy="40" r="12" fill="#444" stroke="#fff" stroke-width="2"/>
+            <circle cx="80" cy="40" r="4" fill="#000" />
+            <rect x="38" y="32" width="24" height="16" fill="#111" stroke="#555" rx="2"/>
+            <line x1="42" y1="40" x2="58" y2="40" stroke="var(--gold)" stroke-width="3"/>
+            <!-- Radiofrekvensmätare -->
+            <rect x="15" y="9" width="70" height="7" fill="#00ffcc" opacity="0.8"/>
+            <line x1="50" y1="8" x2="50" y2="17" stroke="red" stroke-width="2"/>
+        </svg>
+        <div id="radio-cross"></div>
+    </div>
+
+    <!-- ==========================================================================
+       E. OPERATÖRS-MANUAL (INSTRUKTIONER MODAL)
+       ========================================================================== -->
+    <div id="instructions-modal" class="modal">
+        <div class="modal-content">
+            <h1 id="inst-title" style="color: var(--gold); font-family: 'Luckiest Guy'; font-size: 3.5em; text-align: center; margin-top: 0; text-shadow: 4px 4px 0px #000;">OPERATÖRS-MANUAL</h1>
+            
+            <div class="medical-warning" id="medical-warning-text-modal" style="color: #ffcc00; border: 3px solid #ffcc00; padding: 15px; font-size: 20px; font-weight: bold; text-align: center; background: rgba(0,0,0,0.85); margin-bottom: 25px;">
+                ⚠️ MEDICINSK VARNING: Spelet innehåller intensiva stroboskopljus, skakande effekter och plötsliga ljud. Rekommenderas ej för personer med epilepsi.
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; text-align: left;">
+                
+                <section style="background: rgba(130, 0, 255, 0.1); padding: 20px; border-radius: 12px; border: 1px solid var(--kamek-glow);">
+                    <h3 id="sensory-profile-title" style="color: var(--gold); border-bottom: 2px solid var(--gold); margin-top: 0;">🧠 SENSORISK PROFIL</h3>
+                    <ul id="sensory-profile-list" style="font-size: 14px; line-height: 1.5; padding-left: 20px; color: #fff; font-family: Arial, sans-serif;">
+                        <!-- Fylls i dynamiskt av translations -->
+                    </ul>
+                </section>
+
+                <section style="background: rgba(255, 255, 255, 0.03); padding: 20px; border-radius: 12px; border: 1px solid #555;">
+                    <h3 id="combat-controls-title" style="color: var(--gold); border-bottom: 2px solid var(--gold); margin-top: 0;">🎮 STRIDSKONTROLLER</h3>
+                    <div style="font-size: 13px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-family: Arial, sans-serif;">
+                        <div id="combat-left"></div>
+                        <div id="combat-right"></div>
+                    </div>
+                </section>
+            </div>
+
+            <div style="margin-top: 20px; background: rgba(255, 0, 0, 0.1); border: 2px dashed #ff0033; padding: 20px; border-radius: 15px;">
+                <h3 id="kamek-cheat-title" style="color: #ff0033; margin-top: 0;">🧠 KAMEK ANTI-CHEAT & VARNING</h3>
+                <p id="kamek-cheat-desc" style="margin: 0; font-size: 14px; color: #fff; font-family: Arial, sans-serif;">
+                    <!-- Fylls i dynamiskt av translations -->
+                </p>
+            </div>
+
+            <section style="margin-top: 25px; background: rgba(0,255,65,0.05); padding: 20px; border-radius: 12px; border: 2px solid var(--primary);">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <h3 id="repair-system-title" style="color: var(--primary); margin-top: 0;">🛡️ REPARATIONSSYSTEM</h3>
+                        <p id="repair-system-desc" style="font-size: 14px; margin: 0; color: #fff; font-family: Arial, sans-serif;">
+                            <!-- Fylls i dynamiskt av translations -->
+                        </p>
+                    </div>
+                    <div>
+                        <h3 id="powerups-title" style="color: var(--primary); margin-top: 0;">💎 POWER-UPS</h3>
+                        <div id="powerups-list" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; color: #fff; font-family: Arial, sans-serif;">
+                            <!-- Fylls i dynamiskt av translations -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <button id="confirm-rules-btn" onclick="window.closeInstructions()" class="btn-start" style="width: 100%; margin-top: 30px; padding: 20px; font-size: 28px; background: var(--gold); color: #000; border: none; cursor: pointer; border-radius: 15px; box-shadow: 0 8px 0 #b89500;">
+                BEKRÄFTA REGLER & KÖR!
+            </button>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+       F. KAMEK KATASTROF-LÅSNING (HARDCORE LOCKDOWN OVERLAY)
+       ========================================================================== -->
+    <div id="lockdown-overlay">
+        <!-- Vektorritad elak trollkarl som Kamek fallback -->
+        <svg viewBox="0 0 100 100" style="width: 200px; height: 200px; border: 6px solid var(--danger); background: #110022; border-radius: 15px;">
+            <circle cx="50" cy="50" r="40" fill="#2d0052"/>
+            <!-- Trollkarls Hatt -->
+            <polygon points="20,40 50,5 80,40" fill="#8200ff" stroke="#fff" stroke-width="2"/>
+            <ellipse cx="50" cy="40" rx="30" ry="6" fill="#00ffcc"/>
+            <!-- Lysande onda ögon -->
+            <polygon points="35,55 45,60 35,62" fill="yellow"/>
+            <polygon points="65,55 55,60 65,62" fill="yellow"/>
+            <circle cx="40" cy="58" r="2" fill="red"/>
+            <circle cx="60" cy="58" r="2" fill="red"/>
+            <!-- Skevt leende -->
+            <path d="M 40,75 Q 50,65 60,75" stroke="#ff0033" stroke-width="4" fill="none"/>
+        </svg>
+        <h1 id="lockdown-title">CHEAT DETECTED!</h1>
+        <p id="lockdown-msg">Kamek has locked the game!</p>
+        <button onclick="window.location.reload()">RESTART TERMINAL</button>
+    </div>
+
+    <!-- ==========================================================================
+       J. ENHETS-LÅSNING OVERLAY (DEVICE LOCKDOWN - INTELLIGENT BLOCKERING)
+       ========================================================================== -->
+    <div id="device-lockdown-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(20, 0, 40, 0.98); z-index: 1000000; flex-direction: column; align-items: center; justify-content: center; padding: 40px; box-sizing: border-box; color: var(--gold); border: 15px solid var(--danger);">
+        <!-- Kamek vector -->
+        <svg viewBox="0 0 100 100" style="width: 150px; height: 150px; border: 6px solid var(--danger); background: #110022; border-radius: 15px; margin-bottom: 25px;">
+            <circle cx="50" cy="50" r="40" fill="#2d0052"/>
+            <polygon points="20,40 50,5 80,40" fill="#8200ff" stroke="#fff" stroke-width="2"/>
+            <ellipse cx="50" cy="40" rx="30" ry="6" fill="#00ffcc"/>
+            <polygon points="35,55 45,60 35,62" fill="yellow"/>
+            <polygon points="65,55 55,60 65,62" fill="yellow"/>
+            <circle cx="40" cy="58" r="2" fill="red"/>
+            <circle cx="60" cy="58" r="2" fill="red"/>
+            <path d="M 40,75 Q 50,65 60,75" stroke="#ff0033" stroke-width="4" fill="none"/>
+        </svg>
+        <h1 id="device-lockdown-title" style="font-family: 'Luckiest Guy'; font-size: 42px; margin-bottom: 10px; text-shadow: 2px 2px 0 black; text-align: center; color: var(--danger);">DEVICE LOCKDOWN!</h1>
+        <p id="device-lockdown-msg" style="font-family: 'Montserrat', sans-serif; font-size: 18px; text-align: center; max-width: 600px; line-height: 1.6; color: white; background: rgba(0,0,0,0.5); padding: 25px; border-radius: 12px; border: 1px dashed var(--gold); margin-bottom: 25px;">
+            Detta är inget mobilspel!
+        </p>
+        <div class="language-selector-grid" style="margin-bottom: 0;">
+            <button class="flag-button" onclick="window.setLanguage('sv')" style="padding: 8px 12px; font-size: 11px;">SV</button>
+            <button class="flag-button" onclick="window.setLanguage('en')" style="padding: 8px 12px; font-size: 11px;">EN</button>
+            <button class="flag-button" onclick="window.setLanguage('da')" style="padding: 8px 12px; font-size: 11px;">DA</button>
+            <button class="flag-button" onclick="window.setLanguage('no')" style="padding: 8px 12px; font-size: 11px;">NO</button>
+        </div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- ==========================================================================
+       G. KAMEK STRÖM-, KAMERA- & LJUD-ÖVERVAKNINGSMODULER (WIDGETS)
+       ========================================================================== -->
+    <!-- INTEGRERAD HÄLSOMÄTARE PLACERAD EXAKT OVANFÖR KAMERAWIDGETEN -->
+    <div id="health-bar-widget">
+        <div id="health-bar-title">
+            <span>🛡️ INTEGRITET</span>
+            <span><span id="health-percent">100</span>%</span>
+        </div>
+        <div id="health-bar-bg">
+            <div id="health-bar-fill"></div>
+        </div>
+        <div id="wall-status-label">STATUS: GRYM (OK)</div>
+    </div>
+
+    <div id="kamek-media-bridge">
+        <div id="kamek-cam-widget">
+            <div id="kamek-rec-dot">● REC</div>
+            <video id="kamek-video" autoplay playsinline muted></video>
+            <div id="kamek-cam-off">
+                <!-- Fallback-ikon om kamera är avslagen -->
+                <svg viewBox="0 0 24 24" width="40" height="40" fill="var(--gold)">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                </svg>
+                <p id="cam-off-label">KAMERA AVSTÄNGD</p>
+            </div>
+        </div>
+
+        <div id="kamek-mic-widget">
+            <div class="kamek-bars">
+                <div class="k-bar"></div><div class="k-bar"></div>
+                <div class="k-bar"></div><div class="k-bar"></div>
+            </div>
+            <span>AUDIO LIVE</span>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+       H. FULLSTÄNDIGT SAMMANSLUTET SPRÅKSYSTEM & SPELMOTOR (SÄKRAD KÄLLKOD)
+       ========================================================================== -->
+    <script>
+        // --- SÄKER wrapper för LocalStorage för att förebygga krascher i sandlådor ---
+        const safeStorage = {
+            _data: {},
+            getItem: function(key) {
+                try {
+                    return window.localStorage.getItem(key);
+                } catch (e) {
+                    return this._data[key] || null;
+                }
+            },
+            setItem: function(key, value) {
+                try {
+                    window.localStorage.setItem(key, value);
+                } catch (e) {
+                    this._data[key] = String(value);
+                }
+            }
+        };
+
+        // --- TRANSLATION DATA ---
+        const translations = {
+            sv: {
+                score: "POÄNG",
+                mag: "MAGASIN",
+                wave: "VÅG",
+                player_name: "SKRIV DITT NAMN:",
+                placeholder_name: "Ditt namn...",
+                medical_warning: "⚠️ MEDICINSK VARNING: Spelet innehåller intensiva stroboskopljus. Rekommenderas ej för personer med epilepsi.",
+                start_game: "STARTA SPELET",
+                instructions: "INSTRUKTIONER",
+                settings: "INSTÄLLNINGAR",
+                media_control: "MEDIA-KONTROLL",
+                activate_hardware: "Aktivera sensorer för turneringen:",
+                camera: "KAMERA",
+                microphone: "MIKROFON",
+                save_activate: "SPARA & AKTIVERA",
+                top_defenders: "🏆 TOPP-FÖRSVARARE",
+                rank: "RANK",
+                name: "NAMN",
+                score_col: "SCORE",
+                on: "PÅ",
+                off: "AV",
+                no_media_confirm: "Vill du köra turneringen offline utan sensorsupport?",
+                right_click_forbidden: "HÖGERKLICK FÖRBJUDET! Terminalen låst.",
+                escape_locked: "ESCAPE ÄR SPÄRRAT PÅ LAN!",
+                devtools_forbidden: "DEVTOOLS FÖRBJUDET! Hacker-fasoner loggade.",
+                lost_focus: "TERMINAL TAPPAR FOKUS! Ingen fuskpaus tillåten.",
+                tab_switch_detected: "FLIKBYTE DETEKTERAT! Kamek ser allt.",
+                turbo_detected: "TURBO-KLICK/MAKRO UPPTÄCKT! Fuskare diskas.",
+                macro_detected: "MAKRO-KLICK ANALYSERAT! Spel avstängt.",
+                aimbotuser: "AIMBOT ANALYSERAT! Systemlåsning aktiv.",
+                ups_warning: "⚠️ STRÖMAVBROTT / GLAPP! Datorn körs på nödström (UPS)! Koppla in extern laddare omedelbart!",
+                power_status: "⚡ EXTERN STRÖM: OK (UPS SÄKRAD)",
+                power_battery: "🔋 UPS-RESERV (VARNING: INGEN EXTERN STRÖM!)",
+                
+                camera_off_label: "KAMERA AVSTÄNGD",
+                integrity: "🛡️ INTEGRITET",
+                wall_ok: "STATUS: GRYM (OK)",
+                wall_damaged: "STATUS: SKADAD",
+                wall_critical: "STATUS: KRITISK",
+                wall_destroyed: "STATUS: KATASTROF!",
+                wall_integrity_label: "MUR-INTEGRITET: ",
+                
+                inst_title: "OPERATÖRS-MANUAL",
+                medical_warning_modal: "⚠️ MEDICINSK VARNING: Spelet innehåller intensiva stroboskopljus, skakande effekter och plötsliga ljud. Rekommenderas ej för personer med epilepsi.",
+                sensory_profile_title: "🧠 SENSORISK PROFIL",
+                sensory_syn: "<strong>SYN:</strong> Lila/vita blixtar vid skott. Tryck <strong>[S]</strong> for nödstopp.",
+                sensory_horsel: "<strong>HÖRSEL:</strong> Klicka på bandspelaren (boombox) eller tryck <strong>[M]</strong> för tystnad.",
+                sensory_kansel: "<strong>KÄNSEL:</strong> Handkontroller ger fysiska vibrationer vid explosioner.",
+                combat_controls_title: "🎮 STRIDSKONTROLLER",
+                combat_left_html: "<strong>TANGENTBORD:</strong><br>• Mus: Skjut<br>• [R]: Ladda om<br>• [E]: Nödlåda<br>• [S]: Stoppa Strobe",
+                combat_right_html: "<strong>GAMEPAD:</strong><br>• [RT/R2]: Skjut<br>• [X/A]: Ladda om<br>• [B/Y]: Stoppa Strobe",
+                kamek_cheat_title: "🧙‍♂️ KAMEK ANTI-CHEAT & VARNING",
+                kamek_cheat_desc_html: "Turbo-klick, trackpads och fusk-skript detekteras automatiskt. Vid misstanke spärras maskinen (Lockdown).<br><strong style='color: #ff4444;'>☢️ FÖRBJUDET MÅL:</strong> Skjut ALDRIG på radioaktiva tecken (Nukes). Träff = Omedelbar <strong>GAME OVER</strong>.",
+                repair_system_title: "🛡️ REPARATIONSSYSTEM",
+                repair_system_desc_html: "• Din mur startar på <strong>100 HP</strong>.<br>• Skjut hjärtan för att reparere muren med <strong>+25 HP</strong>.<br>• 0 HP = Total kollaps och spelslut.",
+                powerups_title: "💎 POWER-UPS",
+                power_heart: "❤️ Hjärta: +25 HP",
+                power_clock: "🕒 Klocka: Slow-Mo",
+                power_star: "⭐ Stjärna: Odödlig",
+                power_gold: "💰 Guld: X2 Poäng",
+                confirm_btn: "BEKRÄFTA REGLER & KÖR!",
+
+                trackpad_lockdown: "SLUTA SMEKA DIN LAPTOP! 🚫\n\nKamek skrattar åt din klumpiga styrplatta: 'NYEHEHEHE!'\nDina fingrar duger inte för Station 24 Protocol.\n\n⚠️ REKOMMENDATION: Anslut en riktig DATORMUS för precision!",
+                thermal_throttle: "THERMAL_THROTTLE_DETECTED: \n Din dator smälter under spänningen! Spela på en stabil rigg med extern elförsörjning!",
+                pause_lockdown: "KAMEK GILLAR INTE PAUSER!",
+                ups_active_playing: "⚠️ EXTERN STRÖM BRUTEN! UPS AKTIVERAD. ANKOPPLA LADDAREN!",
+                toxic_warning: "⚠️ VARNING #X: STÄDA MUNNEN!",
+                toxic_lockdown_title: "LÅST AV KAMEK",
+                toxic_lockdown_desc: '"Svordomar tillåts inte under turneringen."',
+                retry_btn: "FÖRSÖK IGEN",
+                nuke_explosion: "☢️ NUKE DETONERAD! \n Kamek skrattar åt din aska: 'NYEHEHEHE!'",
+                cheat_detected: "FUSK UPPTÄCKT!",
+
+                mock_legendary: "SUPER (STJÄRNVINSTEN) - LEGENDARISK STATUS!",
+                mock_0: "USELT - Var du ens vaken?",
+                mock_1: "DÅLIGT - Goomborna skrattar åt dig.",
+                mock_2: "GENOMSNITT - Helt okej, men inte mer.",
+                mock_3: "BRA - Nu börjar det likna något!",
+                mock_4: "BÄST - En sann försvarare av basen!",
+                mock_5: "SUPER (STJÄRNVINSTEN) - DU ER OSTOPPBAR!",
+
+                // Nya lokaliserade toast-nycklar
+                lang_changed: "🌐 SPRÅK: SVENSKA DETEKTERAT!",
+                good_luck: "LYCKA TILL, {name}!",
+                radio_off: "🔈 RADIO: AV",
+                radio_on: "🔊 EURODANCE: PÅ!",
+                now_playing: "🎵 SPELAS NU",
+                gamepad_unsupported: "⚠️ Spelkontroll stöds inte fullt ut (för få knappar).",
+                gamepad_connected: "🎮 Spelkontroll ansluten!",
+                offline_mode: "📶 Offline - lokalt LAN-läge säkrat",
+                online_mode: "✅ Online - ansluten till Station 24",
+                ammo_added: "+20 RESERV-AMMO!",
+                invincible_on: "🌟 ODÖDLIG! (7 SEK)",
+                invincible_off: "✨ Odödlighet slut",
+                double_points_on: "💰 DUBBLA POÄNG! (10 SEK)",
+                double_points_off: "💰 Poäng återställda",
+                reloading: "🔄 LADDAR OM...",
+                reloaded_ready: "✅ REDO!",
+                slowmo_on: "🕒 TIDEN SAKTAD!",
+                wall_repaired: "🧱 MUR REPARERAD (+25 HP)!",
+                emergency_ammo_used: "🚨 NÖDAMMO ANVÄND! ({count} kvar)",
+                no_emergency_boxes: "🚫 INGA NÖDLÅDOR KVAR!",
+                gold_transferred: "💰 GULD MYNT VIDAREBEFORDADE! Kungen av Station 24.",
+                sensors_activated: "✅ SENSORER AKTIVERADE",
+                sensors_denied: "❌ SENSORTILLGÅNG NEKAD",
+
+                // Enhetsspecifika hån
+                device_mobile: "MOBILTELEFON UPPTÄCKT! 🚫\nDetta är inget mobilspel! Station 24 kräver rå kraft, extern strömförsörjning och en riktig mus! Sluta fingra på skärmen.",
+                device_tablet: "SURFPLATTA UPPTÄCKT! 👶\nPaddor är till för att titta på barn-tv med, inte för att försvara Station 24! Gå och titta på Babblarna istället.",
+                device_smarttv: "SMART-TV UPPTÄCKT! 📺\nSkärmen är stor, men din processor är en brödrost. YouTube är mycket bättre för dig. Gå och titta på kattklipp!",
+                device_console: "KONSOL UPPTÄCKT! 🎮\nKonsoler är till för att spela GTA på! Station 24 styrs med ren vilja, mus och tangentbord. Sälj din handkontroll.",
+                device_car: "BILSKÄRM UPPTÄCKT! 🚗\nRullande trafikfara! Försöker du skjuta fiender på en Teslaskärm mitt på motorvejen?! Håll ögonen på vägen innan Kamek kraschar din autopilot!",
+                device_refrigerator: "SMART KYLSKÅP UPPTÄCKT! 🧊\nVafan?! Försöker du spela arkadspel på dörren till ditt kylskåp? Gå och stäng mjölkpaketet istället!",
+                device_smartwatch: "SMARTKLOCKA UPPTÄCKT! ⌚\nSkärmen är ju för fan mindre än en enkrona! Hur ska du kunna sikta på den här? Skaffa ett mikroskop.",
+                device_smarthome: "SMART HEM-SKÄRM UPPTÄCKT! 🏠\nHur är detta ens fysiskt möjligt? Försöker du försvara basen från din smarta termostat eller dörrklocka? Kamek skrattar ihjäl sig!",
+                device_unknown: "OKÄND FLUM-ENHET DETEKTERAD! 👽\nVad är detta för rymdteknologi? Enheten stöds ej av Station 24-protokollet!",
+
+                // NYA: Hårdvaruhån & Diagnostik-strängar
+                diag_ram: "Anlyserar fysiskt arbetsminne (RAM)...",
+                diag_cpu: "Söker efter processorkärnor (i5/Ryzen 5)...",
+                diag_os: "Kontrollerar operativsystemets säkerhetsarkitektur...",
+                diag_disk: "Skannar efter tillgängligt lagringsutrymme på HDD...",
+                diag_ok: "OK!",
+                diag_fail: "MISLYCKADES!",
+                device_hw_ram_fail: "KATASTROFAL BRIST: För lite RAM-minne! 💥\nStation 24 kräver minst 4GB RAM för att inte smälta moderkortet. Kamek hånar din patetiska laptop! Skaffa en riktig rigg.",
+                device_hw_cpu_cores_fail: "CPU-MISSLYKKANDE: För få fysiska kärnor! 🚴\nStation 24 kräver minst 4 kärnor (i5/Ryzen 5). Kamek ler åt din manuellt trampade processor. Installera ordentlig hårdvara!",
+                device_hw_os_old_windows: "OS-SPÄRR: Föråldrat Windows upptäckt! 🦖\nDu kör en gammal Windows-version som inte längre stöds. Station 24 kräver minst Windows 10! Gå till museet och spela istället.",
+                device_hw_os_old_mac: "OS-SPÄRR: Gammalt macOS upptäckt! 🍏\nStation 24 kräver minst macOS Sequoia (15.0+). Ditt gamla sura äpple har möglat för länge sedan. Kasta den i soptunnan!",
+                device_hw_os_linux: "HACKER LOCKDOWN: Linux (Pingvinsystem) upptäckt! 🐧\nStation 24 accepterar inte gratis open source-källkod i stridszonen. Installera ett certifierat militärt OS direkt!",
+                device_hw_os_steamos: "STEAMOS UPPTÄCKT: Handhållen leksak! 🎮\nStation 24 är ett högteknologiskt försvarsnätverk, inte en konsol för ditt Steam Deck! Gå och spela plattformsspel någon annanstans.",
+                device_hw_os_chromeos: "SKOLDATOR BANNAD: ChromeOS upptäckt! 🎒\nSkoldatorer och billiga Chromebooks är strängt förbjudna från Station 24-nätverket. Stäng locket och gör dina läxor istället!",
+                device_hw_storage_fail: "HDD INTEGRITETSFEL: Diskutrymme kritiskt! 💾\nStation 24 kräver minst 4GB ledigt hårddiskutrymme för att lagra krypterade nukleära försvarskoder. Frigör utrymme genast!",
+
+                // Integrerad inställningsskärm lokaliseringsnycklar
+                sensor_section_title: "🧙 SENSORER (TURNERING)",
+                audio_section_title: "🔊 LJUD & RADIO",
+                music_label: "Bakgrundsmusik",
+                sfx_vol_label: "Ljudeffekter (SFX)",
+                music_vol_label: "Musikvolym"
+            },
+            en: {
+                score: "SCORE",
+                mag: "MAG",
+                wave: "WAVE",
+                player_name: "ENTER YOUR NAME:",
+                placeholder_name: "Your name...",
+                medical_warning: "⚠️ MEDICAL WARNING: This game contains intense strobe lights. Not recommended for people with epilepsy.",
+                start_game: "START GAME",
+                instructions: "INSTRUCTIONS",
+                settings: "SETTINGS",
+                media_control: "MEDIA CONTROL",
+                activate_hardware: "Activate sensors for the tournament:",
+                camera: "CAMERA",
+                microphone: "MICROPHONE",
+                save_activate: "SAVE & ACTIVATE",
+                top_defenders: "🏆 TOP DEFENDERS",
+                rank: "RANK",
+                name: "NAME",
+                score_col: "SCORE",
+                on: "ON",
+                off: "OFF",
+                no_media_confirm: "Do you want to run the tournament offline without sensor support?",
+                right_click_forbidden: "RIGHT CLICK FORBIDDEN! Terminal locked.",
+                escape_locked: "ESCAPE IS BLOCKED ON LAN!",
+                devtools_forbidden: "DEVTOOLS FORBIDDEN! Hack attempt logged.",
+                lost_focus: "TERMINAL LOST FOCUS! No pausing allowed.",
+                tab_switch_detected: "TAB SWITCH DETECTED! Kamek is watching.",
+                turbo_detected: "TURBO/MACRO CLICK DETECTED! Cheater disqualified.",
+                macro_detected: "MACRO CLICK DETECTED! System shutdown.",
+                aimbotuser: "AIMBOT DETECTED! System locking initiated.",
+                ups_warning: "⚠️ POWER FAULT! Laptop running on UPS reservoir! Connect external power immediately!",
+                power_status: "⚡ EXTERNAL POWER: OK (UPS ARMED)",
+                power_battery: "🔋 UPS-RESERVE (WARNING: NO EXTERNAL POWER!)",
+                
+                camera_off_label: "CAMERA DEACTIVATED",
+                integrity: "🛡️ INTEGRITY",
+                wall_ok: "STATUS: GREAT (OK)",
+                wall_damaged: "STATUS: DAMAGED",
+                wall_critical: "STATUS: CRITICAL",
+                wall_destroyed: "STATUS: CRITICAL!",
+                wall_integrity_label: "WALL INTEGRITY: ",
+
+                inst_title: "OPERATOR'S MANUAL",
+                medical_warning_modal: "⚠️ MEDICAL WARNING: This game contains intense strobe lights, shaking effects and sudden sounds. Not recommended for people with epilepsy.",
+                sensory_profile_title: "🧠 SENSORY PROFILE",
+                sensory_syn: "<strong>VISION:</strong> Purple/white flashes when firing. Press <strong>[S]</strong> for emergency stop.",
+                sensory_horsel: "<strong>AUDIO:</strong> Click the boombox or press <strong>[M]</strong> to mute.",
+                sensory_kansel: "<strong>HAPTICS:</strong> Gamepads provide physical vibrations during explosions.",
+                combat_controls_title: "🎮 COMBAT CONTROLS",
+                combat_left_html: "<strong>KEYBOARD:</strong><br>• Mouse: Shoot<br>• [R]: Reload<br>• [E]: Emergency Box<br>• [S]: Stop Strobe",
+                combat_right_html: "<strong>GAMEPAD:</strong><br>• [RT/R2]: Shoot<br>• [X/A]: Reload<br>• [B/Y]: Stop Strobe",
+                kamek_cheat_title: "🧙‍♂️ KAMEK ANTI-CHEAT & WARNING",
+                kamek_cheat_desc_html: "Turbo-clicks, trackpads and cheat scripts are automatically detected. On suspicion, the machine will lock down.<br><strong style='color: #ff4444;'>☢️ FORBIDDEN TARGET:</strong> NEVER shoot at radioactive signs (Nukes). Hitting one = Immediate <strong>GAME OVER</strong>.",
+                repair_system_title: "🛡️ REPAIR SYSTEM",
+                repair_system_desc_html: "• Your wall starts at <strong>100 HP</strong>.<br>• Shoot hearts to repair the wall by <strong>+25 HP</strong>.<br>• 0 HP = Total collapse and game over.",
+                powerups_title: "💎 POWER-UPS",
+                power_heart: "❤️ Heart: +25 HP",
+                power_clock: "🕒 Clock: Slow-Mo",
+                power_star: "⭐ Star: Invincible",
+                power_gold: "💰 Gold: X2 Points",
+                confirm_btn: "CONFIRM RULES & START!",
+
+                trackpad_lockdown: "STOP STROKING YOUR LAPTOP! 🚫\n\nKamek laughs at your clumsy trackpad: 'NYEHEHEHE!'\nYour fingers are not worthy of the Station 24 Protocol.\n\n⚠️ RECOMMENDATION: Connect a real MOUSE for precision!",
+                thermal_throttle: "THERMAL_THROTTLE_DETECTED: \n Your PC is melting under the pressure! Play on a stable rig with external power!",
+                pause_lockdown: "KAMEK DOES NOT LIKE PAUSES!",
+                ups_active_playing: "⚠️ EXTERNAL POWER LOST! UPS ACTIVATED. CONNECT CHARGER!",
+                toxic_warning: "⚠️ WARNING #X: WATCH YOUR LANGUAGE!",
+                toxic_lockdown_title: "LOCKED BY KAMEK",
+                toxic_lockdown_desc: '"Swearing is not allowed during the tournament."',
+                retry_btn: "TRY AGAIN",
+                nuke_explosion: "☢️ NUKE DETONATED! \n Kamek laughs at your ashes: 'NYEHEHEHE!'",
+                cheat_detected: "CHEAT DETECTED!",
+
+                mock_legendary: "SUPER (STAR WIN) - LEGENDARY STATUS!",
+                mock_0: "TERRIBLE - Were you even awake?",
+                mock_1: "BAD - The Goombas are laughing at you.",
+                mock_2: "AVERAGE - Decent, but nothing more.",
+                mock_3: "GOOD - Now we are talking!",
+                mock_4: "BEST - A true defender of the base!",
+                mock_5: "SUPER (STAR WIN) - YOU ARE UNSTOPPABLE!",
+
+                // Nya lokaliserade toast-nycklar
+                lang_changed: "🌐 LANGUAGE: ENGLISH DETECTED!",
+                good_luck: "GOOD LUCK, {name}!",
+                radio_off: "🔈 RADIO: OFF",
+                radio_on: "🔊 EURODANCE: ON!",
+                now_playing: "🎵 NOW PLAYING",
+                gamepad_unsupported: "⚠️ Gamepad not fully supported (too few buttons).",
+                gamepad_connected: "🎮 Gamepad connected!",
+                offline_mode: "📶 Offline - local LAN mode secured",
+                online_mode: "✅ Online - connected to Station 24",
+                ammo_added: "+20 RESERVE AMMO!",
+                invincible_on: "🌟 INVINCIBLE! (7 SEC)",
+                invincible_off: "✨ Invincibility wear off",
+                double_points_on: "💰 DOUBLE POINTS! (10 SEC)",
+                double_points_off: "💰 Points restored",
+                reloading: "🔄 RELOADING...",
+                reloaded_ready: "✅ READY!",
+                slowmo_on: "🕒 TIME SLOWED!",
+                wall_repaired: "🧱 WALL REPAIRED (+25 HP)!",
+                emergency_ammo_used: "🚨 EMERGENCY AMMO USED! ({count} left)",
+                no_emergency_boxes: "🚫 NO EMERGENCY BOXES LEFT!",
+                gold_transferred: "💰 GOLD COINS TRANSFERRED! King of Station 24.",
+                sensors_activated: "✅ SENSORS ACTIVATED",
+                sensors_denied: "❌ SENSOR ACCESS DENIED",
+
+                // Device block insults english
+                device_mobile: "MOBILE PHONE DETECTED! 🚫\nThis is not a mobile game! Station 24 requires raw power, external power supply, and a real mouse! Stop touching the screen.",
+                device_tablet: "TABLET DETECTED! 👶\nTablets are for kids watching cartoons, not for defending Station 24! Go watch Cocomelon instead.",
+                device_smarttv: "SMART TV DETECTED! 📺\nThe screen is big, but your processor is a toaster. YouTube is much better for you. Go watch cat videos!",
+                device_console: "CONSOLE DETECTED! 🎮\nConsoles are for playing GTA! Station 24 is mastered with pure willpower, mouse, and keyboard. Sell your gamepad.",
+                device_car: "CAR SCREEN DETECTED! 🚗\nRolling traffic hazard! Are you trying to shoot enemies on a Tesla screen on the highway?! Keep your eyes on the road before Kamek crashes your autopilot!",
+                device_refrigerator: "SMART REFRIGERATOR DETECTED! 🧊\nWhat the hell?! Are you trying to play arcade games on your fridge door? Go close the milk carton instead!",
+                device_smartwatch: "SMARTWATCH DETECTED! ⌚\nThe screen is smaller than a coin! How are you supposed to aim here? Go get a microscope.",
+                device_smarthome: "SMART HOME SCREEN DETECTED! 🏠\nHow is this even physically possible? Defending the base from your smart thermostat or doorbell? Kamek is dying of laughter!",
+                device_unknown: "UNKNOWN DEVICE DETECTED! 👽\nWhat kind of space technology is this? Your device is not supported by the Station 24 protocol!",
+
+                // NEW: Hardware insult English
+                diag_ram: "Analyzing physical memory (RAM)...",
+                diag_cpu: "Looking for processor core counts (i5/Ryzen 5)...",
+                diag_os: "Verifying operating system secure design...",
+                diag_disk: "Scanning for available space on HDD...",
+                diag_ok: "PASSED!",
+                diag_fail: "FAILED!",
+                device_hw_ram_fail: "CRITICAL FAILURE: Too little RAM! 💥\nStation 24 requires at least 4GB RAM to prevent core meltdown. Kamek mocks your potato laptop! Upgrade immediately.",
+                device_hw_cpu_cores_fail: "CPU FAILURE: Too few physical cores! 🚴\nAt least 4 CPU cores (i5/Ryzen 5) required. Kamek mocks your bicycle-driven processor. Put real hardware in!",
+                device_hw_os_old_windows: "OS BANNED: Outdated Windows detected! 🦖\nYou are running an obsolete Windows version. Station 24 requires Windows 10 or newer. Stop trying to play inside a museum!",
+                device_hw_os_old_mac: "OS BANNED: Ancient macOS detected! 🍏\nStation 24 requires macOS Sequoia (15.0+). Your rotten apple rotted a long time ago. Throw it in the trash bin!",
+                device_hw_os_linux: "SECURITY LOCKDOWN: Linux (Penguin OS) detected! 🐧\nStation 24 does not accept free open source in the military zone. Install a certified OS immediately!",
+                device_hw_os_steamos: "STEAMOS DETECTED: Handheld toy! 🎮\nStation 24 is a serious tactical mainframe, not a playground for your Steam Deck! Go play casual platformers somewhere else.",
+                device_hw_os_chromeos: "SCHOOL LAPTOP BANNED: ChromeOS detected! 🎒\nSchool computers and cheap Chromebooks are banned from Station 24. Shut the lid and do your homework instead!",
+                device_hw_storage_fail: "HDD FAULT: Critical free space limit! 💾\nStation 24 requires at least 4GB free space to store encrypted nuclear defense protocols. Free up space now!",
+
+                // Integrerad inställningsskärm engelska
+                sensor_section_title: "🧙 SENSORS (TOURNAMENT)",
+                audio_section_title: "🔊 AUDIO & RADIO",
+                music_label: "Background Music",
+                sfx_vol_label: "Sound Effects (SFX)",
+                music_vol_label: "Music Volume"
+            },
+            da: {
+                score: "SCORE",
+                mag: "MAGASIN",
+                wave: "BØLGE",
+                player_name: "SKRIV DIT NAVN:",
+                placeholder_name: "Dit navn...",
+                medical_warning: "⚠️ MEDICINSK ADVARSEL: Spillet indeholder intensive stroboskoplys. Anbefales ikke til folk med epilepsi.",
+                start_game: "START SPIL",
+                instructions: "INSTRUKTIONER",
+                settings: "INDSTILLINGER",
+                media_control: "MEDIEKONTROL",
+                activate_hardware: "Aktivér sensorer til turneringen:",
+                camera: "KAMERA",
+                microphone: "MIKROFON",
+                save_activate: "GEM & AKTIVER",
+                top_defenders: "🏆 TOPFORSVARERE",
+                rank: "RANG",
+                name: "NAVN",
+                score_col: "SCORE",
+                on: "TIL",
+                off: "FRA",
+                no_media_confirm: "Vil du fortsætte uden kamera og mikrofon?",
+                right_click_forbidden: "HØJREKLIK FORBUDT! Terminalen er låst.",
+                escape_locked: "ESCAPE ER LÅST PÅ LAN!",
+                devtools_forbidden: "DEVTOOLS FORBUDT! Hacker-forsøg logget.",
+                lost_focus: "TERMINAL MISTER FOKUS! Ingen fuskpause tilladt.",
+                tab_switch_detected: "SKIFT AF FANE DETEKTERET! Kamek ser alt.",
+                turbo_detected: "TURBO-KLIK DETEKTERET! Snydere diskvalificeres.",
+                macro_detected: "MAKRO-KLIK DETEKTERET! Systemlås aktiv.",
+                aimbotuser: "AIMBOT DETEKTERET! Terminalen er låst.",
+                ups_warning: "⚠️ STRØMAFBRYDELSE! Computer kører på UPS-nødstrøm! Tilslut ekstern oplader nu!",
+                power_status: "⚡ EKSTERN STRØM: OK (UPS SIKRET)",
+                power_battery: "🔋 UPS-RESERVE (ADVARSEL: INGEN EKSTERN STRØM!)",
+                
+                camera_off_label: "KAMERA DEAKTIVERET",
+                integrity: "🛡️ INTEGRITET",
+                wall_ok: "STATUS: SUPERB (OK)",
+                wall_damaged: "STATUS: BESKADIGET",
+                wall_critical: "STATUS: KRITISK",
+                wall_destroyed: "STATUS: KATASTROFE!",
+                wall_integrity_label: "MUR-INTEGRITET: ",
+
+                inst_title: "OPERATØRMANUAL",
+                medical_warning_modal: "⚠️ MEDICINSK ADVARSEL: Spillet indeholder intensive stroboskopslys, rystende effekter og pludselige lyde. Anbefales ikke til personer med epilepsi.",
+                sensory_profile_title: "🧠 SENSORISK PROFIL",
+                sensory_syn: "<strong>SYN:</strong> Lilla/hvide glimt ved skud. Tryk <strong>[S]</strong> for nødstop.",
+                sensory_horsel: "<strong>HØRELSE:</strong> Klik på båndoptageren (boombox) eller tryk <strong>[M]</strong> for lydløs.",
+                sensory_kansel: "<strong>FØLELSE:</strong> Gamepads giver fysiske vibrationer ved eksplosioner.",
+                combat_controls_title: "🎮 KAMPKONTROLLER",
+                combat_left_html: "<strong>TASTATUR:</strong><br>• Mus: Skyd<br>• [R]: Genoplad<br>• [E]: Nødkasse<br>• [S]: Stop Strobe",
+                combat_right_html: "<strong>GAMEPAD:</strong><br>• [RT/R2]: Skyd<br>• [X/A]: Genoplad<br>• [B/Y]: Stop Strobe",
+                kamek_cheat_title: "🧙‍♂️ KAMEK ANTI-CHEAT & ADVARSEL",
+                kamek_cheat_desc_html: "Turbo-klik, trackpads og snydeskrifter registreres automatisk. Ved mistanke låses maskinen helt.<br><strong style='color: #ff4444;'>☢️ FORBUDT MÅL:</strong> Skyd ALDRIG på radioaktive tegn (Nukes). Ramme = Hurtig <strong>GAME OVER</strong>.",
+                repair_system_title: "🛡️ REPARATIONSSYSTEM",
+                repair_system_desc_html: "• Din mur starter på <strong>100 HP</strong>.<br>• Skyd hjerter for å reparere muren med <strong>+25 HP</strong>.<br>• 0 HP = Total kollaps og spil slut.",
+                powerups_title: "💎 POWER-UPS",
+                power_heart: "❤️ Hjerte: +25 HP",
+                power_clock: "🕒 Ur: Slow-Mo",
+                power_star: "⭐ Stjerne: Uovervindelig",
+                power_gold: "💰 Guld: X2 Point",
+                confirm_btn: "BEKRÆFT REGLER & START!",
+
+                trackpad_lockdown: "STOP MED AT AE DIN BÆRBARE! 🚫\n\nKamek griner af din klumpede berøringsplade: 'NYEHEHEHE!'\nDine fingre er ikke egnede til Station 24-protokollen.\n\n⚠️ ANBEFALING: Tilslut en rigtig MUS for præcision!",
+                thermal_throttle: "THERMAL_THROTTLE_DETECTED: \n Din computer smelter under presset! Spil på en stabil maskine med ekstern strømforsyning!",
+                pause_lockdown: "KAMEK KAN IKKE LIDE PAUSER!",
+                ups_active_playing: "⚠️ EKSTERN STRØM AFBRUDT! UPS AKTIVERET. TILSLUT OPLADER!",
+                toxic_warning: "⚠️ ADVARSEL #X: VASK MUNDEN!",
+                toxic_lockdown_title: "LÅST AF KAMEK",
+                toxic_lockdown_desc: '"Bandeord er ikke tilladt under turneringen."',
+                retry_btn: "PRØV IGEN",
+                nuke_explosion: "☢️ NUKE DETONERET! \n Kamek griner af din aske: 'NYEHEHEHE!'",
+                cheat_detected: "SNYD DETEKTERET!",
+
+                mock_legendary: "SUPER (STJERNEGEVINST) - LEGENDARISK STATUS!",
+                mock_0: "FORFÆRDELIGT - Var du overhovedet vågen?",
+                mock_1: "DÅRLIGT - Goombaerne griner af dig.",
+                mock_2: "GENNEMSNITLIGT - Helt okay, men heller ikke mere.",
+                mock_3: "GODT - Nu ligner det noget!",
+                mock_4: "BEDST - En sand forsvarer av basen!",
+                mock_5: "SUPER (STJERNEGEVINST) - DU ER USTOPPELIG!",
+
+                // Nya lokaliserade toast-nycklar
+                lang_changed: "🌐 SPROG: DANSK DETEKTERET!",
+                good_luck: "HELD OG LYKKE, {name}!",
+                radio_off: "🔈 RADIO: FRA",
+                radio_on: "🔊 EURODANCE: TIL!",
+                now_playing: "🎵 SPILLER NU",
+                gamepad_unsupported: "⚠️ Gamepad understøttes ikke fuldt ud (for øvrigt få knapper).",
+                gamepad_connected: "🎮 Gamepad tilsluttet!",
+                offline_mode: "📶 Offline - lokal LAN-tilstand sikret",
+                online_mode: "✅ Online - tilsluttet Station 24",
+                ammo_added: "+20 RESERVEMAGASIN!",
+                invincible_on: "🌟 UOVERVINDELIG! (7 SEK)",
+                invincible_off: "✨ Uovervindelighed forbi",
+                double_points_on: "💰 DOBBELT POINT! (10 SEK)",
+                double_points_off: "💰 Point gendannet",
+                reloading: "🔄 GENOPLADER...",
+                reloaded_ready: "✅ KLAR!",
+                slowmo_on: "🕒 TIDEN SÆNKET!",
+                wall_repaired: "🧱 MUR REPARERET (+25 HP)!",
+                emergency_ammo_used: "🚨 NØDAMMUNITION BRUGT! ({count} tilbage)",
+                no_emergency_boxes: "🚫 INGEN NØDKASSER TILBAGE!",
+                gold_transferred: "💰 GULDMØNTER OVERFØRT! Kongen af Station 24.",
+                sensors_activated: "✅ SENSORER AKTIVERET",
+                sensors_denied: "❌ SENSORADGANG AFVIST",
+
+                // Device block insults danish
+                device_mobile: "MOBILTELEFON REGISTRERET! 🚫\nDette er ikke et mobilspil! Station 24 kræver rå styrke, ekstern strømforsyning og en rigtig mus! Stop med at røre ved skærmen.",
+                device_tablet: "TABLET DETEKTERET! 👶\nTablets er til at se børne-tv på, ikke til at forsvare Station 24! Gå over og se Gurli Gris i stedet.",
+                device_smarttv: "SMART-TV DETEKTERET! 📺\nSkærmen er stor, men din processor er en brødrister. YouTube is meget bedre for dig. Gå og se kattevideoer!",
+                device_console: "KONSOL DETEKTERET! 🎮\nKonsoller er til at spille GTA på! Station 24 styres med ren vilje, mus og tastatur. Sælg din controller.",
+                device_car: "BILSKÆRM DETEKTERET! 🚗\nRullende trafikfare! Prøver du at skyde fjender på en Tesla-skærm midt på motorvejen?! Hold øjnene på vejen, før Kamek crasher din autopilot!",
+                device_refrigerator: "SMART KØLESKAB DETEKTERET! 🧊\nHvad fanden?! Prøver du at spille arkadespil på dit køleskab? Gå hen og luk mælkekartonen i stedet!",
+                device_smartwatch: "SMARTWATCH DETEKTERET! ⌚\nSkærmen er jo mindre end en lille mønt! Hvordan vil du sigte her? Få dig et mikroskop.",
+                device_smarthome: "SMART HJEMME-SKÆRM DETEKTERET! 🏠\nHvordan er det overhovedet muligt? Prøver du at forsvare basen fra din smarte termostat eller dørklokke? Kamek dør af grin!",
+                device_unknown: "UKENDT ENHED DETEKTERET! 👽\nHvad er det for noget rumteknologi? Enheden understøttes ikke af Station 24-protokoller!",
+
+                // NEW: Hardware insult Danish
+                diag_ram: "Analyserer fysisk arbejdshukommelse (RAM)...",
+                diag_cpu: "Søger efter processorkerner (i5/Ryzen 5)...",
+                diag_os: "Kontrollerer operativsystemets sikkerhedsarkitektur...",
+                diag_disk: "Scanner efter ledig lagerplads på HDD...",
+                diag_ok: "GODKENDT!",
+                diag_fail: "MISLYKKEDES!",
+                device_hw_ram_fail: "KATASTROFAL MANGLER: For lidt RAM! 💥\nStation 24 kræver mindst 4GB RAM for ikke at smelte bundkortet. Kamek håner din patetiske bærbare! Få dig en ordentlig computer.",
+                device_hw_cpu_cores_fail: "CPU-FEJL: For få processorkerner! 🚴\nMindst 4 processorkerner (i5/Ryzen 5) kræves. Kamek håner din cykel-drevne CPU. Installer rigtig hardware!",
+                device_hw_os_old_windows: "OS BANNED: Gammel Windows opdaget! 🦖\nDu kører en forældet Windows-version. Station 24 kræver mindst Windows 10! Gå på museum og spil der i stedet.",
+                device_hw_os_old_mac: "OS BANNED: Forældet macOS opdaget! 🍏\nStation 24 kræver mindst macOS Sequoia (15.0+). Dit rådne æble er gået ud på dato. Smid den i skraldespanden!",
+                device_hw_os_linux: "SIKKERHEDS LOCKDOWN: Linux (Pingvin-OS) opdaget! 🐧\nStation 24 accepterer ikke open source i militærområdet. Installer et certificeret operativsystem nu!",
+                device_hw_os_steamos: "STEAMOS DETEKTERET: Håndholdt legetøj! 🎮\nStation 24 is et højteknologisk kampsystem, ikke en spillekonsol til din Steam Deck! Gå hen og spil platformspil et andet sted.",
+                device_hw_os_chromeos: "SKOLECOMPUTER BANDLYST: ChromeOS detekteret! 🎒\nSkolecomputere og billige Chromebooks er strengt forbudt fra Station 24. Luk låget og lav dine lektier i stedet!",
+                device_hw_storage_fail: "HDD INTEGRITETSFEJL: Diskplads kritisk! 💾\nStation 24 kræver mindst 4GB ledig plads til kryptering af nukleare forsvarskoder. Frigør plads nu!",
+
+                // Integrerad inställningsskärm danska
+                sensor_section_title: "🧙 SENSORER (TURNERING)",
+                audio_section_title: "🔊 LYD & RADIO",
+                music_label: "Baggrundsmusik",
+                sfx_vol_label: "Lydeffekter (SFX)",
+                music_vol_label: "Musiklydstyrke"
+            },
+            no: {
+                score: "POENG",
+                mag: "MAGASIN",
+                wave: "BØLGE",
+                player_name: "SKRIV DITT NAMN:",
+                placeholder_name: "Ditt namn...",
+                medical_warning: "⚠️ MEDISINSK ADVARSEL: Spillet inneholder intensive stroboskonlys. Anbefales ikke for personer med epilepsi.",
+                start_game: "START SPILL",
+                instructions: "INSTRUKSJONER",
+                settings: "INNSTILLINGER",
+                media_control: "MEDIEKONTROLL",
+                activate_hardware: "Aktiver sensorer for turneringen:",
+                camera: "KAMERA",
+                microphone: "MIKROFON",
+                save_activate: "LAGRE & AKTIVER",
+                top_defenders: "🏆 TOPPFORSVARERE",
+                rank: "RANG",
+                name: "NAVN",
+                score_col: "SCORE",
+                on: "PÅ",
+                off: "AV",
+                no_media_confirm: "Vill du fortsette uten sensorer på turneringen?",
+                right_click_forbidden: "HØYREKLIKK ER FORBUDT! Terminalen är låst.",
+                escape_locked: "ESCAPE ER SPERRET PÅ LAN!",
+                devtools_forbidden: "DEVTOOLS ER FORBUDT! Hacker-forsøk logget.",
+                lost_focus: "TERMINAL MISTER FOKUS! Juks ikke tillatt.",
+                tab_switch_detected: "FANEBYTTE OPPDAGET! Kamek ser alt.",
+                turbo_detected: "TURBO-KLIKK OPPDAGET! Juksemakere diskvalifiseres.",
+                macro_detected: "MAKRO-KLIKK OPPDAGET! Systemlås.",
+                aimbotuser: "AIMBOT DETEKTERT! Spillet låst.",
+                ups_warning: "⚠️ STRØMBRUDD! Datamaskinen kjører på nødstrøm (UPS)! Koble till ekstern lader umiddelsbart!",
+                power_status: "⚡ EKSTERN STRÖM: OK (UPS SIKRET)",
+                power_battery: "🔋 UPS-RESERVE (ADVARSEL: INGEN EKSTERN STRØM!)",
+                
+                camera_off_label: "KAMERA DEAKTIVERT",
+                integrity: "🛡️ INTEGRITET",
+                wall_ok: "STATUS: FLOTT (OK)",
+                wall_damaged: "STATUS: SKADET",
+                wall_critical: "STATUS: KRITISK",
+                wall_destroyed: "STATUS: KATASTROFE!",
+                wall_integrity_label: "MUR-INTEGRITET: ",
+
+                inst_title: "OPERATØRMANUAL",
+                medical_warning_modal: "⚠️ MEDISINSK ADVARSEL: Spillet inneholder intensive stroboskonlys, rystende effekter og plutselige lyder. Anbefales ikke for personer med epilepsi.",
+                sensory_profile_title: "🧠 SENSORISK PROFIL",
+                sensory_syn: "<strong>SYN:</strong> Lilla/hvite blink ved skudd. Trykk <strong>[S]</strong> for nødstop.",
+                sensory_horsel: "<strong>HÖRSEL:</strong> Klikk på båndspilleren (boombox) eller trykk <strong>[M]</strong> for lydløs.",
+                sensory_kansel: "<strong>BERØRING:</strong> Gamepads gir fysiske vibrationer ved eksplosjoner.",
+                combat_controls_title: "🎮 STRIDSKONTROLLER",
+                combat_left_html: "<strong>TASTATUR:</strong><br>• Skyt med mus<br>• [R]: Lad om<br>• [E]: Nødboks<br>• [S]: Stopp Strobe",
+                combat_right_html: "<strong>GAMEPAD:</strong><br>• [RT/R2]: Skyt<br>• [X/A]: Lad om<br>• [B/Y]: Stopp Strobe",
+                kamek_cheat_title: "🧙‍♂️ KAMEK ANTI-CHEAT & ADVARSEL",
+                kamek_cheat_desc_html: "Turbo-klikk, styreflate og jukseskript registreres automatisk. Ved mistanke vil maskinen vil låses helt.<br><strong style='color: #ff4444;'>☢️ FORBUDT MÅL:</strong> Skyt ALDRIG på radioaktive tegn (Nukes). Treff = Umiddelbar <strong>GAME OVER</strong>.",
+                repair_system_title: "🛡️ REPARASJONSSYSTEM",
+                repair_system_desc_html: "• Muren din starter på <strong>100 HP</strong>.<br>• Skyt hjerter for å reparere muren med <strong>+25 HP</strong>.<br>• 0 HP = Total kollaps og spill slutt.",
+                powerups_title: "💎 POWER-UPS",
+                power_heart: "❤️ Hjerte: +25 HP",
+                power_clock: "🕒 Klokke: Slow-Mo",
+                power_star: "⭐ Stjerne: Uovervinnelig",
+                power_gold: "💰 Gull: X2 Poeng",
+                confirm_btn: "BEKREFT REGLER & START!",
+
+                trackpad_lockdown: "SLUTT Å STRYKE LAPTOPPEN DIN! 🚫\n\nKamek ler av den klumpete styreflaten din: 'NYEHEHEHE!'\nFingrene dine duger ikke til Station 24-protokollen.\n\n⚠️ ANBEFALING: Koble til en ekte MUS for presisjon!",
+                thermal_throttle: "THERMAL_THROTTLE_DETECTED: \n Datamaskinen din smelter under spenningen! Spill på en stabil maskin med ekstern strømforsyning!",
+                pause_lockdown: "KAMEK LIKER IKKE PAUSER!",
+                ups_active_playing: "⚠️ EKSTERN STRØM BRUTT! UPS AKTIVERT. KOBLE TIL LADER!",
+                toxic_warning: "⚠️ ADVARSEL #X: VASK MUNDEN!",
+                toxic_lockdown_title: "LÅST AV KAMEK",
+                toxic_lockdown_desc: '"Sverging er ikke tillatt under turneringen."',
+                retry_btn: "PRØV IGJEN",
+                nuke_explosion: "JUKS OPPDAGET!",
+
+                mock_legendary: "SUPER (STJERNEGEVINST) - LEGENDARISK STATUS!",
+                mock_0: "FORFERDELIG - Var du i det hele tatt våken?",
+                mock_1: "DÅRLIG - Goombas ler av deg.",
+                mock_2: "GJENNOMSNITTLIG - Helt okei, men ikke mer.",
+                mock_3: "BRA - Nå begynner det å ligne noe!",
+                mock_4: "BEST - En sann forsvarare av basen!",
+                mock_5: "SUPER (STJERNEGEVINST) - DU ER USTOPPELIG!",
+
+                // Nya lokaliserade toast-nycklar
+                lang_changed: "🌐 SPRÅK: NORSK OPPDAGET!",
+                good_luck: "LYKKE TIL, {name}!",
+                radio_off: "🔈 RADIO: AV",
+                radio_on: "🔊 EURODANCE: PÅ!",
+                now_playing: "🎵 SPILLER NÅ",
+                gamepad_unsupported: "⚠️ Spillkontroll støttes ikke fullt ut (for få knapper).",
+                gamepad_connected: "🎮 Spillkontroll tilkoblet!",
+                offline_mode: "📶 Offline - lokal LAN-modus sikret",
+                online_mode: "✅ Online - tilkoblet Station 24",
+                ammo_added: "+20 RESERVHAMMO!",
+                invincible_on: "🌟 UOVERVINNELIG! (7 SEK)",
+                invincible_off: "✨ Uovervinnelighet slutt",
+                double_points_on: "💰 DOBLE POENG! (10 SEK)",
+                double_points_off: "💰 Poeng gjenopprettet",
+                reloading: "🔄 LADER OM...",
+                reloaded_ready: "✅ KLAR!",
+                slowmo_on: "🕒 TIDEN SAKTNET!",
+                wall_repaired: "🧱 MUR REPARERT (+25 HP)!",
+                emergency_ammo_used: "🚨 NØDAMMO BRUKT! ({count} igjen)",
+                no_emergency_boxes: "🚫 INGEN NØDBOKSER IGJEN!",
+                gold_transferred: "💰 GULLMYNTER VIDEREFORMIDLET! Kongen av Station 24.",
+                sensors_activated: "✅ SENSORER AKTIVERT",
+                sensors_denied: "❌ SENSORTILGANG NEKTET",
+
+                // Device block insults norwegian
+                device_mobile: "MOBILTELEFON OPPDAGET! 🚫\nDette er ikke et mobilspill! Station 24 krever rå kraft, ekstern strømforsyning og en ekte mus! Slutt å ta på skjermen.",
+                device_tablet: "NETTBRETT OPPDAGET! 👶\nNettbrett er til for å se på barne-tv med, ikke for å forsvare Station 24! Gå og se på Fantorangen i stedet.",
+                device_smarttv: "SMART-TV OPPDAGET! 📺\nSkjermen er stor, men prosessoren din er en brødrister. YouTube er mye bedre for deg. Gå og se på kattevideoer!",
+                device_console: "KONSOL OPPDAGET! 🎮\nKonsoller er til for å spille GTA på! Station 24 styres med ren vilje, mus og tastatur. Selg kontrolleren din.",
+                device_car: "BILSKJERM OPPDAGET! 🚗\nRullende trafikkfare! Prøver du å skyt fiender på en Tesla-skjerm midt på motorveien?! Hold øynene på veien før Kamek krasjer autopiloten din!",
+                device_refrigerator: "SMART KJØLESKAP OPPDAGET! 🧊\nHva i alle dager?! Prøver du å spille arkadespill på kjøleskapsdøren din? Gå og lukk melkekartongen i stedet!",
+                device_smartwatch: "SMARTKLOKKE OPPDAGET! ⌚\nSkjermen er jo mindre enn en kronestykke! Hvordan skal du sikte her? Skaff deg et mikroskop.",
+                device_smarthome: "SMART HJEM-SKJERM OPPDAGET! 🏠\nHvordan er dette i det hele tatt fysisk mulig? Prøver du å forsvare basen fra din smarte termostat eller ringeklokke? Kamek ler seg i hjel!",
+                device_unknown: "UKJENT ENHED OPPDAGET! 👽\nHva slags romteknologi er dette? Enheten støttes ikke av Station 24-protokollen!",
+
+                // NEW: Hardware insult Norwegian
+                diag_ram: "Analyserer fysisk minne (RAM)...",
+                diag_cpu: "Søker etter prosessorkjerner (i5/Ryzen 5)...",
+                diag_os: "Verifiserer operativsystemets sikkerhetsarkitektur...",
+                diag_disk: "Skanner etter ledig diskplass på HDD...",
+                diag_ok: "GODKJENT!",
+                diag_fail: "MISLYKTES!",
+                device_hw_ram_fail: "KATASTROFAL MANGLER: For lite RAM! 💥\nStation 24 krever minst 4GB RAM for å ikke smelte kretsene. Kamek hånliggjør din patetiske bærbare! Skaff deg mer minne.",
+                device_hw_cpu_cores_fail: "CPU-MISSLYKKING: For få prosessorkjerner! 🚴\nMinst 4 prosessorkjerner (i5/Ryzen 5) kreves. Kamek ler av din potet-drevne prosessor. Installer ordentlig maskinvare!",
+                device_hw_os_old_windows: "OS-SPERRE: Gammel Windows oppdaget! 🦖\nDu kjører en utdatert Windows-version. Station 24 krever minst Windows 10! Gå på museum og spill der i stedet.",
+                device_hw_os_old_mac: "OS-SPERRE: Gammelt macOS oppdaget! 🍏\nStation 24 krever minst macOS Sequoia (15.0+). Ditt råtne eple har mugnet for lenge siden. Kast den i søppelkassen!",
+                device_hw_os_linux: "SIKKERHETS LOCKDOWN: Linux (Pingvin-OS) oppdaget! 🐧\nStation 24 tillater ikke open source i militær sone. Installer et sertifisert OS med en gang!",
+                device_hw_os_steamos: "STEAMOS OPPDAGET: Håndholdt leketøy! 🎮\nStation 24 er et seriøst militært forsvarssystem, ikke et leketøy for din Steam Deck! Gå og spill indie-spill et annet sted.",
+                device_hw_os_chromeos: "SKOLE-PC BANNLYST: ChromeOS oppdaget! 🎒\nSkole-PCer og billige Chromebooks er bannlyst fra Station 24. Lukk lokket og gjør leksene dine i stedet!",
+                device_hw_storage_fail: "HDD-FEIL: Diskplass kritisk! 💾\nStation 24 krever minst 4GB ledig plass på HDD for å lagre krypterte nukleære forsvarskoder. Frigør plass!",
+
+                // Integrerad inställningsskärm norska
+                sensor_section_title: "🧙 SENSORER (TURNERING)",
+                audio_section_title: "🔊 LYD & RADIO",
+                music_label: "Bakgrunnsmusikk",
+                sfx_vol_label: "Lydeffekter (SFX)",
+                music_vol_label: "Musikkvolum"
+            }
+        };
+
+        // Standard språk eller autodetektering
+        let currentLang = localStorage.getItem('gameLanguage');
+        if (!currentLang) {
+            const browserLang = navigator.language.slice(0, 2);
+            currentLang = translations[browserLang] ? browserLang : 'en';
+            localStorage.setItem('gameLanguage', currentLang);
+        }
+
+        function t(key) {
+            return translations[currentLang]?.[key] || translations['en']?.[key] || key;
+        }
+
+        function setLanguage(lang) {
+            if (translations[lang]) {
+                currentLang = lang;
+                safeStorage.setItem('gameLanguage', lang);
+                initializeUIText();
+                showToast(t('lang_changed'), "var(--primary)");
+            }
+        }
+
+        function initializeUIText() {
+            if (typeof t === 'function') {
+                document.getElementById('name-label').textContent = t('player_name');
+                document.getElementById('playerName').placeholder = t('placeholder_name');
+                document.getElementById('medical-warning-text').textContent = t('medical_warning');
+                document.getElementById('start-btn').textContent = t('start_game');
+                document.getElementById('instructions-btn').textContent = t('instructions');
+                document.getElementById('settings-btn').textContent = '🎥 ' + t('settings');
+                
+                // Mediamodal
+                document.getElementById('media-control-title').textContent = t('media_control');
+                document.getElementById('media-control-desc').textContent = t('activate_hardware');
+                document.getElementById('camera-label').textContent = t('camera');
+                document.getElementById('microphone-label').textContent = t('microphone');
+                document.getElementById('save-activate-btn').textContent = t('save_activate');
+
+                // HUD labels
+                document.getElementById('score-label').textContent = t('score');
+                document.getElementById('mag-label').textContent = t('mag');
+                document.getElementById('wave-label').textContent = t('wave');
+
+                // Highscore
+                document.getElementById('leaderboard-title').textContent = t('top_defenders');
+                document.getElementById('lb-rank').textContent = t('rank');
+                document.getElementById('lb-name').textContent = t('name');
+                document.getElementById('lb-score').textContent = t('score_col');
+
+                // Kameratillstånd
+                const camOff = document.getElementById('cam-off-label');
+                if (camOff) camOff.textContent = t('camera_off_label');
+
+                // Panel i manualen (DYNAMISK)
+                const instTitle = document.getElementById('inst-title');
+                if (instTitle) instTitle.textContent = t('inst_title');
+
+                const medWarnModal = document.getElementById('medical-warning-text-modal');
+                if (medWarnModal) medWarnModal.textContent = t('medical_warning_modal');
+
+                const sensoryTitle = document.getElementById('sensory-profile-title');
+                if (sensoryTitle) sensoryTitle.textContent = t('sensory_profile_title');
+
+                const sensoryList = document.getElementById('sensory-profile-list');
+                if (sensoryList) {
+                    sensoryList.innerHTML = `
+                        <li>${t('sensory_syn')}</li>
+                        <li>${t('sensory_horsel')}</li>
+                        <li>${t('sensory_kansel')}</li>
+                    `;
+                }
+
+                const combatTitle = document.getElementById('combat-controls-title');
+                if (combatTitle) combatTitle.textContent = t('combat_controls_title');
+
+                const combatLeft = document.getElementById('combat-left');
+                if (combatLeft) {
+                    combatLeft.innerHTML = t('combat_left_html');
+                }
+                const combatRight = document.getElementById('combat-right');
+                if (combatRight) {
+                    combatRight.innerHTML = t('combat_right_html');
+                }
+
+                const kamekTitle = document.getElementById('kamek-cheat-title');
+                if (kamekTitle) kamekTitle.textContent = t('kamek_cheat_title');
+
+                const kamekDesc = document.getElementById('kamek-cheat-desc');
+                if (kamekDesc) {
+                    kamekDesc.innerHTML = t('kamek_cheat_desc_html');
+                }
+
+                const repairTitle = document.getElementById('repair-system-title');
+                if (repairTitle) repairTitle.textContent = t('repair_system_title');
+
+                const repairDesc = document.getElementById('repair-system-desc');
+                if (repairDesc) {
+                    repairDesc.innerHTML = t('repair_system_desc_html');
+                }
+
+                const powerupsTitle = document.getElementById('powerups-title');
+                if (powerupsTitle) powerupsTitle.textContent = t('powerups_title');
+
+                const powerupsList = document.getElementById('powerups-list');
+                if (powerupsList) {
+                    powerupsList.innerHTML = `
+                        <span>${t('power_heart')}</span>
+                        <span>${t('power_clock')}</span>
+                        <span>${t('power_star')}</span>
+                        <span>${t('power_gold')}</span>
+                    `;
+                }
+
+                const confirmBtn = document.getElementById('confirm-rules-btn');
+                if (confirmBtn) confirmBtn.textContent = t('confirm_btn');
+
+                // Lockdown/Anti-cheat rubrik
+                const lockTitle = document.getElementById('lockdown-title');
+                if (lockTitle) lockTitle.textContent = t('cheat_detected');
+
+                // Hälsomätarens widget-titlar
+                const hpTitle = document.querySelector('#health-bar-widget #health-bar-title span:first-child');
+                if (hpTitle) hpTitle.textContent = t('integrity');
+
+                // Nya integrerade inställningskontroller
+                const sensorSec = document.getElementById('sensor-section-title');
+                if (sensorSec) sensorSec.textContent = t('sensor_section_title');
+                const audioSec = document.getElementById('audio-section-title');
+                if (audioSec) audioSec.textContent = t('audio_section_title');
+                const audioToggleLbl = document.getElementById('audio-toggle-label');
+                if (audioToggleLbl) audioToggleLbl.textContent = t('music_label');
+                const musicVolLbl = document.getElementById('music-vol-label');
+                if (musicVolLbl) musicVolLbl.textContent = t('music_vol_label');
+                const sfxVolLbl = document.getElementById('sfx-vol-label');
+                if (sfxVolLbl) sfxVolLbl.textContent = t('sfx_vol_label');
+
+                const modalBtn = document.getElementById('modal-toggle-music');
+                if (modalBtn) {
+                    modalBtn.textContent = isMusicMuted ? t('off') : t('on');
+                    modalBtn.className = isMusicMuted ? "btn-toggle btn-off" : "btn-toggle btn-on";
+                }
+
+                // Om det finns en aktiv enhets-lockdown ritar vi om meddelandet direkt på rätt språk!
+                if (window.__currentLockedDevice) {
+                    const msgTag = document.getElementById('device-lockdown-msg');
+                    if (msgTag) {
+                        msgTag.innerHTML = t('device_' + window.__currentLockedDevice).replace(/\n/g, "<br>");
+                    }
+                }
+
+                // Strömlabel baserat på nuvarande anslutningsläge
+                if (typeof updatePowerWidgetUI === 'function') updatePowerWidgetUI();
+                if (typeof updateHealthBarUI === 'function') updateHealthBarUI();
+            }
+        }
+
+        // Exponera språkvalsfunktioner på fönsternivå
+        window.setLanguage = setLanguage;
+    </script>
+
+    <!-- ==========================================================================
+       I. SPELMOTORN (KRAFTFULLT COMBINERAD SPELKOD)
+       ========================================================================== -->
+    <script>
+        // --- SÄKRAD BLOCKERING OM GAMMAL WEBBLÄSARE DETEKTERATS ---
+        if (window.__legacy_browser_error) {
+            throw new Error("Halt: Legacy browser detected. Halting ES6 parser execution.");
+        }
+
+        // --- GLOBAL VOLYM- OCH LJUDTILLSTÅND ---
+        let musicVolume = 0.3;
+        let sfxVolume = 0.5;
+
+        // --- AUDIO-LOGIK (Säkrad med dynamic volume) ---
+        const playSnd = (audioObj) => {
+            if (audioObj) {
+                audioObj.volume = sfxVolume;
+                audioObj.currentTime = 0;
+                audioObj.play().catch(()=>{});
+            }
+        };
+
+        const sndGlass = new Audio('glass_break.mp3'); 
+        const sndPlat = new Audio('plat.mp3'); 
+        const sndPang = new Audio('pang.mp3');
+        const sndKamek = new Audio('kamek.mp3'); 
+        const sndPling = new Audio('pling.mp3');
+        const sndBoop = new Audio('boooop.mp3'); 
+        const sndHurt = new Audio('hurt.mp3'); 
+        const sndClick = new Audio('click.mp3'); 
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // --- TILLSTÅNDSVARIABLER (HP SYSTEM) ---
+        let score = 0; 
+        let currentHealth = 100; 
+        let maxHealth = 100;
+        let wave = 1;
+        let strobeActive = false;
+        let spawnedThisWave = 0;
+        let enemiesPerWave = 15; 
+        let isTransitioning = false; 
+        let gameState = 'START';
+        let enemies = [];
+
+        let ammoInMag = 10;    
+        let magSize = 10;      
+        let emergencyAmmoBoxes = 3; 
+        let ammoReserve = 40;  
+        let isReloading = false;
+        let isSlowMo = false;
+        const imgSlowMo = new Image(); 
+        imgSlowMo.src = 'slomo.jfif'; 
+        let isInvincible = false;
+        let doublePoints = false;
+        let rainbowTimer = 0;
+
+        let p1 = { x: window.innerWidth/2, y: window.innerHeight/2, color: 'lime' };
+        let p2 = { x: window.innerWidth/2, y: window.innerHeight/2, color: 'cyan', active: false };
+
+        // --- BILD-ASSETS (Vektorgrafik-fallbacks garanterade) ---
+        const imgWeight = new Image(); imgWeight.src = 'weight.png';
+        const imgBomb = new Image(); imgBomb.src = 'bomb.png';
+        const imgStar = new Image(); imgStar.src = 'star.jpg';
+        const imgHeartFull = new Image(); imgHeartFull.src = 'heart_full.png';
+        const imgHeartEmpty = new Image(); imgHeartEmpty.src = 'heart_empty.png';
+        const imgP1 = new Image(); imgP1.src = 'pansar_hel.png';
+        const imgP2 = new Image(); imgP2.src = 'pansar_trasig.png';
+        const imgP3 = new Image(); imgP3.src = 'pansar_mycket_trasig.png';
+
+        // --- TOAST-NOTISER (MEDDELANDEN) ---
+        function showToast(text, color) {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const tDiv = document.createElement('div');
+            tDiv.className = 'toast'; 
+            tDiv.style.borderColor = color; 
+            tDiv.innerText = text;
+
+            container.appendChild(tDiv);
+
+            setTimeout(() => {
+                tDiv.classList.add('fade-out');
+                setTimeout(() => tDiv.remove(), 500); 
+            }, 3000);
+        }
+
+        // --- EURODANCE RADIOSPELLISTA ---
+        const eurodancePlaylist = [
+                'music/gangnam_style.mp3', // FLYTTAD HÄRÅT! Den ultimata YouTube-hiten!
+                'music/billie_jean.mp3', 
+                'music/levitating.mp3', 
+                'music/blinding_lights.mp3', 
+                'music/golden.mp3', 
+                'music/faded.mp3', 
+                'music/headlights.mp3', 
+                'music/miracle.mp3', 
+                'music/starships.mp3', 
+                'music/despre_tine.mp3',
+                'music/good_feeling.mp3', 
+                'music/wild_ones.mp3', 
+                'music/alone.mp3', 
+                'music/where_have_you_been.mp3', 
+                'music/party_rock_anthem.mp3', 
+                'music/titanium.mp3', 
+                'music/fever_dream.mp3', 
+                'music/axel_f.mp3', 
+                'music/dragostea_del_tei.mp3', 
+                'music/low.mp3', 
+                'music/where_them_girls_at.mp3',
+                'music/tik_tok.mp3', 
+                'music/my_system.mp3',
+                'music/animals.mp3',
+                'music/the_business.mp3', 
+                'music/yeah.mp3', 
+                'music/bad_romance.mp3', 
+                'music/beauty_and_a_beat.mp3', 
+                'music/dont_you_worry_child.mp3', 
+                'music/clarity.mp3', 
+                'music/lean_on.mp3',
+                'music/du_hast.mp3', 
+                'music/the_trooper.mp3', 
+                'music/chop_suey.mp3', 
+                'music/through_the_fire_and_flames.mp3',
+                'music/u_cant_touch_this.mp3', 
+                'music/just_wanna_rock.mp3',
+                'music/rockstar.mp3', 
+                'music/rockstar_dababy.mp3', 
+                'music/montero.mp3', 
+                'music/freestyler.mp3', 
+                'music/lose_yourself.mp3',
+                'music/lucid_dreams.mp3',
+                'music/old_town_road.mp3',
+                'music/gods_plan.mp3',
+                'music/ice_ice_baby.mp3',
+                'music/here_i_go_again_ws.mp3', 
+                'music/thunderstruck.mp3', 
+                'music/the_final_countdown.mp3', 
+                'music/in_the_end.mp3', 
+                'music/danger_zone.mp3', 
+                'music/dragula.mp3', 
+                'music/kickstart_my_heart.mp3', 
+                'music/died_in_your_arms.mp3', 
+                'music/we_built_this_city.mp3', 
+                'music/it_has_begun_starset.mp3',
+                'music/take_on_me.mp3', 
+                'music/sweet_dreams.mp3', 
+                'music/moviestar.mp3', 
+                'music/never_gonna_give_you_up.mp3', 
+                'music/send_me_an_angel.mp3',
+                'music/self_control.mp3',
+                'music/take_a_chance.mp3',  
+                'music/dancing_queen.mp3',  
+                'music/mamma_mia.mp3',  
+                'music/knowing_me_knowing_you.mp3', 
+                'music/the_winner_takes_it_all.mp3',
+                'music/you_spin_me_round.mp3', 
+                'music/ma_baker.mp3', 
+                'music/smalltown_boy.mp3',
+                'music/bowsers_galaxy.mp3', 'music/gerudo_valley.mp3', 'music/gusty_garden.mp3', 
+                'music/coconut_mall.mp3', 'music/pokemon_main.mp3', 'music/mario64_slider.mp3', 
+                'music/mk64_rr.mp3', 'music/mk64_raceway.mp3', 'music/my_system.mp3',
+                'music/axel_f.mp3', 
+                'music/caramelldansen.mp3', 
+                'music/dragostea_del_tei.mp3', 
+                'music/despre_tine.mp3',
+                'music/gangnam_style.mp3',
+                'music/rosa_helikopter.mp3', 
+                'music/cotton_eye_joe.mp3', 
+                'music/rhythm_is_a_dancer.mp3', 
+                'music/never_going_home_tonight.mp3', 
+                'music/eurodancer.mp3', 
+                'music/axel_f.mp3', 
+                'music/despre_tine.mp3',
+                'music/dragostea_del_tei.mp3', 
+                'music/miracle.mp3', 
+                'music/here_i_go_again.mp3', 
+                'music/no_limit.mp3', 
+                'music/pump_up_the_jam.mp3', 
+                'music/sandstorm.mp3', 
+                'music/boten_anna.mp3', 
+                'music/scooter.mp3', 
+                'music/caramelldansen.mp3',
+                'music/rosa_helikopter.mp3',  
+                'music/the_logical_song.mp3', 
+                'music/this_is_the_way.mp3', 
+                'music/my_system.mp3',
+                'music/what_is_love.mp3', 
+                'music/blue.mp3', 
+                'music/alone_ii.mp3', 
+                'music/alone_iii.mp3', 
+                'music/diamond_heart.mp3', 
+                'music/on_the_floor.mp3', 
+                'music/strong_enough.mp3', 
+                'music/set_the_world_on_fire.mp3', 
+                'music/better_off_alone.mp3', 
+                'music/boom_boom_boom.mp3', 
+                'music/everytime_we_touch.mp3', 
+                'music/we_like_to_party.mp3', 
+                'music/when_we_were_young.mp3', 
+                'music/be_my_lover.mp3', 
+                'music/infinity_2008.mp3', 
+                'music/children_miles.mp3', 
+                'music/god_is_a_dj.mp3', 
+                'music/sound_of_silence_remix.mp3',
+                'music/ecstasy.mp3', 
+                'music/l_amour_toujours.mp3', 
+                'music/stereo_love.mp3', 
+                'music/mr_saxobeat.mp3',
+                'music/raggen_går.mp3', 
+                'music/rid_mig_som_en_dalahäst.mp3',
+                'music/bubbel_pa_balkongen.mp3', 
+                'music/weed_i_raggarbil.mp3', 
+                'music/rödvin_rose.mp3', 
+                'music/elov_beny.mp3',
+                'music/trucker_motherfucker.mp3', 
+                'music/rom_cola.mp3', 
+                'music/kan_inte_gå.mp3',
+                'music/caramelldansen.mp3',
+                'music/rosa_helikopter.mp3', 
+                'music/forsta_gången_i_en_epa.mp3',
+                'music/ikvall_igen.mp3',
+                'music/30kmh.mp3',
+                'music/banan_melon_kiwi_citron.mp3', 
+                'music/valhalla.mp3', 
+                'music/trakten_epan.mp3',
+                'music/inget_stoppar_oss_nu.mp3', 
+                'music/guld_och_grona_skogar.mp3', 
+                'music/leende_guldbruna_ogon.mp3', 
+                'music/diggiloo_diggiley.mp3',
+                'music/varlden_utanfor.mp3',
+                'music/lyssna_till_ditt_hjarta.mp3',
+                'music/eloise.mp3'
+        ];
+        let isMusicMuted = false;
+        let backgroundMusic = null;
+        const isStreamMode = new URLSearchParams(window.location.search).get('stream') === 'true';
+
+        const toggleMusic = (e) => {
+            if (e) e.stopPropagation(); 
+            if (isStreamMode) return;
+
+            isMusicMuted = !isMusicMuted;
+            const container = document.getElementById('radio-container');
+            const modalBtn = document.getElementById('modal-toggle-music');
+
+            if (isMusicMuted) {
+                if (backgroundMusic) backgroundMusic.pause();
+                if (container) container.classList.add('radio-muted');
+                if (modalBtn) {
+                    modalBtn.textContent = t('off');
+                    modalBtn.className = "btn-toggle btn-off";
+                }
+                showToast(t('radio_off'), "#888");
+            } else {
+                if (container) container.classList.remove('radio-muted');
+                if (modalBtn) {
+                    modalBtn.textContent = t('on');
+                    modalBtn.className = "btn-toggle btn-on";
+                }
+                showToast(t('radio_on'), "var(--primary)");
+                
+                if (backgroundMusic) {
+                    backgroundMusic.volume = musicVolume;
+                    backgroundMusic.play().catch(() => console.log("User interaction needed"));
+                } else {
+                    startStationRadio(); 
+                }
+            }
+        };
+
+        const playNextRandomTrack = () => {
+            if (isMusicMuted || isStreamMode) return;
+            if (backgroundMusic) {
+                backgroundMusic.pause();
+                backgroundMusic = null;
+            }
+
+            const track = eurodancePlaylist[Math.floor(Math.random() * eurodancePlaylist.length)];
+            backgroundMusic = new Audio(track);
+            backgroundMusic.loop = false; // Låt sluta så vi kan shuffla nästa automatisk!
+            backgroundMusic.volume = musicVolume;
+            
+            backgroundMusic.play().then(() => {
+                // Skala ut filnamnet snabbt från sökvägen och släng upp toast
+                const filename = track.substring(track.lastIndexOf('/') + 1);
+                showToast(t('now_playing') + ": " + filename, "var(--primary)");
+            }).catch(e => {
+                console.log("Autoplay blocked safely:", e);
+            });
+
+            backgroundMusic.onended = () => {
+                playNextRandomTrack();
+            };
+        };
+
+        const startStationRadio = () => {
+            if (backgroundMusic || isStreamMode) return;
+            playNextRandomTrack();
+        };
+
+        // --- INPUTS & TANGENTBORD ---
+        window.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() === 'm') {
+                toggleMusic();
+            }
+        });
+
+        // --- EXTERN STRÖM & UPS MONITORERING (HARDCORE KRAV) ---
+        let runningOnUPS = false;
+
+        function updatePowerWidgetUI() {
+            const label = document.getElementById('power-label');
+            const pulse = document.querySelector('.power-pulse');
+            if (!label) return;
+
+            if (runningOnUPS) {
+                label.textContent = t('power_battery');
+                label.style.color = 'var(--danger)';
+                if (pulse) {
+                    pulse.style.backgroundColor = 'var(--danger)';
+                    pulse.style.animation = 'pulse-red 0.4s infinite';
+                }
+            } else {
+                label.textContent = t('power_status');
+                label.style.color = '#00ff00';
+                if (pulse) {
+                    pulse.style.backgroundColor = '#00ff00';
+                    pulse.style.animation = 'pulse-green 1s infinite';
+                }
+            }
+        }
+
+        // Koppla in mot batteri API för att stoppa hybridlägen
+        if (navigator.getBattery) {
+            navigator.getBattery().then(battery => {
+                const checkBatteryStatus = () => {
+                    // Datorn körs på internt batteri = UPS läge, ej tillåtet för turneringen!
+                    if (!battery.charging) {
+                        runningOnUPS = true;
+                        showToast(t('ups_warning'), 'var(--danger)');
+                        // Om spelet är aktivt, ge en massiv prestandavarning
+                        if (gameState === 'PLAYING') {
+                            showToast(t('ups_active_playing'), "orange");
+                        }
+                    } else {
+                        runningOnUPS = false;
+                    }
+                    updatePowerWidgetUI();
+                };
+
+                // Säker lyssnare med fallback för att förebygga "battery.addEventListener is not a function"
+                if (typeof battery.addEventListener === 'function') {
+                    battery.addEventListener('chargingchange', checkBatteryStatus);
+                } else {
+                    battery.onchargingchange = checkBatteryStatus;
+                }
+
+                checkBatteryStatus();
+            }).catch(err => {
+                console.warn("Battery API blockerat eller stöds ej:", err);
+            });
+        }
+
+        // --- KONTROLLANSLUTNINGAR ---
+        window.addEventListener("gamepadconnected", (e) => {
+            if (e.gamepad.buttons.length < 4) {
+                showToast(t('gamepad_unsupported'), "orange");
+            } else {
+                showToast(t('gamepad_connected'), "lime");
+            }
+        });
+
+        // --- ONLINE/OFFLINE KONTROLLER ---
+        window.addEventListener('offline', () => {
+            showToast(t('offline_mode'), "orange");
+        });
+        window.addEventListener('online', () => {
+            showToast(t('online_mode'), "lime");
+        });
+
+        // --- KAMEK ANTI-CHEAT LOCKDOWN TRIGGER ---
+        function triggerLockdown(reason) {
+            if (gameState !== 'LOCKDOWN') {
+                playSnd(sndKamek);
+            }
+            gameState = 'LOCKDOWN';
+            const overlay = document.getElementById('lockdown-overlay');
+            if (overlay) {
+                overlay.style.display = 'flex';
+                const pTag = overlay.querySelector('p');
+                if (pTag) pTag.innerText = reason;
+                document.body.style.overflow = 'auto'; 
+            }
+        }
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            if (gameState === 'START') {
+                p1.x = canvas.width / 2;
+                p1.y = canvas.height / 2;
+            }
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Spärrar för tangentbord och musklick under turneringen
+        window.addEventListener('keydown', (e) => {
+            if (e.key === "Escape") {
+                triggerLockdown(t('escape_locked'));
+            }
+            if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I")) {
+                e.preventDefault();
+                triggerLockdown(t('devtools_forbidden'));
+            }
+        });
+
+        window.onblur = function() {
+            if (gameState === 'PLAYING') {
+                triggerLockdown(t('lost_focus'));
+            }
+        };
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && gameState === 'PLAYING') {
+                triggerLockdown(t('tab_switch_detected'));
+            }
+        });
+
+        // --- TURBO-KLICK & MAKRO SENSOR V3 ---
+        var clickHistory = [];
+        var lastClickTimestamp = 0;
+
+        window.addEventListener('mousedown', function(e) {
+            if (gameState !== 'PLAYING') return;
+
+            var now = Date.now();
+            var delta = now - lastClickTimestamp;
+            lastClickTimestamp = now;
+
+            clickHistory.push(delta);
+            if (clickHistory.length > 15) clickHistory.shift();
+
+            // Snabba klick under 60ms stängs av hårt
+            if (delta < 60) {
+                triggerLockdown(t('turbo_detected'));
+                return;
+            }
+
+            // Makroanalys (Hittar perfekt jämna millisekunder)
+            if (clickHistory.length >= 10) {
+                var isBot = true;
+                var firstInterval = clickHistory[0];
+                
+                for (var i = 1; i < clickHistory.length; i++) {
+                    if (Math.abs(clickHistory[i] - firstInterval) > 1) {
+                        isBot = false;
+                        break;
+                    }
+                }
+
+                if (isBot) {
+                    triggerLockdown(t('macro_detected'));
+                }
+            }
+        });
+
+        // --- SPELAREN & RÖRELSE ---
+        window.addEventListener('mousemove', (e) => { 
+            if (gameState === 'PLAYING') { p1.x = e.clientX; p1.y = e.clientY; } 
+        });
+
+        window.addEventListener('mousedown', () => {
+            if (gameState === 'PLAYING') {
+                shoot(p1);
+            } else if (gameState === 'GAMEOVER') {
+                location.reload();
+            }
+        });
+
+        let currentPlayerName = "Gäst";
+
+        // --- HTML HÄLSOMÄTARE HELPER ---
+        function updateHealthBarUI() {
+            const fill = document.getElementById('health-bar-fill');
+            const percentText = document.getElementById('health-percent');
+            const statusText = document.getElementById('wall-status-label');
+            if(!fill || !percentText || !statusText) return;
+
+            let safeHp = Math.max(0, Math.min(100, currentHealth));
+            percentText.innerText = safeHp;
+            fill.style.width = safeHp + '%';
+
+            if (safeHp > 75) {
+                fill.style.backgroundColor = '#00ff00';
+                statusText.innerText = t('wall_ok');
+                statusText.style.color = '#00ff00';
+            } else if (safeHp > 45) {
+                fill.style.backgroundColor = '#ffcc00';
+                statusText.innerText = t('wall_damaged');
+                statusText.style.color = '#ffcc00';
+            } else if (safeHp > 20) {
+                fill.style.backgroundColor = '#ff6600';
+                statusText.innerText = t('wall_critical');
+                statusText.style.color = '#ff6600';
+            } else {
+                fill.style.backgroundColor = '#ff0000';
+                statusText.innerText = t('wall_destroyed');
+                statusText.style.color = '#ff0000';
+            }
+        }
+
+        // --- GENERERA FIENDER (TUR-BASERAT LAN SVÅRIGHET + NYA FIENDER) ---
+        function spawnEnemy() {
+            if (gameState !== 'PLAYING' || isTransitioning) return;
+
+            // Fienderna träffar muren precis innan botten av skärmen
+            let wallBuffer = 35; 
+            let targetY = canvas.height - wallBuffer;
+
+            if (spawnedThisWave >= enemiesPerWave) {
+                if (enemies.length === 0) {
+                    nextWave();
+                } else {
+                    setTimeout(spawnEnemy, 1000);
+                }
+                return;
+            }
+
+            const r = Math.random();
+            let type = 'weight';
+            let hp = 1;
+            let speed = 0.8 + (wave * 0.25); // Skalar svårare
+
+            // Spawn logik inklusive de nya fiendetyperna
+            if (r < 0.05) { 
+                type = 'life'; // Reparations-hjärta
+                speed *= 1.2; 
+            } else if (r < 0.12) { 
+                type = 'ammo_box'; 
+                speed *= 0.9; 
+            } else if (r < 0.17) {
+                type = 'slowmo';
+            } else if (r < 0.27) {
+                type = 'ghost'; // Sicksack spöke
+                hp = 2; // Tar 2 skott
+                speed *= 1.1;
+            } else if (r < 0.35) {
+                type = 'glitch'; // Teleporterande systemfel
+                hp = 1;
+                speed *= 1.5; // Väldigt snabb!
+            } else if (r < 0.42 && wave >= 2) {
+                type = 'tank'; // Tung jätte
+                hp = 5; // Tar 5 skott!
+                speed *= 0.5; // Långsam
+            } else if (wave >= 4 && r < 0.48) {
+                if (r < 0.45) {
+                    type = 'star'; 
+                    speed *= 1.5;
+                } else {
+                    type = '2x';
+                }
+            } else if (wave >= 5 && r > (0.97 - (wave * 0.015))) {
+                type = 'nuke';
+                speed = 1.0; 
+            } else if (r < 0.65) {
+                type = 'bomb'; 
+                speed *= 1.5;
+            } else if (wave >= 3 && r < 0.80) {
+                type = 'armored';
+                hp = 3;
+                speed *= 0.6;
+            }
+
+            enemies.push({ 
+                x: Math.random() * (canvas.width - 60), 
+                y: -60, 
+                size: type === 'tank' ? 90 : 60, // Stenjätten är fyskt större
+                type, 
+                hp, 
+                speed,
+                spawnTime: Date.now() // Används för rörelsemönster
+            });
+
+            spawnedThisWave++;
+
+            // Snabbare spawns vid högre waves
+            let spawnDelay = Math.max(350, 2200 - (wave * 180));
+            setTimeout(spawnEnemy, spawnDelay);
+        }
+
+        // --- SKJUTA/KONTROLLERA TRÄFFAR ---
+        function shoot(p) {
+            if (isReloading) {
+                playSnd(sndClick);
+                return; 
+            }
+            if (ammoInMag <= 0) {
+                playSnd(sndClick);
+                return; 
+            }
+
+            ammoInMag--;
+            playSnd(sndPang);
+
+            enemies.forEach((en, i) => {
+                if (p.x > en.x && p.x < en.x + en.size && p.y > en.y && p.y < en.y + en.size) {
+                    
+                    if (en.type === 'star') {
+                        activateInvincibility(); 
+                        enemies.splice(i, 1);
+                    } 
+                    else if (en.type === '2x') {
+                        activateDoublePoints(); 
+                        enemies.splice(i, 1);
+                    }
+                    else if (en.type === 'nuke') {
+                        gameState = 'GAMEOVER_ANIMATION'; 
+                        const sndExplosion = new Audio('explosion.mp3'); 
+                        sndExplosion.volume = sfxVolume; // Applicera SFX-volym
+                        sndExplosion.play().catch(()=>{});
+
+                        ctx.fillStyle = "white";
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                        setTimeout(() => {
+                            playSnd(sndKamek);
+                            triggerLockdown(t('nuke_explosion'));
+                            setTimeout(() => endGame(), 3000);
+                        }, 500);
+                        
+                        enemies.splice(i, 1);
+                        return; 
+                    }
+                    else if (en.type === 'life') {
+                        playSnd(sndPling);
+                        // Laga muren med +25 HP
+                        currentHealth = Math.min(100, currentHealth + 25);
+                        updateHealthBarUI();
+                        showToast(t('wall_repaired'), "#00ff00");
+                        enemies.splice(i, 1);
+                    } 
+                    else if (en.type === 'slowmo') {
+                        activateSlowMo();
+                        enemies.splice(i, 1);
+                    }
+                    else if (en.type === 'ammo_box') {
+                        ammoReserve += 20; 
+                        showToast(t('ammo_added'), "#00ccff");
+                        enemies.splice(i, 1);
+                        updateAmmoUI();
+                    }
+                    else {
+                        en.hp--;
+                        if (en.hp <= 0) {
+                            let gain = 100;
+                            if (en.type === 'bomb') gain = 200;
+                            else if (en.type === 'armored') gain = 500;
+                            else if (en.type === 'ghost') gain = 300;
+                            else if (en.type === 'glitch') gain = 400;
+                            else if (en.type === 'tank') gain = 1000;
+
+                            score += doublePoints ? gain * 2 : gain; 
+                            enemies.splice(i, 1);
+                            document.getElementById('score').innerText = score;
+                        } else {
+                            playSnd(sndHurt);
+                        }
+                    }
+                }
+            });
+            updateAmmoUI(); 
+        }
+
+        function updateAmmoUI() {
+            const ammoEl = document.getElementById('ammo-display');
+            if (ammoEl) {
+                ammoEl.innerText = `${ammoInMag} / ${ammoReserve} | 📦: ${emergencyAmmoBoxes}`;
+            }
+        }
+
+        function activateInvincibility() {
+            isInvincible = true;
+            showToast(t('invincible_on'), "gold");
+            setTimeout(() => {
+                isInvincible = false;
+                showToast(t('invincible_off'), "#aaa");
+            }, 7000);
+        }
+
+        function activateDoublePoints() {
+            doublePoints = true;
+            showToast(t('double_points_on'), "#00ff00"); 
+            triggerStrobe();
+            setTimeout(() => {
+                doublePoints = false;
+                showToast(t('double_points_off'), "#aaa"); 
+                killStrobe();
+            }, 10000);
+        }
+
+        function reload() {
+            if (isReloading || ammoInMag === magSize || ammoReserve <= 0) return;
+
+            isReloading = true;
+            showToast(t('reloading'), "#ffffff");
+            
+            setTimeout(() => {
+                let needed = magSize - ammoInMag;
+                let toReload = Math.min(needed, ammoReserve);
+                
+                ammoInMag += toReload;
+                ammoReserve -= toReload;
+                
+                isReloading = false;
+                showToast(t('reloaded_ready'), "#00ff00");
+            }, 1500);
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() === 'r') reload();
+            if (e.key.toLowerCase() === 'e') useEmergencyAmmo();
+            if (e.key.toLowerCase() === 's') killStrobe(); 
+        });
+
+        function activateSlowMo() {
+            isSlowMo = true;
+            showToast(t('slowmo_on'), "#ffcc00");
+            setTimeout(() => { isSlowMo = false; }, 5000); 
+        }
+
+        // --- DETALJERAD PROCEDUR-GENERERAD BRICKWALL (FÖRSVARS-MUR) FÖR DETEKTERING AV LIV (UPPDATERAD MELLAN 0 OCH 100 HP) ---
+        function drawDefenseWall() {
+            let wallHeight = 35;
+            let wallY = canvas.height - wallHeight;
+            
+            // Bakgrundsskugga för muren
+            ctx.fillStyle = "#110022";
+            ctx.fillRect(0, wallY, canvas.width, wallHeight);
+
+            if (currentHealth <= 0) {
+                // Helt förstörd mur (bara spillror och damm kvar)
+                ctx.fillStyle = "#2d1b3c";
+                for (let i = 0; i < canvas.width; i += 30) {
+                    let rubbleHeight = 5 + Math.sin(i) * 5;
+                    ctx.fillRect(i, canvas.height - rubbleHeight, 25, rubbleHeight);
+                }
+                return;
+            }
+
+            // Färg-tema baserat på skadegrad (5 unika visuella stadier)
+            let brickColor = "#73738c"; // 1. Perfekt grå (80-100 HP)
+            let strokeColor = "#39394d";
+            let crackIntensity = 0;
+
+            if (currentHealth <= 20) {
+                // 5. Bränd ruin (0-20 HP)
+                brickColor = "#421212"; 
+                strokeColor = "#1a0505";
+                crackIntensity = 50;
+            } else if (currentHealth <= 45) {
+                // 4. Kritiska sprickor och ras (21-45 HP)
+                brickColor = "#5e3e3e"; 
+                strokeColor = "#2d1c1c";
+                crackIntensity = 30;
+            } else if (currentHealth <= 65) {
+                // 3. Medium skadad mörkgrå (46-65 HP)
+                brickColor = "#4e4e5e"; 
+                strokeColor = "#252533";
+                crackIntensity = 15;
+            } else if (currentHealth <= 80) {
+                // 2. Lätt skadad mörkgrå (66-80 HP)
+                brickColor = "#62627a";
+                strokeColor = "#31313d";
+                crackIntensity = 5;
+            }
+
+            // Rita tegelstenarna
+            ctx.fillStyle = brickColor;
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 2;
+
+            let brickWidth = 50;
+            let rowHeight = 12;
+
+            for (let y = wallY; y < canvas.height; y += rowHeight) {
+                let offset = (y % (rowHeight * 2) === 0) ? 0 : brickWidth / 2;
+                for (let x = -brickWidth; x < canvas.width + brickWidth; x += brickWidth) {
+                    
+                    // Slumpmässigt hoppa över tegelstenar vid skador
+                    if (currentHealth <= 20 && (x + y) % 5 < 2) continue; // Många saknade block
+                    if (currentHealth <= 45 && (x + y) % 8 === 0) continue;
+                    if (currentHealth <= 65 && (x + y) % 15 === 0) continue;
+
+                    ctx.fillRect(x + offset, y, brickWidth - 2, rowHeight - 2);
+                    ctx.strokeRect(x + offset, y, brickWidth - 2, rowHeight - 2);
+                }
+            }
+
+            // Rita sprickor (Vektorsprickor)
+            if (crackIntensity > 0) {
+                ctx.strokeStyle = currentHealth <= 20 ? "#ff4444" : "#111119";
+                ctx.lineWidth = 2;
+                for (let i = 0; i < crackIntensity; i++) {
+                    let cx = (i * 97) % canvas.width;
+                    let cy = wallY + ((i * 23) % wallHeight);
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy);
+                    ctx.lineTo(cx + 8 + (i % 4), cy + 12);
+                    ctx.lineTo(cx - 3 + (i % 6), cy + 22);
+                    ctx.stroke();
+                }
+            }
+
+            // Rita eld och rök om muren är nere på sista HP-nivån (currentHealth <= 45)
+            if (currentHealth <= 45) {
+                let intensityMultiplier = currentHealth <= 20 ? 1.5 : 0.7;
+                ctx.fillStyle = currentHealth <= 20 ? "rgba(255, 30, 0, 0.5)" : "rgba(240, 100, 0, 0.3)";
+                for (let i = 0; i < canvas.width; i += 50) {
+                    let flameHeight = (12 + Math.sin(Date.now() / 120 + i) * 8) * intensityMultiplier;
+                    ctx.beginPath();
+                    ctx.moveTo(i, wallY);
+                    ctx.lineTo(i + 12, wallY - flameHeight);
+                    ctx.lineTo(i + 24, wallY);
+                    ctx.fill();
+                }
+                // Små glödande partiklar
+                ctx.fillStyle = "#ffcc00";
+                let particles = currentHealth <= 20 ? 20 : 8;
+                for (let i = 0; i < particles; i++) {
+                    let px = (Date.now() + i * 130) % canvas.width;
+                    let py = wallY - ((Date.now() / 4 + i * 40) % 40);
+                    ctx.fillRect(px, py, 3, 3);
+                }
+            }
+        }
+
+        // --- HUVUDLOOP FÖR RÖRELSE (MED UNIKA MÖNSTER FÖR NYA FIENDER) ---
+        function update() {
+            if (gameState === 'PLAYING') {
+                handleGamepad(); 
+
+                // Fienderna stoppas och gör skada precis vid muren
+                let wallHeight = 35;
+                let wallY = canvas.height - wallHeight;
+
+                enemies.forEach((en, i) => {
+                    let currentSpeed = isSlowMo ? en.speed * 0.3 : en.speed;
+
+                    // Unika rörelsemönster per typ
+                    if (en.type === 'ghost') {
+                        // Sicksack horisontellt (sinuskurva) på väg ner
+                        en.y += currentSpeed;
+                        en.x += Math.sin((Date.now() - en.spawnTime) / 180) * 4;
+                        // Håll inom ramen
+                        if (en.x < 0) en.x = 0;
+                        if (en.x > canvas.width - en.size) en.x = canvas.width - en.size;
+                    } 
+                    else if (en.type === 'glitch') {
+                        // Supersnabb + slumpmässiga teleporteringar i sidled (glitches)
+                        en.y += currentSpeed * 1.2;
+                        if (Math.random() < 0.04) {
+                            en.x += (Math.random() - 0.5) * 80;
+                        }
+                        if (en.x < 0) en.x = 0;
+                        if (en.x > canvas.width - en.size) en.x = canvas.width - en.size;
+                    } 
+                    else {
+                        // Vanlig spik rakt ner
+                        en.y += currentSpeed;
+                    }
+
+                    // Om fienden når försvarsmuren
+                    if (en.y > wallY - 20) {
+                        const isSafe = ['life', 'slowmo', 'ammo_box', 'star', '2x', 'nuke'].includes(en.type);
+                        
+                        if (!isSafe && !isInvincible) {
+                            // Olika mycket skada beroende på fiendetyp
+                            let damage = 15; // standard
+                            if (en.type === 'tank') damage = 35; // Mycket farlig jätte!
+                            else if (en.type === 'bomb') damage = 20;
+                            else if (en.type === 'glitch') damage = 10;
+                            else if (en.type === 'ghost') damage = 15;
+                            else if (en.type === 'armored') damage = 20;
+
+                            currentHealth -= damage;
+                            playSnd(sndBoop);
+                            updateHealthBarUI();
+                            
+                            if (currentHealth <= 0) endGame();
+                        }
+                        enemies.splice(i, 1); 
+                    }
+                });
+            }
+        }
+
+        // --- RITA ALL GRAPHICS (CANVAS-MOTOR MED NYA FIENDER) ---
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (gameState === 'GAMEOVER_ANIMATION') {
+                ctx.fillStyle = Math.random() > 0.5 ? "white" : "orange";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                return; 
+            }    
+
+            if (isInvincible) {
+                ctx.fillStyle = `hsla(${Date.now() % 360}, 70%, 50%, 0.15)`;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
+            if (gameState === 'PLAYING') {
+                enemies.forEach(en => {
+                    if (en.type === 'ammo_box') {
+                        ctx.fillStyle = "#00ccff";
+                        ctx.fillRect(en.x, en.y, en.size, en.size);
+                        ctx.fillStyle = "white";
+                        ctx.font = "bold 14px Arial";
+                        ctx.textAlign = "center";
+                        ctx.fillText("AMMO", en.x + en.size/2, en.y + en.size/2 + 5);
+                    } 
+                    else if (en.type === 'star') {
+                        if (imgStar.complete) {
+                            ctx.drawImage(imgStar, en.x, en.y, en.size, en.size);
+                        } else {
+                            ctx.fillStyle = "yellow";
+                            ctx.fillRect(en.x, en.y, en.size, en.size);
+                        }
+                    }
+                    else if (en.type === '2x') {
+                        ctx.fillStyle = "#00ff00";
+                        ctx.font = "bold 28px Luckiest Guy";
+                        ctx.textAlign = "center";
+                        ctx.fillText("2X", en.x + en.size/2, en.y + en.size/2 + 10);
+                    } 
+                    else if (en.type === 'nuke') {
+                        ctx.fillStyle = "yellow";
+                        ctx.beginPath();
+                        ctx.moveTo(en.x, en.y + en.size);
+                        ctx.lineTo(en.x + en.size/2, en.y);
+                        ctx.lineTo(en.x + en.size, en.y + en.size);
+                        ctx.fill();
+                        ctx.fillStyle = "black";
+                        ctx.font = "20px Arial";
+                        ctx.fillText("☢️", en.x + en.size/2 - 10, en.y + en.size - 10);
+                    }
+                    // --- NY FIENDE: GHOST ---
+                    else if (en.type === 'ghost') {
+                        ctx.save();
+                        ctx.globalAlpha = 0.75;
+                        ctx.fillStyle = "#9d4edd";
+                        // Spöke kropp
+                        ctx.beginPath();
+                        ctx.arc(en.x + en.size/2, en.y + en.size/3, en.size/3, Math.PI, 0, false);
+                        ctx.lineTo(en.x + en.size*0.8, en.y + en.size);
+                        ctx.lineTo(en.x + en.size*0.6, en.y + en.size*0.8);
+                        ctx.lineTo(en.x + en.size*0.5, en.y + en.size);
+                        ctx.lineTo(en.x + en.size*0.4, en.y + en.size*0.8);
+                        ctx.lineTo(en.x + en.size*0.2, en.y + en.size);
+                        ctx.closePath();
+                        ctx.fill();
+                        // Lysande onda ögon
+                        ctx.fillStyle = "red";
+                        ctx.beginPath();
+                        ctx.arc(en.x + en.size*0.4, en.y + en.size/3, 4, 0, Math.PI*2);
+                        ctx.arc(en.x + en.size*0.6, en.y + en.size/3, 4, 0, Math.PI*2);
+                        ctx.fill();
+                        ctx.restore();
+                    }
+                    // --- NY FIENDE: GLITCH ---
+                    else if (en.type === 'glitch') {
+                        ctx.fillStyle = Math.random() > 0.5 ? "#00ffcc" : "#ff007f";
+                        ctx.fillRect(en.x, en.y, en.size, en.size);
+                        // Ränder/scanlines för glitchy effekt
+                        ctx.fillStyle = "#ffffff";
+                        ctx.fillRect(en.x - 5, en.y + en.size/3, en.size + 10, 3);
+                        ctx.fillRect(en.x + 5, en.y + en.size*0.7, en.size - 10, 2);
+                    }
+                    // --- NY FIENDE: TANK ---
+                    else if (en.type === 'tank') {
+                        ctx.fillStyle = "#2a2d34";
+                        ctx.strokeStyle = "#ffcc00";
+                        ctx.lineWidth = 3;
+                        // Stor robust sten
+                        ctx.beginPath();
+                        ctx.moveTo(en.x, en.y + en.size*0.2);
+                        ctx.lineTo(en.x + en.size*0.5, en.y);
+                        ctx.lineTo(en.x + en.size, en.y + en.size*0.2);
+                        ctx.lineTo(en.x + en.size*0.9, en.y + en.size*0.9);
+                        ctx.lineTo(en.x + en.size*0.1, en.y + en.size*0.9);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.stroke();
+                        // Skriv HP kvar på stenen
+                        ctx.fillStyle = "yellow";
+                        ctx.font = "bold 20px Montserrat";
+                        ctx.textAlign = "center";
+                        ctx.fillText(en.hp, en.x + en.size/2, en.y + en.size/2 + 10);
+                    }
+                    else {
+                        let img = imgWeight;
+                        if (en.type === 'bomb') img = imgBomb;
+                        else if (en.type === 'life') img = imgHeartFull;
+                        else if (en.type === 'slowmo') img = imgSlowMo;
+                        else if (en.type === 'armored') {
+                            const armorStage = [imgP3, imgP2, imgP1];
+                            img = armorStage[en.hp - 1] || imgP1;
+                        }
+
+                        if (img && img.complete) {
+                            ctx.drawImage(img, en.x, en.y, en.size, en.size);
+                        } else {
+                            // Fallback-färger vid laddningsfel lokalt
+                            ctx.fillStyle = en.type === 'life' ? 'red' : (en.type === 'bomb' ? '#ff3300' : '#444');
+                            ctx.fillRect(en.x, en.y, en.size, en.size);
+                        }
+                    }
+                });
+
+                // Rita sikten
+                drawSight(p1);
+                if (p2.active) drawSight(p2);
+
+                // RITA PROCEDUR-MUREN LÄNGST NER (Ersätter de gamla hjärtana)
+                drawDefenseWall();
+
+                if (isTransitioning) {
+                    drawText("WAVE COMPLETE!", canvas.height/2, 60, "yellow");
+                }
+
+            } else if (gameState === 'GAMEOVER') {
+                ctx.fillStyle = "rgba(0,0,0,0.85)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                drawText("MISSION FAILED", canvas.height/2 - 40, 70, "red");
+                drawText(`SCORE: ${score}`, canvas.height/2 + 40, 40, "white");
+            }
+
+            if (gameState === 'START') {
+                drawText("THE BOSS: BASE DEFENSE", canvas.height / 2 - 40, 60, "#ffcc00");
+                drawText("CLICK TO BEGIN", canvas.height / 2 + 40, 30, "lime");
+            }
+
+            if (gameState !== 'LOCKDOWN') {
+                update();
+                requestAnimationFrame(draw);
+            }
+        }
+
+        function triggerStrobe() {
+            if (strobeActive) return;
+            strobeActive = true;
+            document.getElementById('strobe-overlay').classList.add('strobe-attack');
+            setTimeout(() => { killStrobe(); }, 1000); 
+        }
+
+        // Släck blinkljusen
+        function killStrobe() {
+            strobeActive = false;
+            const overlay = document.getElementById('strobe-overlay');
+            if (overlay) {
+                overlay.classList.remove('strobe-attack');
+            }
+        }
+
+        // --- KAMEK SLUMPMÄSSIGT STROBOSKOPHAT (MAYHEM) ---
+        function startRandomStrobeTimer() {
+            setInterval(() => {
+                if (gameState === 'PLAYING' && !strobeActive) {
+                    if (Math.random() < 0.10) {
+                        triggerRandomMayhemStrobe();
+                    }
+                }
+            }, 3000);
+        }
+
+        function triggerRandomMayhemStrobe() {
+            strobeActive = true;
+            const overlay = document.getElementById('strobe-overlay');
+            if (overlay) overlay.classList.add('strobe-attack');
+            let duration = 1500 + Math.random() * 1500;
+            setTimeout(() => { if (strobeActive) { killStrobe(); } }, duration);
+        }
+        startRandomStrobeTimer();
+
+        function useEmergencyAmmo() {
+            if (ammoInMag === 0 && ammoReserve === 0 && emergencyAmmoBoxes > 0) {
+                emergencyAmmoBoxes--;
+                ammoReserve += 15; 
+                showToast(t('emergency_ammo_used').replace('{count}', emergencyAmmoBoxes), "#ffcc00");
+                playSnd(sndPling);
+                updateAmmoUI();
+            } else if (emergencyAmmoBoxes === 0 && ammoInMag === 0 && ammoReserve === 0) {
+                showToast(t('no_emergency_boxes'), "#ff0000");
+            }
+        }
+
+        function toggleInstructions(show) {
+            const modal = document.getElementById('instructions-modal');
+            if (modal) {
+                modal.style.display = show ? 'block' : 'none';
+            }
+        }
+
+        function closeInstructions() {
+            toggleInstructions(false);
+        }
+
+        // --- STYRNING VIA GAMEPAD ---
+        function handleGamepad() {
+            const gps = navigator.getGamepads();
+            
+            [0, 1].forEach(index => {
+                if (gps[index]) {
+                    const gp = gps[index];
+                    let p = (index === 0) ? p1 : p2;
+
+                    if (Math.abs(gp.axes[0]) > 0.1) p.x += gp.axes[0] * 15;
+                    if (Math.abs(gp.axes[1]) > 0.1) p.y += gp.axes[1] * 15;
+
+                    if ((gp.buttons[0].pressed || gp.buttons[7].pressed) && !p.isShooting) {
+                        shoot(p);
+                        p.isShooting = true;
+                        setTimeout(() => { p.isShooting = false; }, 150); 
+                    }
+
+                    if (gp.buttons[2].pressed) {
+                        reload();
+                    }
+                    if (gp.buttons[1].pressed || gp.buttons[3].pressed) { 
+                        killStrobe();
+                    }
+
+                    if (gp.buttons[9].pressed || gp.buttons[8].pressed) {
+                        triggerLockdown(t('pause_lockdown'));
+                    }
+                }
+            });
+
+            const ammoEl = document.getElementById('ammo-display');
+            if (ammoEl) {
+                ammoEl.innerText = `${ammoInMag} / ${ammoReserve}`;
+            }
+        }
+
+        // Ritfunktion
+        function drawText(tStr, y, s, c) {
+            ctx.fillStyle = c; 
+            ctx.textAlign = "center";
+            ctx.font = s + "px 'Luckiest Guy'";
+            ctx.strokeStyle = "black"; 
+            ctx.lineWidth = 4;
+            ctx.strokeText(tStr, canvas.width/2, y);
+            ctx.fillText(tStr, canvas.width/2, y);
+        }
+
+        function drawSight(p) {
+            const isOverTarget = enemies.some(en => 
+                p.x > en.x && p.x < en.x + en.size && 
+                p.y > en.y && p.y < en.y + en.size
+            );
+
+            ctx.strokeStyle = isOverTarget ? "red" : p.color; 
+            ctx.lineWidth = 5;
+            ctx.beginPath(); 
+            ctx.arc(p.x, p.y, 25, 0, Math.PI*2);
+            ctx.moveTo(p.x-40, p.y); ctx.lineTo(p.x+40, p.y);
+            ctx.moveTo(p.x, p.y-40); ctx.lineTo(p.x, p.y+40); 
+            ctx.stroke();
+        }
+
+        function nextWave() {
+            isTransitioning = true;
+            wave++; 
+            enemiesPerWave += 8; // Ökat från +5 till +8 fiender mer per våg!
+            const waveEl = document.getElementById('wave-display');
+            if (waveEl) waveEl.innerText = "WAVE " + wave;
+            setTimeout(() => { isTransitioning = false; spawnEnemy(); }, 2000);
+        }
+
+        function getMockery(finalScore) {
+            const nameInput = document.getElementById('playerName');
+            if (nameInput && nameInput.value.toLowerCase() === "psl631") {
+                showToast(t('gold_transferred'), "gold");
+                return t('mock_legendary');
+            }
+
+            if (finalScore < 1000) return t('mock_0');
+            if (finalScore < 3000) return t('mock_1');
+            if (finalScore < 7000) return t('mock_2');
+            if (finalScore < 15000) return t('mock_3');
+            if (finalScore < 30000) return t('mock_4');
+            return t('mock_5');
+        }
+
+        function endGame() {
+            gameState = 'GAMEOVER';
+            
+            const sadTrombone = new Audio('f6_sad_trombone.mp3');
+            sadTrombone.volume = sfxVolume;
+            sadTrombone.play().catch(()=>{});
+            
+            const rating = getMockery(score);
+            saveHighScore(currentPlayerName, score);
+            
+            setTimeout(() => {
+                showToast(`RESULTAT: ${rating}`, "#ffcc00");
+            }, 500);
+
+            setTimeout(() => {
+                const startScreen = document.getElementById('start-screen');
+                if (startScreen) {
+                    startScreen.style.display = 'block';
+                    updateLeaderboardUI();
+                }
+            }, 4000);
+        }
+
+        // --- LOCAL STORAGE HIGH SCORE & RESTORED WIDGET ---
+        function saveHighScore(name, newScore) {
+            let scores = JSON.parse(safeStorage.getItem('baseDefenseHighScores')) || [];
+            scores.push({ name: name, score: newScore });
+            scores.sort((a, b) => b.score - a.score);
+            scores = scores.slice(0, 5);
+            safeStorage.setItem('baseDefenseHighScores', JSON.stringify(scores));
+            updateLeaderboardUI();
+        }
+
+        // Återskapad funktion för att förhindra ReferenceError vid laddning
+        function updateLeaderboardUI() {
+            const body = document.getElementById('leaderboard-body');
+            if (!body) return;
+            
+            const scores = JSON.parse(safeStorage.getItem('baseDefenseHighScores')) || [];
+            body.innerHTML = ""; 
+
+            if (scores.length === 0) {
+                body.innerHTML = "<tr><td colspan='3'>INGA POÄNG ÄN!</td></tr>";
+                return;
+            }
+
+            scores.forEach((s, index) => {
+                const row = `<tr>
+                    <td>#${index + 1}</td>
+                    <td>${s.name}</td>
+                    <td>${s.score}</td>
+                </tr>`;
+                body.innerHTML += row;
+            });
+        }
+
+        // --- TRACKPAD OCH MUSKRAV ---
+        window.addEventListener('wheel', (e) => {
+            const isTrackpad = !Number.isInteger(e.deltaY) || (Math.abs(e.deltaY) > 0 && Math.abs(e.deltaY) < 20);
+            const isGameRunning = (typeof gameState !== 'undefined' && gameState === 'PLAYING');
+
+            if (isTrackpad && isGameRunning) {
+                const mockery = t('trackpad_lockdown');
+                triggerLockdown(mockery);
+            }
+        }, { passive: false });
+
+        // --- SENSORER OCH MONITORERING ---
+        var kamekStrikes = 0;
+        var kamekForbidden = ["fan", "jävla", "skit", "helvete", "jävlar", "skitstövel", "idiot", "fuck", "shit", "damn", "bitch"];
+
+        async function initKamekMedia(useCam, useMic) {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: useCam, audio: useMic });
+                
+                if (useCam) {
+                    const v = document.getElementById('kamek-video');
+                    v.srcObject = stream;
+                    v.style.display = 'block';
+                    document.getElementById('kamek-cam-off').style.display = 'none';
+                    document.getElementById('kamek-rec-dot').style.display = 'block';
+                }
+                
+                if (useMic) {
+                    document.getElementById('kamek-mic-widget').style.display = 'flex';
+                    setupKamekVisualizer(stream);
+                    setupKamekEar();
+                }
+
+                showToast(t('sensors_activated'), "var(--primary)");
+            } catch (e) {
+                showToast(t('sensors_denied'), "var(--danger)");
+            }
+        }
+
+        function setupKamekVisualizer(stream) {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const src = audioCtx.createMediaStreamSource(stream);
+            const ana = audioCtx.createAnalyser();
+            ana.fftSize = 32;
+            src.connect(ana);
+            const data = new Uint8Array(ana.frequencyBinCount);
+            const bars = document.querySelectorAll('.k-bar');
+
+            function drawMic() {
+                ana.getByteFrequencyData(data);
+                bars.forEach((b, i) => {
+                    let h = Math.max(4, (data[i]/255)*25);
+                    b.style.height = h + "px";
+                    b.style.background = data[i] > 200 ? "red" : "#00ccff";
+                });
+                requestAnimationFrame(drawMic);
+            }
+            drawMic();
+        }
+
+        function setupKamekEar() {
+            const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!Speech) return;
+            const rec = new Speech();
+            rec.continuous = true; 
+            rec.lang = 'sv-SE';
+            rec.onresult = (e) => {
+                const txt = e.results[e.results.length-1][0].transcript.toLowerCase();
+                if (kamekForbidden.some(w => txt.includes(w))) {
+                    kamekStrikes++;
+                    if (kamekStrikes < 3) showToast(t('toxic_warning').replace('#X', kamekStrikes), "red");
+                    else kamekPurpleLockdown();
+                }
+            };
+            rec.start();
+        }
+
+        function kamekPurpleLockdown() {
+            if (window.stop) window.stop();
+            document.body.innerHTML = `
+                <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#1a0033;display:flex;flex-direction:column;justify-content:center;align-items:center;color:white;font-family:Arial;border:15px double #8200ff;box-sizing:border-box;z-index:1000000;">
+                    <h1 style="font-family:'Luckiest Guy';font-size:50px;color:#ffcc00;margin:20px 0;">${t('toxic_lockdown_title')}</h1>
+                    <div style="background:rgba(0,0,0,0.5);padding:30px;border-radius:20px;border:1px dashed #8200ff;">
+                        <p style="font-size:35px;font-style:italic;">${t('toxic_lockdown_desc')}</p>
+                    </div>
+                    <p style="margin-top:40px;color:#8200ff;font-family:monospace;font-weight:bold;">SYSTEM_ERROR: TOXIC_OPERATOR_DETECTED</p>
+                    <button onclick="window.location.reload()" style="margin-top:20px;padding:10px 30px;font-family:'Luckiest Guy';cursor:pointer;background:#ffcc00;border:none;border-radius:10px;">${t('retry_btn')}</button>
+                </div>`;
+        }
+
+        // --- KAMEK DATOR- & PRESTANDAMONITORERING (HARDCORE KRAV) ---
+        var lastExecutionTime = Date.now();
+        var stressLevel = 0;
+
+        function monitorCPULoad() {
+            var now = Date.now();
+            var delta = now - lastExecutionTime;
+            lastExecutionTime = now;
+
+            if (delta > 200 && gameState === 'PLAYING') {
+                stressLevel++;
+                if (stressLevel >= 3) {
+                    triggerLockdown(t('thermal_throttle'));
+                }
+            } else {
+                if (stressLevel > 0) stressLevel -= 0.01;
+            }
+            requestAnimationFrame(monitorCPULoad);
+        }
+        monitorCPULoad();
+
+        // --- ENHETSIDENTIFIERARE & BLOCKERING (PC/DESKTOP ENDAST - RETROKRAV) ---
+        window.__currentLockedDevice = null;
+        function triggerDeviceLockdown(deviceType) {
+            window.__currentLockedDevice = deviceType;
+            gameState = 'LOCKDOWN';
+            const overlay = document.getElementById('device-lockdown-overlay');
+            if (overlay) {
+                overlay.style.display = 'flex';
+                const msgTag = document.getElementById('device-lockdown-msg');
+                if (msgTag) {
+                    msgTag.innerHTML = t('device_' + deviceType).replace(/\n/g, "<br>");
+                }
+                playSnd(sndKamek);
+            }
+        }
+        window.triggerDeviceLockdown = triggerDeviceLockdown;
+
+        // --- DYNAMISK SYSTEMANALYS KONTROLL VID UPPSTART (NYHET) ---
+        function runDiagnosticChecks() {
+            // Sätt översättningar för analysskärmen direkt baserat på språk
+            document.getElementById('diag-ram').innerHTML = t('diag_ram');
+            document.getElementById('diag-cpu').innerHTML = t('diag_cpu');
+            document.getElementById('diag-os').innerHTML = t('diag_os');
+            document.getElementById('diag-disk').innerHTML = t('diag_disk');
+
+            let ua = navigator.userAgent;
+            let w = window.innerWidth || document.documentElement.clientWidth;
+            let h = window.innerHeight || document.documentElement.clientHeight;
+
+            // Fas 1: RAM-minne
+            setTimeout(() => {
+                let ramOk = true;
+                // navigator.deviceMemory rapporterar RAM i GB. Vi kräver minst 4.
+                if (navigator.deviceMemory && navigator.deviceMemory < 4) {
+                    ramOk = false;
+                }
+                
+                if (!ramOk) {
+                    document.getElementById('diag-ram').innerHTML = t('diag_ram') + " <span style='color:red; font-weight:bold;'>" + t('diag_fail') + "</span>";
+                    setTimeout(() => triggerDeviceLockdown("hw_ram_fail"), 1000);
+                    return;
+                } else {
+                    document.getElementById('diag-ram').innerHTML = t('diag_ram') + " <span style='color:#00ff00; font-weight:bold;'>" + t('diag_ok') + "</span>";
+                    document.getElementById('diag-cpu').style.display = "block";
+                }
+
+                // Fas 2: Processorkärnor
+                setTimeout(() => {
+                    let cpuOk = true;
+                    // Vi kräver minst 4 kärnor (motsvarar modern i5/Ryzen 5 trådnivå)
+                    if (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4) {
+                        cpuOk = false;
+                    }
+
+                    if (!cpuOk) {
+                        document.getElementById('diag-cpu').innerHTML = t('diag_cpu') + " <span style='color:red; font-weight:bold;'>" + t('diag_fail') + "</span>";
+                        setTimeout(() => triggerDeviceLockdown("hw_cpu_cores_fail"), 1000);
+                        return;
+                    } else {
+                        document.getElementById('diag-cpu').innerHTML = t('diag_cpu') + " <span style='color:#00ff00; font-weight:bold;'>" + t('diag_ok') + "</span>";
+                        document.getElementById('diag-os').style.display = "block";
+                    }
+
+                    // Fas 3: OS Arkitektur och Platsförbud (Linux, ChromeOS, old Windows/Mac)
+                    setTimeout(() => {
+                        let osType = "desktop";
+                        if (w < 280 || h < 280 || /Watch|WearOS|Pebble|Gear/i.test(ua)) {
+                            osType = "smartwatch";
+                        } else if (/Refrigerator|SmartFridge|LG\s?Fridge|Samsung\s?Fridge|ScreeneFridge/i.test(ua)) {
+                            osType = "refrigerator";
+                        } else if (/Tesla|Model\s(S|3|X|Y)|CarPlay|Android\s?Auto/i.test(ua)) {
+                            osType = "car";
+                        } else if (/Nest|Echo\s?Show|Portal|SmartHome|HomeHub|Google\s?Home/i.test(ua)) {
+                            osType = "smarthome";
+                        } else if (/SmartTV|AppleTV|GoogleTV|Roku|HbbTV|Opera\s?TV|NetCast|Tizen|Web0S|Viera|CastJS|AFTB|AFTN|DLNA|Leanback/i.test(ua)) {
+                            osType = "smarttv";
+                        } else if (/Xbox|PlayStation|Nintendo|Switch|Wii/i.test(ua)) {
+                            osType = "console";
+                        } else if (/iPad|PlayBook|Kindle|Silk/i.test(ua) || (/Android/i.test(ua) && !/Mobile/i.test(ua))) {
+                            osType = "tablet";
+                        } else if (/Mobile|iPhone|Android|Windows\sPhone|Opera\sMobi|BlackBerry/i.test(ua)) {
+                            osType = "mobile";
+                        }
+
+                        if (osType !== "desktop") {
+                            document.getElementById('diag-os').innerHTML = t('diag_os') + " <span style='color:red; font-weight:bold;'>" + t('diag_fail') + "</span>";
+                            setTimeout(() => triggerDeviceLockdown(osType), 1000);
+                            return;
+                        }
+
+                        // Linux blockering
+                        if (/Linux/i.test(ua) && !/Android|CrOS|SteamOS/i.test(ua)) {
+                            if (/Steam/i.test(ua)) {
+                                document.getElementById('diag-os').innerHTML = t('diag_os') + " <span style='color:red; font-weight:bold;'>" + t('diag_fail') + "</span>";
+                                setTimeout(() => triggerDeviceLockdown("hw_os_steamos"), 1000);
+                                return;
+                            }
+                            document.getElementById('diag-os').innerHTML = t('diag_os') + " <span style='color:red; font-weight:bold;'>" + t('diag_fail') + "</span>";
+                            setTimeout(() => triggerDeviceLockdown("hw_os_linux"), 1000);
+                            return;
+                        }
+
+                        // ChromeOS blockering
+                        if (/CrOS/i.test(ua)) {
+                            document.getElementById('diag-os').innerHTML = t('diag_os') + " <span style='color:red; font-weight:bold;'>" + t('diag_fail') + "</span>";
+                            setTimeout(() => triggerDeviceLockdown("hw_os_chromeos"), 1000);
+                            return;
+                        }
+
+                        // SteamOS blockering
+                        if (/SteamOS/i.test(ua) || /Steam/i.test(ua)) {
+                            document.getElementById('diag-os').innerHTML = t('diag_os') + " <span style='color:red; font-weight:bold;'>" + t('diag_fail') + "</span>";
+                            setTimeout(() => triggerDeviceLockdown("hw_os_steamos"), 1000);
+                            return;
+                        }
+
+                        // Gammalt Windows blockering (< Windows 10)
+                        if (/Windows NT/i.test(ua)) {
+                            let winVerMatch = ua.match(/Windows NT (\d+\.\d+)/);
+                            if (winVerMatch) {
+                                let winVer = parseFloat(winVerMatch[1]);
+                                if (winVer < 10.0) {
+                                    document.getElementById('diag-os').innerHTML = t('diag_os') + " <span style='color:red; font-weight:bold;'>" + t('diag_fail') + "</span>";
+                                    setTimeout(() => triggerDeviceLockdown("hw_os_old_windows"), 1000);
+                                    return;
+                                }
+                            }
+                        }
+
+                        // Gammalt macOS blockering (< macOS 15 Sequoia)
+                        if (/Macintosh|Mac OS X/i.test(ua)) {
+                            let macVerMatch = ua.match(/Mac OS X (\d+)[_.](\d+)(?:[_.](\d+))?/);
+                            if (macVerMatch) {
+                                let major = parseInt(macVerMatch[1], 10);
+                                let minor = parseInt(macVerMatch[2], 10);
+                                if ((major === 10 && minor < 15) || (major > 10 && major < 15)) {
+                                    document.getElementById('diag-os').innerHTML = t('diag_os') + " <span style='color:red; font-weight:bold;'>" + t('diag_fail') + "</span>";
+                                    setTimeout(() => triggerDeviceLockdown("hw_os_old_mac"), 1000);
+                                    return;
+                                }
+                            }
+                        }
+
+                        // OS-kontroll godkänd
+                        document.getElementById('diag-os').innerHTML = t('diag_os') + " <span style='color:#00ff00; font-weight:bold;'>" + t('diag_ok') + "</span>";
+                        document.getElementById('diag-disk').style.display = "block";
+
+                        // Fas 4: HDD Lagringsutrymme (Minst 4GB ledigt)
+                        setTimeout(() => {
+                            if (navigator.storage && navigator.storage.estimate) {
+                                navigator.storage.estimate().then(estimate => {
+                                    let freeSpaceGB = (estimate.quota - estimate.usage) / (1024 * 1024 * 1024);
+                                    if (freeSpaceGB < 4) {
+                                        document.getElementById('diag-disk').innerHTML = t('diag_disk') + " <span style='color:red; font-weight:bold;'>" + t('diag_fail') + "</span>";
+                                        setTimeout(() => triggerDeviceLockdown("hw_storage_fail"), 1000);
+                                    } else {
+                                        document.getElementById('diag-disk').innerHTML = t('diag_disk') + " <span style='color:#00ff00; font-weight:bold;'>" + t('diag_ok') + "</span>";
+                                        setTimeout(() => {
+                                            // Dölj diagnostikskärmen och visa spelet!
+                                            document.getElementById('diagnostic-screen').style.display = 'none';
+                                        }, 600);
+                                    }
+                                }).catch(() => {
+                                    // Fallback om estimate blockeras av iframens sandlåda
+                                    document.getElementById('diag-disk').innerHTML = t('diag_disk') + " <span style='color:#00ff00; font-weight:bold;'>" + t('diag_ok') + "</span>";
+                                    setTimeout(() => {
+                                        document.getElementById('diagnostic-screen').style.display = 'none';
+                                    }, 600);
+                                });
+                            } else {
+                                document.getElementById('diag-disk').innerHTML = t('diag_disk') + " <span style='color:#00ff00; font-weight:bold;'>" + t('diag_ok') + "</span>";
+                                setTimeout(() => {
+                                    document.getElementById('diagnostic-screen').style.display = 'none';
+                                }, 600);
+                            }
+                        }, 400);
+
+                    }, 400);
+
+                }, 400);
+
+            }, 400);
+        }
+
+        // --- INTERNA LJUD- & RADIOREGLAGE (INTEGRATION MED MODAL) ---
+        window.setMusicVolume = (val) => {
+            musicVolume = val / 100;
+            const textVal = document.getElementById('music-vol-val');
+            if (textVal) textVal.textContent = val + '%';
+            if (backgroundMusic) {
+                backgroundMusic.volume = musicVolume;
+            }
+        };
+
+        window.setSFXVolume = (val) => {
+            sfxVolume = val / 100;
+            const textVal = document.getElementById('sfx-vol-val');
+            if (textVal) textVal.textContent = val + '%';
+        };
+
+        // Exponera alla globala popup- och spelfunktioner på window-objektet för full sandlåde-kompatibilitet
+        let configCam = false;
+        let configMic = false;
+
+        function toggleMediaState(type) {
+            if (type === 'cam') {
+                configCam = !configCam;
+                var btn = document.getElementById('toggle-cam');
+                var status = document.getElementById('status-cam');
+                btn.className = configCam ? 'btn-toggle btn-on' : 'btn-toggle btn-off';
+                status.innerText = configCam ? t('on') : t('off');
+            } else {
+                configMic = !configMic;
+                var btn = document.getElementById('toggle-mic');
+                var status = document.getElementById('status-mic');
+                btn.className = configMic ? 'btn-toggle btn-on' : 'btn-toggle btn-off';
+                status.innerText = configMic ? t('on') : t('off');
+            }
+        }
+
+        function openMediaPopup() {
+            // Synka musik-knappen i modalen vid öppning
+            const modalBtn = document.getElementById('modal-toggle-music');
+            if (modalBtn) {
+                modalBtn.textContent = isMusicMuted ? t('off') : t('on');
+                modalBtn.className = isMusicMuted ? "btn-toggle btn-off" : "btn-toggle btn-on";
+            }
+            // Synka sliders vid öppning
+            const mSlider = document.getElementById('music-volume-slider');
+            if (mSlider) mSlider.value = musicVolume * 100;
+            const mValText = document.getElementById('music-vol-val');
+            if (mValText) mValText.textContent = (musicVolume * 100) + '%';
+
+            const sSlider = document.getElementById('sfx-volume-slider');
+            if (sSlider) sSlider.value = sfxVolume * 100;
+            const sValText = document.getElementById('sfx-vol-val');
+            if (sValText) sValText.textContent = (sfxVolume * 100) + '%';
+
+            document.getElementById('media-modal-overlay').style.display = 'flex';
+        }
+
+        function closeMediaPopup() {
+            document.getElementById('media-modal-overlay').style.display = 'none';
+        }
+
+        async function confirmAndStart() {
+            if (!configCam && !configMic) {
+                if (!confirm(t('no_media_confirm'))) return;
+            }
+            initKamekMedia(configCam, configMic);
+            closeMediaPopup();
+        }
+
+        // --- STARTA SPELET (LOBBY TRIGGER) ---
+        function startGame() {
+            const docElm = document.documentElement;
+            if (docElm.requestFullscreen) {
+                docElm.requestFullscreen().catch(() => {});
+            }
+
+            const nameInput = document.getElementById('playerName');
+            currentPlayerName = nameInput.value.trim() || "Gäst";
+
+            const startScreen = document.getElementById('start-screen');
+            if (startScreen) startScreen.style.display = 'none';
+
+            gameState = 'PLAYING';
+            score = 0; 
+            currentHealth = 100; // Reset till 100 HP
+            wave = 1; 
+            enemies = []; 
+            spawnedThisWave = 0;
+            enemiesPerWave = 15; // Börjar nu på 15 för högre intensivitet
+            
+            const scoreEl = document.getElementById('score');
+            if (scoreEl) scoreEl.innerText = score;
+            
+            ammoInMag = magSize;
+            ammoReserve = 40;
+            updateAmmoUI();
+            updateHealthBarUI();
+
+            startStationRadio();
+            spawnEnemy();
+            showToast(t('good_luck').replace('{name}', currentPlayerName.toUpperCase()), "lime");
+        }
+
+        // Registrera alla viktiga anrop på fönster-nivå
+        window.startGame = startGame;
+        window.toggleInstructions = toggleInstructions;
+        window.closeInstructions = closeInstructions;
+        window.openMediaPopup = openMediaPopup;
+        window.closeMediaPopup = closeMediaPopup;
+        window.toggleMediaState = toggleMediaState;
+        window.confirmAndStart = confirmAndStart;
+        window.toggleMusic = toggleMusic;
+
+        // Starta systemet när hela DOM:en har utvärderats
+        window.onload = function() {
+            initializeUIText();
+            runDiagnosticChecks(); // Kör enhets-, hårdvaru- och OS-analysen direkt vid uppstart!
+            updateLeaderboardUI();
+            updateHealthBarUI();
+            draw();
+        };
+    </script>
+</body>
+</html>

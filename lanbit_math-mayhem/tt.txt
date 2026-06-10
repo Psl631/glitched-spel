@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Station 24 - Math Mayhem ULTRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
+<script>
+// --- TOTAL BLOCKERING FÖR INTERNET EXPLORER ---
+(function() {
+    // Kontrollera om webbläsaren är IE eller saknar stöd för moderna funktioner
+    var isIE = !!document.documentMode;
+    var supportsModern = typeof window.Promise !== "undefined";
+
+    if (isIE || !supportsModern) {
+        // Vi bygger strängen manuellt utan backticks (``) eller const/let
+        var h = "";
+        h += '<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#8b0000;color:#fff;z-index:999999;display:block;text-align:center;padding-top:100px;font-family:sans-serif;">';
+        h += '<h1 style="font-size:50px;color:#ffcc00;">⚠ STOPP! ⚠</h1>';
+        h += '<p style="font-size:24px;">DIN WEBBLÄSARE STÖDS EJ.</p>';
+        h += '<p style="max-width:600px;margin:20px auto;">Detta spel kräver en modern webbläsare som Chrome, Edge eller Firefox för att fungera korrekt och säkert.</p>';
+        h += '</div>';
+        
+        // document.write är det enda som kan stoppa IE i tid
+        document.write(h); 
+        
+        // Försök stoppa all vidare exekvering av skript
+        if (window.stop) window.stop(); 
+        document.execCommand("Stop");
+        
+        // Kasta ett fel för att döda alla andra skript på sidan
+        throw new Error("Application halted: Legacy browser.");
+    }
+})();
+</script>
+    <style>
+        html, body {
+            margin: 0; padding: 0; min-height: 100vh;
+            background-image: url('lanbit_bg.jfif'); background-size: cover;
+            background-position: center; background-attachment: fixed;
+            font-family: 'Luckiest Guy', cursive; color: white;
+            display: flex; flex-direction: column; align-items: center;
+            overflow: hidden; transition: background-color 0.2s;
+        }
+/* Popup-ruta (Modal) */
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 100001; 
+    left: 0; top: 0; width: 100%; height: 100%; 
+    background-color: rgba(0,0,0,0.8);
+}
+.modal-content {
+    background-color: #fefefe;
+    color: #333;
+    margin: 5% auto;
+    padding: 30px;
+    border: 5px solid #ffcc00;
+    width: 80%;
+    max-width: 700px;
+    border-radius: 20px;
+    font-family: Arial, sans-serif; /* Lättläst teckensnitt */
+    line-height: 1.6;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+.modal-content h2, .modal-content h3 {
+    font-family: 'Luckiest Guy', cursive;
+    color: #ffcc00;
+    -webkit-text-stroke: 1px black;
+}
+.close-btn {
+    background: #ff0000;
+    color: white;
+    padding: 10px 20px;
+    float: right;
+    cursor: pointer;
+    border-radius: 10px;
+    font-family: 'Luckiest Guy';
+}
+
+        /* --- TOAST SYSTEM --- */
+        #toast-container {
+            position: fixed; top: 20px; right: 20px; z-index: 99999;
+            display: flex; flex-direction: column; align-items: flex-end;
+            pointer-events: none;
+        }
+
+
+@keyframes vibrate {
+    0% { transform: translate(0); }
+    20% { transform: translate(-5px, 5px) rotate(-5deg); }
+    40% { transform: translate(-5px, -5px) rotate(5deg); }
+    60% { transform: translate(5px, 5px) rotate(-5deg); }
+    80% { transform: translate(5px, -5px) rotate(5deg); }
+    100% { transform: translate(0); }
+}
+.vibrate-clock {
+    width: 150px;
+    animation: vibrate 0.1s infinite;
+    margin-bottom: 20px;
+}
+@keyframes timerBlink {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.timer-panic {
+    color: #ff0000 !important;
+    text-shadow: 0 0 20px #ff0000;
+    animation: timerBlink 0.2s infinite;
+    font-size: 40px; /* Gör den lite större vid panik */
+}
+
+.bg-panic {
+    background-color: #440000 !important; /* Mörkröd bakgrund */
+    transition: background-color 0.1s;
+}
+        .toast {
+            background: rgba(0, 0, 0, 0.95); color: white; padding: 15px 25px;
+            border-radius: 15px; margin-bottom: 10px; border: 4px solid #ffcc00;
+            font-size: 22px; box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+            min-width: 250px; text-align: center; animation: toastIn 0.3s forwards;
+        }
+        @keyframes toastIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* --- LOCKDOWN & OVERLAYS --- */
+        #lockdown-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(128, 0, 128, 0.95); z-index: 100000;
+            flex-direction: column; align-items: center; justify-content: center; text-align: center;
+        }
+
+        #alarm-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(139, 0, 0, 0.95); z-index: 1000;
+            flex-direction: column; align-items: center; justify-content: center;
+        }
+
+        /* --- MENYER --- */
+        #start-screen, #end-screen, #leaderboard-screen {
+            background: rgba(0, 0, 0, 0.9); padding: 30px; border-radius: 30px;
+            margin: 20px auto; text-align: center; border: 8px solid #ffcc00;
+            max-width: 600px; z-index: 200;
+        }
+        #end-screen, #leaderboard-screen { display: none; }
+        .btn-start { background-color: #00ff00; color: black; cursor: pointer; width: 80%; font-size: 28px; border-radius: 15px; padding: 15px; }
+
+        /* --- SPELPLAN --- */
+        #game-container { display: none; width: 95%; max-width: 800px; text-align: center; margin-top: 20px; }
+        #math-card { background: rgba(0, 0, 0, 0.85); padding: 40px; border-radius: 30px; border: 8px solid #00ccff; }
+        #question { font-size: 100px; margin: 10px 0; color: #ffcc00; text-shadow: 5px 5px #000; }
+        .answer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .answer-btn { background: #fff; color: #333; padding: 25px; font-size: 40px; cursor: pointer; border-radius: 20px; font-family: 'Luckiest Guy'; }
+        
+        #snooze-input { font-size: 35px; text-align: center; border: 5px solid #ffcc00; font-family: 'Luckiest Guy'; margin-top: 20px; }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+<div id="toast-container"></div>
+
+<div id="lockdown-overlay">
+    <!-- Bilden på Kamek visas här -->
+    <img src="kamek.jfif" alt="Kamek" style="width: 250px; margin-bottom: 20px; border-radius: 20px; border: 5px solid #ffcc00;">
+    <h1 style="font-size: 60px;">FUSK DETEKTERAT!</h1>
+    <p style="font-size: 30px;">Kamek har låst spelet! Inget flikbyte eller fusk tillåtet!</p>
+    <button onclick="location.reload()" style="background: #ffcc00; padding: 20px; font-size: 25px; border-radius: 10px; font-family: 'Luckiest Guy';">STARTA OM</button>
+</div>
+
+<div id="start-screen">
+    <h1>MATH MAYHEM ULTRA</h1>
+    <div style="background:rgba(255,0,0,0.2); padding:15px; border-radius:15px; margin-bottom:15px; font-size: 18px;">
+        <strong style="color:#ffcc00;">KAMEK LOCKDOWN:</strong> Flikbyte eller DevTools låser spelet! Spelet går vidare vid både rätt och fel svar.[cite: 8]
+    </div>
+    <input type="text" id="player-name" placeholder="DITT NAMN, DIN GOOMBA?" style="font-size:25px; padding:10px; width:80%; text-align:center; border-radius: 10px;">
+    <br>
+    <button class="btn-start" onclick="startGame()">STARTA TURNERING</button>
+    <button style="background:#ffcc00; font-family:'Luckiest Guy'; padding:10px; border-radius:10px; cursor:pointer;" onclick="toggleInstructions(true)">HUR SPELAR JAG?</button> <button style="background:#00ccff; font-family:'Luckiest Guy'; padding:10px; border-radius:10px; cursor:pointer;" onclick="showLeaderboard()">TOPPLISTA</button>
+</div>
+
+<div id="game-container">
+    <div style="font-size: 28px; margin-bottom: 10px;">
+        SPELARE: <span id="display-name"></span> | POÄNG: <span id="display-score">0</span> | TID: <span id="timer">60</span>s
+    </div>
+    <div id="math-card">
+        <div id="question">?</div>
+        <div class="answer-grid" id="answer-options"></div>
+    </div>
+</div>
+
+<div id="alarm-overlay">
+    <img src="clock.jfif" id="alarm-img" class="vibrate-clock">
+    <h1 id="alarm-msg" style="font-size: 70px; margin-bottom:10px; text-align: center;">VAKNA!!!</h1>
+    <div id="alarm-task-area" style="text-align: center;"></div>
+    <button id="main-snooze" onclick="snooze()" style="display:none; background:#ffcc00; font-size:40px; padding:20px 40px; font-family:'Luckiest Guy'; border-radius: 15px; border: 5px solid white; cursor: pointer;">SNOOZE!</button>
+</div>
+
+<div id="leaderboard-screen">
+    <h1>TOPPLISTA - STATION 24</h1>
+    <div id="high-score-content"></div>
+    <button style="background:#ffcc00; font-family:'Luckiest Guy'; padding:15px; border-radius:10px; margin-top: 20px;" onclick="location.reload()">TILLBAKA</button>
+</div>
+
+<div id="end-screen">
+    <h1 id="end-title"></h1>
+    <p id="end-message" style="font-size: 30px;"></p>
+    <button style="background:#ffcc00; font-family:'Luckiest Guy'; font-size:25px; padding:15px; border-radius:10px;" onclick="location.reload()">MENY</button>
+</div>
+<div id="instructions-modal" class="modal">
+<div class="modal-content">
+        <span class="close-btn" onclick="toggleInstructions(false)">STÄNG</span>
+        <h2 style="color: #ffcc00; -webkit-text-stroke: 1.5px black; font-size: 40px;">📜 OFFICIELLA REGLER</h2>
+        
+        <div style="font-family: Arial, sans-serif; text-align: left; color: #333; line-height: 1.6; font-size: 18px;">
+            <p style="background: #ff0000; color: white; padding: 10px; border-radius: 10px; text-align: center; font-weight: bold;">
+                ⚠️ TÄNK INTE FÖR LÄNGE – KLOCKAN TICKAR HELA TIDEN!
+            </p>
+
+            <h3>⏱️ TID & POÄNG</h3>
+            <ul>
+                <li><strong>Starttid:</strong> Du har exakt <strong>60 sekunder</strong> på dig från början.</li>
+                <li><strong>Rätt svar:</strong> Ger dig poäng och <strong>+2 sekunder</strong> extra på klockan.</li>
+                <li><strong>Fel svar:</strong> Resulterar i hån och att värdefull <strong>tid dras av</strong> (-5 sekunder).</li>
+                <li><strong>Mål:</strong> Samla så mycket poäng du bara kan innan tiden når noll.</li>
+            </ul>
+
+            <h3>🧠 MATTE-DUELLEN</h3>
+            <ul>
+                <li><strong>Huvudräkning:</strong> Lös talen direkt på skärmen. <strong>Miniräknare är absolut förbjudet!</strong>.</li>
+                <li><strong>Snabbhet:</strong> Klicka på det svar du tror är rätt. Var beredd – alternativen kan plötsligt byta plats![cite: 1].</li>
+            </ul>
+
+            <h3>🚨 LARMET (VÄCKARKLOCKAN)</h3>
+            <ul>
+                <li><strong>Vakna!:</strong> Plötsligt kan väckarklockan börja ringa och avbryta ditt spel[cite: 1].</li>
+                <li><strong>Snooza:</strong> För att tysta larmet måste du klicka på SNOOZE-knappen eller slutföra den specialuppgift som dyker upp[cite: 1].</li>
+                <li><strong>Uppgifter:</strong> Det kan handla om att jaga en rörlig prick, spamma tangenter eller stava ord korrekt[cite: 1].</li>
+            </ul>
+
+            <h3>🔒 KAMEKS FUSK-VAKT</h3>
+            <ul>
+                <li><strong>Lockdown:</strong> Om du försöker fuska (F12, högerklick eller byta flik) låser Kamek spelet direkt[cite: 1].</li>
+            </ul>
+        </div>
+        
+        <button onclick="toggleInstructions(false)" style="background:#00ff00; color: black; padding: 15px 40px; font-family:'Luckiest Guy'; border-radius:15px; cursor:pointer; margin-top: 20px; border: 4px solid black; font-size: 24px; width: 100%;">JAG ÄR REDO!</button>
+    </div>
+</div>
+<script>
+    let score = 0, timeLeft = 60, currentAnswer = 0, gameActive = false, alarmActive = false, currentPlayer = "";
+    let timerInterval, currentAlarmAudio, moveInterval, dotTimeout, alarmTaskInterval;
+    let qSpamCount = 0, holdStartTime = 0, targetHoldKey = "";
+    let snoozeMode = "";
+
+    const HAN_LISTA = [
+        "MEN HERREGUD, KAN DU INTE RÄKNA?",
+        "KAMEK SKRATTAR ÅT DIN DUMHET!",
+        "MIN MORMOR ÄR SNABBARE ÄN DIG!",
+        "SÄMRE ÄN EN GOOMBA!",
+        "VILL DU HA EN KRYCKA TILL HJÄRNAN?"
+    ];
+
+    function showToast(text, color) {
+        const container = document.getElementById('toast-container');
+        const t = document.createElement('div');
+        t.className = 'toast'; t.style.borderColor = color; t.innerText = text;
+        container.appendChild(t);
+        setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 500); }, 3000);
+    }
+
+    function saveHighScore(name, finalScore) {
+        let scores = JSON.parse(localStorage.getItem('math_mayhem_scores')) || [];
+        scores.push({ name: name, score: finalScore });
+        scores.sort((a, b) => b.score - a.score);
+        localStorage.setItem('math_mayhem_scores', JSON.stringify(scores.slice(0, 10)));
+    }
+function toggleInstructions(show) {
+    const modal = document.getElementById('instructions-modal');
+    modal.style.display = show ? 'block' : 'none';
+}
+
+// Stäng popupen om man klickar utanför rutan
+window.onclick = function(event) {
+    const modal = document.getElementById('instructions-modal');
+    if (event.target == modal) {
+        toggleInstructions(false);
+    }
+}
+
+
+/* --- SYSTEMVAKTER (HÅN-TOASTS) --- */
+    function checkSystemStatus() {
+        if ('getBattery' in navigator) {
+            navigator.getBattery().then(bat => {
+                if(!bat.charging) showToast("🔋 BATTERI?! TROR DU STRÖM ÄR GRATIS? LADDA, DIN SOPA!", "red");
+            });
+        }
+        if (!navigator.onLine) showToast("🌐 OFFLINE! KAMEK KAN INTE SYNC-HÅNA DIG I MOLNET JUST NU.", "orange");
+        if (!navigator.cookieEnabled) showToast("🍪 COOKIES AV? GLÖM ATT JAG SPARAR DINA POÄNG, DIN GOOMBA!", "red");
+        
+        const adCheck = document.createElement('div');
+        adCheck.innerHTML = '&nbsp;'; adCheck.className = 'adsbox';
+        document.body.appendChild(adCheck);
+        window.setTimeout(() => {
+            if (adCheck.offsetHeight === 0) showToast("🛡️ ADBLOCK? STATION 24 KRÄVER TOTAL ÖPPENHET!", "purple");
+            adCheck.remove();
+        }, 100);
+    }
+
+/* --- YTTERLIGARE SYSTEMHÅN --- */
+
+// 1. Check för Ping/Latens (Nätverkshån)
+if (navigator.connection) {
+    const conn = navigator.connection;
+    const checkPing = () => {
+        if (conn.rtt > 150) {
+            showToast("📶 " + conn.rtt + "ms PING? DIN ANSLUTNING ÄR LIKA SEGT SOM DIN HJÄRNA!", "orange");
+        }
+    };
+    conn.onchange = checkPing;
+    checkPing();
+}
+
+// 1. Check för LocalStorage (om poäng faktiskt kan sparas)
+try {
+    localStorage.setItem('test', 'test');
+    localStorage.removeItem('test');
+} catch (e) {
+    showToast("💾 KAN EJ SPARA POÄNG! DIN WEBBLÄSARE ÄR LIKA TRASIG SOM DIN MATEMATIK.", "red");
+}
+
+/* --- YTTERLIGARE SYSTEMHÅN --- */
+
+// 1. Check för minne (RAM/Storage)
+if (navigator.deviceMemory && navigator.deviceMemory < 4) {
+    showToast("💾 BARA " + navigator.deviceMemory + "GB RAM? DIN DATOR ÄR LIKA FATTIG SOM DIN LOGIK!", "red");
+}
+
+// 2. Prestanda-drop (FPS vakt)
+let lastTime = performance.now();
+let frames = 0;
+function checkFPS() {
+    frames++;
+    let now = performance.now();
+    if (now >= lastTime + 1000) {
+        let fps = Math.round((frames * 1000) / (now - lastTime));
+        if (fps < 30 && gameActive) {
+            showToast("🐢 " + fps + " FPS? DIN DATOR ÄR LIKA LÅNGSAM SOM EN FULL GOOMBA!", "orange");
+        }
+        frames = 0;
+        lastTime = now;
+    }
+    if (gameActive) requestAnimationFrame(checkFPS);
+}
+requestAnimationFrame(checkFPS);
+
+// 3. JavaScript-vakt (Triggas om t.ex. tunga script blockeras)
+window.onerror = function() {
+    showToast("⚠️ JAVASCRIPT KRASCHAR! ÄR DU SÅ DÅLIG ATT DU PAJSAR KODEN?", "red");
+    return false;
+};
+
+// 4. CPU-belastning / "Dator för långsam"
+if (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4) {
+    showToast("🐌 " + navigator.hardwareConcurrency + " KÄRNOR? MIN MINIRÄKNARE ÄR SNABBARE ÄN DIN BURK!", "red");
+}
+
+// 5. Inget minne kvar (Quota check)
+if (navigator.storage && navigator.storage.estimate) {
+    navigator.storage.estimate().then(est => {
+        let percent = Math.round((est.usage / est.quota) * 100);
+        if (percent > 80) {
+            showToast("🗄️ " + percent + "% DISK ANVÄNT! RENSA DIN SKRÄPDATOR INNAN DU FÖRSÖKER SPELA!", "orange");
+        }
+    });
+}
+
+// 3. Inkognito/Privat läge-vakt
+if (navigator.storage && navigator.storage.estimate) {
+    navigator.storage.estimate().then(est => {
+        if (est.quota < 120000000) { // Ofta lägre quota i privat läge
+            showToast("🕵️ INKOGNITO? VAD HAR DU ATT DÖLJA, DIN LILLA FUSKARE?", "purple");
+        }
+    });
+}
+
+    function showLeaderboard() {
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('leaderboard-screen').style.display = 'block';
+        const scores = JSON.parse(localStorage.getItem('math_mayhem_scores')) || [];
+        document.getElementById('high-score-content').innerHTML = scores.map((s, i) => 
+            `<div style="font-size:24px; margin: 10px 0;">${i+1}. ${s.name} - ${s.score} PT</div>`).join('');
+    }
+
+    function triggerLockdown() {
+        if (!gameActive) return;
+        gameActive = false;
+        clearInterval(timerInterval);
+        if (currentAlarmAudio) currentAlarmAudio.pause();
+        document.getElementById('lockdown-overlay').style.display = 'flex';
+        new Audio('kamek.mp3').play().catch(()=>{});
+    }
+
+/* --- TOTAL KAMEK LOCKDOWN --- */
+
+// 1. Blockera högerklick helt och trigga Lockdown direkt
+document.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    if (gameActive) {
+        triggerLockdown();
+    }
+}, false);
+
+// 2. Avancerad vakt för tangentbordet
+window.addEventListener('keydown', (e) => {
+    // Lista på förbjudna handlingar (F12, Inspektera, Visa källa, Spara sida)
+    const isF12 = e.key === "F12";
+    const isDevTools = (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J" || e.key === "C" || e.key === "K"));
+    const isSourceView = (e.ctrlKey && e.key.toLowerCase() === "u");
+    const isSavePage = (e.ctrlKey && e.key.toLowerCase() === "s");
+
+    if (isF12 || isDevTools || isSourceView || isSavePage) {
+        e.preventDefault(); 
+        if (gameActive) triggerLockdown();
+        return false;
+    }
+    
+    // --- BEHÅLL LARM-LOGIK NEDAN ---
+    if (alarmActive) {
+        if (snoozeMode === "Q_SPAM" && e.key.toLowerCase() === 'q') {
+            qSpamCount++;
+            document.getElementById('alarm-msg').innerText = "SPAMMA Q: " + (10 - qSpamCount);
+            if (qSpamCount >= 10) snooze();
+        }
+        if (snoozeMode === "HOLD_KEY" && e.key.toUpperCase() === targetHoldKey && holdStartTime === 0) {
+            holdStartTime = Date.now();
+        }
+    }
+});
+
+// 3. Blur-timer: Räknar ner från 5 när man lämnar fliken
+window.addEventListener('blur', () => {
+    if (gameActive && !alarmActive) {
+        let count = 5;
+        showToast("⚠️ ÅTERVÄND INOM " + count + "s ELLER BLI LÅST!", "orange");
+        
+        blurTimeout = setInterval(() => {
+            count--;
+            if (count > 0) {
+                showToast("TID KVAR: " + count + "s", "orange");
+            } else {
+                clearInterval(blurTimeout);
+                triggerLockdown();
+            }
+        }, 1000);
+    }
+});
+
+// Stoppa timern om spelaren kommer tillbaka i tid
+window.addEventListener('focus', () => {
+    if (blurTimeout) {
+        clearInterval(blurTimeout);
+        showToast("TUR FÖR DIG, DIN SOPA...", "#ffcc00");
+    }
+});
+
+// 3. Blockera fusk via "drag and drop" av text/länkar (valfritt men bra)
+window.addEventListener('dragstart', (e) => {
+    if (gameActive) e.preventDefault();
+});
+        if (alarmActive) {
+            if (snoozeMode === "Q_SPAM" && e.key.toLowerCase() === 'q') {
+                qSpamCount++;
+                document.getElementById('alarm-msg').innerText = "SPAMMA Q: " + (10 - qSpamCount);
+                if (qSpamCount >= 10) snooze();
+            }
+            if (snoozeMode === "HOLD_KEY" && e.key.toUpperCase() === targetHoldKey && holdStartTime === 0) {
+                holdStartTime = Date.now();
+            }
+        }
+
+
+    window.addEventListener('keyup', (e) => {
+        if (alarmActive && snoozeMode === "HOLD_KEY" && e.key.toUpperCase() === targetHoldKey) {
+            holdStartTime = 0;
+        }
+    });
+
+    document.addEventListener('visibilitychange', () => { if (document.hidden && gameActive) triggerLockdown(); });
+
+    function startGame() {
+        currentPlayer = document.getElementById('player-name').value.trim() || "Gäst";
+        document.getElementById('display-name').innerText = currentPlayer.toUpperCase();
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('game-container').style.display = 'block';
+        gameActive = true; score = 0; timeLeft = 60;
+        showToast("HÅLL FOKUS, DIN GOOMBA!", "#00ccff");
+        startTimer(); generateQuestion();
+    }
+
+    function startTimer() {
+    timerInterval = setInterval(() => {
+        if (!alarmActive && gameActive) {
+            timeLeft--;
+            const timerEl = document.getElementById('timer');
+            timerEl.innerText = timeLeft;
+
+            // --- RÖD VISUELL VARNING (Sista 10 sekunderna) ---
+            if (timeLeft <= 10 && timeLeft > 0) {
+                // Lägg till blinkande klass på timern
+                timerEl.classList.add('timer-panic');
+                
+                // Pulserande röd bakgrund på hela bodyn
+                if (timeLeft % 2 === 0) {
+                    document.body.classList.add('bg-panic');
+                    showToast("⚠️ TIDEN RINNER UT!", "red");
+                } else {
+                    document.body.classList.remove('bg-panic');
+                }
+            } else {
+                // Återställ om tiden ökar (vid rätt svar)
+                timerEl.classList.remove('timer-panic');
+                document.body.classList.remove('bg-panic');
+            }
+
+            let alarmChance = 0.08 + (score / 40000);
+            if (Math.random() < alarmChance && timeLeft > 10) triggerAlarm();
+            if (timeLeft <= 0) endGame("TIDEN SLUT!");
+        }
+    }, 1000);
+} // <--- KOM IHÅG: Stänger startTimer
+
+    function generateQuestion() {
+    let diff = Math.floor(score / 2000);
+    // Operatörer låses upp gradvis baserat på poäng för att öka kaoset
+    let ops = ['+', '-', '*'];
+    if (score > 2000) ops.push('/');
+    if (score > 4000) ops.push('%');
+    if (score > 6000) ops.push('^', 'sqrt');
+
+    const op = ops[Math.floor(Math.random() * ops.length)];
+    let n1, n2;
+
+    if (op === '/') {
+        // Division: Garanterar heltal genom att multiplicera baklänges
+        n2 = Math.floor(Math.random() * 9) + 2;
+        currentAnswer = Math.floor(Math.random() * 10) + 1;
+        n1 = currentAnswer * n2;
+        document.getElementById('question').innerText = n1 + " / " + n2;
+    } 
+    else if (op === '%') {
+        // Procent: Använder jämna procentsatser för huvudräkning
+        let percentages = [10, 20, 25, 50, 75];
+        n2 = percentages[Math.floor(Math.random() * percentages.length)];
+        n1 = (Math.floor(Math.random() * 10) + 1) * 20;
+        currentAnswer = (n2 / 100) * n1;
+        document.getElementById('question').innerText = n2 + "% AV " + n1;
+    }
+    else if (op === '^') {
+        // Potens: Upphöjt till 2 (Kvadrat)
+        n1 = Math.floor(Math.random() * 10) + 2;
+        currentAnswer = Math.pow(n1, 2);
+        document.getElementById('question').innerText = n1 + "²";
+    }
+    else if (op === 'sqrt') {
+        // Roten ur: Garanterar jämna rötter
+        currentAnswer = Math.floor(Math.random() * 11) + 2;
+        n1 = currentAnswer * currentAnswer;
+        document.getElementById('question').innerText = "√" + n1;
+    }
+    else if (op === '*') {
+        n1 = Math.floor(Math.random() * (10 + diff)) + 2;
+        n2 = Math.floor(Math.random() * (10 + diff)) + 2;
+        currentAnswer = n1 * n2;
+        document.getElementById('question').innerText = n1 + " × " + n2;
+    }
+    else if (op === '-') {
+        n1 = Math.floor(Math.random() * (50 + diff)) + 20;
+        n2 = Math.floor(Math.random() * 19) + 2;
+        currentAnswer = n1 - n2;
+        document.getElementById('question').innerText = n1 + " - " + n2;
+    }
+    else {
+        // Standard: Addition
+        n1 = Math.floor(Math.random() * (50 + diff)) + 2;
+        n2 = Math.floor(Math.random() * (50 + diff)) + 2;
+        currentAnswer = n1 + n2;
+        document.getElementById('question').innerText = n1 + " + " + n2;
+    } // <--- Slut på if/else-kedjan
+
+    setupOptions(currentAnswer);
+} // <--- VIKTIGT: Denna stänger hela generateQuestion-funktionen
+
+    function setupOptions(correct) {
+        let opts = [correct];
+        while(opts.length < 4) {
+            let a = correct + (Math.floor(Math.random()*16)-8);
+            if(a > 0 && !opts.includes(a)) opts.push(a);
+        }
+        opts.sort(() => Math.random()-0.5);
+        const grid = document.getElementById('answer-options');
+        grid.innerHTML = '';
+        opts.forEach(o => {
+            const b = document.createElement('button'); b.className = 'answer-btn'; b.innerText = o;
+            b.onclick = () => {
+                if (o === correct) { 
+                    score += 150 + (Math.floor(score / 1000) * 10); 
+                    timeLeft += 2;
+                    new Audio('pling.mp3').play().catch(()=>{});
+                    showToast("TUR ELLER SKICKLIGHET?", "#00ff00");
+                } else { 
+                    new Audio('kamek.mp3').play().catch(()=>{});
+                    const hån = HAN_LISTA[Math.floor(Math.random() * HAN_LISTA.length)];
+                    showToast(hån, "purple");
+                    document.body.style.backgroundColor = 'purple';
+                    setTimeout(() => document.body.style.backgroundColor = '', 300);
+                    timeLeft -= 5;
+                }
+                document.getElementById('display-score').innerText = score;
+                generateQuestion(); 
+            };
+            grid.appendChild(b);
+        });
+    }
+
+// Slumpmässigt kaos: 20% chans att knapparna byter plats efter 1.5 sekund
+if (Math.random() < 0.20) {
+    setTimeout(() => {
+        const grid = document.getElementById('answer-options');
+        const buttons = Array.from(grid.children);
+        // Blanda knapparna
+        buttons.sort(() => Math.random() - 0.5);
+        grid.innerHTML = '';
+        buttons.forEach(btn => grid.appendChild(btn));
+        
+        // Spela Kamek-ljudet för att irritera
+        new Audio('kamek_laugh.mp3').play().catch(()=>{});
+        showToast("HOHOHO! VAR DE DÄR DU TÄNKTE KLICKA?", "purple");
+    }, 1500);
+}
+
+    function triggerAlarm() {
+        alarmActive = true;
+        const overlay = document.getElementById('alarm-overlay'), taskArea = document.getElementById('alarm-task-area'), mainBtn = document.getElementById('main-snooze');
+        overlay.style.display = 'flex'; taskArea.innerHTML = ''; mainBtn.style.display = 'none';
+        
+        let modes = ["SIMPLE", "DOT", "WORD", "MULTI_CLICK", "HOLD_KEY", "Q_SPAM"];
+        snoozeMode = modes[Math.floor(Math.random() * modes.length)];
+
+        if (snoozeMode === "SIMPLE") {
+            document.getElementById('alarm-msg').innerText = "VAKNA!!!";
+            mainBtn.style.display = 'block';
+        } else if (snoozeMode === "MULTI_CLICK") {
+            let clicks = 6 + Math.floor(score/5000);
+            document.getElementById('alarm-msg').innerText = "KLICKA " + clicks + " GÅNGER!";
+            mainBtn.style.display = 'block';
+            mainBtn.onclick = () => { clicks--; document.getElementById('alarm-msg').innerText = "KLICKA " + clicks + " GÅNGER!"; if(clicks<=0) snooze(); };
+        } else if (snoozeMode === "DOT") {
+            let dotsToFind = 1 + Math.floor(score/8000); // Ökar mer sällan nu
+            document.getElementById('alarm-msg').innerText = "JAGA PRICKEN (" + dotsToFind + ")!";
+            for (let i = 0; i < dotsToFind; i++) {
+                const dot = document.createElement('div');
+                // Gjorde pricken 60px istället för 50px för att den ska vara lättare att träffa
+                dot.style.cssText = "width:60px; height:60px; background:yellow; border-radius:50%; position:absolute; cursor:pointer; transition:0.6s; z-index:2000; border: 3px solid black;";
+                taskArea.appendChild(dot);
+                const move = () => { 
+                    dot.style.top = (Math.random()*70+15) + "%"; 
+                    dot.style.left = (Math.random()*70+15) + "%"; 
+                };
+                move();
+                // Sänkt hastighet: 800ms starttid istället för 400ms
+                let moveInt = setInterval(move, 800 - Math.min(400, (score / 100))); 
+                dot.onclick = () => { 
+                    dot.remove(); 
+                    clearInterval(moveInt); 
+                    dotsToFind--; 
+                    if(dotsToFind <= 0) snooze(); 
+                }; }
+            } else if (snoozeMode === "WORD") {
+            const words = ["KAMEK", "LANBIT", "KUNGSBACKA", "DATORMUS", "HÅRDDISKFRAGMENTERING", "TANGENTBORD", "DATORMUS", "ADRESS"];
+            const target = words[Math.floor(Math.random() * words.length)];
+            document.getElementById('alarm-msg').innerHTML = "STAVA: <span style='color:yellow'>" + target + "</span>";
+            const input = document.createElement('input'); input.id = "snooze-input";
+            input.oninput = () => { if(input.value.toUpperCase() === target) snooze(); else if(!target.startsWith(input.value.toUpperCase())) { new Audio('boooop.mp3').play(); endGame("STAVFEL!"); } };
+            taskArea.appendChild(input); setTimeout(() => input.focus(), 50);
+        } else if (snoozeMode === "Q_SPAM") {
+            qSpamCount = 0;
+            document.getElementById('alarm-msg').innerText = "SPAMMA Q 10 GÅNGER! (5s)";
+            dotTimeout = setTimeout(() => { if(alarmActive) endGame("FÖR SEGT SPAM!"); }, 5000);
+        } else if (snoozeMode === "HOLD_KEY") {
+            const keys = ['A', 'S', 'D', 'F'];
+            targetHoldKey = keys[Math.floor(Math.random() * keys.length)];
+            document.getElementById('alarm-msg').innerText = `HÅLL IN '${targetHoldKey}' I 2 SEK!`;
+            holdStartTime = 0;
+            alarmTaskInterval = setInterval(() => { if(holdStartTime > 0 && Date.now() - holdStartTime >= 2000) snooze(); }, 100);
+        }
+// Lista på slumpade alarmljud
+        const alarmSounds = ['alarm_buzzer.mp3', 'clock_alarm.mp3', 'cukoo_clock.mp3', 'classic_alarm.mp3'];
+        const randomSound = alarmSounds[Math.floor(Math.random() * alarmSounds.length)];
+        
+        currentAlarmAudio = new Audio(randomSound); 
+        currentAlarmAudio.loop = true; 
+        currentAlarmAudio.play().catch(()=>{});
+        
+        showToast("VAKNA, DIN SLÖFOCK!", "red");
+} // <--- KOM IHÅG DENNA MÅSVINGE: Stänger triggerAlarm
+
+    function snooze() {
+        alarmActive = false; document.getElementById('alarm-overlay').style.display = 'none';
+        if(currentAlarmAudio) { currentAlarmAudio.pause(); currentAlarmAudio.currentTime = 0; }
+        clearInterval(moveInterval); clearInterval(alarmTaskInterval); clearTimeout(dotTimeout);
+        holdStartTime = 0; snoozeMode = "";
+        showToast("TUR FÖR DIG, DIN SOPA...", "#ffcc00");
+    }
+
+    function endGame(reason) {
+        gameActive = false; clearInterval(timerInterval);
+        saveHighScore(currentPlayer, score);
+        document.getElementById('game-container').style.display = 'none';
+        document.getElementById('alarm-overlay').style.display = 'none';
+        const screen = document.getElementById('end-screen'); screen.style.display = 'block';
+        
+        let title, msg, color, sound;
+        if (score >= 10000) { title = "SUPER"; msg = "DU ÄR EN GUD! (STJÄRNVINST)"; color = "#ff00ff"; sound = "secret.mp3"; }
+        else if (score >= 6000) { title = "BÄST"; msg = "LEGENDARISKT! GULDMYNT!"; color = "#ffcc00"; sound = "yay.mp3"; }
+        else if (score >= 3000) { title = "BRA"; msg = "HELT OK FÖR EN MÄNNISKA."; color = "#00ff00"; sound = "pling.mp3"; }
+        else if (score >= 1000) { title = "GENOMSNITT"; msg = "DU ÄR SOM ALLA ANDRA."; color = "#00ccff"; sound = "kamek2.mp3"; }
+        else if (score >= 500) { title = "DÅLIGT"; msg = "FÖRSÖKTE DU ENS?"; color = "#ff6600"; sound = "sad_trombone.mp3"; }
+        else { title = "USELT"; msg = "TOTALT USELT! GÅ HEM OCH ÖVA."; color = "#ff0000"; sound = "mk64_loser.wav"; }
+
+        document.getElementById('end-title').innerText = title;
+        document.getElementById('end-title').style.color = color;
+        document.getElementById('end-message').innerHTML = `${reason}<br>POÄNG: ${score}<br>${msg}`;
+        new Audio(sound).play().catch(()=>{});
+    }
+
+    if ('getBattery' in navigator) {
+        navigator.getBattery().then(bat => {
+            const check = () => { if(!bat.charging && bat.level < 0.25) showToast("LADDA DATORN!", "red"); };
+            bat.onlevelchange = check;
+        });
+    }
+    let idle = 0; setInterval(() => { if(gameActive) { idle++; if(idle === 30) showToast("SOVER DU?", "orange"); if(idle >= 60) location.reload(); } }, 1000);
+    window.onmousemove = () => idle = 0; window.onkeydown = () => idle = 0;
+</script>
+</body>
+</html>

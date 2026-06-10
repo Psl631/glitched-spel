@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Selector with Flags - Base Defense Ultra</title>
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0b0b0b 0%, #1a0033 100%);
+            color: #fff;
+            font-family: 'Luckiest Guy', Arial;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #ffcc00;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.5em;
+        }
+        
+        .section {
+            background: rgba(130, 0, 255, 0.1);
+            border: 2px solid #8200ff;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .section h2 {
+            color: #00ffcc;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        
+        /* Flag-based Language Selector */
+        .language-selector-flags {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .flag-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            background: #1a0033;
+            border: 3px solid #8200ff;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #ffcc00;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .flag-button:hover {
+            background: #2d0052;
+            border-color: #00ffcc;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+        }
+        
+        .flag-button img {
+            width: 60px;
+            height: 40px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            border: 2px solid #ffcc00;
+        }
+        
+        .flag-button span {
+            display: block;
+            font-size: 12px;
+        }
+        
+        /* Compact Flag Selector (for top-right corner) */
+        .language-selector-compact {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        
+        .flag-button-compact {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #8200ff;
+            border-radius: 5px;
+            padding: 3px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #1a0033;
+        }
+        
+        .flag-button-compact:hover {
+            border-color: #00ffcc;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+        }
+        
+        .flag-button-compact img {
+            width: 100%;
+            height: 100%;
+            border-radius: 3px;
+        }
+        
+        /* Code Example */
+        pre {
+            background: #0b0b0b;
+            border: 1px solid #333;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin: 15px 0;
+        }
+        
+        .example-box {
+            background: rgba(0, 255, 204, 0.05);
+            border: 1px solid #00ccff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        
+        button.demo-btn {
+            background: #8200ff;
+            color: #ffcc00;
+            border: 2px solid #ffcc00;
+            padding: 10px 20px;
+            font-family: 'Luckiest Guy';
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        button.demo-btn:hover {
+            background: #6600cc;
+            box-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
+        }
+        
+        .info-box {
+            background: rgba(255, 204, 0, 0.1);
+            border: 2px solid #ffcc00;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        
+        .info-box strong {
+            color: #ffcc00;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        table th, table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #8200ff;
+        }
+        
+        table th {
+            background: rgba(130, 0, 255, 0.2);
+            color: #00ffcc;
+        }
+        
+        .flag-icon {
+            width: 30px;
+            height: 20px;
+            border-radius: 3px;
+            display: inline-block;
+            margin-right: 5px;
+        }
+    </style>
+    <script src="translations.js"></script>
+</head>
+<body>
+<div class="container">
+    <h1>🌐 Language Selector with Flag Icons</h1>
+    
+    <!-- DEMO 1: Full Flag Selector -->
+    <div class="section">
+        <h2>Full Size Language Selector (Grid)</h2>
+        <p>Use this in your start screen or main menu:</p>
+        <div class="language-selector-flags" id="demo1">
+            <!-- Generated by JavaScript -->
+        </div>
+    </div>
+    
+    <!-- DEMO 2: Compact Flag Selector -->
+    <div class="section">
+        <h2>Compact Language Selector (Top-Right Corner)</h2>
+        <p>Use this for a small corner selector:</p>
+        <div class="language-selector-compact" id="demo2">
+            <!-- Generated by JavaScript -->
+        </div>
+    </div>
+    
+    <!-- Implementation Guide -->
+    <div class="section">
+        <h2>📋 Implementation Guide</h2>
+        
+        <h3 style="color: #00ffcc; margin-top: 20px;">Option 1: Full Size Selector</h3>
+        <p>Best for: Start screen, main menu</p>
+        <pre>&lt;div class="language-selector-flags"&gt;
+  &lt;button onclick="setLanguage('sv')" class="flag-button"&gt;
+    &lt;img src="se.png" alt="Swedish"&gt;
+    &lt;span&gt;Svenska&lt;/span&gt;
+  &lt;/button&gt;
+  &lt;button onclick="setLanguage('en')" class="flag-button"&gt;
+    &lt;img src="en.png" alt="English"&gt;
+    &lt;span&gt;English&lt;/span&gt;
+  &lt;/button&gt;
+  &lt;button onclick="setLanguage('da')" class="flag-button"&gt;
+    &lt;img src="dk.png" alt="Danish"&gt;
+    &lt;span&gt;Dansk&lt;/span&gt;
+  &lt;/button&gt;
+  &lt;button onclick="setLanguage('no')" class="flag-button"&gt;
+    &lt;img src="no.png" alt="Norwegian"&gt;
+    &lt;span&gt;Norsk&lt;/span&gt;
+  &lt;/button&gt;
+&lt;/div&gt;</pre>
+
+        <h3 style="color: #00ffcc; margin-top: 20px;">Option 2: Compact Selector</h3>
+        <p>Best for: Top-right corner, floating button</p>
+        <pre>&lt;div class="language-selector-compact"&gt;
+  &lt;button onclick="setLanguage('sv')" class="flag-button-compact" title="Swedish"&gt;
+    &lt;img src="se.png" alt="SV"&gt;
+  &lt;/button&gt;
+  &lt;button onclick="setLanguage('en')" class="flag-button-compact" title="English"&gt;
+    &lt;img src="en.png" alt="EN"&gt;
+  &lt;/button&gt;
+  &lt;button onclick="setLanguage('da')" class="flag-button-compact" title="Danish"&gt;
+    &lt;img src="dk.png" alt="DA"&gt;
+  &lt;/button&gt;
+  &lt;button onclick="setLanguage('no')" class="flag-button-compact" title="Norwegian"&gt;
+    &lt;img src="no.png" alt="NO"&gt;
+  &lt;/button&gt;
+&lt;/div&gt;</pre>
+
+        <h3 style="color: #00ffcc; margin-top: 20px;">Option 3: Fixed Top-Right Corner</h3>
+        <p>Best for: Always visible during gameplay</p>
+        <pre>&lt;div style="position: fixed; top: 20px; right: 20px; z-index: 50;"&gt;
+  &lt;div class="language-selector-compact"&gt;
+    &lt;button onclick="setLanguage('sv')" class="flag-button-compact" title="Swedish"&gt;
+      &lt;img src="se.png" alt="SV"&gt;
+    &lt;/button&gt;
+    &lt;button onclick="setLanguage('en')" class="flag-button-compact" title="English"&gt;
+      &lt;img src="en.png" alt="EN"&gt;
+    &lt;/button&gt;
+    &lt;button onclick="setLanguage('da')" class="flag-button-compact" title="Danish"&gt;
+      &lt;img src="dk.png" alt="DA"&gt;
+    &lt;/button&gt;
+    &lt;button onclick="setLanguage('no')" class="flag-button-compact" title="Norwegian"&gt;
+      &lt;img src="no.png" alt="NO"&gt;
+    &lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+    </div>
+    
+    <!-- CSS Styles -->
+    <div class="section">
+        <h2>🎨 CSS Styles</h2>
+        <p>Copy these CSS classes to your style.css:</p>
+        <pre>.language-selector-flags {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.flag-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    background: #1a0033;
+    border: 3px solid #8200ff;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #ffcc00;
+    font-size: 14px;
+    font-weight: bold;
+    font-family: 'Luckiest Guy';
+}
+
+.flag-button:hover {
+    background: #2d0052;
+    border-color: #00ffcc;
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+}
+
+.flag-button img {
+    width: 60px;
+    height: 40px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    border: 2px solid #ffcc00;
+}
+
+.language-selector-compact {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.flag-button-compact {
+    width: 50px;
+    height: 50px;
+    border: 2px solid #8200ff;
+    border-radius: 5px;
+    padding: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #1a0033;
+}
+
+.flag-button-compact:hover {
+    border-color: #00ffcc;
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+}
+
+.flag-button-compact img {
+    width: 100%;
+    height: 100%;
+    border-radius: 3px;
+}</pre>
+    </div>
+    
+    <!-- File Mapping -->
+    <div class="section">
+        <h2>📂 Flag Image Files</h2>
+        <p>Use these filenames for flag images in your game folder:</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Language</th>
+                    <th>Code</th>
+                    <th>Filename</th>
+                    <th>Example</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Swedish</td>
+                    <td>sv</td>
+                    <td><strong>se.png</strong></td>
+                    <td><img src="se.png" alt="Swedish" class="flag-icon"></td>
+                </tr>
+                <tr>
+                    <td>English</td>
+                    <td>en</td>
+                    <td><strong>en.png</strong></td>
+                    <td><img src="en.png" alt="English" class="flag-icon"></td>
+                </tr>
+                <tr>
+                    <td>Danish</td>
+                    <td>da</td>
+                    <td><strong>dk.png</strong></td>
+                    <td><img src="dk.png" alt="Danish" class="flag-icon"></td>
+                </tr>
+                <tr>
+                    <td>Norwegian</td>
+                    <td>no</td>
+                    <td><strong>no.png</strong></td>
+                    <td><img src="no.png" alt="Norwegian" class="flag-icon"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Usage Examples -->
+    <div class="section">
+        <h2>💡 Complete Integration Example</h2>
+        <p>Here's a complete HTML snippet ready to use:</p>
+        <pre>&lt;!-- Include Translation Library --&gt;
+&lt;script src="translations.js"&gt;&lt;/script&gt;
+
+&lt;!-- Add CSS for language selector --&gt;
+&lt;link rel="stylesheet" href="style.css"&gt;
+
+&lt;!-- Start Screen with Language Selector --&gt;
+&lt;div id="start-screen"&gt;
+    &lt;h1&gt;BASE DEFENSE ULTRA&lt;/h1&gt;
+    
+    &lt;!-- Language Selector with Flags --&gt;
+    &lt;div class="language-selector-flags"&gt;
+        &lt;button onclick="setLanguage('sv')" class="flag-button"&gt;
+            &lt;img src="se.png" alt="Swedish"&gt;
+            &lt;span&gt;Svenska&lt;/span&gt;
+        &lt;/button&gt;
+        &lt;button onclick="setLanguage('en')" class="flag-button"&gt;
+            &lt;img src="en.png" alt="English"&gt;
+            &lt;span&gt;English&lt;/span&gt;
+        &lt;/button&gt;
+        &lt;button onclick="setLanguage('da')" class="flag-button"&gt;
+            &lt;img src="dk.png" alt="Danish"&gt;
+            &lt;span&gt;Dansk&lt;/span&gt;
+        &lt;/button&gt;
+        &lt;button onclick="setLanguage('no')" class="flag-button"&gt;
+            &lt;img src="no.png" alt="Norwegian"&gt;
+            &lt;span&gt;Norsk&lt;/span&gt;
+        &lt;/button&gt;
+    &lt;/div&gt;
+    
+    &lt;button class="btn-start" id="start-btn"&gt;&lt;/button&gt;
+    &lt;script&gt;
+        document.getElementById('start-btn').textContent = t('start_game');
+    &lt;/script&gt;
+&lt;/div&gt;</pre>
+    </div>
+    
+    <!-- Best Practices -->
+    <div class="section">
+        <h2>✨ Best Practices</h2>
+        <div class="info-box">
+            <strong>📌 Placement Recommendations:</strong><br>
+            • <strong>Start Screen:</strong> Use full-size grid selector<br>
+            • <strong>During Gameplay:</strong> Use compact selector in top-right corner<br>
+            • <strong>Floating Button:</strong> Make it always accessible
+        </div>
+        
+        <div class="info-box">
+            <strong>🎨 Styling Tips:</strong><br>
+            • Add hover effects (scale, shadow, color change)<br>
+            • Use game color scheme (#ffcc00, #00ffcc, #8200ff)<br>
+            • Maintain consistency with game UI<br>
+            • Ensure flags are clickable and sized appropriately
+        </div>
+        
+        <div class="info-box">
+            <strong>💾 Storage:</strong><br>
+            • Language choice automatically saved to localStorage<br>
+            • No additional code needed for persistence<br>
+            • Players' choice survives page reload
+        </div>
+    </div>
+    
+    <!-- Testing -->
+    <div class="section">
+        <h2>🧪 Testing the Selector</h2>
+        <p>Try clicking the flag buttons above to test:</p>
+        <div class="example-box">
+            Current Language: <strong id="current-lang-display">English</strong><br>
+            Current Score Translation: <strong id="current-trans-display">SCORE</strong>
+        </div>
+        <button class="demo-btn" onclick="testTranslation()">Test Translation</button>
+        <button class="demo-btn" onclick="showLanguages()">Show All Languages</button>
+    </div>
+</div>
+
+<script>
+// Generate flag selectors
+function generateFlagSelectors() {
+    const langs = getAvailableLanguages();
+    
+    // Full size selector
+    const demo1 = document.getElementById('demo1');
+    langs.forEach(lang => {
+        const flagFile = lang.code === 'sv' ? 'se.png' :
+                        lang.code === 'en' ? 'en.png' :
+                        lang.code === 'da' ? 'dk.png' : 'no.png';
+        
+        const btn = document.createElement('button');
+        btn.className = 'flag-button';
+        btn.onclick = () => setLanguage(lang.code);
+        btn.innerHTML = `<img src="${flagFile}" alt="${lang.name}"><span>${lang.name}</span>`;
+        demo1.appendChild(btn);
+    });
+    
+    // Compact selector
+    const demo2 = document.getElementById('demo2');
+    langs.forEach(lang => {
+        const flagFile = lang.code === 'sv' ? 'se.png' :
+                        lang.code === 'en' ? 'en.png' :
+                        lang.code === 'da' ? 'dk.png' : 'no.png';
+        
+        const btn = document.createElement('button');
+        btn.className = 'flag-button-compact';
+        btn.title = lang.name;
+        btn.onclick = () => setLanguage(lang.code);
+        btn.innerHTML = `<img src="${flagFile}" alt="${lang.code.toUpperCase()}">`;
+        demo2.appendChild(btn);
+    });
+    
+    updateDisplay();
+}
+
+function updateDisplay() {
+    const current = getCurrentLanguage();
+    const langName = TRANSLATIONS[current].lang_name;
+    document.getElementById('current-lang-display').textContent = langName;
+    document.getElementById('current-trans-display').textContent = t('score');
+}
+
+function testTranslation() {
+    alert('Current Language: ' + getCurrentLanguage() + 
+          '\nTranslation of "score": ' + t('score') +
+          '\nClick a flag above to change language!');
+}
+
+function showLanguages() {
+    const langs = getAvailableLanguages();
+    let msg = 'Available Languages:\n\n';
+    langs.forEach(lang => {
+        msg += `${lang.code}: ${lang.name}\n`;
+    });
+    alert(msg);
+}
+
+// Initialize on load
+window.addEventListener('load', generateFlagSelectors);
+
+// Intercept setLanguage to update display after reload
+const originalSetLanguage = window.setLanguage;
+window.setLanguage = function(lang) {
+    localStorage.setItem('baseDefenseLanguage', lang);
+    // Wait a moment then reload to show in console
+    console.log('Language changed to:', lang);
+    location.reload();
+};
+</script>
+</body>
+</html>

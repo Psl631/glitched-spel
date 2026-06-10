@@ -1,0 +1,225 @@
+/* ===========================================================
+   STATION 24: TERMINAL PROTOCOL v43.0 - INTERNATIONAL EDITION
+   =========================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+
+:root {
+    --terminal-green: #00ff00;
+    --error-red: #ff0000;
+    --bg-black: #050505;
+    --neon-pink: #ff00ff;
+    --monitor-border: #333;
+    --kamek-purple: #200040;
+}
+
+/* --- 1. BASE STYLES --- */
+body {
+    background: linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.9)), 
+                url('lanbit_bg.jfif') no-repeat center center fixed;
+    background-size: cover;
+    color: var(--terminal-green);
+    font-family: 'VT323', monospace;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    overflow: hidden; /* Prevent scrolling during the mission */
+}
+
+/* --- 2. SCREEN CONTROL --- */
+.hidden { 
+    display: none !important; 
+}
+
+.screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    animation: bootSequence 0.4s ease-out;
+}
+
+@keyframes bootSequence {
+    from { opacity: 0; filter: blur(5px); }
+    to { opacity: 1; filter: blur(0); }
+}
+
+/* --- 3. MONITOR & CRT EFFECTS --- */
+.monitor-frame {
+    width: 95%;
+    max-width: 800px;
+    background: #1a1a1a;
+    padding: 15px;
+    border: 10px solid var(--monitor-border);
+    border-radius: 10px;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 1);
+    position: relative;
+}
+
+.screen-content {
+    background: var(--bg-black);
+    padding: 30px;
+    position: relative;
+    border: 2px solid #111;
+    min-height: 480px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Scanline Overlay */
+.screen-content::after {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    z-index: 10;
+    background-size: 100% 3px, 3px 100%;
+    pointer-events: none;
+}
+
+/* --- 4. TYPOGRAPHY --- */
+.glitch {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 2.2rem;
+    text-align: center;
+    color: #fff;
+    text-shadow: 3px 0 var(--neon-pink);
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    text-align: center;
+    font-family: 'VT323';
+    font-size: 1.2rem;
+    letter-spacing: 4px;
+    margin-bottom: 20px;
+}
+
+/* --- 5. INTERACTIVE ELEMENTS --- */
+.rules-box {
+    border: 1px solid var(--terminal-green);
+    padding: 15px;
+    margin-bottom: 20px;
+    background: rgba(0, 255, 0, 0.05);
+}
+
+#rules-list {
+    list-style: none;
+    padding: 0;
+    font-size: 0.9rem;
+}
+
+#player-name {
+    background: #000;
+    border: 2px solid var(--terminal-green);
+    color: #fff;
+    padding: 10px;
+    font-family: 'VT323';
+    font-size: 1.5rem;
+    text-align: center;
+    width: 250px;
+    outline: none;
+}
+
+.main-btn, .option-btn, .lifeline-btn {
+    background: transparent;
+    color: var(--terminal-green);
+    border: 2px solid var(--terminal-green);
+    padding: 10px 20px;
+    font-family: 'VT323';
+    font-size: 1.4rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+}
+
+.main-btn:hover, .option-btn:hover:not(.used) {
+    background: var(--terminal-green);
+    color: #000;
+    box-shadow: 0 0 15px var(--terminal-green);
+}
+
+/* --- 6. QUIZ GRID & LIFELINES --- */
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.lifelines {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.lifeline-btn {
+    font-size: 1rem;
+    padding: 5px 10px;
+}
+
+/* --- 7. FEEDBACK & STATES --- */
+.correct-flash {
+    background: var(--terminal-green) !important;
+    color: #000 !important;
+    animation: flash-green 0.2s 3;
+}
+
+.wrong-flash {
+    background: var(--error-red) !important;
+    color: #fff !important;
+    border-color: #fff !important;
+}
+
+.used {
+    opacity: 0.3;
+    cursor: not-allowed;
+    filter: grayscale(100%);
+    pointer-events: none;
+}
+
+/* --- 8. KAMEK & SYSTEM DAMAGE EFFECTS --- */
+.screen-damage {
+    animation: screen-shake 0.3s ease-in-out, red-flash 0.3s steps(2);
+}
+
+@keyframes screen-shake {
+    0% { transform: translate(0, 0); }
+    20% { transform: translate(-10px, 5px); }
+    40% { transform: translate(10px, -5px); }
+    60% { transform: translate(-5px, 10px); }
+    80% { transform: translate(5px, -10px); }
+    100% { transform: translate(0, 0); }
+}
+
+@keyframes red-flash {
+    0% { background-color: transparent; }
+    50% { background-color: rgba(255, 0, 0, 0.3); }
+    100% { background-color: transparent; }
+}
+
+#kamek-screen {
+    background: var(--kamek-purple) !important;
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 1000;
+}
+
+/* Custom Scrollbar for results */
+#result-screen::-webkit-scrollbar {
+    width: 8px;
+}
+#result-screen::-webkit-scrollbar-track {
+    background: #000;
+}
+#result-screen::-webkit-scrollbar-thumb {
+    background: var(--terminal-green);
+    border: 1px solid #fff;
+}

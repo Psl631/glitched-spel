@@ -1,0 +1,256 @@
+
+            if (currentPlayerName !== "Gäst" && currentPlayerName !== "Guest" && score > 0) {
+                saveHighScore(currentPlayerName, score);
+            }
+            if ("Notification" in window && Notification.permission === "granted") {
+                let isVictory = score >= winScoreThreshold && currentPlayerName !== "Gäst";
+                let title = isVictory ? "👑 GLITCHED VICTORY!" : "💀 TERMINAL CRASHED!";
+                let message = isVictory 
+                    ? `Deltagare: ${currentPlayerName} har satt ett nytt rekord med ${score} poäng! 🏆` 
+                    : `Deltagare: ${currentPlayerName} avslutade rundan med ${score} poäng.`;
+
+                let gameNoti = new Notification(title, {
+                    body: message,
+                    icon: "glitched.png"
+                });
+
+                // --- PÅSKÄGG: SPONSOR ROULETTE VID KLICK ---
+                gameNoti.onclick = function(e) {
+                    e.preventDefault();
+                    window.focus();
+                    
+                    const glitchedSponsors = [
+                        'https://www.sj.se/trafikinfo',
+                        'https://www.elgiganten.se/',
+                        'https://www.vattenfall.se/',
+                        'https://www.telia.se/',
+                        'https://www.trygghansa.se/',
+                        'https://glitched.se/sv/',
+                        'https://www.rogjourney.se/'
+                    ];
+                    
+                    let randomSponsorUrl = glitchedSponsors[Math.floor(Math.random() * glitchedSponsors.length)];
+                    window.open(randomSponsorUrl, '_blank');
+                    
+                    showToast("📡 MATRIX LINKED: REDIRECTING TO FESTIVAL PARTNER!", "var(--primary)");
+                };
+            }
+            // Stäng av röstlyssningen omedelbart
+            if (recognition && isMicActive) {
+                isMicActive = false;
+                recognition.stop();
+                showToast(currentLang === 'sv' ? "🎤 MIKROFON AVAKTIVERAD" : "🎤 MIC DISCONNECTED", "orange");
+            }
+            // Stäng av hårdvaruströmmen till micken (släcker röda lampan på webbläsaren)
+            if (microphoneStream) {
+                microphoneStream.getTracks().forEach(track => track.stop());
+            }
+            if (audioContext) {
+                audioContext.close();
+            }
+            document.getElementById('strike-meter-container').style.display = 'none';
+            if (activeGameIdleTimer) clearTimeout(activeGameIdleTimer);
+            enemyLaserLines.forEach(line => scene.remove(line));
+        enemyLaserLines = [];
+        
+        enemyReticleMeshes.forEach(reticle => scene.remove(reticle));
+        enemyReticleMeshes = [];
+        
+        // Återställ fiendernas interna siktes-referenser
+        enemies.forEach(en => {
+            if (en.reticle) {
+                en.reticle.material.opacity = 0;
+                en.isCharging = false;
+                en.reticle = null; 
+            }
+        });
+            currentVolumeLevel = 0;
+            gameState = 'GAMEOVER';
+            
+            if (backgroundMusic) backgroundMusic.pause();
+            document.body.style.cursor = 'default';
+
+            // Hämta referenser till dina befintliga element från din HTML-struktur
+    const modal = document.getElementById('gameover-modal');
+    const goScore = document.getElementById('go-score');
+    const goRating = document.getElementById('go-rating');
+    const goMock = document.getElementById('go-mock');
+    const verificationBox = document.getElementById('verification-box');
+
+    // Antar att din globala poängvariabel heter score eller finalScore
+    const finalScore = score; 
+    if (goScore) goScore.innerText = finalScore;
+
+    // Läsa av turneringsläge och svårighetsgrad (Hämtas från dina existerande element/variabler)
+    const tournamentCheck = document.getElementById('tournament-mode-checkbox');
+    const isTournament = tournamentCheck ? tournamentCheck.checked : false;
+    
+    // Hämtar vald svårighetsgrad ('easy', 'normal', 'hard') utifrån spelets nuvarande läge
+    const currentDifficulty = typeof difficulty !== 'undefined' ? difficulty : 'normal'; 
+
+    // ==========================================================================
+    // 1. 🔮 KAMEKS UNIKA HÅN BEROENDE PÅ POÄNG (Injiceras i #go-mock)
+    // ==========================================================================
+    let kamekInsult = "";
+    if (finalScore >= 40000) {
+        kamekInsult = "NYEHEHEHE! Okej, du kan skriva... Men fuskar du? Kamek har ögonen på dina fingrar!";
+    } else if (finalScore >= 25000) {
+        kamekInsult = "Inte illa för en vanlig mässbesökare. Men du är fortfarande en lök jämfört med Kameks magi!";
+    } else if (finalScore >= 12000) {
+        kamekInsult = "Du missade hälften av orden! Gick du i skolan med tangentbords-fuskare eller?";
+    } else if (finalScore >= 4000) {
+        kamekInsult = "Kollade du ens på skärmen? Min arga robot rörde sig knappt innan du kraschade!";
+    } else {
+        kamekInsult = "NYEHEHEHE! Skriver du med armbågarna?! Det där var det sämsta Kamek någonsin skådat!";
+    }
+
+    if (goMock) goMock.innerText = kamekInsult;
+
+    // ==========================================================================
+    // 2. 🏆 RATING- OCH VINSTLOGIK (Injiceras i #go-rating)
+    // ==========================================================================
+    let hasWon = false;
+
+    if (goRating) {
+        if (isTournament) {
+            // --- TURNERINGSLÄGE: Dynamiska vinstnivåer baserade på svårighetsgrad ---
+            let winThreshold = 15000; // Normal fallback (15k)
+            if (currentDifficulty === 'easy') winThreshold = 7500;
+            if (currentDifficulty === 'hard') winThreshold = 30000;
+
+            if (finalScore >= winThreshold) {
+                goRating.innerText = "VINST: HÄMTA UT PRIS!";
+                goRating.style.color = "var(--primary)"; // Din cyan/gröna färg för vinst
+                hasWon = true;
+            } else if (finalScore >= winThreshold * 0.75) {
+                goRating.innerText = "SÅ NÄRA!";
+                goRating.style.color = "var(--gold)";
+            } else if (finalScore >= winThreshold * 0.4) {
+                goRating.innerText = "BRA FÖRSÖK MEN DU KAN BÄTTRE";
+                goRating.style.color = "var(--gold)";
+            } else {
+                goRating.innerText = "KÄMPA PÅ";
+                goRating.style.color = "var(--danger)";
+            }
+        } else {
+            // --- STANDARDLÄGE: Klassiska betyg A-F ---
+            if (finalScore >= 45000) { goRating.innerText = "A++ (LEGEND)"; goRating.style.color = "var(--primary)"; }
+            else if (finalScore >= 30000) { goRating.innerText = "A"; goRating.style.color = "var(--primary)"; }
+            else if (finalScore >= 22000) { goRating.innerText = "B"; goRating.style.color = "var(--gold)"; }
+            else if (finalScore >= 14000) { goRating.innerText = "C"; goRating.style.color = "var(--gold)"; }
+            else if (finalScore >= 7000)  { goRating.innerText = "D"; goRating.style.color = "var(--danger)"; }
+            else if (finalScore >= 2500)  { goRating.innerText = "E"; goRating.style.color = "var(--danger)"; }
+            else { goRating.innerText = "F (LÖKIG)"; goRating.style.color = "var(--danger)"; }
+        }
+    }
+
+            // Kontrollera om det blev en vanlig förlust eller en legendarisk turneringsvinst
+            if (score >= winScoreThreshold && (isTournamentMode)) {
+                
+                // ==========================================================================
+                // --- NYTT: PRIS-SPÄRR FÖR GÄSTER ---
+                // ==========================================================================
+                if (currentPlayerName === "Gäst") {
+                    document.getElementById('verification-box').style.display = 'none'; // Dölj absolut verifieringen!
+                    
+                    let regularDeathAudio = new Audio('mario_death_sound.mp3'); // Spela förlustljud istället för yay
+                    regularDeathAudio.volume = sfxVolumeFactor * 0.6; regularDeathAudio.play().catch(()=>{});
+
+                    document.getElementById('go-title').innerText = "❌ PRIS BLOCKERAT";
+                    document.getElementById('go-title').style.color = "var(--danger)";
+                    document.getElementById('go-desc').innerText = "ANONYMA SPELARE/ANONYMOUS PLAYERS ELIGIBLE FOR NO REWARDS";
+                    
+                    document.getElementById('go-mock').innerHTML = 
+                        "Kamek asgarvar: 'NYEHEHEHE! Du nådde poänggränsen, men du spelade anonymt eller använde ett censurerat namn! <br><br>" +
+                        "Systemet har nekat dig din verifieringskod. <br><br>" +
+                        "<strong>Du kan INTE hämta ut någon samlarfigur i Lobby Syd som 'Gäst'</strong>! Starta om, skriv in ditt riktiga LAN-namn (utan svordomar) för att kunna vinna på riktigt!'";
+                    
+                    document.getElementById('go-rating').innerText = "🚫 UNQUALIFIED";
+                    
+                    let goBtn = document.querySelector('#gameover-modal .btn-start');
+                    if (goBtn) goBtn.innerText = currentLang === 'sv' ? "FÖRSÖK IGEN MED RIKTIGT NAMN" : "RETRY WITH VALID NAME";
+                } 
+                // ==========================================================================
+                // --- GILTIG SPELARE (ÄKTA VINST) ---
+                // ==========================================================================
+                else {
+                    let victoryAudio = new Audio('yay.mp3');
+                    victoryAudio.volume = sfxVolumeFactor; victoryAudio.play().catch(() => {});
+
+                    spawnConfetti();
+                    generateSecureVerification(currentPlayerName, score);
+
+                    document.getElementById('go-title').innerText = "👑 TURNERINGSSEGER!";
+                    document.getElementById('go-title').style.color = "var(--primary)";
+                    document.getElementById('go-desc').innerText = "STATION 24 PURGED - EXKLUSIV QWERTIE UPPLÅST!";
+                    
+                    document.getElementById('go-mock').innerHTML = 
+                        "SYSTEM SÄKRET: DU HAVE VUNNIT EN SAMLARFIGUR! 🤩<br><br>" +
+                        "Kamek tjuter i ren frustration: 'OMÖJLIGT! Du lyckades hålla ut till " + score + " poäng?! Mitt virus-grid är pulveriserat!'<br><br>" +
+                        "Gå direkt till <strong>Glitched Merch Shop i Lobby Syd</strong> och visa upp denna skärm för crewet för att hämta din fysiska Qwertie samlarfigur!";
+                    
+                    document.getElementById('go-rating').innerText = "🏆 GODLIKE";
+                    
+                    let goBtn = document.querySelector('#gameover-modal .btn-start');
+                    if (goBtn) goBtn.innerText = "KVALIFICERAD ✔️";
+                }
+            } else {
+                // --- STANDARD GAMEOVER SKÄRM (MED ORIGINAL-HÅN) ---
+                document.getElementById('verification-box').style.display = 'none'; // Dölj säkerhetsrutan
+                document.getElementById('go-title').innerText = "GAME OVER";
+                document.getElementById('go-title').style.color = "var(--danger)";
+                document.getElementById('go-desc').innerText = "STATION 24 COMPROMISED - TERMINAL LOCKED BY KAMEK";
+                
+                // HÄR ÄR DINA ORIGINAL-HÅN: Systemet slumpar fram ett av dina gamla hån!
+                const originalInsults = [
+                    t('mock_0'), // Var du ens vaken? Mina drönare flög bättre än din musmatta!
+                    t('mock_1'), // Patetiskt. Goomborna på LAN:et har bättre precision än du.
+                    t('mock_2'), // Helt lagom dussinspelare. Inget som imponerar på crewet.
+                    t('mock_3')  // Okej, du kan sikta. Men du är fortfarande bara en amatör i min 3D-rymd!
+                ];
+
+                if (window.__nukeDeathTriggered) {
+                    document.getElementById('go-mock').innerText = t('nuke_abort');
+                    window.__nukeDeathTriggered = false;
+                } else {
+                    // Slumpa ett av original-hånen så att de alltid visas!
+                    let randomInsult = originalInsults[Math.floor(Math.random() * originalInsults.length)];
+                    document.getElementById('go-mock').innerText = randomInsult;
+                }
+
+                // Beräkna betyg baserat på poäng
+                let rat = "ROOKIE";
+                if (score > 8000) rat = "CYBER WARRIOR";
+                else if (score > 4000) rat = "SYSADMIN";
+                else if (score > 1500) rat = "SCRIPT KIDDIE";
+                document.getElementById('go-rating').innerText = rat;
+                
+                let goBtn = document.querySelector('#gameover-modal .btn-start');
+                if (goBtn) goBtn.innerText = currentLang === 'sv' ? "STARTA OM SYSTEMET" : "RESTART TERMINAL";
+            }
+
+            // --- NYTT: SCREEN-CURTAIN (ANTI-IDLE RESET) ---
+            // Om en spelare överger montern efter att ha förlorat, starta om efter 60 sekunder
+            if (idleTimer) clearTimeout(idleTimer);
+            
+            idleTimer = setTimeout(() => {
+                showToast("🔮 KAMEK RESETTING TERMINAL DUE TO INACTIVITY...", "var(--danger)");
+                setTimeout(() => { window.location.reload(); }, 1500);
+            }, 60000); // 60000 millisekunder = 1 minut
+
+            // Om någon rör skärmen eller trycker på en tangent, avbryt inaktivitetsgardinen direkt!
+            const cancelIdle = () => {
+                if (idleTimer) {
+                    clearTimeout(idleTimer);
+                    idleTimer = null;
+                }
+                document.removeEventListener('keydown', cancelIdle);
+                document.removeEventListener('mousemove', cancelIdle);
+            };
+            document.addEventListener('keydown', cancelIdle);
+            document.addEventListener('mousemove', cancelIdle);
+
+            document.getElementById('go-score-lbl').innerText = t('score');
+            document.getElementById('go-rating-lbl').innerText = currentLang === 'sv' ? 'BETYG' : 'RATING';
+            document.getElementById('go-score').innerText = score;
+            document.getElementById('gameover-modal').style.display = 'flex';

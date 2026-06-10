@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Station 24 x Glitched</title>
+    <style>
+        :root { --glitch-green: #00ffcc; --dark-bg: #030008; }
+        body { background-color: var(--dark-bg); color: white; font-family: 'Montserrat', sans-serif; text-align: center; padding: 20px; }
+        img { max-width: 400px; margin-bottom: 20px; }
+        h1 { color: var(--glitch-green); text-transform: uppercase; }
+        .game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 30px; }
+        .game-card { background: #1a1a2e; padding: 20px; border-radius: 10px; border: 1px solid var(--glitch-green); }
+        .warning-box { background: #330000; border: 1px solid red; padding: 15px; margin-top: 40px; border-radius: 5px; }
+        a { color: var(--glitch-green); text-decoration: none; font-weight: bold; font-size: 1.2em; }
+        .difficulty { font-size: 0.8em; color: #aaa; }
+    </style>
+</head>
+<body>
+
+    <img src="glitched.png" alt="Glitched Logotyp">
+    <h1>Station 24 x Glitched</h1>
+    <p>Välkommen till arkaden! Välj ett spel nedan för att starta utmaningen.</p>
+
+    <div class="game-grid">
+        <div class="game-card">
+            <a href="The Boss - Base Defense/qwerty_defense.html">Qwerty Defense</a>
+            <p class="difficulty">Svårighetsgrad: Extrem | Ålder: 10+</p>
+        </div>
+        <div class="game-card">
+            <a href="The Boss - Base Defense/index3.html">Base Defense</a>
+            <p class="difficulty">Svårighetsgrad: Medium | Ålder: 7+</p>
+        </div>
+        </div>
+
+    <div class="warning-box">
+        <h3>⚠️ Sensorisk varning & Information</h3>
+        <p>Spelen kan innehålla blinkande ljus, snabba rörelser och höga ljudnivåer. 
+        <br>Om du är känslig för sensoriska intryck, vänligen kontakta Crew vid Station 24 för anpassning.</p>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,77 @@
+_02_sea
+=======
+  Textures:
+    - B_sunsetgrade
+
+  Ambient Colors:
+    - 128, 128, 128, 50
+
+
+
+_02_usugumo
+===========
+  Textures:
+    - B_sky_kumo128
+        Offset: 2.8350579738616943, 2.8350579738616943
+        Scale: 2, 2
+    - B_sky_kumo128
+        Scale: 0.625, 0.625
+
+  Ambient Colors:
+    - 128, 128, 128, 50
+
+  Constant Colors:
+    - 255, 255, 255, 127
+
+  Material Colors:
+    - 248, 126, 0, 255
+    - 248, 126, 0, 255
+
+
+
+_03_sky
+=======
+  Textures:
+    - B_sunsetgrade
+
+  Ambient Colors:
+    - 128, 128, 128, 50
+
+  Color Registers:
+    - 0, 69, 36, 255
+    - 248, 122, 0, 255
+
+
+
+_Enk
+====
+  Textures:
+    - B_skySunsetCloud
+        Offset: 0.6930670142173767, 0
+        Scale: 7, 1
+
+  Ambient Colors:
+    - 128, 128, 128, 50
+
+  Material Colors:
+    - 110, 89, 176, 208
+    - 110, 89, 176, 208
+
+  Color Registers:
+    - -5, -66, -37, 255
+
+
+
+_zodiac
+=======
+  Textures:
+    - B_sterJimi
+        Scale: 2, 2
+    - B_sterJimi
+        Scale: 3, 3
+
+  Ambient Colors:
+    - 128, 128, 128, 50
+
+  Constant Colors:
+    - 255, 255, 255, 127

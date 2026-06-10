@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Station 24 - THE BOSS HQ</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="flashplayer.png">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <noscript>
+        <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #ff0000; color: #fff; z-index: 9999999; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-family: 'Press Start 2P'; padding: 20px;">
+            <h1>[ SYSTEM ERROR ]</h1>
+            <p>JavaScript must be enabled to run Station 24 Protocol.</p>
+        </div>
+    </noscript>
+
+    <script>
+        var isIE = /*@cc_on!@*/false || !!document.documentMode;
+        if (isIE) {
+            alert("⚠️ SYSTEM ERROR: Your browser is too old for Station 24. Please use a modern terminal.");
+            window.location.href = "https://www.google.com/chrome/";
+        }
+    </script>
+
+    <div class="monitor-frame">
+        <div class="screen-content">
+            <div class="scanlines"></div>
+            
+            <div id="beep-overlay" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:red; font-family:'Press Start 2P'; font-size:4rem; z-index:100;"></div>
+
+            <div id="start-screen" class="screen">
+                <h1 class="glitch" data-text="STATION 24">STATION 24</h1>
+                <p class="subtitle">OPERATOR PSL631 HQ</p>
+
+                <div class="rules-box">
+                    <h3>[ TOURNAMENT RULES ]</h3>
+                    <ul id="rules-list">
+                        <li>[!] NO GOOGLING – Tab switching triggers Kamek.</li>
+                        <li>[!] KAMEK SEES ALL – System locks upon cheating.</li>
+                        <li>[!] NAME FILTER – Offensive tags are flagged.</li>
+                        <li>[!] POWER CHECK – Use charger, not battery.</li>
+                    </ul>
+                </div>
+
+                <div class="input-group">
+                    <label>YOUR GAMER TAG:</label>
+                    <input type="text" id="player-name" placeholder="Type name..." maxlength="15">
+                </div>
+
+                <div id="mode-selection" style="margin: 15px 0; display: flex; gap: 10px; justify-content: center;">
+                    <button onclick="setMode('tournament')" class="main-btn" id="btn-tournament" style="font-size:0.8rem;">TOURNAMENT</button>
+                    <button onclick="setMode('classic')" class="main-btn" id="btn-classic" style="font-size:0.8rem;">CLASSIC</button>
+                </div>
+
+                <button id="start-button" class="main-btn" onclick="startQuiz()">BOOT PROTOCOL 🚀</button>
+            </div>
+
+            <div id="loading-container" class="screen hidden">
+                <p style="font-family: 'Press Start 2P'; color: var(--terminal-green);">CONFIGURING TERMINAL...</p>
+                <div class="spinner"></div>
+            </div>
+
+            <div id="quiz-screen" class="screen hidden">
+                <div class="stats-bar" style="display:flex; justify-content:space-between; width:100%; align-items: center;">
+                    <div id="progress" style="font-family: 'VT323'; font-size: 1.5rem;"></div>
+                    <div id="lives-container" style="display: flex; gap: 5px;"></div>
+                </div>
+
+                <div id="question-category" style="color: yellow; font-family: 'VT323'; font-size: 1.2rem; text-transform: uppercase; margin-top: 10px;">
+                    [ SYSTEM CATEGORY ]
+                </div>
+
+                <h2 id="question-text" class="question" style="margin: 15px 0; min-height: 50px;"></h2>
+                
+                <div id="options-grid" class="options-grid"></div>
+
+                <div class="lifelines">
+                    <button id="fifty-fifty-btn" class="lifeline-btn" onclick="useFiftyFifty()">50/50</button>
+                    <button id="skip-btn" class="lifeline-btn" onclick="useSkipQuestion()">SKIP</button>
+                    <button id="analysis-btn" class="lifeline-btn" onclick="useAnalysis()">ANALYSIS</button>
+                    <button id="reboot-btn" class="lifeline-btn" onclick="useReboot()">REBOOT</button>
+                </div>
+
+                <div id="feedback" style="min-height: 20px; margin-top: 10px; font-family: 'Press Start 2P'; font-size: 0.7rem;"></div>
+            </div>
+
+            <div id="result-screen" class="screen hidden"></div>
+
+            <div id="kamek-screen" class="screen hidden">
+                <h1 style="font-family: 'Press Start 2P'; color: yellow; margin-top: 50px;">YOU GOT CAUGHT! 🪄✨</h1>
+                <div id="kamek-img-container" style="margin: 20px auto;">
+                    <img src="kamek.jfif" alt="Kamek" style="width:220px; display:block; border:5px solid black; margin: 0 auto;">
+                </div>
+                <p id="kamek-reason" style="font-family:'VT323'; font-size:2.2rem; color:yellow; background: black; padding: 15px; border: 2px dashed yellow; margin-bottom: 20px; max-width: 90%; margin-left: auto; margin-right: auto;">
+                    VIOLATION: [DETECTED]
+                </p>
+                <p style="font-family:'VT323'; color:#fff; font-size:1.4rem; margin-top: 20px; max-width: 750px; line-height: 1.3; margin-left: auto; margin-right: auto;">
+                    You tried to cheat or leave the page. As punishment, Kamek has played his laugh and locked the terminal. Operator Psl631 has been informed.
+                </p>
+                <div style="margin-top:40px; margin-bottom: 40px;">
+                    <button id="kamek-reboot-btn" onclick="location.reload()" style="background:#ff0000; color:white; border:4px solid white; padding:20px 40px; cursor:pointer; font-family:'Press Start 2P';">REBOOT SYSTEM 🚀</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <title>STATION 24 - HOVEDMENU</title>
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #05000a;
+            color: #ffcc00;
+            font-family: 'Luckiest Guy', cursive;
+            text-align: center;
+            padding: 50px;
+        }
+        h1 { font-size: 60px; text-shadow: 3px 3px #8200ff; }
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            max-width: 1000px;
+            margin: 40px auto;
+        }
+        .game-card {
+            background: #1a0033;
+            border: 4px solid #ffcc00;
+            padding: 20px;
+            border-radius: 20px;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .game-btn {
+            color: #fff;
+            text-decoration: none;
+            font-size: 22px;
+            padding: 15px;
+            border: 2px solid #ffcc00;
+            border-radius: 10px;
+        }
+        .game-card:hover { transform: scale(1.02); background: #2a0055; }
+        .sensory-label { font-size: 14px; font-family: sans-serif; padding: 5px; border-radius: 5px; }
+        .low { background: #00ff00; color: black; }
+        .med { background: #ffaa00; color: black; }
+        .high { background: #ff3300; color: white; }
+        .extreme { background: #8200ff; color: white; }
+    </style>
+</head>
+<body>
+
+    <h1>STATION 24 - HOVEDMENU</h1>
+    <p>Vælg dit protokolsystem:</p>
+
+    <div class="menu-grid">
+        <div class="game-card">
+            <a href="lanbit_memory/index_da.html" class="game-btn">🧠 MEMORY KAOS</a>
+            <span class="sensory-label low">Sensorisk Profil: Lav</span>
+        </div>
+        <div class="game-card">
+            <a href="The Boss - Base Defense/index3.html" class="game-btn">🚀 BASE DEFENSE</a>
+            <span class="sensory-label high">Sensorisk Profil: Høj</span>
+        </div>
+        <div class="game-card">
+            <a href="The Boss - Base Defense/base_defense_boss.html" class="game-btn">👾 BASE DEFENSE (BOSS)</a>
+            <span class="sensory-label extreme">Sensorisk Profil: Ekstrem</span>
+        </div>
+        <div class="game-card">
+            <a href="lanbit_math-mayhem/index3.html" class="game-btn">🧮 MATH MAYHEM</a>
+            <span class="sensory-label med">Sensorisk Profil: Medium</span>
+        </div>
+        <div class="game-card">
+            <a href="lanbit_quiz/index_da.html" class="game-btn">❓ LAN-QUIZ</a>
+            <span class="sensory-label low">Sensorisk Profil: Lav</span>
+        </div>
+        <div class="game-card">
+            <a href="lanbit hänga gubbe/index.html" class="game-btn">💀 BØDDEL (HANGMAN)</a>
+            <span class="sensory-label low">Sensorisk Profil: Lav</span>
+        </div>
+        <div class="game-card">
+            <a href="keyboard warrior/index_da.html" class="game-btn">⌨️ KEYBOARD WARRIOR</a>
+            <span class="sensory-label med">Sensorisk Profil: Medium</span>
+        </div>
+        <div class="game-card">
+            <a href="lanbit_reaktionsspel/index.html" class="game-btn">⚡ REAKTIONS-SPIL</a>
+            <span class="sensory-label high">Sensorisk Profil: Høj</span>
+        </div>
+        <div class="game-card">
+            <a href="mystery/mariospel.html" class="game-btn">🍄 MARIO-SPIL</a>
+            <span class="sensory-label med">Sensorisk Profil: Medium</span>
+        </div>
+        <div class="game-card">
+            <a href="lanbit_antivirus/index2.html" class="game-btn">🛡️ VIRUS-SPIL</a>
+            <span class="sensory-label high">Sensorisk Profil: Høj</span>
+        </div>
+    </div>
+
+</body>
+</html>

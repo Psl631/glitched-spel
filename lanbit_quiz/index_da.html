@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Station 24 - THE BOSS HQ</title>
+    <link rel="icon" type="image/png" href="flashplayer.png">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ===========================================================
+           STATION 24: TERMINAL PROTOCOL v43.0 - CLEAN SYSTEM STYLES
+           =========================================================== */
+        :root {
+            --terminal-green: #00ff00;
+            --error-red: #ff0000;
+            --bg-black: #050505;
+            --neon-pink: #ff00ff;
+            --monitor-border: #333;
+        }
+
+        #instructions-screen ul {
+            list-style-type: square;
+            color: #00ffcc;
+        }
+
+        #instructions-screen li {
+            margin-bottom: 8px;
+        }
+
+        #instructions-screen strong {
+            color: #fff;
+        }
+
+        #game-window {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 450px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 100%;
+            max-width: 600px;
+            margin-top: 10px;
+        }
+
+        body {
+            background: linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.9)), 
+                        url('lanbit_bg.jfif') no-repeat center center fixed;
+            background-size: cover;
+            color: var(--terminal-green);
+            font-family: 'VT323', monospace;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .monitor-frame {
+            width: 95%;
+            max-width: 800px;
+            background: #1a1a1a;
+            padding: 15px;
+            border: 10px solid var(--monitor-border);
+            border-radius: 10px;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 1);
+        }
+
+        .screen-content {
+            background: var(--bg-black);
+            padding: 30px;
+            position: relative;
+            border: 2px solid #111;
+            min-height: 450px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .scanlines {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .glitch {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 2.2rem;
+            text-align: center;
+            color: #fff;
+            text-shadow: 3px 0 var(--neon-pink);
+            margin-bottom: 30px;
+        }
+
+        .question {
+            font-size: 1.8rem;
+            text-align: center;
+            color: #fff;
+            min-height: 80px;
+        }
+
+        #player-name {
+            background: #000;
+            border: 2px solid var(--terminal-green);
+            color: #fff;
+            padding: 10px;
+            font-family: 'VT323';
+            font-size: 1.5rem;
+            text-align: center;
+            width: 250px;
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        .menu-btn, .option-btn {
+            background: transparent;
+            color: var(--terminal-green);
+            border: 2px solid var(--terminal-green);
+            padding: 12px 20px;
+            font-family: 'VT323';
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .menu-btn:hover, .option-btn:hover {
+            background: var(--terminal-green);
+            color: #000;
+            box-shadow: 0 0 15px var(--terminal-green);
+        }
+
+        .correct-flash {
+            background: var(--terminal-green) !important;
+            color: #000 !important;
+        }
+
+        .wrong-flash {
+            background: var(--error-red) !important;
+            color: #fff !important;
+            border-color: #fff !important;
+        }
+
+        #toad-sad-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .loader-container {
+            width: 200px;
+            height: 15px;
+            border: 2px solid var(--terminal-green);
+            margin: 20px auto;
+        }
+
+        #toad-guide {
+            pointer-events: none;
+            user-select: none;
+        }
+
+        div::-webkit-scrollbar {
+            width: 10px;
+        }
+        div::-webkit-scrollbar-track {
+            background: #000;
+        }
+        div::-webkit-scrollbar-thumb {
+            background: #f00;
+            border: 2px solid #000;
+        }
+
+        #question-text {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        #quiz-screen {
+            max-height: 80vh;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .option-btn {
+            background: #111;
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            padding: 15px;
+            font-family: 'VT323', monospace;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover {
+            background: #00ff00;
+            color: #000;
+        }
+
+        .lifelines button.used {
+            background: #222 !important;
+            color: #444 !important;
+            border-color: #333 !important;
+            cursor: not-allowed;
+            opacity: 0.5;
+            pointer-events: none;
+            filter: grayscale(100%);
+            box-shadow: none !important;
+        }
+
+        .screen-damage {
+            animation: screen-shake 0.3s ease-in-out, red-flash 0.3s steps(2);
+            pointer-events: none;
+        }
+
+        @keyframes screen-shake {
+            0% { transform: translate(0, 0); }
+            10% { transform: translate(-10px, 5px); }
+            20% { transform: translate(10px, -5px); }
+            30% { transform: translate(-5px, 10px); }
+            40% { transform: translate(5px, -10px); }
+            50% { transform: translate(-10px, 5px); }
+            60% { transform: translate(10px, -5px); }
+            70% { transform: translate(-5px, 10px); }
+            80% { transform: translate(5px, -10px); }
+            90% { transform: translate(-10px, 5px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        @keyframes red-flash {
+            0% { background-color: transparent; }
+            50% { background-color: rgba(255, 0, 0, 0.4); }
+            100% { background-color: transparent; }
+        }
+
+        #beep-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff0000;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 4rem;
+            text-shadow: 5px 5px 0px #000;
+            z-index: 100;
+            letter-spacing: 10px;
+            display: none;
+        }
+
+        #result-screen {
+            max-height: 80vh;
+            overflow-y: auto;
+            padding-right: 10px;
+            scrollbar-width: thin;
+            scrollbar-color: #ff0000 #000;
+        }
+
+        #result-screen::-webkit-scrollbar {
+            width: 8px;
+        }
+        #result-screen::-webkit-scrollbar-track {
+            background: #000;
+        }
+        #result-screen::-webkit-scrollbar-thumb {
+            background: #ff0000;
+            border: 1px solid #fff;
+        }
+
+        .lifeline-btn.used {
+            filter: grayscale(100%) brightness(0.7);
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: auto;
+            border-color: #555 !important;
+            color: #888 !important;
+        }
+
+        .lifeline-btn {
+            background: transparent;
+            color: var(--terminal-green);
+            border: 2px solid var(--terminal-green);
+            padding: 8px 15px;
+            font-family: 'VT323';
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin: 0 5px;
+            transition: all 0.2s;
+        }
+        .lifeline-btn:hover {
+            background: var(--terminal-green);
+            color: #000;
+        }
+
+        /* --- MEDIA POPUP & AUDIO INTERFACE --- */
+        .btn-toggle {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 11px;
+            padding: 15px 25px;
+            border: 3px solid #333;
+            border-radius: 12px;
+            cursor: pointer;
+            min-width: 180px;
+            transition: all 0.2s;
+            color: white;
+        }
+        .btn-off { background: #440000; border-color: #ff0000; box-shadow: 0 0 10px rgba(255, 0, 0, 0.2); }
+        .btn-on { background: #004400; border-color: #00ff00; box-shadow: 0 0 20px rgba(0, 255, 0, 0.4); transform: translateY(-2px); }
+        
+        .btn-start-game {
+            width: 100%;
+            background: #ffcc00;
+            color: black;
+            font-family: 'Press Start 2P';
+            font-size: 14px;
+            padding: 20px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            border-bottom: 5px solid #b89500;
+            margin-top: 15px;
+        }
+        .btn-start-game:hover { background: #ffe066; }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 20000;
+            justify-content: center;
+            align-items: center;
+        }
+        .popup-content {
+            position: relative;
+            width: 90%;
+            max-width: 500px;
+            background: #111;
+            border: 4px solid #8200ff;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(130, 0, 255, 0.5);
+        }
+        .close-popup {
+            position: absolute;
+            top: 15px; right: 15px;
+            background: none; border: none;
+            color: #ffcc00; font-size: 20px; cursor: pointer;
+            font-family: 'Press Start 2P';
+        }
+        .toggle-container { display: flex; flex-direction: column; gap: 15px; margin: 25px 0; }
+        .open-settings-btn {
+            padding: 10px 20px;
+            font-family: 'VT323';
+            font-size: 1.3rem;
+            background: #1a0033; color: #ffcc00;
+            border: 2px solid #8200ff; cursor: pointer; border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        #audio-interface { position: fixed; bottom: 20px; right: 20px; z-index: 99999; cursor: pointer; user-select: none; transition: all 0.3s ease; }
+        #boombox-container { position: relative; width: 80px; height: 80px; }
+        #boombox-img { width: 100%; height: 100%; border-radius: 12px; border: 3px solid #ffcc00; box-shadow: 0 0 20px rgba(0,0,0,0.8); opacity: 0.5; transform: scale(0.9); transition: all 0.3s; }
+        #status-cross { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); border-radius: 12px; pointer-events: none; }
+        #status-cross span { color: #ff0000; font-size: 60px; font-weight: bold; text-shadow: 2px 2px 4px #000; }
+        #track-info { position: absolute; bottom: 90px; right: 0; background: rgba(0,0,0,0.9); color: #ffcc00; padding: 8px 12px; border-radius: 8px; font-size: 11px; font-family: monospace; white-space: nowrap; display: none; border: 1px solid #ffcc00; }
+    </style>
+</head>
+<body>
+
+    <noscript>
+        <div style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;color:red;z-index:9999999;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-family:'Press Start 2P';padding:20px;">
+            <h1>[ SYSTEM ERROR ]</h1>
+            <p>JavaScript skal være aktiveret for at køre Station 24 Protocol.</p>
+        </div>
+    </noscript>
+
+    <script>
+        /* ===========================================================
+           DETEKTERING & FORSKÆRMS-BLOCKER (DANSK)
+           =========================================================== */
+        (function() {
+            var ua = navigator.userAgent;
+            var blocked = false;
+            var title = "[ TERMINAL-FEJL ]";
+            var message = "";
+            var subMessage = "";
+            var errorCode = "HARDWARE_INCOMPATIBLE_V4.1";
+
+            var isIE = /*@cc_on!@*/false || !!document.documentMode;
+            var isAncient = false;
+            try { eval("var t = function() { let x = 1; };"); } catch (e) { isAncient = true; }
+
+            var isMobile = /iPhone|Android|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+            var isTablet = /iPad|PlayBook|Silk/i.test(ua) || (navigator.maxTouchPoints > 0 && /Macintosh/.test(ua));
+            var isConsole = /PlayStation|Nintendo|Xbox/i.test(ua);
+            var isTV = /SmartTV|Tizen|Web0S|Roku|AppleTV|DLNA|LGBrowser/i.test(ua);
+            var isCar = /Tesla|CarBrowser/i.test(ua);
+
+            if (isIE || isAncient) {
+                blocked = true;
+                title = "[ SYSTEM-ARKÆOLOGI ]";
+                message = "Din browser er en arkæologisk fortidsled.";
+                subMessage = "Station 24 Protocol kræver en moderne terminal. Opdatér din computer eller brug en maskine fra dette årti.";
+                errorCode = "UPGRADE_REQUIRED_NOW";
+            } 
+            else if (isCar) {
+                blocked = true;
+                title = "[ KØRETØJSTERMINAL AFVIST ]";
+                message = "Forsøger du at hacke Station 24 fra førersædet?";
+                subMessage = "Parker bilen og tilslut via en rigtig stationær computer (Windows/Mac/Linux). Vi understøtter ikke rullende hardware.";
+                errorCode = "DRIVE_BY_ACCESS_DENIED";
+            }
+            else if (isTV) {
+                blocked = true;
+                title = "[ MEDIABOKS-ADVARSEL ]";
+                message = "Et TV er til for at se film, ikke til seriøst arbejde.";
+                subMessage = "Operatør PSL631 kræver en arbejdsstation med mus og tastatur. Sofaen er ikke en godkendt kommandocentral.";
+                errorCode = "TV_NOT_A_COMPUTER";
+            }
+            else if (isConsole) {
+                blocked = true;
+                title = "[ KONSOL-BEGRÆNSNING ]";
+                message = "Forlad dit legetøj og hent en rigtig computer.";
+                subMessage = "Station 24 kører kun på 'Master Race'-hardware. Windows, Mac eller Linux er et krav for at dekryptere disse data.";
+                errorCode = "CONSOLE_HARDWARE_WEAK";
+            }
+            else if (isMobile) {
+                blocked = true;
+                title = "[ LOMMELEGETØJ DETEKTERET ]";
+                message = "Din skærm er for lille til dette intelligensniveau.";
+                subMessage = "Station 24 er ikke et mobilspil. Tilslut via en PC, Mac eller Linux-terminal for at få adgang.";
+                errorCode = "DESKTOP_ONLY_SECTOR";
+            }
+            else if (isTablet) {
+                blocked = true;
+                title = "[ BERØRINGSSKÆRMS-FORBUD ]";
+                message = "Fedtede fingre på glasset er uprofessionelt.";
+                subMessage = "En tablet er ikke en computer. Operatør PSL631 kræver fysiske taster og ægte CPU-kraft. Skift til en bærbar eller desktop.";
+                errorCode = "TABLET_ACCESS_REJECTED";
+            }
+
+            if (blocked) {
+                document.write(`
+                    <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; color:#ff0000; z-index:99999999; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:'Press Start 2P', cursive; text-align:center; padding:30px; border:15px solid #ff0000; box-sizing:border-box;">
+                        <div style="border: 4px solid #ff0000; padding: 30px; background: rgba(30,0,0,0.8); box-shadow: 0 0 50px #ff0000; max-width:850px;">
+                            <h1 style="font-size:1.4rem; margin-bottom:30px; text-shadow: 5px 5px #550000; line-height:1.3;">${title}</h1>
+                            <p style="color:#fff; font-family:'VT323'; font-size:2.4rem; margin-bottom:20px; line-height:1.2;">${message}</p>
+                            <p style="color:yellow; font-family:'VT323'; font-size:1.6rem; margin-bottom:30px; border-top:1px dashed #ff0000; padding-top:20px;">${subMessage}</p>
+                            <div style="font-family:'VT323'; font-size:1.1rem; color:#666; letter-spacing:1px;">
+                                SYSTEM_REQUIREMENTS: PC / MAC / LINUX<br>
+                                ACCESS_STATUS: TERMINATED<br>
+                                ERROR_CODE: ${errorCode}
+                            </div>
+                        </div>
+                    </div>
+                `);
+                window.stop();
+            }
+        })();
+    </script>
+
+    <div class="main-container">
+        <div class="monitor-frame">
+            <div class="screen-content">
+                <div class="scanlines"></div>
+                <div id="beep-overlay"></div>
+
+                <div id="game-window">
+                    
+                    <div id="instructions-screen" class="screen hidden">
+                        <h2 style="color: #00ff00; font-family: 'Press Start 2P'; font-size: 1.1rem; margin-bottom: 15px; text-shadow: 3px 3px #000;">INSTRUKTIONER & PROTOKOLLER</h2>
+                        <div style="text-align: left; font-family: 'VT323'; font-size: 1.25rem; line-height: 1.4; padding: 25px; color: #fff; background: rgba(0,20,0,0.95); border: 2px solid var(--terminal-green); margin-bottom: 20px; overflow-y: auto; max-height: 380px; width: 95%; box-shadow: inset 0 0 20px rgba(0,255,0,0.2);">
+                            <div style="border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px; background: rgba(50,0,0,0.4);">
+                                <h3 style="color: #ff0000; margin: 0 0 10px 0; font-family: 'Press Start 2P'; font-size: 0.7rem;">⚠️ SENSORISK ADVARSEL</h3>
+                                <p style="margin: 0; font-size: 1.1rem;">
+                                    Station 24 Protocol indeholder <strong>hurtige lysglimt</strong>, <strong>skærmrystende effekter</strong> og <strong>pludselige høje lyde</strong> ved forkerte svar eller systemfejl. Operatører med lysfølsomhed bør udvise forsigtighed.
+                                </p>
+                            </div>
+                            <h3 style="color: yellow; margin: 0 0 10px 0; border-bottom: 1px solid yellow;">1. VÆLG TERMINAL-TILSTAND</h3>
+                            <p>Før boot-sekvensen starter, skal en tilstand vælges:</p>
+                            <ul style="padding-left: 20px; margin-bottom: 20px;">
+                                <li><strong>[ TURNERING ]</strong>: Til dataindsamling. Du har <strong>uendelig energi (liv)</strong> og kan ikke blive låst ude på grund af forkerte svar.</li>
+                                <li><strong>[ KLASSISK ]</strong>: Den sande prøve. Du starter med <strong>3 liv</strong>. Hvert forkert svar forårsager systemskade og fjerner et liv.</li>
+                            </ul>
+                            <h3 style="color: yellow; margin: 20px 0 10px 0; border-bottom: 1px solid yellow;">2. SYSTEMASSISTENCE (LIVLINER)</h3>
+                            <p>Du har adgang til fire værktøjer. Hvert værktøj kan kun bruges <strong>én gang</strong> pr. session:</p>
+                            <ul style="padding-left: 20px; margin-bottom: 20px;">
+                                <li><strong>50/50</strong>: Eliminerer halvdelen af de forkerte svarmuligheder.</li>
+                                <li><strong>BYT SPØRGSMÅL</strong>: Henter en ny datapakke (nyt spørgsmål).</li>
+                                <li><strong>ANALYS</strong>: PSL631 giver dig det første bogstav i det rigtige svar.</li>
+                                <li><strong>REBOOT</strong>: Reparerer systemet og giver <strong>+1 liv</strong> (Kun tilgængelig i Klassisk tilstand).</li>
+                                <li><strong>Advarsel:</strong> Brug af livliner diskvalificerer dig fra Stjernegevinsten.</li>
+                            </ul>
+                            <h3 style="color: #00ffff; margin: 20px 0 10px 0; border-bottom: 1px solid #00ffff;">3. BELØNNINGER (STATION 24 LOOT)</h3>
+                            <p>Operatør PSL631 har fastsat følgende gevinstparametre:</p>
+                            <ul style="padding-left: 20px; margin-bottom: 20px;">
+                                <li><strong style="color: gold;">[ GULDMØNT ]</strong>: Modtages ved at overleve og gennemføre <strong>Classic-tilstanden</strong>.</li>
+                                <li><strong style="color: #00ff00;">[ TURNERINGSGEVINST ]</strong>: Tildeles den operatør, der har <strong>flest point</strong> i turneringsprotokollen.</li>
+                                <li><strong style="color: #ff00ff;">[ STJERNEGEVINSTEN ]</strong>: Den legendariske sejr! Kræver <strong>30/30 rigtige</strong> uden at bruge en <strong>eneste livlina</strong> under hele sessionen.</li>
+                            </ul>
+                            <h3 style="color: #ff0000; margin: 20px 0 10px 0; border-bottom: 1px solid #ff0000;">4. ANTI-CHEAT (KAMEK LOCKDOWN)</h3>
+                            <p>Sikkerhedssystemet Kamek overvåger din terminal i realtid:</p>
+                            <ul style="padding-left: 20px;">
+                                <li><strong>Fokus-tab</strong>: Hvis du skifter fane eller minimerer vinduet (f.eks. for at google), låses terminalen øjeblikkeligt.</li>
+                                <li><strong>Uautoriseret input</strong>: Brug af højreklik eller udviklerværktøjer (F12) fører til øjeblikkelig diskvalifikation.</li>
+                                <li><strong>Konsekvens</strong>: Ved overtrædelse afbrydes quizzen, og du tvinges til en fuld systemgendannelse.</li>
+                            </ul>
+                        </div>
+                        <button class="menu-btn" onclick="hideInstructions()" style="width: 300px;">BEKRÆFT PROTOKOL 🚀</button>
+                    </div>
+
+                    <div id="start-screen" class="screen">
+                        <h1 class="glitch" data-text="STATION 24">STATION 24</h1>
+                        <div class="main-menu-container">
+                            <div id="rules-box" style="border: 1px solid var(--terminal-green); padding: 15px; background: rgba(0,10,0,0.5); font-family: monospace; font-size: 1.1rem; margin-bottom: 15px;">
+                                <h3 id="rules-title" style="margin:0 0 10px 0; color: yellow;">--- TURNERINGSREGLER ---</h3>
+                                <ul id="rules-list" style="list-style: none; padding: 0; margin: 0; text-align: left;">
+                                    <li>[!] INGEN GOOGLE - Vi ser, hvis du snyder via faneskift.</li>
+                                    <li>[!] KAMEK SER ALT - Systemet låses ved mistænkelig adfærd.</li>
+                                    <li>[!] NAVNEFILTER - Upassende navne bliver flagget.</li>
+                                </ul>
+                            </div>
+
+                            <div id="mode-selection" style="margin: 15px 0; display: flex; gap: 10px; justify-content: center;">
+                                <button onclick="setMode('tournament')" class="mode-btn" id="btn-tournament" style="background:transparent; border:2px solid #333; color: #00ff00; padding: 10px; font-family:'VT323'; font-size:1.3rem; cursor:pointer;">
+                                    [ TURNERING ]<br><small style="font-size:0.8rem; color:#888;">Uendeligt liv | 3 Livliner</small>
+                                </button>
+                                <button onclick="setMode('classic')" class="mode-btn" id="btn-classic" style="background:transparent; border:2px solid #333; color: #00ff00; padding: 10px; font-family:'VT323'; font-size:1.3rem; cursor:pointer;">
+                                    [ KLASSISK ]<br><small style="font-size:0.8rem; color:#888;">3 Liv | 4 Livlinor</small>
+                                </button>
+                            </div>
+
+                            <div class="start-controls">
+                                <label id="label-gamer-tag" style="font-size:1.4rem; display:block; margin-bottom:5px;">DITT GAMER-TAG:</label>
+                                <input type="text" id="player-name" placeholder="Skriv her..." maxlength="15">
+                                <button id="start-button" class="menu-btn" onclick="startQuiz()" style="display:block; width:250px; margin:0 auto;">BOOT PROTOCOL [ START ]</button>
+                                <button id="how-to-play-btn" class="menu-btn" onclick="showInstructions()" style="margin-top: 10px; background: #222; border-color: #555; font-size: 0.9rem;">[ HVORDAN SPILLER JEG? ]</button>
+                                <br>
+                                <button class="open-settings-btn" onclick="openMediaPopup()">🎥 INDSTILLINGER</button>
+                            </div>
+                        </div>
+                        
+                        <div id="media-modal-overlay" class="modal-overlay">
+                            <div class="popup-content">
+                                <button class="close-popup" onclick="closeMediaPopup()">X</button>
+                                <h1 style="font-family:'VT323'; font-size:2.5rem; color:#ffcc00; margin:0;">MEDIA-KONTROL</h1>
+                                <p style="font-family:'VT323'; font-size:1.3rem; color:#fff;">Aktivér hardware til turneringen:</p>
+                                <div class="toggle-container">
+                                    <button id="toggle-cam" class="btn-toggle btn-off" onclick="toggleMediaState('cam')">
+                                        📸 KAMERA: <span id="status-cam">AF</span>
+                                    </button>
+                                    <button id="toggle-mic" class="btn-toggle btn-off" onclick="toggleMediaState('mic')">
+                                        🎤 MIKROFON: <span id="status-mic">AF</span>
+                                    </button>
+                                </div>
+                                <button class="btn-start-game" onclick="confirmAndStart()">GEM & AKTIVÉR</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="loading-container" class="screen hidden">
+                        <div class="loading-content" style="text-align:center;">
+                            <div class="spinner" style="border: 4px solid rgba(0,255,0,0.1); width: 50px; height: 50px; border-radius: 50%; border-left-color: #00ff00; animation: spin 1s linear infinite; margin: 0 auto 20px auto;"></div>
+                            <div class="loading-text" style="font-size:2rem; letter-spacing:2px;">KONFIGURERER...</div>
+                        </div>
+                        <style>@keyframes spin { 0% { transform: rotate(0deg); } 10% { transform: rotate(360deg); } }</style>
+                    </div>
+
+                    <div id="quiz-screen" class="screen hidden">
+                        <div id="progress" style="color: var(--terminal-green); font-family: 'VT323'; font-size: 1.4rem; margin-bottom: 10px;">
+                            STATUS: PROTOKOLL 1/30
+                        </div>
+                        <div class="quiz-header" style="width: 100%; display: flex; flex-direction: column; align-items: center; margin-bottom: 10px;">
+                            <div id="lives-container" style="display: flex; gap: 5px; margin-bottom: 5px;"></div>
+                            <div id="question-category" style="color: yellow; font-family: 'VT323'; font-size: 1.2rem; text-transform: uppercase;">
+                                [ SYSTEM-KATEGORI ]
+                            </div>
+                        </div>
+                        <h2 id="question-text" class="question" style="margin: 15px 0; min-height: 60px; color: #fff; font-family: 'VT323'; font-size: 1.8rem; text-align: center;"></h2>
+                        <div id="options-grid" class="options-grid"></div>
+                        <div class="lifelines" style="margin-top: 20px;">
+                            <button id="fifty-fifty-btn" class="lifeline-btn" onclick="useFiftyFifty()">50/50</button>
+                            <button id="skip-btn" class="lifeline-btn" onclick="useSkipQuestion()">BYT SPØRGSMÅL</button>
+                            <button id="analysis-btn" class="lifeline-btn" onclick="useAnalysis()">ANALYS</button>
+                            <button id="reboot-btn" class="lifeline-btn" onclick="useReboot()">REBOOT</button>
+                        </div>
+                        <div id="feedback" style="min-height: 25px; margin-top: 10px; font-family: 'Press Start 2P'; font-size: 0.7rem;"></div>
+                    </div>
+
+                    <div id="result-screen" class="screen hidden"></div>
+
+                    <div id="kamek-screen" class="screen hidden"></div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="kamek-media-bridge">
+        <div id="kamek-cam-widget">
+            <div id="kamek-rec-dot">● REC</div>
+            <video id="kamek-video" autoplay playsinline muted></video>
+            <div id="kamek-cam-off">
+                <img src="kamek.jfif" onerror="this.src='https://via.placeholder.com/60?text=KAMEK'">
+                <p>KAMERA AFBRUDT</p>
+            </div>
+        </div>
+        <div id="kamek-mic-widget">
+            <div class="kamek-bars">
+                <div class="k-bar"></div><div class="k-bar"></div>
+                <div class="k-bar"></div><div class="k-bar"></div>
+            </div>
+            <span>AUDIO LIVE</span>
+        </div>
+    </div>
+
+    <style>
+        #kamek-cam-widget {
+            position: fixed; bottom: 20px; left: 20px; width: 200px; height: 140px;
+            background: #000; border: 3px solid #8200ff; border-radius: 12px;
+            overflow: hidden; z-index: 9999; box-shadow: 0 0 15px rgba(130,0,255,0.4);
+        }
+        #kamek-video { width: 100%; height: 100%; object-fit: cover; display: none; }
+        #kamek-cam-off { 
+            width: 100%; height: 100%; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; background: #1a0033; color: #ffcc00; 
+        }
+        #kamek-cam-off img { width: 50px; height: 50px; border-radius: 50%; border: 1px solid #ffcc00; margin-bottom: 5px; opacity: 0.6; }
+        #kamek-cam-off p { margin: 0; font-family: 'VT323', monospace; font-size: 14px; }
+        #kamek-rec-dot { 
+            position: absolute; top: 8px; left: 8px; color: red; font-family: Arial; 
+            font-weight: bold; font-size: 12px; display: none; animation: k-blink 1s infinite;
+        }
+        #kamek-mic-widget {
+            position: fixed; bottom: 20px; right: 20px; width: 80px; height: 80px;
+            background: rgba(26,0,51,0.9); border: 2px solid #00ccff; border-radius: 50%;
+            display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 9999;
+        }
+        .kamek-bars { display: flex; align-items: flex-end; height: 25px; gap: 3px; }
+        .k-bar { width: 4px; background: #00ccff; height: 5px; border-radius: 2px; transition: height 0.05s; }
+        #kamek-mic-widget span { font-size: 9px; color: #00ccff; margin-top: 4px; font-family: sans-serif; }
+        .k-toast {
+            position: fixed; top: 20px; right: 20px; background: #1a0033; color: #ffcc00;
+            border: 2px solid #ffcc00; padding: 15px; border-radius: 10px; 
+            font-family: monospace; font-size: 14px; font-weight: bold; z-index: 10000; animation: k-slide 0.3s ease-out;
+        }
+        @keyframes k-slide { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    </style>
+
+    <div id="audio-interface">
+        <div id="boombox-container">
+            <img src="bandspelare.jfif" id="boombox-img" alt="Musik">
+            <div id="status-cross"><span>✕</span></div>
+        </div>
+        <div id="track-info">SPILER: INTET</div>
+    </div>
+
+    <script>
+        // DOM Debug Tool
+        const originalGetId = document.getElementById;
+        document.getElementById = function(id) {
+            const el = originalGetId.call(document, id);
+            if (!el) console.warn(`VARNING: Elementet med ID "${id}" saknas i din HTML!`);
+            return el;
+        };
+
+        // --- 1. FRÅGEDATABAS (DANSK) ---
+        const questions = [
+{ q: "Hvad er verdens største levende organisme målt i areal?", a: ["En honningsvamp i Oregon", "Den blåhval", "Great Barrier Reef", "En kæmpe sequoia"], r: "En honningsvamp i Oregon", cat: "NATUR" },
+{ q: "Hvilket år brød Berlinmuren sammen?", a: ["1987", "1989", "1991", "1993"], r: "1989", cat: "HISTORIE" },
+{ q: "Hvad er den kemiske betegnelse for guld?", a: ["Ag", "Au", "Pt", "Pb"], r: "Au", cat: "VIDENSKAB" },
+{ q: "Hvilket hav er det dybeste i verden?", a: ["Atlanterhavet", "Stillehavet", "Det Indiske Ocean", "Sydhavet"], r: "Stillehavet", cat: "GEOGRAFI" },
+{ q: "Hvilket dyr har den stærkeste bidkraft i dyreriget?", a: ["Løve", "Saltvandskrokodille", "Flodhest", "Tiger"], r: "Saltvandskrokodille", cat: "DYR" },
+{ q: "Hvilket sprog har flest ord i moderne brug?", a: ["Engelsk", "Mandarin", "Arabisk", "Tysk"], r: "Engelsk", cat: "SPROG" },
+{ q: "Hvilket metal leder elektricitet bedst?", a: ["Kobber", "Guld", "Sølv", "Aluminium"], r: "Sølv", cat: "VIDENSKAB" },
+{ q: "Hvilken planet har den længste dag målt i jordtimer?", a: ["Venus", "Mars", "Merkur", "Jupiter"], r: "Venus", cat: "UNIVERSET" },
+{ q: "Hvilket land opfandt papir?", a: ["Indien", "Kina", "Egypten", "Persien"], r: "Kina", cat: "HISTORIE" },
+{ q: "Hvad er hovedingrediensen i traditionel hummus?", a: ["Linser", "Kikærter", "Bønner", "Ris"], r: "Kikærter", cat: "MAD" },
+
+{ q: "Hvilket dyr kan sove i op til tre år under ekstreme forhold?", a: ["Skildpadde", "Sneglen", "Koala", "Flagermus"], r: "Sneglen", cat: "DYR" },
+{ q: "Hvilket land har verdens længste kystlinje?", a: ["Canada", "Australien", "Indonesien", "Rusland"], r: "Canada", cat: "GEOGRAFI" },
+{ q: "Hvilket element udgør størstedelen af Jordens atmosfære?", a: ["Oxygen", "Kvælstof", "Argon", "CO₂"], r: "Kvælstof", cat: "VIDENSKAB" },
+{ q: "Hvilken by kaldes 'Den Evige Stad'?", a: ["Athen", "Rom", "Istanbul", "Jerusalem"], r: "Rom", cat: "HISTORIE" },
+{ q: "Hvilket land drikker mest kaffe pr. indbygger?", a: ["Italien", "Finland", "Brasilien", "USA"], r: "Finland", cat: "MAD" },
+{ q: "Hvilket organ kan regenerere sig selv?", a: ["Hjertet", "Leveren", "Lungerne", "Nyrerne"], r: "Leveren", cat: "BIOLOGI" },
+{ q: "Hvilket dyr har verdens største øjne?", a: ["Struds", "Kæmpeblæksprutte", "Hvalros", "Haj"], r: "Kæmpeblæksprutte", cat: "DYR" },
+{ q: "Hvilket land opfandt saunaen?", a: ["Sverige", "Finland", "Norge", "Estland"], r: "Finland", cat: "KULTUR" },
+{ q: "Hvilket år blev FN grundlagt?", a: ["1943", "1945", "1947", "1950"], r: "1945", cat: "HISTORIE" },
+{ q: "Hvilket dyr kan ikke hoppe?", a: ["Elefant", "Giraf", "Næsehorn", "Flodhest"], r: "Elefant", cat: "DYR" },
+
+{ q: "Hvilket land har flest vulkaner?", a: ["Japan", "Indonesien", "USA", "Island"], r: "Indonesien", cat: "GEOGRAFI" },
+{ q: "Hvad er verdens mest talte modersmål?", a: ["Engelsk", "Hindi", "Spansk", "Mandarin"], r: "Mandarin", cat: "SPROG" },
+{ q: "Hvilket dyr har den længste migrationsrute?", a: ["Blåhval", "Laks", "Monarksommerfugl", "Sild"], r: "Monarksommerfugl", cat: "DYR" },
+{ q: "Hvilket land har verdens ældste monarki?", a: ["Japan", "Danmark", "Storbritannien", "Thailand"], r: "Japan", cat: "HISTORIE" },
+{ q: "Hvilken gas bruges i neonreklamer?", a: ["Argon", "Neon", "Krypton", "Helium"], r: "Neon", cat: "VIDENSKAB" },
+{ q: "Hvilket hav er det mindste?", a: ["Det Arktiske Hav", "Det Indiske Ocean", "Atlanterhavet", "Sydhavet"], r: "Det Arktiske Hav", cat: "GEOGRAFI" },
+{ q: "Hvilket dyr har den hurtigste slagfrekvens på vingerne?", a: ["Kolibri", "Bi", "Myg", "Svale"], r: "Kolibri", cat: "DYR" },
+{ q: "Hvilket land producerer mest vin?", a: ["Frankrig", "Italien", "Spanien", "USA"], r: "Italien", cat: "MAD" },
+{ q: "Hvilket instrument har både strenge og tangenter?", a: ["Piano", "Harpe", "Cembalo", "Guitar"], r: "Piano", cat: "MUSIK" },
+{ q: "Hvilket år blev euroen indført som fysisk valuta?", a: ["1999", "2000", "2002", "2004"], r: "2002", cat: "POLITIK" },
+
+{ q: "Hvilket dyr har den længste hals i forhold til kroppen?", a: ["Giraf", "Svanen", "Flamingo", "Slange"], r: "Svanen", cat: "DYR" },
+{ q: "Hvilket land har verdens største olieproduktion?", a: ["USA", "Saudi-Arabien", "Rusland", "Iran"], r: "USA", cat: "ØKONOMI" },
+{ q: "Hvilket metal bruges mest i elektronik?", a: ["Kobber", "Guld", "Sølv", "Aluminium"], r: "Kobber", cat: "TEKNOLOGI" },
+{ q: "Hvilket land har flest UNESCO‑verdensarvssteder?", a: ["Kina", "Italien", "Spanien", "Frankrig"], r: "Italien", cat: "KULTUR" },
+{ q: "Hvilket dyr har den hurtigste reaktionstid?", a: ["Gepard", "Mantisreje", "Ørn", "Kobra"], r: "Mantisreje", cat: "DYR" },
+{ q: "Hvad er den største planet i solsystemet?", a: ["Jupiter", "Saturn", "Uranus", "Neptun"], r: "Jupiter", cat: "UNIVERSET" },
+{ q: "Hvilket land opfandt kompasset?", a: ["Kina", "Grækenland", "Indien", "Tyrkiet"], r: "Kina", cat: "HISTORIE" },
+{ q: "Hvilket dyr kan ændre køn efter behov?", a: ["Klovnfisk", "Haj", "Sæl", "Skildpadde"], r: "Klovnfisk", cat: "BIOLOGI" },
+{ q: "Hvilket land har verdens største befolkning?", a: ["Indien", "Kina", "USA", "Indonesien"], r: "Indien", cat: "GEOGRAFI" },
+{ q: "Hvilket dyr har den længste levetid?", a: ["Galapagosskildpadde", "Grønlandshval", "Elefant", "Albatros"], r: "Grønlandshval", cat: "DYR" },
+
+{ q: "Hvilket land opfandt demokratiet?", a: ["Rom", "Grækenland", "Egypten", "Persien"], r: "Grækenland", cat: "HISTORIE" },
+{ q: "Hvilket dyr har flest tænder?", a: ["Haj", "Delfin", "Snegl", "Krokodille"], r: "Snegl", cat: "DYR" },
+{ q: "Hvilket land har verdens største ørken (ikke sandørken)?", a: ["Antarktis", "Sahara", "Gobi", "Arktis"], r: "Antarktis", cat: "GEOGRAFI" },
+{ q: "Hvilket dyr kan løbe hurtigst?", a: ["Gepard", "Pronghorn", "Løve", "Hest"], r: "Gepard", cat: "DYR" },
+{ q: "Hvilket land har verdens ældste universitet i drift?", a: ["Italien", "Marokko", "Egypten", "Spanien"], r: "Marokko", cat: "HISTORIE" },
+{ q: "Hvilket dyr har den største hjerne i forhold til kroppen?", a: ["Myrer", "Delfin", "Menneske", "Blæksprutte"], r: "Myrer", cat: "DYR" },
+{ q: "Hvilket land producerer mest kakao?", a: ["Ghana", "Elfenbenskysten", "Brasilien", "Nigeria"], r: "Elfenbenskysten", cat: "MAD" },
+{ q: "Hvilket dyr har den højeste blodtryk?", a: ["Giraf", "Elefant", "Haj", "Hest"], r: "Giraf", cat: "DYR" },
+{ q: "Hvilket land har flest øer?", a: ["Indonesien", "Sverige", "Filippinerne", "Norge"], r: "Sverige", cat: "GEOGRAFI" },
+{ q: "Hvilket dyr har den stærkeste muskel i forhold til størrelse?", a: ["Myre", "Bille", "Rotte", "Frø"], r: "Myre", cat: "DYR" },
+
+{ q: "Hvilket land opfandt skak?", a: ["Indien", "Persien", "Kina", "Tyrkiet"], r: "Indien", cat: "KULTUR" },
+{ q: "Hvilket dyr har den længste tunge i forhold til kroppen?", a: ["Myresluger", "Giraf", "Flagermus", "Frø"], r: "Frø", cat: "DYR" },
+{ q: "Hvilket land har verdens største sø (areal)?", a: ["Kaspiske Hav", "Lake Superior", "Lake Victoria", "Bajkalsøen"], r: "Kaspiske Hav", cat: "GEOGRAFI" },
+{ q: "Hvilket dyr kan overleve i rummet i kort tid?", a: ["Tardigrade", "Bille", "Edderkop", "Skorpion"], r: "Tardigrade", cat: "VIDENSKAB" },
+{ q: "Hvilket land har verdens højeste gennemsnitlige IQ ifølge flere studier?", a: ["Japan", "Singapore", "Sydkorea", "Taiwan"], r: "Singapore", cat: "SAMFUND" },
+{ q: "Hvilket dyr har den hurtigste slagkraft?", a: ["Mantisreje", "Gorilla", "Hest", "Ørn"], r: "Mantisreje", cat: "DYR" },
+{ q: "Hvilket land har verdens største økonomi?", a: ["USA", "Kina", "Japan", "Tyskland"], r: "USA", cat: "ØKONOMI" },
+{ q: "Hvilket dyr har den længste hale?", a: ["Giraf", "Kænguru", "Spermhval", "Lemur"], r: "Spermhval", cat: "DYR" },
+{ q: "Hvilket land har verdens største skovområde?", a: ["Brasilien", "Rusland", "Canada", "USA"], r: "Rusland", cat: "GEOGRAFI" },
+{ q: "Hvilket dansk fodboldhold har vundet flest mesterskaber?", a: ["FCK", "Brøndby IF", "AGF", "OB"], r: "FCK", cat: "SPORT" },
+{ q: "Hvor mange spillere er der på banen pr. hold i håndbold?", a: ["6", "7", "8", "9"], r: "7", cat: "SPORT" },
+{ q: "Hvilket år vandt Danmark EM i fodbold?", a: ["1988", "1992", "1996", "2000"], r: "1992", cat: "SPORT" },
+{ q: "Hvilken dansk cykelrytter har vundet Tour de France?", a: ["Jonas Vingegaard", "Bjarne Riis", "Jakob Fuglsang", "Michael Rasmussen"], r: "Jonas Vingegaard", cat: "SPORT" },
+{ q: "Hvor mange point giver en sejr i Superligaen?", a: ["2", "3", "4", "5"], r: "3", cat: "SPORT" },
+
+{ q: "Hvor mange minutter varer en LAN‑turneringskamp i Rocket League normalt?", a: ["3", "5", "7", "10"], r: "5", cat: "LAN" },
+{ q: "Hvor mange spillere er der på et CS:GO‑hold?", a: ["4", "5", "6", "7"], r: "5", cat: "LAN" },
+{ q: "Hvad kaldes det, når en gamer spiller hele natten uden pause?", a: ["Night‑run", "Hard‑grind", "All‑nighter", "Sleep‑skip"], r: "All‑nighter", cat: "LAN" },
+{ q: "Hvad står FPS for i gaming?", a: ["Frames Per Second", "Fast Play Speed", "Full Player Sync", "Frame Pixel Scale"], r: "Frames Per Second", cat: "TEKNOLOGI" },
+{ q: "Hvilket spil er kendt for begrebet 'Blue Shell'?", a: ["Mario Kart", "Crash Team Racing", "Sonic Racing", "F‑Zero"], r: "Mario Kart", cat: "LAN" },
+
+{ q: "En LAN‑pizza koster 79 kr. Du køber 4. Hvor meget betaler du?", a: ["236 kr", "296 kr", "316 kr", "316 kr"], r: "316 kr", cat: "MATEMATIK" },
+{ q: "Du har 500 Mbps internet. Hvor mange Mbps har du tilbage, hvis 3 venner bruger 100 hver?", a: ["100", "150", "200", "250"], r: "200", cat: "MATEMATIK" },
+{ q: "En gamer drikker 0,33 L energidrik pr. time. Hvor meget drikker han på 9 timer?", a: ["2,37 L", "2,7 L", "3,0 L", "3,3 L"], r: "2,97 L", cat: "MATEMATIK" },
+{ q: "Et LAN‑rum har 48 pladser. 75% er fyldt. Hvor mange sidder der?", a: ["32", "34", "36", "38"], r: "36", cat: "MATEMATIK" },
+{ q: "En turnering har 64 spillere. Hvor mange runder i et knockout‑format?", a: ["5", "6", "7", "8"], r: "6", cat: "MATEMATIK" },
+
+{ q: "Hvad er Danmarks hovedstad?", a: ["København", "Aarhus", "Odense", "Aalborg"], r: "København", cat: "DANMARK" },
+{ q: "Hvilket dyr er Danmarks nationaldyr?", a: ["Svanen", "Haren", "Ræven", "Hjorten"], r: "Svanen", cat: "DANMARK" },
+{ q: "Hvilket hav ligger øst for Danmark?", a: ["Nordsøen", "Østersøen", "Atlanterhavet", "Skagerrak"], r: "Østersøen", cat: "DANMARK" },
+{ q: "Hvor mange regioner har Danmark?", a: ["3", "4", "5", "6"], r: "5", cat: "DANMARK" },
+{ q: "Hvilket år blev Storebæltsbroen indviet?", a: ["1994", "1996", "1998", "2000"], r: "1998", cat: "DANMARK" },
+
+{ q: "Hvilket dyr kan løbe hurtigst?", a: ["Gepard", "Hest", "Pronghorn", "Løve"], r: "Gepard", cat: "DYR" },
+{ q: "Hvilket hav er det største?", a: ["Stillehavet", "Atlanterhavet", "Det Indiske Ocean", "Sydhavet"], r: "Stillehavet", cat: "GEOGRAFI" },
+{ q: "Hvilket grundstof har atomnummer 1?", a: ["Helium", "Hydrogen", "Oxygen", "Nitrogen"], r: "Hydrogen", cat: "VIDENSKAB" },
+{ q: "Hvilket land har flest øer i verden?", a: ["Indonesien", "Sverige", "Filippinerne", "Norge"], r: "Sverige", cat: "GEOGRAFI" },
+{ q: "Hvilket dyr har den største hjerne?", a: ["Elefant", "Spermhval", "Delfin", "Gorilla"], r: "Spermhval", cat: "DYR" },
+
+{ q: "Hvilket spil kaldes ofte 'Danmarks nationalsport online'?", a: ["CS:GO", "FIFA", "Fortnite", "League of Legends"], r: "CS:GO", cat: "LAN" },
+{ q: "Hvad kaldes det, når man får 3 kills i træk i CS:GO?", a: ["Triple", "Trifecta", "Triple‑kill", "Streak‑3"], r: "Triple‑kill", cat: "LAN" },
+{ q: "Hvor mange hjerter har en blæksprutte?", a: ["1", "2", "3", "4"], r: "3", cat: "DYR" },
+{ q: "Hvilket land opfandt LEGO?", a: ["Sverige", "Danmark", "Norge", "Tyskland"], r: "Danmark", cat: "DANMARK" },
+{ q: "Hvad står CPU for?", a: ["Central Processing Unit", "Core Power Unit", "Central Program Utility", "Compute Power Unit"], r: "Central Processing Unit", cat: "TEKNOLOGI" },
+
+{ q: "Hvor mange grader er der i en ret vinkel?", a: ["45", "90", "180", "360"], r: "90", cat: "MATEMATIK" },
+{ q: "Hvad er 12 × 12?", a: ["124", "132", "144", "156"], r: "144", cat: "MATEMATIK" },
+{ q: "Hvad er 25% af 200?", a: ["25", "40", "50", "75"], r: "50", cat: "MATEMATIK" },
+{ q: "Hvad er 3⁴?", a: ["27", "64", "81", "108"], r: "81", cat: "MATEMATIK" },
+{ q: "Hvad er kvadratroden af 169?", a: ["11", "12", "13", "14"], r: "13", cat: "MATEMATIK" },
+
+{ q: "Hvilket land vandt VM i fodbold 2018?", a: ["Frankrig", "Kroatien", "Brasilien", "Tyskland"], r: "Frankrig", cat: "SPORT" },
+{ q: "Hvor mange spillere er der på banen i volleyball pr. hold?", a: ["4", "5", "6", "7"], r: "6", cat: "SPORT" },
+{ q: "Hvilket land opfandt badminton?", a: ["Kina", "Indien", "Japan", "Thailand"], r: "Indien", cat: "SPORT" },
+{ q: "Hvor mange meter er et maraton?", a: ["42195", "40000", "45000", "50000"], r: "42195", cat: "SPORT" },
+{ q: "Hvilket land har vundet flest OL‑medaljer?", a: ["USA", "Kina", "Rusland", "Tyskland"], r: "USA", cat: "SPORT" },
+
+{ q: "Hvad kaldes Danmarks parlament?", a: ["Stortinget", "Folketinget", "Riksdagen", "Lagtinget"], r: "Folketinget", cat: "DANMARK" },
+{ q: "Hvilket år blev Danmark medlem af EU?", a: ["1970", "1973", "1975", "1978"], r: "1973", cat: "DANMARK" },
+{ q: "Hvad er Danmarks næststørste by?", a: ["Odense", "Aarhus", "Aalborg", "Esbjerg"], r: "Aarhus", cat: "DANMARK" },
+{ q: "Hvilket dansk slot er dronningens residens?", a: ["Amalienborg", "Rosenborg", "Frederiksborg", "Christiansborg"], r: "Amalienborg", cat: "DANMARK" },
+{ q: "Hvilket dansk ø er den største?", a: ["Sjælland", "Fyn", "Bornholm", "Lolland"], r: "Sjælland", cat: "DANMARK" },
+
+{ q: "Hvad er navnet på Danmarks største festival?", a: ["Roskilde Festival", "Smukfest", "NorthSide", "Copenhell"], r: "Roskilde Festival", cat: "KULTUR" },
+{ q: "Hvilket instrument har 88 tangenter?", a: ["Piano", "Orgel", "Keyboard", "Cembalo"], r: "Piano", cat: "MUSIK" },
+{ q: "Hvilket land opfandt pizzaen?", a: ["Spanien", "Frankrig", "Italien", "Grækenland"], r: "Italien", cat: "MAD" },
+{ q: "Hvilket dyr kan hoppe højere end et hus?", a: ["Alle dyr", "Ingen dyr", "Kun kænguruer", "Kun insekter"], r: "Alle dyr", cat: "SJOV" },
+{ q: "Hvilket sprog tales mest i verden?", a: ["Engelsk", "Spansk", "Mandarin", "Hindi"], r: "Mandarin", cat: "SPROG" },
+
+{ q: "Hvad er navnet på den største planet i solsystemet?", a: ["Jupiter", "Saturn", "Uranus", "Neptun"], r: "Jupiter", cat: "UNIVERSET" },
+{ q: "Hvor mange kontinenter findes der?", a: ["5", "6", "7", "8"], r: "7", cat: "GEOGRAFI" },
+{ q: "Hvad er den kemiske formel for vand?", a: ["CO₂", "H₂O", "O₂", "H₂"], r: "H₂O", cat: "VIDENSKAB" },
+{ q: "Hvilket dyr har den hurtigste puls?", a: ["Kolibri", "Mus", "Hamster", "Flagermus"], r: "Kolibri", cat: "DYR" },
+{ q: "Hvilket land har verdens største befolkning?", a: ["Indien", "Kina", "USA", "Indonesien"], r: "Indien", cat: "GEOGRAFI" },
+{ q: "Hvad hedder hovedskurken i Crash Bandicoot?", a: ["Neo Cortex", "N. Gin", "Tiny Tiger", "Ripper Roo"], r: "Neo Cortex", cat: "CRASH" },
+{ q: "Hvad hedder Crash’ søster?", a: ["Lola", "Coco", "Nina", "Tina"], r: "Coco", cat: "CRASH" },
+{ q: "Hvad siger Aku Aku, når du får masken?", a: ["Wumpa!", "Booga‑Booga!", "Uka‑Uka!", "Wahoo!"], r: "Booga‑Booga!", cat: "CRASH" },
+{ q: "Hvilken frugt samler Crash Bandicoot?", a: ["Bananer", "Wumpa‑frugt", "Æbler", "Mango"], r: "Wumpa‑frugt", cat: "CRASH" },
+{ q: "Hvilken type spil er Crash Bandicoot?", a: ["RPG", "Platform", "Racerspil", "Puzzle"], r: "Platform", cat: "CRASH" },
+{ q: "Hvad hedder den onde tvilling til Aku Aku?", a: ["Uka Uka", "N. Tropy", "N. Brio", "Nitros Oxide"], r: "Uka Uka", cat: "CRASH" },
+{ q: "Hvilket dyr er Crash Bandicoot?", a: ["Kænguru", "Bandicoot", "Ræv", "Vaskebjørn"], r: "Bandicoot", cat: "CRASH" },
+{ q: "Hvad sker der, når Crash får tre Aku Aku‑masker?", a: ["Han dør", "Han bliver usynlig", "Han bliver udødelig", "Han flyver"], r: "Han bliver udødelig", cat: "CRASH" },
+{ q: "Hvilket Crash‑spil er et racerspil?", a: ["Crash Bash", "Crash Team Racing", "Crash Twinsanity", "Crash 4"], r: "Crash Team Racing", cat: "CRASH" },
+{ q: "Hvad hedder Crash’ fjende, der bruger tid som våben?", a: ["N. Tropy", "N. Gin", "Cortex", "Koala Kong"], r: "N. Tropy", cat: "CRASH" },
+{ q: "Hvad står COD for?", a: ["Call of Duty", "Combat of Destruction", "Code of Defense", "Call of Danger"], r: "Call of Duty", cat: "COD" },
+{ q: "Hvilket COD‑spil introducerede Zombies‑mode?", a: ["MW2", "Black Ops", "World at War", "Ghosts"], r: "World at War", cat: "COD" },
+{ q: "Hvad hedder valutaen i Warzone?", a: ["Credits", "Cash", "Tokens", "Coins"], r: "Cash", cat: "COD" },
+{ q: "Hvilket våben er kendt som 'noob‑tube'?", a: ["Sniper", "Shotgun", "Grenade Launcher", "SMG"], r: "Grenade Launcher", cat: "COD" },
+{ q: "Hvad hedder det ikoniske MW2‑map på en lufthavn?", a: ["Terminal", "Runway", "Airport", "Skyline"], r: "Terminal", cat: "COD" },
+{ q: "Hvilket COD‑spil har karakteren Ghost?", a: ["MW2", "BO2", "WW2", "Ghosts"], r: "MW2", cat: "COD" },
+{ q: "Hvad kaldes en 25‑kill streak i MW2?", a: ["Nuke", "MOAB", "Juggernaut", "Chopper Gunner"], r: "Nuke", cat: "COD" },
+{ q: "Hvilket COD‑spil foregår i fremtiden?", a: ["BO3", "MW3", "WW2", "BO1"], r: "BO3", cat: "COD" },
+{ q: "Hvad hedder standard‑granaten i COD?", a: ["Flash", "Frag", "Smoke", "Molotov"], r: "Frag", cat: "COD" },
+{ q: "Hvilket COD‑spil introducerede slide‑movement?", a: ["BO2", "BO3", "MW2019", "AW"], r: "AW", cat: "COD" },
+{ q: "Hvad hedder valutaen i Fortnite?", a: ["V‑Coins", "V‑Bucks", "Fort‑Coins", "Battle‑Cash"], r: "V‑Bucks", cat: "FORTNITE" },
+{ q: "Hvad kaldes den sidste spiller i Fortnite?", a: ["Winner", "Champion", "Victory Royale", "Last Man"], r: "Victory Royale", cat: "FORTNITE" },
+{ q: "Hvilket våben er kendt for at bygge hurtigt?", a: ["Pickaxe", "Shotgun", "SMG", "Rifle"], r: "Pickaxe", cat: "FORTNITE" },
+{ q: "Hvad hedder øen i Fortnite Chapter 1?", a: ["Athena", "Apollo", "Prime", "Zero"], r: "Athena", cat: "FORTNITE" },
+{ q: "Hvilken sjældenhed er farven lilla?", a: ["Common", "Rare", "Epic", "Legendary"], r: "Epic", cat: "FORTNITE" },
+{ q: "Hvad kaldes stormens sikre område?", a: ["Safe Zone", "Circle", "Storm Eye", "Ring"], r: "Storm Eye", cat: "FORTNITE" },
+{ q: "Hvad kan du bruge til at glide i Fortnite?", a: ["Wings", "Glider", "Parachute", "Jetpack"], r: "Glider", cat: "FORTNITE" },
+{ q: "Hvad hedder Fortnite’s udvikler?", a: ["Epic Games", "Valve", "EA", "Ubisoft"], r: "Epic Games", cat: "FORTNITE" },
+{ q: "Hvad kaldes spillets byggemateriale IKKE?", a: ["Metal", "Sten", "Træ", "Glas"], r: "Glas", cat: "FORTNITE" },
+{ q: "Hvad hedder Fortnite’s battle pass‑system?", a: ["Season Pass", "Battle Pass", "Fort Pass", "XP Pass"], r: "Battle Pass", cat: "FORTNITE" },
+{ q: "Hvad står CS:GO for?", a: ["Counter‑Strike: Global Offensive", "Combat Strike: Global Ops", "Counter‑Shoot: GO", "Combat System: GO"], r: "Counter‑Strike: Global Offensive", cat: "CSGO" },
+{ q: "Hvad koster en AWP i CS:GO?", a: ["3000", "4750", "5000", "5250"], r: "4750", cat: "CSGO" },
+{ q: "Hvad kaldes det, når man dræber alle på fjendens hold?", a: ["Ace", "Clutch", "Sweep", "Wipe"], r: "Ace", cat: "CSGO" },
+{ q: "Hvilket map har bombesites A og B i en ørkenby?", a: ["Inferno", "Dust2", "Mirage", "Nuke"], r: "Dust2", cat: "CSGO" },
+{ q: "Hvad er standard‑kniven i CS:GO?", a: ["Bayonet", "Flip Knife", "Default Knife", "Karambit"], r: "Default Knife", cat: "CSGO" },
+
+{ q: "Hvad hedder hovedpersonen i GTA V?", a: ["Niko", "Franklin, Michael og Trevor", "CJ", "Tommy"], r: "Franklin, Michael og Trevor", cat: "GTA" },
+{ q: "Hvilken by er Los Santos baseret på?", a: ["New York", "Miami", "Los Angeles", "Chicago"], r: "Los Angeles", cat: "GTA" },
+{ q: "Hvad kan du IKKE gøre i GTA?", a: ["Køre bil", "Flyve fly", "Spise mad", "Teleportere"], r: "Teleportere", cat: "GTA" },
+{ q: "Hvilket GTA‑spil introducerede Trevor?", a: ["GTA IV", "GTA V", "GTA San Andreas", "GTA Vice City"], r: "GTA V", cat: "GTA" },
+{ q: "Hvad hedder valutaen i GTA Online?", a: ["Cash", "GTA‑Dollars", "Credits", "Coins"], r: "GTA‑Dollars", cat: "GTA" },
+{ q: "Hvem er hovedpersonen i Kingdom Hearts?", a: ["Sora", "Riku", "Mickey", "Donald"], r: "Sora", cat: "DISNEY" },
+{ q: "Hvilket dyr er Stitch?", a: ["Hund", "Alien", "Kat", "Bjergløve"], r: "Alien", cat: "DISNEY" },
+{ q: "Hvem er Mickeys trofaste hund?", a: ["Goofy", "Pluto", "Max", "Bolt"], r: "Pluto", cat: "DISNEY" },
+{ q: "Hvilken Disney‑figur bruger en magisk pensel i et tv‑spil?", a: ["Mickey", "Donald", "Elsa", "Ariel"], r: "Mickey", cat: "DISNEY" },
+{ q: "Hvilket spil handler om at bygge en Disney‑park?", a: ["Disneyland Adventures", "Epic Mickey", "Dreamlight Valley", "Disney Infinity"], r: "Disneyland Adventures", cat: "DISNEY" },
+{ q: "Hvem er skurken i Aladdin‑spillet?", a: ["Jafar", "Iago", "Hades", "Scar"], r: "Jafar", cat: "DISNEY" },
+{ q: "Hvilket spil lader dig spille som Simba?", a: ["Lion King", "Jungle Book", "Tarzan", "Hercules"], r: "Lion King", cat: "DISNEY" },
+{ q: "Hvem er hovedpersonen i Frozen‑spil?", a: ["Elsa", "Anna", "Olaf", "Kristoff"], r: "Elsa", cat: "DISNEY" },
+{ q: "Hvilket Disney‑spil bruger figurer som fysiske legetøj?", a: ["Disney Infinity", "Dreamlight Valley", "Epic Mickey", "Kingdom Hearts"], r: "Disney Infinity", cat: "DISNEY" },
+{ q: "Hvem er den onde i Hercules‑spillet?", a: ["Hades", "Zeus", "Ares", "Apollo"], r: "Hades", cat: "DISNEY" },
+
+{ q: "Hvilket spil har Jack Sparrow som spilbar figur?", a: ["Kingdom Hearts", "Epic Mickey", "Disney Infinity", "Toy Story 3"], r: "Kingdom Hearts", cat: "DISNEY" },
+{ q: "Hvilket dyr er Bambi?", a: ["Hjort", "Kanin", "Ræv", "Fugl"], r: "Hjort", cat: "DISNEY" },
+{ q: "Hvem er hovedpersonen i Mulan‑spillet?", a: ["Mulan", "Shang", "Mushu", "Khan"], r: "Mulan", cat: "DISNEY" },
+{ q: "Hvilket spil foregår i Andeby?", a: ["DuckTales", "Epic Mickey", "Disney Infinity", "Toy Story"], r: "DuckTales", cat: "DISNEY" },
+{ q: "Hvem er Woody’s bedste ven i Toy Story‑spil?", a: ["Buzz", "Jessie", "Rex", "Hamm"], r: "Buzz", cat: "DISNEY" },
+{ q: "Hvilket spil har figuren Baymax?", a: ["Kingdom Hearts 3", "Epic Mickey", "Disney Infinity", "Frozen"], r: "Kingdom Hearts 3", cat: "DISNEY" },
+{ q: "Hvem er skurken i Løvernes Konge‑spillet?", a: ["Scar", "Zazu", "Shenzi", "Mufasa"], r: "Scar", cat: "DISNEY" },
+{ q: "Hvilket Disney‑spil handler om at lave mad?", a: ["Ratatouille", "Bolt", "Cars", "Up"], r: "Ratatouille", cat: "DISNEY" },
+{ q: "Hvilket spil har figuren WALL‑E?", a: ["Disney Infinity", "Epic Mickey", "Toy Story 3", "Cars 2"], r: "Disney Infinity", cat: "DISNEY" },
+{ q: "Hvem er hovedpersonen i Tarzan‑spillet?", a: ["Tarzan", "Jane", "Clayton", "Terk"], r: "Tarzan", cat: "DISNEY" },
+
+{ q: "Hvilket spil har figuren Lightning McQueen?", a: ["Cars", "Bolt", "Up", "Toy Story"], r: "Cars", cat: "DISNEY" },
+{ q: "Hvem er skurken i Peter Pan‑spillet?", a: ["Kaptajn Klo", "Smee", "Tinkerbell", "Tiger Lily"], r: "Kaptajn Klo", cat: "DISNEY" },
+{ q: "Hvilket spil introducerede figuren Master Chief?", a: ["Halo", "Destiny", "Gears of War", "Mass Effect"], r: "Halo", cat: "SPIL" },
+{ q: "Hvilket firma står bag spilserien The Legend of Zelda?", a: ["Sony", "Nintendo", "Ubisoft", "EA"], r: "Nintendo", cat: "SPIL" },
+{ q: "Hvilket våben er ikonisk for Doom‑serien?", a: ["BFG 9000", "Laser Rifle", "Pulse Gun", "Railgun"], r: "BFG 9000", cat: "SPIL" },
+{ q: "Hvilket spil foregår i byen Rapture?", a: ["BioShock", "Fallout", "Dishonored", "Prey"], r: "BioShock", cat: "SPIL" },
+{ q: "Hvilket spil har karakteren Geralt of Rivia?", a: ["The Witcher", "Skyrim", "Dragon Age", "Dark Souls"], r: "The Witcher", cat: "SPIL" },
+
+{ q: "Hvilket spil er kendt for sætningen 'War. War never changes'?", a: ["Fallout", "Metro", "Stalker", "Half‑Life"], r: "Fallout", cat: "SPIL" },
+{ q: "Hvilket spil foregår i Hyrule?", a: ["Zelda", "Final Fantasy", "Elden Ring", "Dragon Quest"], r: "Zelda", cat: "SPIL" },
+{ q: "Hvilket spil har en karakter ved navn Solid Snake?", a: ["Metal Gear Solid", "Splinter Cell", "Hitman", "Deus Ex"], r: "Metal Gear Solid", cat: "SPIL" },
+{ q: "Hvilket spil foregår i byen Los Santos?", a: ["GTA V", "Saints Row", "Watch Dogs 2", "Mafia II"], r: "GTA V", cat: "SPIL" },
+{ q: "Hvilket spil har en karakter ved navn Lara Croft?", a: ["Tomb Raider", "Uncharted", "Prince of Persia", "Control"], r: "Tomb Raider", cat: "SPIL" },
+
+{ q: "Hvilket spil er kendt for figuren 'Creeper'?", a: ["Minecraft", "Terraria", "Roblox", "Fortnite"], r: "Minecraft", cat: "SPIL" },
+{ q: "Hvilket spil har en verden kaldet Azeroth?", a: ["World of Warcraft", "Guild Wars", "Runescape", "Elder Scrolls Online"], r: "World of Warcraft", cat: "SPIL" },
+{ q: "Hvilket spil har en karakter ved navn Nathan Drake?", a: ["Uncharted", "Far Cry", "Just Cause", "Hitman"], r: "Uncharted", cat: "SPIL" },
+{ q: "Hvilket spil foregår i Tamriel?", a: ["Skyrim", "Dark Souls", "Dragon Age", "Baldur's Gate"], r: "Skyrim", cat: "SPIL" },
+{ q: "Hvilket spil har en karakter ved navn Kratos?", a: ["God of War", "For Honor", "Assassin's Creed", "Diablo"], r: "God of War", cat: "SPIL" },
+
+{ q: "Hvilket spil har en karakter ved navn Agent 47?", a: ["Hitman", "Splinter Cell", "Control", "Max Payne"], r: "Hitman", cat: "SPIL" },
+{ q: "Hvilket spil foregår i byen Midgar?", a: ["Final Fantasy VII", "Persona 5", "Nier Automata", "Xenoblade"], r: "Final Fantasy VII", cat: "SPIL" },
+{ q: "Hvilket spil har figuren Claptrap?", a: ["Borderlands", "Fallout", "Overwatch", "Destiny"], r: "Borderlands", cat: "SPIL" },
+{ q: "Hvilket spil har en karakter ved navn Aloy?", a: ["Horizon Zero Dawn", "The Last of Us", "Control", "Forspoken"], r: "Horizon Zero Dawn", cat: "SPIL" },
+{ q: "Hvilket spil foregår i byen City 17?", a: ["Half‑Life 2", "Cyberpunk 2077", "Deus Ex", "Prey"], r: "Half‑Life 2", cat: "SPIL" },
+
+{ q: "Hvilket spil har figuren 'Big Daddy'?", a: ["BioShock", "Dead Space", "Resident Evil", "Metro"], r: "BioShock", cat: "SPIL" },
+{ q: "Hvilket spil har en karakter ved navn Ezio Auditore?", a: ["Assassin's Creed", "The Witcher", "Dark Souls", "For Honor"], r: "Assassin's Creed", cat: "SPIL" },
+{ q: "Hvilket spil har en karakter ved navn Samus Aran?", a: ["Metroid", "Halo", "Mass Effect", "Star Fox"], r: "Metroid", cat: "SPIL" },
+{ q: "Hvilket spil foregår i Silent Hill?", a: ["Silent Hill", "Resident Evil", "Alan Wake", "Outlast"], r: "Silent Hill", cat: "SPIL" },
+{ q: "Hvilket spil har figuren Leon S. Kennedy?", a: ["Resident Evil", "Dead Space", "The Evil Within", "Dying Light"], r: "Resident Evil", cat: "SPIL" },
+
+{ q: "Hvilket spil har figuren 'Chocobo'?", a: ["Final Fantasy", "Zelda", "Dragon Quest", "Fire Emblem"], r: "Final Fantasy", cat: "SPIL" },
+{ q: "Hvilket spil har en karakter ved navn Booker DeWitt?", a: ["BioShock Infinite", "Dishonored", "Fallout 4", "Control"], r: "BioShock Infinite", cat: "SPIL" },
+{ q: "Hvilket spil har en karakter ved navn Isaac Clarke?", a: ["Dead Space", "Mass Effect", "Halo", "Prey"], r: "Dead Space", cat: "SPIL" },
+{ q: "Hvilket spil foregår i byen Kamurocho?", a: ["Yakuza", "Sleeping Dogs", "Shenmue", "Judgment"], r: "Yakuza", cat: "SPIL" },
+{ q: "Hvilket spil har figuren 'Vault Boy'?", a: ["Fallout", "Borderlands", "Metro", "Stalker"], r: "Fallout", cat: "SPIL" },
+
+{ q: "Hvilket spil har en karakter ved navn Ellie?", a: ["The Last of Us", "Life is Strange", "Detroit Become Human", "Until Dawn"], r: "The Last of Us", cat: "SPIL" },
+{ q: "Hvilket spil har figuren 'Cortana'?", a: ["Halo", "Destiny", "Mass Effect", "Starfield"], r: "Halo", cat: "SPIL" },
+{ q: "Hvilket spil foregår i byen Night City?", a: ["Cyberpunk 2077", "Watch Dogs", "Deus Ex", "GTA"], r: "Cyberpunk 2077", cat: "SPIL" },
+{ q: "Hvilket spil har figuren 'Tracer'?", a: ["Overwatch", "Valorant", "Apex Legends", "Team Fortress 2"], r: "Overwatch", cat: "SPIL" },
+{ q: "Hvilket spil har figuren 'Sackboy'?", a: ["LittleBigPlanet", "Rayman", "Ori", "Yoshi"], r: "LittleBigPlanet", cat: "SPIL" },
+
+{ q: "Hvilket spil har figuren 'Steve'?", a: ["Minecraft", "Roblox", "Terraria", "Fortnite"], r: "Minecraft", cat: "SPIL" },
+{ q: "Hvilket spil foregår i byen Dunwall?", a: ["Dishonored", "Bloodborne", "Dark Souls", "Thief"], r: "Dishonored", cat: "SPIL" },
+{ q: "Hvilket spil har figuren 'Shepard'?", a: ["Mass Effect", "Halo", "Starfield", "Outer Worlds"], r: "Mass Effect", cat: "SPIL" },
+{ q: "Hvilket spil har figuren 'Arthur Morgan'?", a: ["Red Dead Redemption 2", "GTA V", "Far Cry 5", "Mafia 3"], r: "Red Dead Redemption 2", cat: "SPIL" },
+{ q: "Hvilket spil har figuren 'Sonic'?", a: ["Sonic the Hedgehog", "Rayman", "Crash", "Spyro"], r: "Sonic the Hedgehog", cat: "SPIL" },
+
+{ q: "Hvilket spil har figuren 'Spyro'?", a: ["Spyro the Dragon", "Crash", "Banjo‑Kazooie", "Rayman"], r: "Spyro the Dragon", cat: "SPIL" },
+{ q: "Hvilket spil har figuren 'Gordon Freeman'?", a: ["Half‑Life", "Portal", "Prey", "System Shock"], r: "Half‑Life", cat: "SPIL" },
+{ q: "Hvilket spil foregår i byen Columbia?", a: ["BioShock Infinite", "Dishonored 2", "Fallout 3", "Control"], r: "BioShock Infinite", cat: "SPIL" },
+{ q: "Hvilket spil har figuren 'Max Payne'?", a: ["Max Payne", "Hitman", "Control", "Alan Wake"], r: "Max Payne", cat: "SPIL" },
+{ q: "Hvilket spil har figuren 'Cloud Strife'?", a: ["Final Fantasy VII", "Kingdom Hearts", "Xenoblade", "Persona"], r: "Final Fantasy VII", cat: "SPIL" },
+
+{ q: "Hvilket spil har figuren 'Sam Fisher'?", a: ["Splinter Cell", "Hitman", "Metal Gear", "Control"], r: "Splinter Cell", cat: "SPIL" },
+{ q: "Hvilket spil foregår i byen Pelican Town?", a: ["Stardew Valley", "Harvest Moon", "Animal Crossing", "Rune Factory"], r: "Stardew Valley", cat: "SPIL" },
+{ q: "Hvilket spil har figuren 'Shovel Knight'?", a: ["Shovel Knight", "Hollow Knight", "Celeste", "Dead Cells"], r: "Shovel Knight", cat: "SPIL" },
+{ q: "Hvilket spil har figuren 'Sans'?", a: ["Undertale", "Cuphead", "Hollow Knight", "Ori"], r: "Undertale", cat: "SPIL" },
+{ q: "Hvilket spil har figuren 'Apex Legends'?", a: ["Apex Legends", "Valorant", "Overwatch", "PUBG"], r: "Apex Legends", cat: "SPIL" },
+{ q: "Hvilken virksomhed skabte den første PlayStation?", a: ["Sony", "Nintendo", "Sega", "Atari"], r: "Sony", cat: "KONSOL" },
+{ q: "Hvilken Nintendo‑konsol blev udgivet i 1983 i Japan?", a: ["NES", "SNES", "GameCube", "N64"], r: "NES", cat: "KONSOL" },
+{ q: "Hvilken konsol bruger Joy‑Cons som controllere?", a: ["Switch", "Wii", "PS4", "Xbox One"], r: "Switch", cat: "KONSOL" },
+{ q: "Hvilken Xbox‑model introducerede Game Pass?", a: ["Xbox One", "Xbox 360", "Xbox Series X", "Xbox"], r: "Xbox One", cat: "KONSOL" },
+{ q: "Hvilken PlayStation‑konsol havde Blu‑ray som standard?", a: ["PS2", "PS3", "PS4", "PS5"], r: "PS3", cat: "KONSOL" },
+
+{ q: "Hvilken konsol havde spillet 'Wii Sports' inkluderet?", a: ["Wii", "Switch", "GameCube", "PS3"], r: "Wii", cat: "KONSOL" },
+{ q: "Hvilken retro‑konsol brugte kassettebånd som spilmedie?", a: ["Commodore 64", "NES", "SNES", "Sega Saturn"], r: "Commodore 64", cat: "KONSOL" },
+{ q: "Hvilken konsol havde 'Red Ring of Death' som fejl?", a: ["Xbox 360", "PS3", "Wii U", "Dreamcast"], r: "Xbox 360", cat: "FEJL" },
+{ q: "Hvilken PlayStation‑konsol havde 'Yellow Light of Death'?", a: ["PS2", "PS3", "PS4", "PS5"], r: "PS3", cat: "FEJL" },
+{ q: "Hvilket format brugte GameCube‑spil?", a: ["Mini‑DVD", "CD", "Blu‑ray", "Kassette"], r: "Mini‑DVD", cat: "KONSOL" },
+
+{ q: "Hvilken konsol introducerede DualShock‑controlleren?", a: ["PS1", "PS2", "PS3", "PS4"], r: "PS1", cat: "KONTROLLER" },
+{ q: "Hvilken konsol havde Kinect som tilbehør?", a: ["Xbox 360", "PS3", "Wii", "Switch"], r: "Xbox 360", cat: "KONTROLLER" },
+{ q: "Hvilken Nintendo‑konsol havde to skærme?", a: ["3DS", "Switch", "Wii U", "Game Boy"], r: "3DS", cat: "KONSOL" },
+{ q: "Hvilken konsol kunne spille UMD‑film?", a: ["PSP", "PS Vita", "DS", "Switch"], r: "PSP", cat: "KONSOL" },
+{ q: "Hvilken konsol havde Virtual Console‑tjenesten?", a: ["Wii", "PS3", "Xbox One", "Switch"], r: "Wii", cat: "ONLINE" },
+
+{ q: "Hvilken konsol havde problemet 'drift' på analogpinde?", a: ["Switch", "PS4", "Xbox One", "PS5"], r: "Switch", cat: "FEJL" },
+{ q: "Hvilken konsol brugte Memory Cards i stedet for harddisk?", a: ["PS2", "PS3", "Xbox One", "Switch"], r: "PS2", cat: "KONSOL" },
+{ q: "Hvilken konsol havde spillet 'Halo: Combat Evolved' som launch‑titel?", a: ["Xbox", "Xbox 360", "Xbox One", "Xbox Series X"], r: "Xbox", cat: "KONSOL" },
+{ q: "Hvilken konsol kunne bruge 'EyeToy'?", a: ["PS2", "PS3", "PS4", "PS1"], r: "PS2", cat: "KONTROLLER" },
+{ q: "Hvilken konsol havde 'Miiverse' som social platform?", a: ["Wii U", "Switch", "PS4", "Xbox One"], r: "Wii U", cat: "ONLINE" },
+
+{ q: "Hvilken konsol havde 'Sega Channel' som online‑tjeneste?", a: ["Sega Genesis", "Dreamcast", "Saturn", "Master System"], r: "Sega Genesis", cat: "ONLINE" },
+{ q: "Hvilken konsol var den første med indbygget modem?", a: ["Dreamcast", "PS2", "Xbox", "GameCube"], r: "Dreamcast", cat: "KONSOL" },
+{ q: "Hvilken konsol havde 'Ring Fit Adventure'?", a: ["Switch", "Wii", "PS4", "Xbox One"], r: "Switch", cat: "KONSOL" },
+{ q: "Hvilken konsol brugte 'VMU' som memory‑unit?", a: ["Dreamcast", "PS1", "N64", "GameCube"], r: "Dreamcast", cat: "KONSOL" },
+{ q: "Hvilken konsol havde 'Sixaxis'‑controlleren?", a: ["PS3", "PS2", "PS4", "PS5"], r: "PS3", cat: "KONTROLLER" },
+
+{ q: "Hvilken konsol havde problemet 'Open Tray Error'?", a: ["Xbox 360", "PS2", "Wii", "PS3"], r: "Xbox 360", cat: "FEJL" },
+{ q: "Hvilken konsol kunne spille Blu‑ray 4K?", a: ["PS5", "PS4 Pro", "Switch", "Wii U"], r: "PS5", cat: "KONSOL" },
+{ q: "Hvilken konsol havde 'StreetPass'?", a: ["3DS", "Switch", "PS Vita", "PSP"], r: "3DS", cat: "ONLINE" },
+{ q: "Hvilken konsol havde 'Red Screen of Death'?", a: ["PS2", "PS3", "PS4", "PS1"], r: "PS2", cat: "FEJL" },
+{ q: "Hvilken konsol brugte 'Cartridges' i 2017?", a: ["Switch", "PS4", "Xbox One", "Wii U"], r: "Switch", cat: "KONSOL" },
+
+{ q: "Hvilken konsol havde 'Game Boy Player' som tilbehør?", a: ["GameCube", "Wii", "SNES", "N64"], r: "GameCube", cat: "KONSOL" },
+{ q: "Hvilken konsol havde 'HD DVD' som mislykket tilbehør?", a: ["Xbox 360", "PS3", "Wii", "PS2"], r: "Xbox 360", cat: "HARDWARE" },
+{ q: "Hvilken konsol havde 'DualSense'‑controlleren?", a: ["PS5", "PS4", "PS3", "PS2"], r: "PS5", cat: "KONTROLLER" },
+{ q: "Hvilken konsol havde 'Game Pass Ultimate'?", a: ["Xbox Series X", "PS5", "Switch", "PS4"], r: "Xbox Series X", cat: "ONLINE" },
+{ q: "Hvilken konsol havde 'Wii MotionPlus'?", a: ["Wii", "Switch", "PS3", "Xbox 360"], r: "Wii", cat: "KONTROLLER" },
+
+{ q: "Hvilken konsol havde problemet 'Laser Burn' på diske?", a: ["Xbox 360", "PS2", "PS3", "Wii"], r: "Xbox 360", cat: "FEJL" },
+{ q: "Hvilken konsol havde 'PlayStation Home'?", a: ["PS3", "PS4", "PS2", "PS5"], r: "PS3", cat: "ONLINE" },
+{ q: "Hvilken konsol havde 'Zapper'‑pistolen?", a: ["NES", "SNES", "N64", "GameCube"], r: "NES", cat: "KONTROLLER" },
+{ q: "Hvilken konsol havde 'Rumble Pak'?", a: ["N64", "SNES", "GameCube", "Wii"], r: "N64", cat: "KONTROLLER" },
+{ q: "Hvilken konsol havde 'PS Vita TV'?", a: ["PS Vita", "PSP", "PS3", "PS2"], r: "PS Vita", cat: "KONSOL" },
+
+{ q: "Hvilken konsol havde 'Game Gear' som håndholdt konkurrent?", a: ["Game Boy", "DS", "PSP", "Switch"], r: "Game Boy", cat: "KONSOL" },
+{ q: "Hvilken konsol havde 'Yellow Screen of Death'?", a: ["PSP", "PS Vita", "Switch", "Wii"], r: "PSP", cat: "FEJL" },
+{ q: "Hvilken konsol havde 'Backward Compatibility' for PS1‑spil?", a: ["PS2", "PS3", "PS4", "PS5"], r: "PS2", cat: "KONSOL" },
+{ q: "Hvilken konsol havde 'Xbox Live' som online‑tjeneste?", a: ["Xbox", "Xbox 360", "Xbox One", "Series X"], r: "Xbox", cat: "ONLINE" },
+{ q: "Hvilken konsol havde 'WiiConnect24'?", a: ["Wii", "Wii U", "Switch", "DS"], r: "Wii", cat: "ONLINE" },
+
+{ q: "Hvilken konsol havde 'PS Move'?", a: ["PS3", "PS4", "PS2", "PS5"], r: "PS3", cat: "KONTROLLER" },
+{ q: "Hvilken konsol havde 'Game Boy Advance Link Cable'?", a: ["GBA", "DS", "Switch", "PSP"], r: "GBA", cat: "KONSOL" },
+{ q: "Hvilken konsol havde 'Error 2101‑0001' som kendt fejl?", a: ["Switch", "PS5", "Xbox Series X", "PS4"], r: "Switch", cat: "FEJL" },
+{ q: "Hvilken konsol havde 'Blue Light of Death'?", a: ["PS4", "PS5", "PS3", "PS2"], r: "PS4", cat: "FEJL" },
+{ q: "Hvilken konsol havde 'Joy‑Con drift' som udbredt problem?", a: ["Switch", "Wii U", "PS Vita", "PSP"], r: "Switch", cat: "FEJL" },
+
+{ q: "Hvilken konsol havde 'Expansion Pak'?", a: ["N64", "SNES", "GameCube", "Wii"], r: "N64", cat: "HARDWARE" },
+{ q: "Hvilken konsol havde 'PlayStation Now'?", a: ["PS4", "PS3", "PS5", "PS2"], r: "PS4", cat: "ONLINE" },
+{ q: "Hvilken konsol havde 'Error E74'?", a: ["Xbox 360", "PS3", "Wii", "PS2"], r: "Xbox 360", cat: "FEJL" },
+{ q: "Hvilken konsol havde 'Game Boy Camera'?", a: ["Game Boy", "GBA", "DS", "Switch"], r: "Game Boy", cat: "KONSOL" },
+{ q: "Hvilken konsol havde 'PSX' som alternativ model?", a: ["PS2", "PS1", "PS3", "PSP"], r: "PS2", cat: "KONSOL" },
+{ q: "Hvad står CPU for?", a: ["Central Processing Unit", "Core Power Unit", "Compute Performance Utility", "Central Program Unit"], r: "Central Processing Unit", cat: "PC" },
+{ q: "Hvad er GPU'ens primære funktion?", a: ["Grafikbehandling", "Lydstyring", "Netværk", "Strømstyring"], r: "Grafikbehandling", cat: "PC" },
+{ q: "Hvad betyder RAM?", a: ["Random Access Memory", "Rapid Access Module", "Read And Manage", "Runtime Active Memory"], r: "Random Access Memory", cat: "PC" },
+{ q: "Hvilken type lagring er hurtigst?", a: ["HDD", "SSD", "USB 2.0", "DVD"], r: "SSD", cat: "PC" },
+{ q: "Hvad måles CPU‑hastighed i?", a: ["GHz", "MB", "FPS", "RPM"], r: "GHz", cat: "PC" },
+
+{ q: "Hvad er en almindelig årsag til overophedning?", a: ["Støv", "For meget RAM", "For mange USB‑enheder", "Lav opløsning"], r: "Støv", cat: "FEJL" },
+{ q: "Hvad gør en PSU?", a: ["Leverer strøm", "Køler CPU'en", "Behandler grafik", "Gemmer data"], r: "Leverer strøm", cat: "PC" },
+{ q: "Hvad er en almindelig fejl ved dårlige RAM‑moduler?", a: ["BSOD", "Lav FPS", "Ingen lyd", "Ingen internet"], r: "BSOD", cat: "FEJL" },
+{ q: "Hvad betyder BSOD?", a: ["Blue Screen of Death", "Boot System Overload", "Binary Shutdown Device", "Basic System Output Display"], r: "Blue Screen of Death", cat: "FEJL" },
+{ q: "Hvad er en almindelig årsag til langsom PC‑opstart?", a: ["For mange startup‑programmer", "For meget RAM", "Ny PSU", "Ny mus"], r: "For mange startup‑programmer", cat: "FEJL" },
+
+{ q: "Hvad gør termisk pasta?", a: ["Leder varme", "Leder strøm", "Lagrer data", "Forbedrer grafik"], r: "Leder varme", cat: "PC" },
+{ q: "Hvad er en SSD’s største fordel?", a: ["Hastighed", "Størrelse", "Pris", "Støj"], r: "Hastighed", cat: "PC" },
+{ q: "Hvad er en almindelig årsag til coil whine?", a: ["GPU‑belastning", "Dårlig RAM", "Defekt PSU‑kabel", "For meget støv"], r: "GPU‑belastning", cat: "FEJL" },
+{ q: "Hvad betyder FPS?", a: ["Frames Per Second", "Fast Processing Speed", "File Performance System", "Frame Pixel Scale"], r: "Frames Per Second", cat: "PC" },
+{ q: "Hvad gør en køleribbe?", a: ["Afgiver varme", "Gemmer data", "Behandler grafik", "Forbedrer internet"], r: "Afgiver varme", cat: "PC" },
+
+{ q: "Hvad er en almindelig årsag til at en PC ikke starter?", a: ["Defekt PSU", "For meget RAM", "For høj opløsning", "For mange USB‑porte"], r: "Defekt PSU", cat: "FEJL" },
+{ q: "Hvad betyder BIOS?", a: ["Basic Input Output System", "Binary Operating System", "Boot Internal Output Setup", "Base Interface OS"], r: "Basic Input Output System", cat: "PC" },
+{ q: "Hvad er UEFI?", a: ["Moderne BIOS", "Grafikkortdriver", "RAM‑test", "CPU‑køling"], r: "Moderne BIOS", cat: "PC" },
+{ q: "Hvad er en almindelig årsag til dårlig FPS?", a: ["For svag GPU", "For meget RAM", "For stor skærm", "For mange USB‑enheder"], r: "For svag GPU", cat: "FEJL" },
+{ q: "Hvad betyder 'bottleneck'?", a: ["En komponent begrænser resten", "PC'en fryser", "Strømfejl", "Netværksfejl"], r: "En komponent begrænser resten", cat: "PC" },
+
+{ q: "Hvad er en almindelig årsag til at en PC genstarter tilfældigt?", a: ["Overophedning", "For meget RAM", "For mange faner åbne", "For høj opløsning"], r: "Overophedning", cat: "FEJL" },
+{ q: "Hvad betyder GPU‑driveropdateringer?", a: ["Forbedrer grafik og stabilitet", "Sletter filer", "Reducerer FPS", "Slukker PC'en"], r: "Forbedrer grafik og stabilitet", cat: "PC" },
+{ q: "Hvad er en almindelig årsag til at en PC larmer meget?", a: ["Støv i blæsere", "For meget RAM", "For stor skærm", "For mange mapper"], r: "Støv i blæsere", cat: "FEJL" },
+{ q: "Hvad er en M.2‑SSD?", a: ["En hurtig lagringsenhed", "En CPU‑type", "En GPU‑model", "En RAM‑standard"], r: "En hurtig lagringsenhed", cat: "PC" },
+{ q: "Hvad betyder 'thermal throttling'?", a: ["CPU/GPU sænker hastighed pga. varme", "PC'en slukker", "RAM fejler", "PSU stopper"], r: "CPU/GPU sænker hastighed pga. varme", cat: "FEJL" },
+
+{ q: "Hvad er en almindelig årsag til dårlig Wi‑Fi‑forbindelse?", a: ["Afstand til router", "For meget RAM", "For stor skærm", "For mange USB‑porte"], r: "Afstand til router", cat: "NETVÆRK" },
+{ q: "Hvad betyder ping?", a: ["Forsinkelse i ms", "Downloadhastighed", "Uploadhastighed", "CPU‑belastning"], r: "Forsinkelse i ms", cat: "NETVÆRK" },
+{ q: "Hvad er en router?", a: ["Netværksenhed", "Grafikkort", "CPU‑køler", "Lagringsenhed"], r: "Netværksenhed", cat: "NETVÆRK" },
+{ q: "Hvad betyder LAN?", a: ["Local Area Network", "Large Access Node", "Local Active Network", "Link Access Network"], r: "Local Area Network", cat: "NETVÆRK" },
+{ q: "Hvad er en almindelig årsag til at internettet falder ud?", a: ["Dårlig router", "For meget RAM", "For stor skærm", "For mange mapper"], r: "Dårlig router", cat: "NETVÆRK" },
+
+{ q: "Hvad betyder 'overclocking'?", a: ["Øger hastighed på CPU/GPU", "Reducerer varme", "Sletter filer", "Forbedrer Wi‑Fi"], r: "Øger hastighed på CPU/GPU", cat: "PC" },
+{ q: "Hvad er risikoen ved overclocking?", a: ["Overophedning", "Lav FPS", "Ingen internet", "Ingen lyd"], r: "Overophedning", cat: "FEJL" },
+{ q: "Hvad betyder TDP?", a: ["Thermal Design Power", "Total Data Processing", "Thermal Drive Performance", "Turbo Drive Power"], r: "Thermal Design Power", cat: "PC" },
+{ q: "Hvad er en PSU‑fejl ofte årsag til?", a: ["PC slukker", "Lav FPS", "Ingen lyd", "Ingen Wi‑Fi"], r: "PC slukker", cat: "FEJL" },
+{ q: "Hvad betyder 'POST' ved opstart?", a: ["Power‑On Self Test", "Program Output System Test", "Primary OS Setup Test", "Performance Output Scan"], r: "Power‑On Self Test", cat: "PC" },
+
+{ q: "Hvad er en almindelig årsag til at en PC ikke viser billede?", a: ["Defekt GPU", "For meget RAM", "For stor skærm", "For mange mapper"], r: "Defekt GPU", cat: "FEJL" },
+{ q: "Hvad betyder 'artifacting'?", a: ["Grafikfejl", "Lydfejl", "Netværksfejl", "Strømfejl"], r: "Grafikfejl", cat: "FEJL" },
+{ q: "Hvad er en almindelig årsag til artifacting?", a: ["Overophedet GPU", "For meget RAM", "For stor skærm", "For mange mapper"], r: "Overophedet GPU", cat: "FEJL" },
+{ q: "Hvad betyder 'driver crash'?", a: ["Grafikdriver stopper", "CPU brænder af", "PSU slukker", "RAM slettes"], r: "Grafikdriver stopper", cat: "FEJL" },
+{ q: "Hvad er en almindelig årsag til driver crash?", a: ["Gamle drivere", "For meget RAM", "For stor skærm", "For mange mapper"], r: "Gamle drivere", cat: "FEJL" },
+
+{ q: "Hvad betyder 'cache'?", a: ["Hurtig midlertidig lagring", "Permanent lagring", "Grafikchip", "Netværksbuffer"], r: "Hurtig midlertidig lagring", cat: "PC" },
+{ q: "Hvad er en almindelig årsag til langsom browser?", a: ["For mange faner", "For meget RAM", "For stor skærm", "For mange mapper"], r: "For mange faner", cat: "FEJL" },
+{ q: "Hvad betyder 'malware'?", a: ["Skadelig software", "Grafikdriver", "CPU‑test", "RAM‑fejl"], r: "Skadelig software", cat: "SOFTWARE" },
+{ q: "Hvad er en firewall?", a: ["Sikkerhedsbarriere", "Grafikkort", "CPU‑køler", "Lagringsenhed"], r: "Sikkerhedsbarriere", cat: "SOFTWARE" },
+{ q: "Hvad betyder 'formatere en disk'?", a: ["Slette alt", "Installere drivere", "Opdatere BIOS", "Forbedre grafik"], r: "Slette alt", cat: "SOFTWARE" },
+
+{ q: "Hvad er en almindelig årsag til at Windows ikke starter?", a: ["Korrupt boot‑fil", "For meget RAM", "For stor skærm", "For mange mapper"], r: "Korrupt boot‑fil", cat: "FEJL" },
+{ q: "Hvad betyder 'Safe Mode'?", a: ["Fejlsikret tilstand", "Turbo‑tilstand", "Gaming‑tilstand", "Strømbesparelse"], r: "Fejlsikret tilstand", cat: "SOFTWARE" },
+{ q: "Hvad betyder 'defragmentering'?", a: ["Optimere HDD", "Optimere GPU", "Optimere RAM", "Optimere CPU"], r: "Optimere HDD", cat: "SOFTWARE" },
+{ q: "Hvad er en almindelig årsag til at en PC fryser?", a: ["Overophedning", "For meget RAM", "For stor skærm", "For mange mapper"], r: "Overophedning", cat: "FEJL" },
+{ q: "Hvad betyder 'boot loop'?", a: ["PC genstarter konstant", "PC slukker", "PC mister internet", "PC mister lyd"], r: "PC genstarter konstant", cat: "FEJL" },
+
+{ q: "Hvad betyder 'dual‑channel RAM'?", a: ["To RAM‑moduler arbejder sammen", "RAM med to farver", "RAM med dobbelt størrelse", "RAM med dobbelt hastighed"], r: "To RAM‑moduler arbejder sammen", cat: "PC" },
+{ q: "Hvad er en almindelig årsag til at en PC lugter brændt?", a: ["PSU‑fejl", "For meget RAM", "For stor skærm", "For mange mapper"], r: "PSU‑fejl", cat: "FEJL" },
+{ q: "Hvad betyder 'thermal paste pump‑out'?", a: ["Pastaen tørrer ud", "CPU brænder af", "GPU mister strøm", "RAM fejler"], r: "Pastaen tørrer ud", cat: "FEJL" },
+{ q: "Hvad betyder 'S.M.A.R.T. error'?", a: ["Diskfejl", "GPU‑fejl", "RAM‑fejl", "CPU‑fejl"], r: "Diskfejl", cat: "FEJL" },
+{ q: "Hvad betyder 'overvoltage'?", a: ["For høj strøm", "For lav strøm", "For meget RAM", "For stor skærm"], r: "For høj strøm", cat: "FEJL" },
+
+{ q: "Hvad betyder 'undervolting'?", a: ["Sænke spænding", "Øge spænding", "Slette RAM", "Forbedre Wi‑Fi"], r: "Sænke spænding", cat: "PC" },
+{ q: "Hvad er en almindelig årsag til at en PC mister lyd?", a: ["Driverfejl", "For meget RAM", "For stor skærm", "For mange mapper"], r: "Driverfejl", cat: "FEJL" },
+{ q: "Hvad betyder 'DirectX'?", a: ["Grafik‑API", "CPU‑driver", "RAM‑test", "Netværksprotokol"], r: "Grafik‑API", cat: "SOFTWARE" },
+{ q: "Hvad betyder 'VRAM'?", a: ["Video RAM", "Virtual RAM", "Variable RAM", "Voltage RAM"], r: "Video RAM", cat: "PC" },
+{ q: "Hvad er en almindelig årsag til at en PC ikke kan installere spil?", a: ["Manglende lagerplads", "For meget RAM", "For stor skærm", "For mange mapper"], r: "Manglende lagerplads", cat: "FEJL" },
+{ q: "Hvilket dyr har den hurtigste puls?", a: ["Kolibri", "Mus", "Hamster", "Flagermus"], r: "Kolibri", cat: "DYR" }
+        ];
+
+        // --- 2. LOCALIZED TRANSLATIONS CONFIG ---
+        const forbiddenWordsArr = [
+            "røvhul", "fuck", "fisse", "pik", "kælling", "luder", "satan", "kraftedeme", 
+    "for helvede", "skide", "lort", "røv", "kusse", "kneppe", "bøsserøv", 
+    "spasser", "idiot", "dummerøv", "gøgler", "klam", "klamhugger"
+        ];
+
+        const ui = {
+            startBtn: "BOOT PROTOCOL 🚀",
+            gamerTag: "DITT GAMER-TAG:",
+            scoreText: "af 30 point.",
+            kamekTitle: "DU BLEV FANGEVOGTET! 🪄✨",
+            kamekFoul: "Du forsøgte at snyde eller forlade siden. Som straf har Kamek afspillet sin latter og lukket din quiz ned.",
+            kamekReason: "Årsag: ",
+            reboot: "PRØV IGEN 🚀",
+            correct: "RIGTIGT SVAR!",
+            wrong: "FORKERT SVAR!",
+            perfect: "BEDØMMELSE: MVG++ (30/30) – PERFEKT! Operatør Psl631 sender luftskibet. Hent din gevinst!",
+            high: "BEDØMMELSE: MVG – FREMRAGENDE! Du er en elite-gamer.",
+            average: "BEDØMMELSE: VG – VEL GODKENDT. Kamek griner af din indsats, men du er stadig god.",
+            low: "BEDØMMELSE: G – GODKENDT. Du klarede den, men du skal øve dig mere.",
+            fail: "BEDØMMELSE: IG – UNDERKENDT. Resultatet rakte ikke hele vejen.",
+            critical: "BEDØMMELSE: IG- (TOTALT MISLYKKET). Toad græder.",
+            batteryLow: "⚠️ [ADVARSEL] STRØMFORSYNING AFBRUDT. TILSLUT LADERE FOR OPTIMAL TERMINALPRESTATION.",
+            noInternet: "[ADVARSEL] Offline: Dine resultater gemmes ikke i skyen, men i stedet lokalt**",
+            adBlock: "[SYSTEM] AdBlock registreret, slå fra for maksimal ydeevne",
+            nameWarning: "[SYSTEM] Dit navn blev flagget som offensivt og er ændret til 'Gæst'",
+            syncing: "[SYSTEM] SYNKRONISERER MED SKYEN...",
+            syncComplete: "[SYSTEM] DATA OVERFØRT TIL CENTRALEN"
+        };
+
+        // --- 3. SYSTEM FUNCTIONS & NAVIGATION ---
+        function showInstructions() {
+            if (sfx.boop) playSound(sfx.boop);
+            document.getElementById("start-screen").classList.add("hidden");
+            document.getElementById("instructions-screen").classList.remove("hidden");
+        }
+
+        function hideInstructions() {
+            if (sfx.boop) playSound(sfx.boop);
+            document.getElementById("instructions-screen").classList.add("hidden");
+            document.getElementById("start-screen").classList.remove("hidden");
+        }
+
+        let playerName = "";
+        let score = 0;
+        let currentIdx = 0;
+        let lives = 3;
+        let maxLives = 3;
+        let shuffledQuestions = [];
+        let currentMode = 'tournament';
+        let lifelines = { fiftyFifty: true, skip: true, analysis: true, reboot: true };
+        let questionStartTime = 0;
+        let stats = { answerTimes: [], categories: {} };
+        window.quizActive = false;
+
+        // --- 4. SFX MODULE ---
+        const sfx = {
+            pling: new Audio('pling.mp3'),
+            boop: new Audio('boooop.mp3'),
+            kamek: new Audio('kamek.mp3'),
+            denied: new Audio('denied.wav'),
+            gameOver: new Audio('mario_game_over.mp3'),
+            hacker: new Audio('hacker.mp3'),
+            glitch: new Audio('reboot.mp3'),
+            warp: new Audio('skip.mp3'),
+            ana: new Audio('analysis.mp3'),
+            yay: new Audio('yay.mp3'),
+            cash: new Audio('cash_register.mp3'),
+            trombone: new Audio('sad_trombone.mp3'),
+            loser: new Audio('mk64_loser.wav')
+        };
+
+        function playSound(audio) {
+            if (!audio) return;
+            audio.currentTime = 0;
+            audio.play().catch(() => {});
+        }
+
+        function showToast(msg, color) {
+            const toast = document.createElement("div");
+            toast.style = `position:fixed; top:20px; right:20px; background:${color}; color:white; padding:15px; font-family:'VT323'; z-index:10000; border:2px solid white; box-shadow:5px 5px 0px black; pointer-events:none;`;
+            toast.innerHTML = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 6000);
+        }
+
+        async function checkSystemStatus() {
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            if (isMobile) {
+                document.body.innerHTML = `<div style="background:black; color:red; height:100vh; display:flex; align-items:center; justify-content:center; font-family:'Press Start 2P'; text-align:center; padding:20px;">[ SYSTEM ERROR ]<br><br>MOBIL ER IKKE TILLADT PÅ DENNE PLATFORM!</div>`;
+                return;
+            }
+            if (!navigator.onLine) {
+                showToast(ui.noInternet, "#ff0000");
+            }
+
+            const adTest = document.createElement('div');
+            adTest.innerHTML = '&nbsp;';
+            adTest.className = 'adsbygoogle';
+            adTest.style.position = 'absolute'; adTest.style.left = '-999px';
+            document.body.appendChild(adTest);
+
+            window.setTimeout(() => {
+                if (adTest.offsetHeight === 0) {
+                    showToast(ui.adBlock, "#6600cc");
+                }
+                adTest.remove();
+            }, 100);
+
+            if ('getBattery' in navigator) {
+                navigator.getBattery().then(battery => {
+                    const checkBattery = () => { if (!battery.charging) showToast(ui.batteryLow, "#ff6600"); };
+                    battery.addEventListener('chargingchange', checkBattery);
+                    checkBattery();
+                });
+            }
+        }
+
+        function sanitizeName(name) {
+            let clean = name.trim();
+            if (!clean || clean.toLowerCase() === "gæst") return "Gæst";
+            const allowedPattern = /^[a-zA-ZæøåÆØÅ0-9 ]+$/;
+            if (!allowedPattern.test(clean) || forbiddenWordsArr.some(word => clean.toLowerCase().includes(word))) {
+                showToast(ui.nameWarning, "red");
+                return "Gæst";
+            }
+            return clean.length > 15 ? clean.substring(0, 15) : clean;
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(b => b.style.borderColor = "#333");
+            const activeBtn = document.getElementById('btn-' + (mode === 'tournament' ? 'tournament' : 'classic'));
+            if (activeBtn) activeBtn.style.borderColor = "#00ff00";
+        }
+
+        function updateLivesUI() {
+            const container = document.getElementById("lives-container");
+            if (!container) return;
+            container.innerHTML = "";
+            if (currentMode === 'tournament') {
+                container.innerHTML = "<span style='color:gold; font-family:VT323;'>[ UENDELIGT LIV ]</span>";
+                return;
+            }
+            for (let i = 1; i <= maxLives; i++) {
+                const heart = document.createElement("img");
+                heart.style.width = "25px";
+                heart.src = i <= lives ? "heart_full.png" : "heart_empty.png";
+                container.appendChild(heart);
+            }
+        }
+
+        // --- 5. CORE GAME LOOPS ---
+        function startQuiz() {
+            console.log("System: Initierar uppstart...");
+            const nameInput = document.getElementById("player-name");
+            if (!nameInput) return;
+
+            playerName = sanitizeName(nameInput.value);
+            const startScreen = document.getElementById("start-screen");
+            const loadingScreen = document.getElementById("loading-container");
+            const quizScreen = document.getElementById("quiz-screen");
+
+            if (startScreen) startScreen.classList.add("hidden");
+            if (loadingScreen) loadingScreen.classList.remove("hidden");
+
+            setTimeout(() => {
+                if (loadingScreen) loadingScreen.classList.add("hidden");
+                if (quizScreen) quizScreen.classList.remove("hidden");
+
+                window.quizActive = true; 
+                shuffledQuestions = [...questions].sort(() => Math.random() - 0.5);
+                currentIdx = 0;
+                score = 0;
+                
+                if (typeof updateLivesUI === "function") updateLivesUI();
+                showQuestion();
+            }, 1500);
+        }
+
+        function showQuestion() {
+            const q = shuffledQuestions[currentIdx];
+            questionStartTime = Date.now();
+            
+            document.getElementById("progress").innerText = `STATION 24 - PROTOKOLL ${currentIdx + 1} / 30`;
+            const catDisplay = document.getElementById("question-category");
+            if (catDisplay) catDisplay.innerText = `[ KATEGORI: ${q.cat || "ALMINDELIG"} ]`;
+
+            document.getElementById("question-text").innerText = q.q;
+            const grid = document.getElementById("options-grid");
+            grid.innerHTML = "";
+            
+            const randomizedAnswers = [...q.a].sort(() => Math.random() - 0.5);
+            randomizedAnswers.forEach(alt => {
+                const btn = document.createElement("button");
+                btn.className = "option-btn";
+                btn.innerHTML = `<span>${alt}</span>`; 
+                btn.onclick = () => checkAnswer(alt, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(choice, btn) {
+            const q = shuffledQuestions[currentIdx];
+            const allBtns = document.querySelectorAll('.option-btn');
+            const timeTaken = (Date.now() - questionStartTime) / 1000;
+            stats.answerTimes.push(timeTaken);
+
+            allBtns.forEach(b => b.style.pointerEvents = 'none');
+            const monitor = document.querySelector('.monitor-frame');
+            const beepText = document.getElementById('beep-overlay');
+
+            if (choice === q.r) {
+                score++;
+                playSound(sfx.pling);
+                btn.classList.add("correct-flash");
+                setTimeout(nextQuestion, 1500);
+            } else {
+                playSound(sfx.boop);
+                if (monitor) monitor.classList.add('screen-damage');
+                if (beepText) beepText.style.display = 'block';
+                btn.classList.add("wrong-flash");
+                allBtns.forEach(b => { 
+                    if(b.innerText.trim() === q.r) b.classList.add("correct-flash"); 
+                });
+                if (currentMode === 'classic') {
+                    lives--;
+                    updateLivesUI();
+                    if (lives <= 0) { 
+                        setTimeout(() => {
+                            cleanupWrongAnswerEffects(monitor, beepText);
+                            showGameOver();
+                        }, 1400);
+                        return;
+                    }
+                }
+                setTimeout(() => {
+                    cleanupWrongAnswerEffects(monitor, beepText);
+                    nextQuestion();
+                }, 1800);
+            }
+        }
+
+        function cleanupWrongAnswerEffects(monitor, beepText) {
+            if (monitor) monitor.classList.remove('screen-damage');
+            if (beepText) beepText.style.display = 'none';
+        }
+
+        function nextQuestion() {
+            currentIdx++;
+            if (currentIdx < 30) {
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showGameOver() {
+            window.quizActive = false;
+            playSound(sfx.gameOver);
+            document.getElementById("quiz-screen").classList.add("hidden");
+            const res = document.getElementById("result-screen");
+            res.classList.remove("hidden");
+            res.innerHTML = `
+                <h1 style="color:red; font-family:'Press Start 2P'; font-size:2rem;">GAME OVER</h1>
+                <p style="font-family:VT323; font-size:1.5rem;">Systemet løb tør for energi (liv).</p>
+                <p style="color:yellow; font-family:VT323; font-size:1.3rem;">Point: ${score}/30</p>
+                <button onclick="location.reload()" class="menu-btn" style="margin-top:20px;">GENSTART TERMINAL 🚀</button>
+            `;
+        }
+
+        function triggerLifelineWarning() {
+            if (sfx.denied) {
+                sfx.denied.currentTime = 0;
+                sfx.denied.play().catch(e => console.log("Ljud blockerat:", e));
+            }
+            showToast("LIVLINA ALLEREDE BRUGT", "#ff0000");
+            const quizScreen = document.getElementById("quiz-screen");
+            if (quizScreen) {
+                quizScreen.classList.add("error-shake");
+                setTimeout(() => quizScreen.classList.remove("error-shake"), 500);
+            }
+        }
+
+        // --- 6. LIFELINE ACTION SECTORS ---
+        function useFiftyFifty() {
+            if (!lifelines.fiftyFifty) { triggerLifelineWarning(); return; }
+            playSound(sfx.hacker);
+            const currentQ = shuffledQuestions[currentIdx];
+            const buttons = Array.from(document.querySelectorAll(".option-btn"));
+            let removed = 0;
+            buttons.sort(() => Math.random() - 0.5).forEach(btn => {
+                if (btn.innerText !== currentQ.r && removed < 2) {
+                    btn.style.visibility = "hidden";
+                    removed++;
+                }
+            });
+            lifelines.fiftyFifty = false;
+            const btnElement = document.getElementById("fifty-fifty-btn");
+            if (btnElement) btnElement.classList.add("used");
+            showToast("50/50 AKTIVERET", "#00ff00");
+        }
+
+        function useSkipQuestion() {
+            if (!lifelines.skip) { triggerLifelineWarning(); return; }
+            playSound(sfx.skip);
+            lifelines.skip = false;
+            const btnElement = document.getElementById("skip-btn");
+            if (btnElement) btnElement.classList.add("used");
+            currentIdx++;
+            if (currentIdx < shuffledQuestions.length) {
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function useAnalysis() {
+            if (!lifelines.analysis) { triggerLifelineWarning(); return; }
+            playSound(sfx.analysis);
+            const currentQ = shuffledQuestions[currentIdx];
+            showToast(`ANALYSE: SVARET STARTER MED "${currentQ.r.charAt(0)}"`, "#00ccff");
+            lifelines.analysis = false;
+            const btnElement = document.getElementById("analysis-btn");
+            if (btnElement) btnElement.classList.add("used");
+        }
+
+        function useReboot() {
+            if (!lifelines.reboot) { triggerLifelineWarning(); return; }
+            if (lives >= 3) {
+                showToast("SYSTEMET ALLEREDE OPTIMERET (FULDE LIV)", "#ffffff");
+                return;
+            }
+            playSound(sfx.reboot);
+            lives++;
+            if (typeof updateLivesUI === "function") updateLivesUI();
+            lifelines.reboot = false;
+            const btnElement = document.getElementById("reboot-btn");
+            if (btnElement) btnElement.classList.add("used");
+        }
+
+        // --- 7. METRICS & TELEMETRY DISPLAY ---
+        function showResults() {
+            window.quizActive = false;
+            document.getElementById("quiz-screen").classList.add("hidden");
+            const res = document.getElementById("result-screen");
+            res.classList.remove("hidden");
+            res.innerHTML = `<p style="color:cyan; font-family:'VT323';">${ui.syncing}</p><div class="fake-progress-bar"></div>`;
+            
+            setTimeout(() => {
+                res.innerHTML = `
+                    <h2 id="result-header" style="font-size:2rem; margin:0 0 15px 0;">ANALYSE AFSLUTTET</h2>
+                    <div id="toad-sad-container" class="hidden"><img src="sad_toad.jfif" style="width:100px; border:2px solid red;"></div>
+                    <p id="result-score" style="font-size:1.8rem; color:#fff; margin:5px 0;">${playerName}: ${score}/30</p>
+                    <p id="result-comment" style="color:yellow; font-size:1.2rem; font-family:VT323; line-height:1.3; max-width:600px; margin:0 auto 15px auto;"></p>
+                    <div id="advanced-stats" style="font-family:VT323; text-align:left; border-top:1px solid #333; padding-top:10px; font-size:1.2rem;"></div>
+                    <div id="leaderboard-display" style="margin-top:15px;"></div>
+                    <button class="menu-btn" onclick="location.reload()" style="margin-top:20px;">OMSTART 🚀</button>
+                `;
+                
+                const avgTime = (stats.answerTimes.reduce((a,b)=>a+b,0) / stats.answerTimes.length).toFixed(1);
+                const comment = document.getElementById("result-comment");
+                
+                if (score === 30) { comment.innerText = ui.perfect; playSound(sfx.yay); }
+                else if (score >= 23) { comment.innerText = ui.high; playSound(sfx.cash); }
+                else if (score >= 14) { comment.innerText = ui.average; playSound(sfx.kamek); }
+                else if (score >= 6) { comment.innerText = ui.fail; playSound(sfx.trombone); }
+                else { 
+                    comment.innerText = ui.critical; playSound(sfx.loser); 
+                    document.getElementById("toad-sad-container").classList.remove("hidden");
+                    showToast("ADVARSEL: MEKANISK DISKFEJL REGISTRERET", "#ff0000");
+                }
+
+                document.getElementById("advanced-stats").innerHTML = `
+                    <p>> GENNEMSNITSTID PR. SPØRGSMÅL: ${avgTime}s</p>
+                    <p>> PRÆCISION: ${Math.round((score/30)*100)}%</p>
+                `;
+                updateLeaderboard();
+                showToast(ui.syncComplete, "green");
+            }, 2000);
+        }
+
+        function updateLeaderboard() {
+            let lb = JSON.parse(localStorage.getItem('station24_lb')) || [];
+            lb.push({ name: playerName, score: score });
+            lb.sort((a,b) => b.score - a.score);
+            localStorage.setItem('station24_lb', JSON.stringify(lb.slice(0, 5)));
+            let html = "<h3 style='color:cyan; margin:10px 0 5px 0;'>--- HALL OF FAME ---</h3>";
+            lb.slice(0,5).forEach((e, i) => { html += `<p style='margin:3px 0;'>${i + 1}. ${e.name} - ${e.score} XP</p>`; });
+            document.getElementById("leaderboard-display").innerHTML = html;
+        }
+
+        /* ===========================================================
+           KAMEK AGGRESSIVE ANTI-CHEAT PROTOCOL (LOCKDOWN v4.1)
+           =========================================================== */
+        window.addEventListener('blur', () => { 
+            if (window.quizActive) { triggerKamekVrede("REGISTRERET FOKUS-TAB (FORSØG PÅ GOOGLING)"); }
+        });
+
+        window.addEventListener('contextmenu', (e) => {
+            if (window.quizActive) { e.preventDefault(); triggerKamekVrede("HØJREKLIK REGISTRERET (FORBUDT HANDLING)"); }
+        });
+
+        window.addEventListener('wheel', (e) => {
+            if (window.quizActive && (!Number.isInteger(e.deltaY) || (Math.abs(e.deltaY) > 0 && Math.abs(e.deltaY) < 20))) {
+                triggerKamekVrede("STYRPLADE_ANVENDT - Stop med at stryge din bærbar! Brug en rigtig mus til Station 24 Protocol. Kamek accepterer kun mekanisk præcision!");
+            }
+        }, { passive: false });
+
+        window.addEventListener('keydown', (e) => {
+            if (!window.quizActive) return;
+            if (e.keyCode === 123) { e.preventDefault(); triggerKamekVrede("F12 REGISTRERET (SYSTEMINTRUDSFORSØG)"); }
+            if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
+                e.preventDefault(); triggerKamekVrede("DEVELOPER TOOLS GENVEJ REGISTRERET");
+            }
+            if (e.ctrlKey && e.keyCode === 85) { e.preventDefault(); triggerKamekVrede("SOURCE VIEW REGISTRERET"); }
+        });
+
+        function triggerKamekVrede(reason) {
+            window.quizActive = false;
+            Object.values(sfx).forEach(sound => { sound.pause(); sound.currentTime = 0; });
+            playSound(sfx.kamek);
+            
+            const styleInject = document.createElement('style');
+            styleInject.innerHTML = `
+                @keyframes kamek-pulse {
+                    0% { border-color: #ff0000; box-shadow: 0 0 20px #550000; }
+                    50% { border-color: #550000; box-shadow: 0 0 10px #220000; }
+                    100% { border-color: #ff0000; box-shadow: 0 0 20px #550000; }
+                }
+                .kamek-overlay { animation: kamek-pulse 2.5s infinite ease-in-out; }
+            `;
+            document.head.appendChild(styleInject);
+            document.title = "🛑 Quiz afbrudt af Kamek";
+            
+            document.body.innerHTML = `
+                <div class="kamek-overlay" style="background:#000; color:#ff0000; height:100vh; width:100vw; position:fixed; top:0; left:0; z-index:9999999; display:block; font-family:'Press Start 2P', cursive; text-align:center; padding:20px; border: 15px solid #ff0000; box-sizing: border-box; overflow-y: auto;">
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100%; padding: 20px 0;">
+                        <h1 style="font-size:2.2rem; margin-bottom: 30px; text-shadow: 8px 8px #550000; line-height: 1.2;">${ui.kamekTitle}</h1>
+                        <div style="background: red; padding: 10px; margin-bottom: 30px; display: inline-block;">
+                            <img src="kamek.jfif" style="width:220px; display:block; border:5px solid black;">
+                        </div>
+                        <p style="font-family:'VT323'; font-size:2.2rem; color:yellow; background: black; padding: 15px; border: 2px dashed yellow; margin-bottom: 20px; max-width: 90%;">
+                            OVERTRÆDELSE: ${reason}
+                        </p>
+                        <p style="font-family:'VT323'; color:#fff; font-size:1.6rem; margin-top: 20px; max-width: 750px; line-height: 1.3; margin-bottom: 10px;">
+                            ${ui.kamekFoul}<br>Din deltagelse i Station 24 er blevet afbrudt, og Operatør Psl631 er blevet informeret.
+                        </p>
+                        <div style="margin-top:40px; margin-bottom: 40px;">
+                            <button onclick="location.reload()" style="background:#ff0000; color:white; border:4px solid white; padding:20px 40px; cursor:pointer; font-family:'Press Start 2P'; font-size:1.1rem; box-shadow: 5px 5px 0px #550000;">
+                                ${ui.reboot}
+                            </button>
+                        </div>
+                        <div style="width:100%; opacity:0.3; font-size:0.6rem; letter-spacing:2px; font-family: 'Press Start 2P';">
+                            ERROR_CODE: CHEAT_DETECTED_STATION_24_V4.1
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- 8. HARDWARE MEDIA CORE CAPTURE ---
+        var configCam = false;
+        var configMic = false;
+
+        function toggleMediaState(type) {
+            if (type === 'cam') {
+                configCam = !configCam;
+                var btn = document.getElementById('toggle-cam');
+                var status = document.getElementById('status-cam');
+                btn.className = configCam ? 'btn-toggle btn-on' : 'btn-toggle btn-off';
+                status.innerText = configCam ? 'PÅ' : 'AF';
+            } else {
+                configMic = !configMic;
+                var btn = document.getElementById('toggle-mic');
+                var status = document.getElementById('status-mic');
+                btn.className = configMic ? 'btn-toggle btn-on' : 'btn-toggle btn-off';
+                status.innerText = configMic ? 'PÅ' : 'AF';
+            }
+        }
+
+        function openMediaPopup() { document.getElementById('media-modal-overlay').style.display = 'flex'; }
+        function closeMediaPopup() { document.getElementById('media-modal-overlay').style.display = 'none'; }
+
+        async function confirmAndStart() {
+            if (!configCam && !configMic) {
+                if (!confirm("Ingen medier valgt. Fortsæt alligevel?")) return;
+            }
+            initKamekMedia(configCam, configMic);
+            closeMediaPopup();
+        }
+
+        async function initKamekMedia(useCam, useMic) {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: useCam, audio: useMic });
+                if (useCam) {
+                    const v = document.getElementById('kamek-video');
+                    v.srcObject = stream; v.style.display = 'block';
+                    document.getElementById('kamek-cam-off').style.display = 'none';
+                    document.getElementById('kamek-rec-dot').style.display = 'block';
+                }
+                if (useMic) {
+                    document.getElementById('kamek-mic-widget').style.display = 'flex';
+                    setupKamekVisualizer(stream);
+                    setupKamekEar();
+                }
+                kamekToast("✅ SYSTEMET ER LIVE");
+            } catch (e) {
+                kamekToast("❌ ADGANG AFVIST ELLER INGEN ENHED FUNDET");
+            }
+        }
+
+        function setupKamekVisualizer(stream) {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const src = ctx.createMediaStreamSource(stream);
+            const ana = ctx.createAnalyser(); ana.fftSize = 32;
+            src.connect(ana);
+            const data = new Uint8Array(ana.frequencyBinCount);
+            const bars = document.querySelectorAll('.k-bar');
+
+            function draw() {
+                ana.getByteFrequencyData(data);
+                bars.forEach((b, i) => {
+                    let h = Math.max(4, (data[i]/255)*25);
+                    b.style.height = h + "px";
+                    b.style.background = data[i] > 200 ? "red" : "#00ccff";
+                });
+                requestAnimationFrame(draw);
+            }
+            draw();
+        }
+
+        function setupKamekEar() {
+            const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!Speech) return;
+            const rec = new Speech();
+            rec.continuous = true; rec.lang = 'da-DK';
+            rec.onresult = (e) => {
+                const txt = e.results[e.results.length-1][0].transcript.toLowerCase();
+                const forbiddenDa = ["lort", "pis", "helvede", "kraftedeme", "satan", "fisse", "pik", "røvhul"];
+                if (forbiddenDa.some(w => txt.includes(w))) {
+                    kamekStrikes++;
+                    if (kamekStrikes < 3) kamekToast("⚠️ ADVARSEL #" + kamekStrikes + ": TAL ORDENTLIGT!");
+                    else kamekPurpleLockdown();
+                }
+            };
+            var kamekStrikes = 0;
+            rec.start();
+        }
+
+        function kamekToast(m) {
+            const t = document.createElement('div'); t.className = 'k-toast';
+            t.innerHTML = m; document.body.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
+        function kamekPurpleLockdown() {
+            if (window.stop) window.stop();
+            document.body.innerHTML = `
+                <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#1a0033;display:flex;flex-direction:column;justify-content:center;align-items:center;color:white;font-family:Arial;border:15px double #8200ff;box-sizing:border-box;z-index:1000000;text-align:center;">
+                    <h1 style="font-size:40px;color:#ffcc00;margin-bottom:20px;">LÅST AF KAMEK</h1>
+                    <p style="font-size:24px;font-style:italic;">"Bandeord er ikke tilladt i terminalen."</p>
+                    <p style="color:red;font-weight:bold;font-size:20px;margin-top:20px;">RESULTAT: 0 POINT REGISTRERET</p>
+                    <button onclick="location.reload()" style="margin-top:20px;padding:10px 30px;cursor:pointer;background:#ffcc00;border:none;font-weight:bold;">FORSØG IGEN</button>
+                </div>`;
+        }
+
+        // --- 9. BACKGROUND JUKEBOX CONTROLLER ---
+        const KAMEK_TRACKS = ['bowsers_galaxy.mp3',
+    'gerudo_valley.mp3',
+    'gusty_garden.mp3',
+    'coconut_mall.mp3',
+    'pokemon_main.mp3',
+    'mario64_slider.mp3',
+    'mk64_rr.mp3',
+'music/you_spin_me_round.mp3', 'music/cotton_eye_joe.mp3',
+                    '../The Boss - Base Defense/music/rhythm_is_a_dancer.mp3', '../The Boss - Base Defense/music/never_going_home_tonight.mp3',
+                    '../The Boss - Base Defense/music/ma_baker.mp3', '../The Boss - Base Defense/music/sandstorm.mp3', '../The Boss - Base Defense/music/scooter.mp3',
+                    '../The Boss - Base Defense/music/the_logical_song.mp3', '../The Boss - Base Defense/music/this_is_the_way.mp3',
+                    '../The Boss - Base Defense/music/titanium.mp3', '../The Boss - Base Defense/music/what_is_love.mp3', '../The Boss - Base Defense/usic/blue.mp3',
+                    '../The Boss - Base Defense/music/du_hast.mp3',
+                    '../The Boss - Base Defense/music/strong_enough.mp3', '../The Boss - Base Defense/music/the_business.mp3', '../The Boss - Base Defense/music/animals.mp3',
+                    '../The Boss - Base Defense/music/set_the_world_on_fire.mp3', '../The Boss - Base Defense/music/better_off_alone.mp3',
+                    '../The Boss - Base Defense/music/boom_boom_boom.mp3', '../The Boss - Base Defense/music/faded.mp3', '../The Boss - Base Defense/music/here_i_go_again.mp3',
+                    '../The Boss - Base Defense/music/here_i_go_again_ws.mp3', '../The Boss - Base Defense/music/thunderstruck.mp3', '../The Boss - Base Defense/music/the_final_countdown.mp3',
+                    '../The Boss - Base Defense/music/boten_anna.mp3', '../The Boss - Base Defense/music/in_the_end.mp3', '../The Boss - Base Defense/music/levitating.mp3',
+                    '../The Boss - Base Defense/music/blinding_lights.mp3', '../The Boss - Base Defense/music/golden.mp3', '../The Boss - Base Defense/music/take_on_me.mp3',
+                    '../The Boss - Base Defense/music/the_trooper.mp3', '../The Boss - Base Defense/music/everytime_we_touch.mp3', '../The Boss - Base Defense/music/my_system.mp3',
+                    '../The Boss - Base Defense/music/gs.mp3', '../The Boss - Base Defense/music/we_like_to_party.mp3', '../The Boss - Base Defense/music/when_we_were_young.mp3',
+                    '../The Boss - Base Defense/music/billie_jean.mp3', '../The Boss - Base Defense/music/be_my_lover.mp3',
+    'mk64_raceway.mp3'];
+        const jukebox = new Audio();
+        jukebox.loop = true; jukebox.volume = 0.5;
+        let musicActive = false;
+
+        const uiContainer = document.getElementById('audio-interface');
+        const uiImg = document.getElementById('boombox-img');
+        const uiCross = document.getElementById('status-cross');
+        const uiInfo = document.getElementById('track-info');
+
+        function playRandomTrack() {
+            const randomIdx = Math.floor(Math.random() * KAMEK_TRACKS.length);
+            const trackName = KAMEK_TRACKS[randomIdx];
+            jukebox.src = trackName;
+            jukebox.play().then(() => {
+                uiInfo.innerText = "SPILER: " + trackName.replace('.mp3', '').toUpperCase();
+                uiInfo.style.display = 'block';
+                setTimeout(() => { uiInfo.style.display = 'none'; }, 3000);
+            }).catch(err => console.log("Interaktion kræves"));
+        }
+
+        function toggleMusic() {
+            musicActive = !musicActive;
+            if (musicActive) {
+                if (!jukebox.src) playRandomTrack(); else jukebox.play();
+                uiImg.style.opacity = "1"; uiImg.style.transform = "scale(1.1)";
+                uiCross.style.display = "none";
+            } else {
+                jukebox.pause();
+                uiImg.style.opacity = "0.5"; uiImg.style.transform = "scale(0.9)";
+                uiCross.style.display = "flex";
+            }
+        }
+
+        uiContainer.addEventListener('click', toggleMusic);
+        document.addEventListener('keydown', (e) => { if (e.key.toLowerCase() === 'm') { toggleMusic(); } });
+
+        // --- 10. SYSTEM INITIALIZATION ---
+        window.addEventListener('load', () => {
+            if (typeof checkSystemStatus === "function") { checkSystemStatus(); }
+        });
+    </script>
+</body>
+</html>

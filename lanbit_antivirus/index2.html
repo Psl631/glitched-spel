@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virus Cleaner - Absolute Lockout Edition 3.2</title>
+    <style>
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: #000;
+            font-family: 'Tahoma', 'Segoe UI', Geneva, Verdana, sans-serif;
+            overflow: hidden; box-sizing: border-box; user-select: none;
+        }
+
+        /* Fullskärms-monitor chassis */
+        .monitor {
+            width: 100vw; height: 100vh;
+            background: #d4d0c8; border: 16px solid #b5b1a9;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+            box-sizing: border-box; position: relative;
+        }
+
+        .screen {
+            width: 100%; height: 100%;
+            background-image: url('bliss.jfif'); background-size: cover; background-position: center;
+            position: relative; overflow: hidden;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.6);
+        }
+
+        /* Toppmeny */
+        .top-bar {
+            position: absolute; top: 0; left: 0; right: 0; height: 40px;
+            background: rgba(212, 208, 200, 0.9);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.4); z-index: 100;
+        }
+
+        .stats { font-weight: bold; font-size: 15px; }
+        .health-container { width: 180px; height: 18px; background: #eee; border: 1px solid #999; display: inline-block; vertical-align: middle; margin-left: 8px; }
+        .health-bar { width: 100%; height: 100%; background: #00ff00; transition: width 0.1s; }
+
+        /* Windows XP Fönster */
+        .window {
+            position: absolute; background: #d4d0c8;
+            border: 2px solid #ffffff; border-right-color: #404040; border-bottom-color: #404040;
+            box-shadow: 3px 3px 15px rgba(0,0,0,0.5); z-index: 10; width: 250px;
+            outline: none;
+        }
+
+        .win-header { color: white; padding: 5px 8px; font-size: 13px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .win-close { background: #e04343; color: white; border: 1px solid #fff; width: 16px; height: 16px; font-size: 10px; text-align: center; line-height: 14px; cursor: pointer; }
+        .win-body { padding: 15px 12px; font-size: 13px; text-align: center; position: relative; }
+        .win-btn { margin-top: 10px; background: #d4d0c8; border: 2px solid #ffffff; border-right-color: #404040; border-bottom-color: #404040; padding: 4px 15px; cursor: pointer; font-size: 13px; }
+
+        /* Fönstertyper */
+        .type-virus .win-header { background: linear-gradient(90deg, #0058e6, #3a97fc); }
+        .type-powerup { border-color: #00a859; width: 220px; }
+        .type-powerup .win-header { background: linear-gradient(90deg, #118626, #34c759); }
+        .type-nuke { animation: flash-red-yellow 0.5s infinite alternate; width: 260px; }
+        .type-nuke .win-header { background: #ff0000; }
+        .type-train-trap { width: 300px; }
+        .type-train-trap .win-header { background: linear-gradient(90deg, #4a4a4a, #8e8e8e); }
+        .type-train-trap .win-btn { background: #fee; border-color: red; color: red; font-weight: bold; }
+        .type-kernel-trap { width: 320px; border-width: 4px; animation: flash-red 0.3s infinite alternate; }
+        .type-kernel-trap .win-header { background: #bb0000; }
+        .type-kernel-trap .win-body { background: black; color: white; font-family: monospace; }
+        .type-update-trap .win-header { background: linear-gradient(90deg, #666, #999); }
+        .type-update-trap .win-close { display: none; }
+        
+        .type-snooze { width: 270px; }
+        .type-snooze .win-header { background: linear-gradient(90deg, #b76e00, #ffaa00); }
+        .type-snooze .chase-dot { position: absolute; width: 16px; height: 16px; background: red; border-radius: 50%; cursor: pointer; box-shadow: 0 0 5px black; }
+        .type-snooze input[type="text"] { width: 90%; padding: 3px; font-family: monospace; font-size: 14px; text-align: center; margin-top: 5px; }
+
+        .time-bar-container { width: 100%; height: 5px; background: #ccc; }
+        .time-bar { width: 100%; height: 100%; background: #ff3333; }
+
+        @keyframes flash-red-yellow { from { border-color: #ff0000; } to { border-color: #eedd00; } }
+        @keyframes flash-red { from { border-color: red; } to { border-color: black; } }
+
+        /* Meny-boxar & Överlägg */
+        .overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 200;
+        }
+
+        .menu-box {
+            background: #d4d0c8; border: 3px solid #fff; border-right-color: #404040; border-bottom-color: #404040;
+            padding: 40px; text-align: center; box-shadow: 5px 5px 25px rgba(0,0,0,0.6); max-width: 500px;
+        }
+
+        button.main-btn {
+            background: #0058e6; color: white; border: 2px solid #3a97fc;
+            padding: 12px 30px; font-size: 18px; font-weight: bold; cursor: pointer;
+        }
+
+        select { padding: 6px; font-size: 15px; margin-bottom: 25px; }
+
+        /* Blue Screen (BSOD) */
+        .bsod {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #0000aa; color: #ffffff; font-family: 'Lucida Console', Courier, monospace;
+            padding: 50px; box-sizing: border-box; display: none; z-index: 300; text-align: left;
+            overflow-y: auto;
+        }
+
+        .bsod h1 { background: #ffffff; color: #0000aa; display: inline-block; padding: 0 10px; font-size: 22px; margin-top:0; }
+        .bsod p { font-size: 16px; line-height: 1.4; margin: 10px 0; }
+        .bsod-btn { background: white; color: black; border: none; padding: 8px 20px; cursor: pointer; font-weight: bold; margin-top: 15px; font-size: 14px; font-family: monospace; }
+        .bsod-input { background: #0000aa; color: #fff; border: 1px solid #fff; padding: 4px; font-family: 'Lucida Console', monospace; font-size: 16px; width: 200px; text-transform: uppercase; outline: none; }
+
+        /* Anti-Cheat & Device Lockdown Skärm */
+        .lockdown {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: radial-gradient(circle, #400 0%, #000 100%);
+            color: #ff3333; font-family: 'Courier New', Courier, monospace;
+            padding: 50px; box-sizing: border-box; display: none; z-index: 999999;
+            animation: flash-red 0.6s infinite alternate;
+        }
+        .lockdown-box { max-width: 750px; margin: 20px auto; border: 4px solid red; background: black; padding: 30px; text-align: center; box-shadow: 0 0 30px red; }
+        .lockdown-logo { max-width: 180px; margin-bottom: 20px; border: 2px solid #fff; }
+        
+        .toast-popup {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: #ffffe1; color: #000; border: 1px solid #000; border-radius: 4px;
+            padding: 8px 16px; font-family: 'Tahoma', sans-serif; font-size: 13px; font-weight: bold;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.5); z-index: 9999999; display: none;
+        }
+
+        /* Fullskärms Videoreklam-gränssnitt */
+        .video-ad-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #000; z-index: 450000; display: none;
+        }
+        .ad-video-clickable-zone { width: 100%; height: 100%; cursor: pointer; position: relative; }
+        .ad-video-player { width: 100%; height: 100%; object-fit: cover; pointer-events: none; } /* Klick fångas av zonen istället */
+        .ad-text-banner {
+            position: absolute; top: 12%; left: 50%; transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9); color: #fff; padding: 15px 30px;
+            border: 3px solid #ffcc00; text-align: center; width: 65%;
+            font-size: 16px; font-weight: bold; box-shadow: 0 0 15px rgba(0,0,0,0.8);
+            z-index: 450010;
+        }
+
+        #biometricPanel {
+    position: absolute; 
+    bottom: 20px; /* Flyttad från top till bottom */
+    right: 20px; 
+    width: 190px; 
+    background: #d4d0c8; 
+    border: 2px solid #fff; 
+    z-index: 9999; 
+    font-size: 11px;
+}
+        .ad-unmute-btn {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: #ff0000; color: #fff; border: 2px solid #fff; font-size: 18px;
+            font-weight: bold; padding: 15px 30px; cursor: pointer; box-shadow: 0 0 20px red;
+            animation: flash-red 0.4s infinite alternate; z-index: 450020;
+        }
+        .ad-skip-container {
+            position: absolute; bottom: 12%; right: 4%;
+            background: rgba(0, 0, 0, 0.9); border: 1px solid #777;
+            color: #bbb; padding: 12px 24px; font-family: sans-serif;
+            font-size: 14px; font-weight: bold; min-width: 140px; text-align: center;
+            z-index: 450020; pointer-events: auto;
+        }
+        .ad-skip-clickable { background: #fff; color: #000; border-color: #fff; cursor: pointer; color: black !important; }
+    </style>
+</head>
+<body>
+
+    <!-- SKRIPTBLOCK 1: ULTRA-LEGACY (FÖR INTERNET EXPLORER) -->
+    <script>
+        (function() {
+            var ua = navigator.userAgent.toLowerCase();
+            var isIE = (ua.indexOf('msie') !== -1 || ua.indexOf('trident') !== -1);
+            var isAncient = (!window.addEventListener || !document.querySelector);
+            
+            if (isIE || isAncient) {
+                var legacyDiv = document.createElement('div');
+                legacyDiv.style.position = 'fixed'; legacyDiv.style.top = '0'; legacyDiv.style.left = '0';
+                legacyDiv.style.width = '100%'; legacyDiv.style.height = '100%';
+                legacyDiv.style.background = '#0000aa'; legacyDiv.style.color = '#ffffff';
+                legacyDiv.style.fontFamily = 'monospace'; legacyDiv.style.padding = '50px';
+                legacyDiv.style.zIndex = '9999999'; legacyDiv.style.boxSizing = 'border-box';
+                
+                var msg = '';
+                if (isIE) {
+                    msg = '<h1>GRAVPLATS: INTERNET EXPLORER DETEKTERAT</h1>' +
+                          '<img src="ie_crossed.jfif" style="max-width:150px; margin-bottom:20px; border:2px solid white;"><br>' +
+                          '<p>[SV] Internet Explorer dog och begravdes officiellt år 2022. Varför gräver du upp ett digitalt lik? ' +
+                          'Ring Telia på deras gamla fyllerelefon och be dem skicka en CD-skiva med en källkodsmus.</p>';
+                } else {
+                    msg = '<h1>CRITICAL ERROR: MUSEUM PIECE DETECTED</h1>' +
+                          '<img src="telia.png" style="max-width:150px; margin-bottom:20px; border:2px solid white;"><br>' +
+                          '<p>[SV] Din webbläsare är antik. Windows XP ringde och ville ha sin källkod tillbaka.</p>';
+                }
+                
+                legacyDiv.innerHTML = msg;
+                document.body.appendChild(legacyDiv);
+                if (window.stop) { window.stop(); }
+            }
+        })();
+    </script>
+
+    <div id="toastPopup" class="toast-popup">Spelet kan inte pausas!</div>
+
+    <!-- SPELETS GIGANTISKA FULLSKÄRMS-ANNONS-OVERLAY -->
+    <div id="videoAdBlocker" class="video-ad-overlay">
+        <div class="ad-video-clickable-zone" id="adClickZone">
+            <video id="adVideoAsset" class="ad-video-player" loop muted playsinline></video>
+            <div id="adCorporateText" class="ad-text-banner">SPONSORED ADVERTISEMENT</div>
+        </div>
+        <button id="adUnmuteTrigger" class="ad-unmute-btn">🔊 SLÅ PÅ LJUDET / UNMUTE</button>
+        <div id="adSkipBox" class="ad-skip-container">Annonse...</div>
+    </div>
+
+    <!-- ANTI-CHEAT & DEVICE LOCKDOWN SKÄRM -->
+    <div class="lockdown" id="lockdownScreen">
+        <div class="lockdown-box">
+            <img src="" alt="Security Violation Asset" class="lockdown-logo" id="lockdownImage">
+            <h1 id="lockdownTitle" style="font-size:30px; text-shadow: 0 0 10px red; margin-top:0;">🚨 HARDWARE BAN / SYSTEM MANIPULATION 🚨</h1>
+            <h3 id="lockdownReason" style="color: yellow; text-transform: uppercase;">ORSAK: Okänt systemfel</h3>
+            <p id="lockdownInsult" style="font-size:18px; background:#200; padding:15px; border:1px dashed red; color:white; font-weight:bold; line-height:1.5;"></p>
+            <p id="lockdownFooter" style="font-size:12px; color:#666;">Telemetri skickad.</p>
+        </div>
+    </div>
+    <div id="alarmScreen" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:#ff0000; z-index:999999; display:none; flex-direction:column; align-items:center; justify-content:center; color:white; font-family:Impact, sans-serif;">
+    <h1 style="font-size: 80px;">🚨 VAKNA! 🚨</h1>
+    <p id="alarmMessage" style="font-size: 24px;">SYSTEMET KAN INTE PAUSAS!</p>
+    <button class="win-btn" onclick="stopAlarm()" style="padding: 20px 40px; font-size: 20px;">STÄNG AV LARM</button>
+</div>
+
+    <!-- SPELMONITOR -->
+    <div class="monitor" id="gameMonitor">
+        <div class="screen" id="screen">
+            
+            <!-- Toppmeny -->
+            <div class="top-bar">
+                <div>
+                    <select id="langSelect" onchange="changeLanguage(this.value)">
+                        <option value="sv">Svenska</option>
+                        <option value="da">Dansk</option>
+                        <option value="no">Norsk</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+                <div class="stats"><span id="scoreLabel">Poäng</span>: <span id="score">0</span></div>
+                <div class="stats">
+                    <span id="statusLabel">Systemhälsa</span>:
+                    <div class="health-container"><div class="health-bar" id="healthBar"></div></div>
+                </div>
+            </div>
+
+            <!-- Startmeny -->
+            <div class="overlay" id="startMenu">
+                <div class="menu-box">
+    <h1 id="gameTitle">Virusrensaren 3.2</h1>
+    <p id="gameDesc">Validerar miljö...</p>
+    
+    <div class="biometric-start-toggles" style="margin: 20px 0; text-align: left; background: #e1dfda; padding: 15px; border: 1px dashed #888;">
+        <div style="margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
+            <label style="cursor:pointer; font-weight:bold;"><input type="checkbox" id="biometricUseCam" onchange="toggleSetupIndicator('cam')"> Webbkamera</label>
+            <span id="camStatusBtn" style="background: #00a859; color: white; padding: 3px 8px; font-weight: bold; border-radius: 3px; font-size: 11px; box-shadow: 1px 1px 2px #000;">PÅ</span>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <label style="cursor:pointer; font-weight:bold;"><input type="checkbox" id="biometricUseMic" onchange="toggleSetupIndicator('mic')"> Mikrofon</label>
+            <span id="micStatusBtn" style="background: #00a859; color: white; padding: 3px 8px; font-weight: bold; border-radius: 3px; font-size: 11px; box-shadow: 1px 1px 2px #000;">PÅ</span>
+        </div>
+    </div>
+    
+    <button class="main-btn" id="startBtn" onclick="requestFullscreenAndStart()">Starta Spel</button>
+</div>
+            </div>
+<div id="biometricPanel">
+    <div style="background:#000080; color:#fff; padding:4px;">🛡️ BIOMETRISK AI</div>
+    <div style="padding:8px;">
+        <div id="spyCamBox" class="spy-cam-box" style="height: 120px; background: black; display: flex; align-items: center; justify-content: center;">
+            <video id="spyVideo" autoplay playsinline muted style="display:none;"></video>
+            <div id="spyCamOffState" style="color: red; font-weight: bold; text-align: center;">KAMERA AV</div>
+        </div>
+        <div id="spyMicBar" style="width:0%; height:10px; background:green; margin-top:5px;"></div>
+    </div>
+</div>
+            <!-- Blue Screen (Krasch) -->
+            <div class="bsod" id="bsodScreen">
+                <h1>SYSTEM CRASH</h1>
+                <p id="bsodMsg">Datorn har kraschat.</p>
+                <p>*** STOP: 0x000000FA (0x0000000A, 0x00000001, 0x00000000, 0xF86B5A89)</p>
+                <p id="finalScoreLabel">Slutgiltig poäng: <span id="finalScore">0</span></p>
+                
+                <div id="leaderboardInputArea" style="margin-top: 20px;">
+                    <span id="namePromptLabel">Skriv ditt namn: </span>
+                    <input type="text" id="playerName" maxlength="12" class="bsod-input" autocomplete="off">
+                    <button class="bsod-btn" style="margin-top:0; margin-left:10px;" id="saveScoreBtn" onclick="submitScore()">Spara</button>
+                </div>
+                
+                <div id="leaderboardViewArea" style="margin-top: 25px; display:none;">
+                    <h3 id="leaderboardTitle" style="margin:5px 0; color:#ffff00;">--- TOPPLISTA ---</h3>
+                    <pre id="leaderboardList" style="font-family: 'Lucida Console', monospace; margin: 0; line-height:1.4; font-size:15px; color:#fff;"></pre>
+                </div>
+
+                <button class="bsod-btn" id="restartBtn" onclick="restartGame()" style="display:none; background:#e04343; color:white;">Omstart (Reboot)</button>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="adsbox ads-banner advertisement pub_300x250" id="adTrap" style="position: absolute; left: -9999px; width: 1px; height: 1px;">&nbsp;</div>
+
+    <!-- SKRIPTBLOCK 2: HUVUDKOD, DYNAMISKA TÅG-URLER OCH ANIMALISKT ANTIFUSK -->
+    <script>
+        // Definitioner av videor och deras tillhörande spärrlänkar
+        const videoAdPoolConfig = [
+            { id: "sj", src: "sj.mp4", url: "https://www.sj.se" },
+            { id: "vy", src: "vy.mp4", url: "https://www.vy.no" },
+            { id: "dsb", src: "dsb.mp4", url: "https://www.dsb.dk" },
+            { id: "vr", src: "vrresa.mp4", url: "https://www.vrresa.se" },
+            { id: "generic", src: "telia.mp4", url: "https://www.telia.se" }
+        ];
+
+        const translations = {
+            sv: {
+                title: "Virusrensaren 3.2", desc: "Utrota virus! Klicka absolut INTE på videoannonserna pga flikbytes-anticheat!",
+                redoBtn: "REDO ➡️",
+                start: "Starta Spel (Fullskärm)", score: "Poäng", status: "Systemstatus",
+                virusH: "VARNING: VIRUS!", virusB: "Skadlig kod körs!", virusBtn: "Ta bort",
+                fwH: "BRANDVÄGG.EXE", fwB: "Rensar skadliga processer!", fwBtn: "Aktivera",
+                lifeH: "EXTRA_LIV.SYS", lifeB: "Återställer hälsa!", lifeBtn: "Reparera",
+                batH: "BATTERI.BAT", batB: "Fryser tiden i 5 sekunder!", batBtn: "Ladda",
+                nukeH: "!!! GRATIS VINST !!!", nukeB: "DU HAR VUNNIT 100 000 KR!", nukeBtn: "HÄMTA VINST",
+                adblock: "AdBlocker Upptäckt", 
+adblockI: "Du blockerar annonser! Tror du att internet är gratis? Stäng av din AdBlocker omedelbart eller så kommer Kamek att korrumpera din hårddisk.",
+                snoozeH: "ALARM: VAKNA!", alarmOff: "Stäng av",
+                trains: [{ text: "SJ: Tåget till Stockholm inställt på grund av lövhalka. Omboka nu!", url: "https://www.sj.se" }],
+                trainBtn: "Boka Om på webben", kernelH: "!!! KERNEL KORRUPTION !!!", kernelB: "Snabb systemdränering startar.",
+                updateH: "UPPDATERING.EXE", updateB: "Laddar ner del 1/532...",
+                bsodVirus: "DATORN HAR KRASCHAT! Registret kollapsade under virusbördan.",
+                bsodNuke: "DIREKT KRASCH! Du klickade på en Nuke-fälla. Ring Telia för support.",
+                finalScore: "Din slutgiltiga poäng blev", restart: "Omstart (Reboot)",
+                ldTitleHardware: "🚨 INKOMPATIBEL HÅRDVARA DETEKTERAD 🚨", ldTitleCheat: "🚨 CHEAT / MANIPULATION DETECTED 🚨",
+                ldFooterHardware: "Telemetri skickad till Telias supportavdelning för blockering.",
+                ldFooterCheat: "Kamek kastade en förbannelse över ditt spel. fuskare tolereras ej.",
+                alarmTasks: ["Dags att vakna!", "Klicka SNOOZE %s gånger till!", "Kasta ut klockan från skärmen! (Dra)", "Stava ordet: <strong>%s</strong>", "Jaga pricken!", "Spamma [SPACE] %s gånger!", "Håll in [ENTER] i 2 sekunder!"],
+                alarmWords: ["VAKNA", "STÄNGAV", "ALARM"],
+                guest: "GÄST", enterName: "Ange namn för historieböckerna: ", saveBtnText: "Spara", leaderboardTitle: "--- SYSTEM HIGH SCORES (TOP 5) ---", ratingLabel: "Systembetyg:",
+                noPause: "Spelet kan inte pausas!",
+                videoSkipWait: "Hoppa över om %s...", videoSkipReady: "Hoppa över annons ➡️",
+                videoAdTexts: {
+                    sj: "SJ: Signalfel i Hallsberg. Samtliga loktåg är inställda. Ingen prognos finns för tillfället.",
+                    vy: "Vy: Snabbtåget står strömlöst på fjellet. Sitt kvar i kupén i 14 timmar.",
+                    dsb: "DSB: Sporarbejde på Sjælland. Toget erstattes af en rutebil som også er forsinket.",
+                    vr: "VR: Tåget till Göteborg försenat pga vagnbrist.",
+                    generic: "Detta är en annons"
+                },
+                ratingTiers: { uselt: "USELT 💩", daoligt: "DÅLIGT 📉", medel: "MEDEL 😐", bra: "BRA 🔥", baest: "BÄST 👑" },
+                anticheat: {
+                    watch: "Smartklocka", watchI: "Spelar du på en klocka?! Gå ut och spring istället och ring Telia.",
+                    car: "Fordon (Bilskärm)", carI: "Sitter du i en BIL och försöker spela på instrumentbrädan? Fokusera på vägen innan du kraschar.",
+                    tv: "Smart TV", tvI: "Försöker du rensa virus med din TV-FJÄRRKONTROLL? Gå till sängs.",
+                    console: "Spelkonsol", consoleI: "Det här spelet är för PC master race. Ingen Aim-Assist här.",
+                    tablet: "Surfplatta (Padda)", tabletI: "Ska du klicka bort maskar med skärmflottiga fingrar? Det här spelet kräver en mus.",
+                    mobile: "Mobiltelefon", mobileI: "Letar du efter pekskärmen? Det här är ett riktigt PC-spel, inte Candy Crush.",
+                    fridge: "Smart Hem-Enhet", fridgeI: "Försöker du spela på kylskåpsdörren? Stäng dörren, mjölken blir sur.",
+                    kindle: "Kindle Fire", kindleI: "Det här är ett intensivt virusspel, inte en jävla läsplatta. Gå och läs Harry Potter istället.",
+                    linux: "Linux (OS Förbjudet)", linuxI: "Detekterade Linux! Gå tillbaka till din terminal och kompilere din egen muspekare i tre timmar.",
+                    chromebook: "Chromebook (Skoldator spärrad)", chromebookI: "Detekterade en Chromebook. Gå tillbaka till lektionen. (chromebook_school.jfif)",
+                    winOld: "Gammalt Windows OS", winOldI: "Ditt Windows är för gammalt. Alla operativsystem under Windows 10 är bannlysta. (windows_burning.jfif)",
+                    macOld: "Gammalt macOS", macOldI: "Ditt macOS är antikt. Vi kräver minst macOS 15 Sequoia. (apple_rotten.jfif)",
+                    ultrawide: "Skärmfel (Ultrawide)", ultrawideI: "Detekterade en extrem ultrawide-skärm. Ring Telia för en gammal 4:3 tjockskärm.",
+                    tab: "Flikbyte / Alt-Tab", tabI: "Ertappad! Du klickade på en tågannons eller böt flik, vilket fick Kameks fuskvakt att spärra spelet direkt!",
+                    context: "Inspektion", contextI: "Högerklick? Kamek förvandlade din källkod till aska.",
+                    devtools: "DevTools Öppnat", devtoolsI: "Öppna inte utvecklarverktygen din fuskande lilla kodsnok.",
+                    trackpad: "Trackpad Detekterad", trackpadI: "Att smeka en plastplatta räknas som fusk. Koppla in en riktig mus.",
+                    battery: "Kritiskt Batteri", batteryI: "Hämta sladden innan datorn dör.",
+                    batteryLow: "BATTERI UNDER 10% (CRITICAL)", batteryLowM: "HÄMTA LADDAREN! Kamek förvandlade din sista elström till aska. Koppla in sladden omedelbart!",
+                    resize: "Fönstermanipulation (Resize)", resizeI: "Försöker du ändra storlek på fönstret under spelets gång? Kamek låste skärmen permanent.",
+                    adblock: "AdBlocker Upptäckt", adblockI: "Du blockerar annonser! Stäng av din AdBlocker!",
+                    macro: "Fuskprogram / Makro Upptäckt", macroI: "Detekterade omänsklig klickhastighet. Ditt makro har spärrats av Kameks magi!"
+                }
+            },
+            da: {
+                title: "Virusrenseren 3.2", desc: "Virus dræner helbred! Klik absolut IKKE på videoannoncerne!",
+                start: "Start Spil (Fuldskærm)", score: "Point", status: "Systemstatus",
+                virusH: "ADVARSEL: VIRUS!", virusB: "Skadelig kode fundet!", virusBtn: "Fjern",
+                fwH: "FIREWALL.EXE", fwB: "Renser virusser!", fwBtn: "Aktiver",
+                lifeH: "EKSTRA_LIV.SYS", lifeB: "Genopretter helbred!", lifeBtn: "Reparer",
+                batH: "BATTERI.BAT", batB: "Fryser tiden i 5 sekunder!", batBtn: "Oplad",
+                nukeH: "!!! GEVINST !!!", nukeB: "DU HAR VUNDET 100.000 KR!", nukeBtn: "HENT GEVINST",
+                snoozeH: "ALARM: VÅGN OP!", alarmOff: "Sluk larm",
+                trains: [{ text: "DSB: Signalfejl. Ombok nu!", url: "https://www.dsb.dk" }],
+                trainBtn: "Ombook", kernelH: "!!! KERNEL CORRUPTION !!!", kernelB: "Systemdræning i gang.",
+                updateH: "OPDATERING.EXE", updateB: "Downloader...",
+                bsodVirus: "COMPUTEREN ER CRASHET!", bsodNuke: "DIREKTE CRASH!",
+                finalScore: "Din score blev", restart: "Genstart computeren",
+                ldTitleHardware: "🚨 IKKE UNDERSTØTTET HARDWARE 🚨", ldTitleCheat: "🚨 MANIPULATION DETEKTERET (KAMEK) 🚨",
+                ldFooterHardware: "Blokeret af Telia.", ldFooterCheat: "Snyd tolereres ikke.",
+                alarmTasks: ["Tid til at vågne!", "Klik SNOOZE %s gange mere!", "Smid uret ud! (Træk)", "Stav: <strong>%s</strong>", "Jagt prikken!", "Spam [SPACE] %s gange!", "Hold [ENTER] i 2 sekunder!"],
+                alarmWords: ["VÅGNOP", "ALARM", "KLOKKE"],
+                guest: "GÆST", enterName: "Indtast navn: ", saveBtnText: "Gem", leaderboardTitle: "--- TOPLISTE (TOP 5) ---", ratingLabel: "Bedømmelse:",
+                noPause: "Spillet kan ikke pauses!",
+                redoBtn: "KLAR ➡️",
+                videoSkipWait: "Spring over om %s...", videoSkipReady: "Spring over ➡️",
+                videoAdTexts: { sj: "SJ ad", vy: "Vy ad", dsb: "DSB: Sporarbejde på Sjælland. Klik ikke!", vr: "VR ad", generic: "Generic ad" },
+                ratingTiers: { uselt: "USELT 💩", daoligt: "DÅRLIGT 📉", medel: "MIDDEL 😐", bra: "GODT 🔥", baest: "BEDST 👑" },
+                anticheat: { watch: "Smartwatch", watchI: "Gå ud og løb i stedet.", car: "Bilskærm", carI: "Fokusere på vejen.", tv: "Smart TV", tvI: "Gå i seng.", console: "Spilkonsol", consoleI: "PC master race kun.", tablet: "Tablet", tabletI: "Brug en mus.", mobile: "Mobiltelefon", mobileI: "Dine mobilreflekser er elendige.", fridge: "Smart Hub", fridgeI: "Mælken bliver sur.", kindle: "Kindle Fire", kindleI: "Læs en bog i stedet.", linux: "Linux (OS Forbudt)", linuxI: "Linux detekteret!", chromebook: "Chromebook (Forbudt)", chromebookI: "Skolecomputer understøttes ikke.", winOld: "Gammelt Windows", winOldI: "Windows ældre end 10 understøttes ikke.", macOld: "Gammelt macOS", macOldI: "macOS ældre end 15 Sequoia understøttes ikke.", ultrawide: "Ultrawide", ultrawideI: "Resolution snyd detekteret.", tab: "Fanebladskift", tabI: "Kamek så fanebladsskift!", context: "Højreklik", contextI: "Glem det.", devtools: "DevTools", devtoolsI: "Luk DevTools.", trackpad: "Trackpad", trackpadI: "Brug en mus.", battery: "Batteri", batteryI: "Hent kablet.", batteryLow: "BATTERI UNDER 10%", batteryLowM: "HENT OPLADEREN!", resize: "Skærmmanipulation", resizeI: "Snyder! Låst på grund af resize.", adblock: "AdBlocker", adblockI: "Sluk uBlock!", macro: "Makro detekteret", macroI: "Autoclicker blokeret af Kamek!" }
+            },
+            no: {
+                title: "Virusrenseren 3.2", desc: "Virus drar helse! IKKE klikk på videoannonsene pga Kamek-fellen!",
+                start: "Start Spill (Fullskjerm)", score: "Poeng", status: "Systemstatus",
+                virusH: "ADVARSEL: VIRUS!", virusB: "Skadelig programvare!", virusBtn: "Fjern",
+                fwH: "BRANNMUR.EXE", fwB: "Sletter virus!", fwBtn: "Aktiver",
+                lifeH: "EXTRA_LIV.SYS", lifeB: "Gjenoppretter helse!", lifeBtn: "Reparer",
+                batH: "BATTERI.BAT", batB: "Fryser tiden i 5 sekunder!", batBtn: "Lade",
+                redoBtn: "KLAR ➡️",
+                nukeH: "!!! GEVINST !!!", nukeB: "DU HAR VUNNET 100 000 KR!", nukeBtn: "HENT GEVINST",
+                snoozeH: "ALARM: VÅKN OPP!", alarmOff: "Slå av",
+                trains: [{ text: "Vy: Toget til Oslo er innstilt. Ombok nå!", url: "https://www.vy.no" }],
+                trainBtn: "Ombok", kernelH: "!!! KERNEL CORRUPTION !!!", kernelB: "Systemdrenering pågår.",
+                updateH: "OPPDATERING.EXE", updateB: "Laster ned...",
+                bsodVirus: "DATAMASKINEN HAR KRASJET!", bsodNuke: "DIREKTE KRASJ!",
+                finalScore: "Din poengsum ble", restart: "Start datamaskinen på nytt",
+                ldTitleHardware: "🚨 SYSTEMET STØTTES IKKE 🚨", ldTitleCheat: "🚨 JUKS SYNLIGGJORT AV KAMEK 🚨",
+                ldFooterHardware: "Enhet blokkert av Telia.", ldFooterCheat: "Juksere spärres permanent.",
+                alarmTasks: ["På tide å våkne!", "Klikk SNOOZE %s ganger til!", "Kast klokken ut! (Dra)", "Stav: <strong>%s</strong>", "Jakt prikken!", "Spam [SPACE] %s ganger!", "Hold [ENTER] i 2 sekunder!"],
+                alarmWords: ["VÅKNOPP", "ALARM", "KLOKKE"],
+                guest: "GJEST", enterName: "Skriv navn: ", saveBtnText: "Lagre", leaderboardTitle: "--- TOPPLISTE (TOP 5) ---", ratingLabel: "Vurdering:",
+                noPause: "Spillet kan ikke pauses!",
+                videoSkipWait: "Hopp over om %s...", videoSkipReady: "Hopp over annons ➡️",
+                videoAdTexts: { sj: "SJ ad", vy: "Vy: Toget står fast på fjellet. Klikk ikke på filmen!", dsb: "DSB ad", vr: "VR ad", generic: "Generic ad" },
+                ratingTiers: { uselt: "USELT 💩", daoligt: "DÅRLIGT 📉", medel: "MIDDELS 😐", bra: "BRA 🔥", baest: "BEST 👑" },
+                anticheat: { watch: "Smartklokke", watchI: "Gå ut og løp i stedet.", car: "Bilskærm", carI: "Fokusere på vejen.", tv: "Smart TV", tvI: "Gå og legg deg.", console: "Spillkonsoll", consoleI: "PC master race kun.", tablet: "Nettbrett", tabletI: "Dette krever mus.", mobile: "Mobiltelefon", mobileI: "Mobilreflexene dine er ubrukelige.", fridge: "Smart Hub", fridgeI: "Melken blir sur.", kindle: "Kindle Fire", kindleI: "Les en bok i stedet.", linux: "Linux (OS Forbudt)", linuxI: "Linux detektert! Gå tilbake til terminalen.", chromebook: "Chromebook (Forbudt)", chromebookI: "Skole-chromebook støttes ikke.", winOld: "Gammelt Windows", winOldI: "Windows eldre enn 10 støttes ikke.", macOld: "Gammelt macOS", macOldI: "macOS eldre enn 15 Sequoia støttes ikke.", ultrawide: "Ultrawide", ultrawideI: "Juks med oppløsningen.", tab: "Fanebytte", tabI: "Kamek merket fanebyttet!", context: "Høyreklikk", contextI: "Glem det.", devtools: "DevTools", devtoolsI: "Ikke prøv deg.", trackpad: "Trackpad", trackpadI: "Bruk ekte mus.", battery: "Batteri", batteryI: "Hent ledningen.", batteryLow: "BATTERI UNDER 10%", batteryLowM: "HENT LADEREN!", resize: "Skjermmanipulasjon", resizeI: "Juksemaker! Låst på grunn av resize.", adblock: "AdBlocker", adblockI: "Slå av uBlock!", macro: "Makro oppdaget", macroI: "Autoklikker sperret av Kamek!" }
+            },
+            en: {
+                title: "Virus Cleaner 3.2", desc: "Eradicate viruses! Do NOT click the video ads due to the tab-switching anti-cheat!",
+                start: "Start Game (Fullscreen)", score: "Score", status: "System Status",
+                virusH: "WARNING: VIRUS!", virusB: "Malicious code executing!", virusBtn: "Remove",
+                fwH: "FIREWALL.EXE", fwB: "Clears all viruses!", fwBtn: "Activate",
+                lifeH: "EXTRA_LIFE.SYS", lifeB: "Restores health!", lifeBtn: "Repair",
+                batH: "BATTERY.BAT", batB: "Freezes time for 5 seconds!", batBtn: "Charge",
+                nukeH: "!!! FREE CASH PRIZE !!!", nukeB: "YOU WON A $100,000 JACKPOT!", nukeBtn: "CLAIM PRIZE",
+                snoozeH: "ALARM: WAKE UP!", alarmOff: "Turn Off",
+                trains: [{ text: "Amtrak: Delayed due to track issues. Rebook now!", url: "https://www.amtrak.com" }],
+                trainBtn: "Rebook", kernelH: "!!! KERNEL CORRUPTION !!!", kernelB: "Rapid system health drain imminent.",
+                updateH: "UPDATE_CHECKER.EXE", updateB: "Downloading...",
+                bsodVirus: "THE COMPUTER HAS CRASHED!", bsodNuke: "INSTANT CRASH!",
+                redoBtn: "READY ➡️",
+                finalScore: "Your final score was", restart: "Restart Computer",
+                ldTitleHardware: "🚨 SYSTEM NOT SUPPORTED 🚨", ldTitleCheat: "🚨 CHEATING DETECTED BY KAMEK MAGIC 🚨",
+                ldFooterHardware: "Device banned. Telia network lockout active.", ldFooterCheat: "Your deceptive actions have summoned Kamek. Game permanent lock.",
+                alarmTasks: ["Time to wake up!", "Click SNOOZE %s more times!", "Throw the clock away! (Drag)", "Spell: <strong>%s</strong>", "Chase the dot!", "Spam [SPACE] %s times!", "Hold [ENTER] for 2 sec!"],
+                alarmWords: ["WAKEUP", "ALARM", "CLOCK"],
+                guest: "GUEST", enterName: "Enter name: ", saveBtnText: "Save", leaderboardTitle: "--- SYSTEM LEADERBOARD (TOP 5) ---", ratingLabel: "System Rating:",
+                noPause: "The game cannot be paused!",
+                videoSkipWait: "Skip ad in %s...", videoSkipReady: "Skip Advertisement ➡️",
+               videoAdTexts: {
+                    sj: "SJ: Signal failure in Hallsberg. Do not click this ad layout or Kamek will execute a ban script!",
+                    vy: "Vy: Train stranded in the mountains. Infinite delays.",
+                    dsb: "DSB: Track maintenance loop active on Zealand.",
+                    vr: "VR: Rolling stock shortage near Gothenburg.",
+                    generic: "TELIA: Network maintenance simulation active. Wait for the skip box."
+                },
+                ratingTiers: { uselt: "ABYSMAL 💩", daoligt: "POOR 📉", medel: "AVERAGE 😐", bra: "GOOD 🔥", baest: "BEST 👑" },
+                anticheat: { watch: "Smartwatch Mismatch", watchI: "Go out for a run instead.", car: "Vehicle Dashboard", carI: "Focus on the road.", tv: "Smart TV Remote", tvI: "Go to bed.", console: "Console Peasant", consoleI: "No aim-assist available.", tablet: "Tablet Detected", tabletI: "Touchscreens are not allowed.", mobile: "Mobile Device", mobileI: "Your mobile reflexes are pathetic.", fridge: "Smart Home Hub", fridgeI: "The milk is going sour.", kindle: "Kindle Fire", kindleI: "Read Harry Potter instead.", linux: "Linux (OS Forbidden)", linuxI: "Linux detected! Go back to your bash terminal.", chromebook: "Chromebook (Banned)", chromebookI: "Glorified mobile browser devices are forbidden.", winOld: "Legacy Windows OS", winOldI: "Versions below Windows 10 are banned.", macOld: "Legacy macOS", macOldI: "Minimum requirement is macOS 15 Sequoia.", ultrawide: "Screen Error (Ultrawide)", ultrawideI: "Resolution exploit detected.", tab: "Tab Switching", tabI: "Busted! Kamek detected your browser tab unfocus loop!", context: "Right Click Attempt", contextI: "Kamek vaporized your context menu.", devtools: "DevTools", devtoolsI: "Stop snooping around the source code.", trackpad: "Trackpad Detected", trackpadI: "Connect a mechanical mouse.", battery: "Critical Battery", batteryI: "Go fetch your laptop charger.", batteryLow: "BATTERY BELOW 10% (CRITICAL)", batteryLowM: "GET THE CHARGER! Kamek vaporized your power grid!", resize: "Window Resize Manipulation", resizeI: "Cheater! Kamek locked your screen permanently.", adblock: "AdBlocker Active", adblockI: "Turn off uBlock!", macro: "Cheat Tool / Macro Detected", macroI: "Autoclicker tools are fully blocked!" }
+            }
+        };
+
+        let score = 0, health = 100, gameActive = false, spawnTimeout, timeFreeze = false, spawnSpeed = 2200, tamperLocked = false, currentLang = 'sv';
+        const screen = document.getElementById('screen'), scoreDisplay = document.getElementById('score'), healthBar = document.getElementById('healthBar');
+
+        let lastClickTime = 0, clickIntervals = [], macroCounter = 0;
+        // Global variabel för hårdvarugodkännande
+let hardwareAuthorized = false;
+// Globala variabler
+window.score = 0; 
+window.gameActive = false; 
+window.videoAdActive = false; 
+window.tamperLocked = false;
+window.useMic = false; // NY: Deklarera globalt
+window.useCam = false; // NY: Deklarera globalt
+// Språkordbok för övervakningssystemet (Kamera/Mick)
+const spyDict = {
+    sv: {
+        statusOk: "SÄKERHETSANALYSER AKTIV",
+        camOff: "KAMERA AVSTÄNGD",
+        camDenied: "HÅRDVARUFEL / NEKAD"
+    },
+    no: {
+        statusOk: "SIKKERHETSANALYSE AKTIV",
+        camOff: "KAMERA DEAKTIVERT",
+        camDenied: "MASKINVAREFEIL / NEKTET"
+    },
+    da: {
+        statusOk: "SIKKERHEDSANALYSE AKTIV",
+        camOff: "KAMERA AFBRUDT",
+        camDenied: "HARDWAREFEJL / AFVIST"
+    },
+    en: {
+        statusOk: "SECURITY ANALYSIS ACTIVE",
+        camOff: "CAMERA DISABLED",
+        camDenied: "HARDWARE ERROR / DENIED"
+    }
+};
+        let resizeProtectionActive = false;
+        let videoAdActive = false; 
+        let activeAdUrl = ""; // Håller koll på vilken sida som ska öppnas vid klick på videon
+
+        function lockDownSystem(token) {
+            if (tamperLocked) return; tamperLocked = true; gameActive = false; clearTimeout(spawnTimeout);
+            const data = translations[currentLang].anticheat;
+            const cheatTokens = ['tab', 'context', 'devtools', 'trackpad', 'battery', 'batteryLow', 'resize', 'adblock', 'macro'];
+            const lockImg = document.getElementById('lockdownImage');
+            
+            if (cheatTokens.includes(token)) {
+                lockImg.src = 'kamek.jfif';
+                document.getElementById('lockdownTitle').innerText = translations[currentLang].ldTitleCheat;
+                document.getElementById('lockdownFooter').innerText = translations[currentLang].ldFooterCheat;
+            } else {
+                document.getElementById('lockdownTitle').innerText = translations[currentLang].ldTitleHardware;
+                document.getElementById('lockdownFooter').innerText = translations[currentLang].ldFooterHardware;
+                
+                if (token === 'linux') lockImg.src = 'linux_dead.jfif';
+                else if (token === 'macOld') lockImg.src = 'apple_rotten.jfif';
+                else if (token === 'winOld') lockImg.src = 'windows_burning.jfif';
+                else if (token === 'chromebook') lockImg.src = 'chromebook_school.jfif';
+                else lockImg.src = 'telia.png';
+            }
+
+            document.getElementById('gameMonitor').style.display = 'none';
+            document.getElementById('lockdownScreen').style.display = 'block';
+            document.getElementById('lockdownReason').innerText = `${translations[currentLang].status}: ${data[token] || token}`;
+            document.getElementById('lockdownInsult').innerText = data[token + 'I'] || data[token + 'M'] || "Unauthorized manipulation.";
+            
+            window.addEventListener('keydown', e => { e.preventDefault(); e.stopPropagation(); }, true);
+        }
+
+        function checkDeviceAndHardware() {
+            const ua = navigator.userAgent.toLowerCase();
+            const platform = navigator.platform ? navigator.platform.toLowerCase() : '';
+
+            if ((window.screen.width / window.screen.height) > 2.2) { lockDownSystem('ultrawide'); return; }
+            if (ua.includes('cros') || ua.includes('chromebook')) { lockDownSystem('chromebook'); return; }
+            if (ua.includes('watch') || ua.includes('wear os')) { lockDownSystem('watch'); return; }
+            if (ua.includes('tesla') || ua.includes('qtcarbrowser')) { lockDownSystem('car'); return; }
+            if (ua.includes('smart-tv') || ua.includes('tizen') || ua.includes('googletv') || ua.includes('smarttv')) { lockDownSystem('tv'); return; }
+            if (ua.includes('xbox') || ua.includes('playstation') || ua.includes('nintendo')) { lockDownSystem('console'); return; }
+            if (ua.includes('kindle') || ua.includes('silk') || ua.includes('amazonca')) { lockDownSystem('kindle'); return; }
+            if (/ipad|tablet|playbook/.test(ua)) { lockDownSystem('tablet'); return; }
+            if (/mobi|iphone|android|blackberry/.test(ua)) { lockDownSystem('mobile'); return; }
+            if (ua.includes('alexa') || ua.includes('homehub')) { lockDownSystem('fridge'); return; }
+            
+            if (ua.includes('windows nt')) {
+                const winVer = parseFloat(ua.split('windows nt ')[1]);
+                if (winVer < 10.0) { lockDownSystem('winOld'); return; }
+            }
+            if (ua.includes('mac os x')) {
+                let macVerStr = ua.split('mac os x ')[1].split(')')[0].replace(/_/g, '.');
+                let macVer = parseFloat(macVerStr);
+                if (macVer < 15.0 && macVerStr !== '10.15.7') { lockDownSystem('macOld'); return; }
+            }
+            if (platform.indexOf('linux') !== -1 || ua.includes('linux')) { lockDownSystem('linux'); return; }
+        }
+
+        // Blockera ESC
+        window.addEventListener('keydown', e => {
+            if (e.key === 'Escape' || e.keyCode === 27) {
+                e.preventDefault(); e.stopPropagation();
+                const toast = document.getElementById('toastPopup');
+                toast.innerText = translations[currentLang].noPause;
+                toast.style.display = 'block';
+                setTimeout(() => { toast.style.display = 'none'; }, 2000);
+            }
+        }, true);
+
+        // Autoclicker detektering via Kamek
+        window.addEventListener('click', e => {
+            if (!gameActive || videoAdActive) return; 
+            const now = performance.now();
+            const delta = now - lastClickTime;
+            lastClickTime = now;
+
+            if (delta < 35) { lockDownSystem('macro'); return; }
+
+            if (clickIntervals.length > 0) {
+                const prevDelta = clickIntervals[clickIntervals.length - 1];
+                if (Math.abs(delta - prevDelta) < 0.8) {
+                    macroCounter++;
+                    if (macroCounter > 4) { lockDownSystem('macro'); return; }
+                } else {
+                    macroCounter = 0;
+                }
+            }
+            clickIntervals.push(delta);
+            if (clickIntervals.length > 10) clickIntervals.shift();
+        }, true);
+
+        document.addEventListener('visibilitychange', () => { if (document.hidden) lockDownSystem('tab'); });
+        window.addEventListener('contextmenu', e => { e.preventDefault(); lockDownSystem('context'); });
+        window.addEventListener('keydown', e => {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || (e.ctrlKey && e.key.toLowerCase() === 'u')) {
+                e.preventDefault(); lockDownSystem('devtools');
+            }
+        });
+        window.addEventListener('wheel', e => { if (Math.abs(e.deltaY) > 0 && Math.abs(e.deltaY) < 10 && !Number.isInteger(e.deltaY)) lockDownSystem('trackpad'); });
+        
+        window.addEventListener('resize', () => { if (gameActive && resizeProtectionActive && !document.fullscreenElement) { lockDownSystem('resize'); } });
+        document.addEventListener('fullscreenchange', () => { if (document.fullscreenElement) { setTimeout(() => { resizeProtectionActive = true; }, 1000); } else { resizeProtectionActive = false; } });
+
+        if (navigator.getBattery) {
+            navigator.getBattery().then(bat => {
+                function evalBattery() {
+                    if (bat.level <= 0.10 && !bat.charging) { lockDownSystem('batteryLow'); }
+                    else if (bat.level < 0.15 && !bat.charging) { lockDownSystem('battery'); }
+                }
+                evalBattery(); bat.addEventListener('levelchange', evalBattery); bat.addEventListener('chargingchange', evalBattery);
+            });
+        }
+        setTimeout(() => { const trap = document.getElementById('adTrap'); if (trap.offsetHeight === 0 || window.getComputedStyle(trap).display === 'none') lockDownSystem('adblock'); }, 6000);
+
+        function initBrowserLanguage() {
+            let browserLang = (navigator.language || navigator.userLanguage).substring(0, 2).toLowerCase();
+            if (!['sv', 'da', 'no', 'en'].includes(browserLang)) browserLang = 'en';
+            document.getElementById('langSelect').value = browserLang;
+            changeLanguage(browserLang);
+        }
+
+        function changeLanguage(lang) {
+            currentLang = lang;
+            document.getElementById('gameTitle').innerText = translations[lang].title;
+            document.getElementById('gameDesc').innerText = translations[lang].desc;
+            document.getElementById('startBtn').innerText = translations[lang].start;
+            document.getElementById('scoreLabel').innerText = translations[lang].score;
+            document.getElementById('statusLabel').innerText = translations[lang].status;
+        }
+
+        // ==========================================
+// NYTT HARDWARE-WIZARD FLÖDE (JA -> VÄNTAR -> REDO)
+// ==========================================
+window.requestFullscreenAndStart = function() {
+    if (tamperLocked) return;
+    
+    // Hämta värden från UI och spara i de globala variablerna
+    window.useCam = document.getElementById('biometricUseCam').checked;
+    window.useMic = document.getElementById('biometricUseMic').checked;
+    
+    const startBtn = document.getElementById('startBtn');
+    const logEl = document.getElementById('spyStatusLog');
+
+    if ((window.useCam || window.useMic) && !hardwareAuthorized) {
+        startBtn.innerText = "Väntar på enheter...";
+        startBtn.disabled = true;
+        startBtn.style.background = "#888888";
+        if (logEl) logEl.innerText = "PROMPTING...";
+
+        const promises = [];
+        if (window.useCam) promises.push(navigator.mediaDevices.getUserMedia({ video: true }).catch(() => null));
+        if (window.useMic) promises.push(navigator.mediaDevices.getUserMedia({ audio: true }).catch(() => null));
+
+        Promise.all(promises).then(() => {
+            hardwareAuthorized = true;
+            startBtn.disabled = false;
+            startBtn.innerText = "REDO ➡️";
+            startBtn.style.background = "#00a859";
+            
+            // Ändra klick-funktionen
+            startBtn.onclick = function() {
+                const elem = document.documentElement;
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen().then(() => { startGame(); }).catch(() => { startGame(); });
+                } else {
+                    startGame();
+                }
+            };
+        });
+    } else {
+        // Om ingen hårdvara valdes
+        startGame();
+    }
+};
+
+        function startGame() {
+    document.getElementById('startMenu').style.display = 'none';
+    score = 0; health = 100; gameActive = true; spawnSpeed = 2200; timeFreeze = false; videoAdActive = false;
+    scoreDisplay.innerText = score; 
+    updateHealthBar(); 
+    
+    // Kör hårdvaru-avläsningen nu när spelet faktiskt drar igång!
+    setupBiometrics(); 
+    
+    gameLoop();
+}
+
+        function gameLoop() {
+            if (!gameActive) return;
+            if (videoAdActive) {
+                spawnTimeout = setTimeout(gameLoop, 1000);
+                return;
+            }
+
+            let rand = Math.random();
+            // 7% risk för ett fullskärms videoavbrott efter 30 poäng
+            if (rand < 0.07 && score > 30) {
+                triggerFullscreenVideoAd();
+            } else if (rand < 0.40) {
+                spawnVirus();
+            } else if (rand < 0.52) {
+                spawnPowerUp();
+            } else if (rand < 0.68) {
+                spawnSnooze();
+            } else if (rand < 0.05) { spawnButterfly(); } // 5% chans för fjäril
+              else if (rand < 0.98) {
+                spawnFakeAssistant();
+            } else if (rand < 0.03) { triggerAlarm(); }        // 3% chans för fullskärmslarm
+              else if (rand < 0.06) { spawnGhostWindow(); }    // 3% chans för irriterande fönster
+              else if (rand < 0.08) { triggerBlackout(); }     // 2% chans för totalt mörker
+               else if (rand < 0.80) {
+                spawnTrainTrap();
+            } else if (rand < 0.92) {
+                spawnUpdateTrap();
+            } else if (rand < 0.96) {
+                spawnKernelTrap();
+            } else {
+                spawnNuke();
+            }
+            
+            let currentSpeed = Math.max(350, spawnSpeed - (score * 8));
+            spawnTimeout = setTimeout(gameLoop, currentSpeed);
+        }
+
+// Ljudfiler
+const alarmSounds = ['alarm_buzzer.mp3', 'cukoo_clock.mp3', 'beep_alarm.mp3', 'clock_alarm.mp3'];
+let activeAlarm = null;
+
+function triggerAlarm() {
+    if (tamperLocked) return;
+    
+    // Slumpa ljud
+    const soundFile = alarmSounds[Math.floor(Math.random() * alarmSounds.length)];
+    activeAlarm = new Audio(soundFile);
+    activeAlarm.loop = true;
+    activeAlarm.play().catch(e => console.log("Ljud blockerat av webbläsaren"));
+
+    // Visa skärm
+    document.getElementById('alarmScreen').style.display = 'flex';
+}
+
+function stopAlarm() {
+    if (activeAlarm) {
+        activeAlarm.pause();
+        activeAlarm.currentTime = 0;
+    }
+    document.getElementById('alarmScreen').style.display = 'none';
+    score += 20; // Belöning för att ha överlevt larmet
+    scoreDisplay.innerText = score;
+}
+
+function spawnGhostWindow() {
+    const win = document.createElement('div');
+    win.className = "window";
+    win.style.position = "absolute";
+    win.style.top = "100px"; win.style.left = "100px";
+    win.innerHTML = `<div class="win-header">SYSTEMFEL</div><div class="win-body">Klicka för att rensa!</div>`;
+    // Flytta sig vid mus-över
+    win.onmouseover = () => {
+        win.style.top = Math.random() * 80 + "vh";
+        win.style.left = Math.random() * 80 + "vw";
+    };
+    screen.appendChild(win);
+}
+
+function triggerBlackout() {
+    const overlay = document.createElement('div');
+    overlay.style.position = "fixed"; overlay.style.top = 0; overlay.style.left = 0;
+    overlay.style.width = "100%"; overlay.style.height = "100%";
+    overlay.style.background = "black"; overlay.style.zIndex = 1000;
+    document.body.appendChild(overlay);
+    setTimeout(() => overlay.remove(), 2000); // Mörkt i 2 sekunder
+}
+
+
+        // ==========================================
+        // 📺 DYNAMISKT FULLSKÄRMS-ANNONSSYSTEM (SLUMPAT)
+        // ==========================================
+        function triggerFullscreenVideoAd() {
+            videoAdActive = true;
+            const adOverlay = document.getElementById('videoAdBlocker');
+            const video = document.getElementById('adVideoAsset');
+            const textBanner = document.getElementById('adCorporateText');
+            const skipBox = document.getElementById('adSkipBox');
+            const unmuteBtn = document.getElementById('adUnmuteTrigger');
+            const clickZone = document.getElementById('adClickZone');
+
+            // Slumpa fram en konfiguration ur listan
+            const chosenAd = videoAdPoolConfig[Math.floor(Math.random() * videoAdPoolConfig.length)];
+            activeAdUrl = chosenAd.url;
+            video.src = chosenAd.src;
+
+            // Hämta tillhörande översatt textremsa
+            const textPool = translations[currentLang].videoAdTexts;
+            textBanner.innerText = textPool[chosenAd.id] || textPool['generic'];
+
+            // Återställ videospelaren
+            video.muted = true;
+            unmuteBtn.style.display = 'block';
+            adOverlay.style.display = 'block';
+            
+            video.play().catch(() => {
+                adOverlay.style.background = 'linear-gradient(45deg, #a00, #00a)';
+            });
+
+            // GÖR ANNONSKLICK ZONE TRIPPELT LIVSFARLIG (Öppnar url -> tab-unfocus -> Kamek-ban!)
+            clickZone.onclick = function() {
+                window.open(activeAdUrl, '_blank');
+            };
+
+            // Unmute-fällan (Tågtuta)
+            unmuteBtn.onclick = (e) => {
+                e.stopPropagation(); // Hindra klicket från att registreras på clickZone
+                video.muted = false;
+                unmuteBtn.style.display = 'none';
+                try {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = ctx.createOscillator(); const gain = ctx.createGain();
+                    osc.type = 'sawtooth'; osc.frequency.setValueAtTime(290, ctx.currentTime);
+                    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                    osc.connect(gain); gain.connect(ctx.destination);
+                    osc.start(); osc.stop(ctx.currentTime + 1.2);
+                } catch(err) {}
+            };
+
+            // Nedräkning för "Skip Ad"
+            let adTimeLeft = 5;
+            skipBox.classList.remove('ad-skip-clickable');
+            skipBox.innerText = translations[currentLang].videoSkipWait.replace('%s', adTimeLeft);
+            skipBox.onclick = null;
+
+            let adCounter = setInterval(() => {
+                if (!gameActive) { clearInterval(adCounter); return; }
+                adTimeLeft--;
+                if (adTimeLeft <= 0) {
+                    clearInterval(adCounter);
+                    skipBox.innerText = translations[currentLang].videoSkipReady;
+                    skipBox.classList.add('ad-skip-clickable');
+                    
+                    skipBox.onclick = (e) => {
+                        e.stopPropagation(); // Förhindra klick på videofällan!
+                        video.pause();
+                        adOverlay.style.display = 'none';
+                        videoAdActive = false;
+                        score += 15;
+                        scoreDisplay.innerText = score;
+                    };
+                } else {
+                    skipBox.innerText = translations[currentLang].videoSkipWait.replace('%s', adTimeLeft);
+                }
+            }, 1000);
+        }
+
+// Funktionen för assistenten
+function spawnFakeAssistant() {
+    const win = document.createElement('div');
+    win.className = "window";
+    win.innerHTML = `
+        <div class="win-header">Assistent</div>
+        <div class="win-body">
+            Vill du formatera C:?<br>
+            <button class="win-btn" onclick="spawnVirus(); spawnVirus(); this.parentNode.parentNode.remove();">JA</button>
+            <button class="win-btn" onclick="spawnVirus(); spawnVirus(); this.parentNode.parentNode.remove();">NEJ</button>
+        </div>`;
+    document.getElementById('screen').appendChild(win);
+}
+
+        function submitScore() {
+            let nameInput = document.getElementById('playerName').value.trim().toUpperCase();
+            if (!nameInput) nameInput = translations[currentLang].guest;
+            let scores = [];
+            try { scores = JSON.parse(localStorage.getItem('nordic_virus_cleaner_scores')) || []; } catch(e) { scores = []; }
+            scores.push({ name: nameInput, points: score });
+            scores.sort((a, b) => b.points - a.points);
+            scores = scores.slice(0, 5);
+            localStorage.setItem('nordic_virus_cleaner_scores', JSON.stringify(scores));
+            document.getElementById('leaderboardInputArea').style.display = 'none';
+            const viewArea = document.getElementById('leaderboardViewArea');
+            const listPre = document.getElementById('leaderboardList');
+            let tableHTML = "";
+            scores.forEach((item, index) => {
+                tableHTML += `[${index + 1}]  ${item.name.padEnd(14, ' ')} ----  ${item.points.toString().padStart(5, ' ')} PTS\n`;
+            });
+            listPre.innerText = tableHTML;
+            viewArea.style.display = 'block';
+            document.getElementById('restartBtn').style.display = 'inline-block';
+        }
+
+        function crashComputer(reason) {
+            gameActive = false; resizeProtectionActive = false; videoAdActive = false;
+            document.getElementById('videoAdBlocker').style.display = 'none';
+            clearTimeout(spawnTimeout); document.querySelectorAll('.window').forEach(w => w.remove());
+            const bsod = document.getElementById('bsodScreen'); bsod.style.display = 'block'; bsod.style.zIndex = "300";
+            document.getElementById('bsodMsg').innerText = (reason === 'nuke') ? translations[currentLang].bsodNuke : translations[currentLang].bsodVirus;
+            
+            const tiers = translations[currentLang].ratingTiers;
+            let ratingText = "";
+            if (score < 50) ratingText = tiers.uselt;
+            else if (score <= 150) ratingText = tiers.daoligt;
+            else if (score <= 300) ratingText = tiers.medel;
+            else if (score <= 600) ratingText = tiers.bra;
+            else ratingText = tiers.baest;
+
+            document.getElementById('finalScoreLabel').innerHTML = `${translations[currentLang].finalScore}: <strong>${score} PTS</strong><br>${translations[currentLang].ratingLabel} ${ratingText}`;
+            document.getElementById('leaderboardInputArea').style.display = 'block';
+            document.getElementById('leaderboardViewArea').style.display = 'none';
+            document.getElementById('restartBtn').style.display = 'none';
+            document.getElementById('playerName').value = "";
+        }
+
+        function restartGame() { document.getElementById('bsodScreen').style.display = 'none'; document.getElementById('startMenu').style.display = 'flex'; }
+
+        // ALARM MINIGAMES SYSTEM
+        function spawnSnooze() {
+            const win = document.createElement('div'); win.className = `window type-snooze`;
+            const maxX = screen.clientWidth - 270 - 30; const maxY = screen.clientHeight - 180 - 80;
+            const rx = Math.floor(Math.random() * Math.max(10, maxX)) + 10; const ry = Math.floor(Math.random() * Math.max(10, maxY)) + 50;
+            win.style.left = rx + 'px'; win.style.top = ry + 'px'; win.style.width = '270px';
+            win.tabIndex = 0;
+
+            const taskType = Math.floor(Math.random() * 7);
+            const taskList = translations[currentLang].alarmTasks;
+            const wordList = translations[currentLang].alarmWords;
+            let bodyHTML = "";
+            let targetWord = wordList[Math.floor(Math.random() * wordList.length)];
+            let clickCounter = 5, spaceSpam = 10, holdProgress = 0, holdTimer = null, dotInterval = null;
+
+            switch(taskType) {
+                case 0: bodyHTML = `<p>${taskList[0]}</p><button class="win-btn" style="background:#ff9999;" id="btnSnooze">Snooze</button><button class="win-btn" style="background:#99ff99;" id="btnOff">${translations[currentLang].alarmOff}</button>`; break;
+                case 1: bodyHTML = `<p>${taskList[1].replace('%s', clickCounter)}</p><button class="win-btn" style="background:orange;font-weight:bold;width:80%;" id="btnMulti">SNOOZE</button>`; break;
+                case 2: bodyHTML = `<p style="padding:15px 0;">👉 ${taskList[2]}</p><div style="font-size:24px;">⏰💥</div>`; break;
+                case 3: bodyHTML = `<p>${taskList[3].replace('%s', targetWord)}</p><input type="text" id="spellInput" autocomplete="off" placeholder="Type...">`; break;
+                case 4: bodyHTML = `<p>${taskList[4]}</p><div style="height:70px; background:#eee; border:1px solid #aaa; position:relative; overflow:hidden;" id="chaseArea"><div class="chase-dot" id="theDot"></div></div>`; break;
+                case 5: bodyHTML = `<p>${taskList[5].replace('%s', spaceSpam)}</p><div style="font-size:20px;font-weight:bold;color:blue;" id="spamCounter">${spaceSpam}</div>`; break;
+                case 6: bodyHTML = `<p>${taskList[6]}</p><div style="width:100%;height:15px;background:#ccc;border:1px solid #777;"><div id="holdBar" style="width:0%;height:100%;background:green;transition:width 0.1s;"></div></div>`; break;
+            }
+
+            win.innerHTML = `<div class="win-header"><span>⏰ ${translations[currentLang].snoozeH}</span></div><div class="win-body">${bodyHTML}</div>`;
+            screen.appendChild(win);
+            setTimeout(() => win.focus(), 50);
+
+            if (taskType === 0) {
+                win.querySelector('#btnSnooze').onclick = () => { win.remove(); spawnSnooze(); spawnSnooze(); };
+                win.querySelector('#btnOff').onclick = () => { win.remove(); score+=5; scoreDisplay.innerText=score; };
+            } else if (taskType === 1) {
+                const btn = win.querySelector('#btnMulti');
+                btn.onclick = () => { clickCounter--; if(clickCounter <= 0) { win.remove(); score+=15; scoreDisplay.innerText=score; } else { win.querySelector('p').innerHTML = taskList[1].replace('%s', clickCounter); } };
+            } else if (taskType === 2) {
+                const header = win.querySelector('.win-header'); let dragging = false, ox = 0, oy = 0; header.style.cursor = 'move';
+                header.onmousedown = (e) => { dragging = true; ox = e.clientX - win.offsetLeft; oy = e.clientY - win.offsetTop; };
+                const moveHandler = (e) => {
+                    if (!dragging) return; let nx = e.clientX - ox, ny = e.clientY - oy; win.style.left = nx + 'px'; win.style.top = ny + 'px';
+                    if (nx < -200 || nx > screen.clientWidth + 50 || ny < -100 || ny > screen.clientHeight + 50) { document.removeEventListener('mousemove', moveHandler); win.remove(); score += 20; scoreDisplay.innerText = score; }
+                };
+                document.addEventListener('mousemove', moveHandler); document.addEventListener('mouseup', () => dragging = false, {once: true});
+            } else if (taskType === 3) {
+                const input = win.querySelector('#spellInput'); input.focus(); input.oninput = () => { if (input.value === targetWord) { win.remove(); score += 20; scoreDisplay.innerText = score; } };
+            } else if (taskType === 4) {
+                const dot = win.querySelector('#theDot'), area = win.querySelector('#chaseArea');
+    
+    // ÄNDRING: Ökat intervall från 320ms till 800ms gör pricken mycket långsammare
+    function moveDot() { 
+        if (!win.parentNode) { clearInterval(dotInterval); return; } 
+        dot.style.left = Math.floor(Math.random() * (area.clientWidth - 20)) + 'px'; 
+        dot.style.top = Math.floor(Math.random() * (area.clientHeight - 20)) + 'px'; 
+    }
+    
+    moveDot(); 
+    dotInterval = setInterval(moveDot, 800); // 800ms ger spelaren tid att reagera
+    
+    dot.onclick = () => { 
+        clearInterval(dotInterval); 
+        win.remove(); 
+        score += 25; 
+        scoreDisplay.innerText = score; 
+    };
+            } else if (taskType === 5) {
+                win.onkeydown = (e) => { if (e.key === ' ' || e.code === 'Space') { e.preventDefault(); spaceSpam--; win.querySelector('#spamCounter').innerText = spaceSpam; if(spaceSpam <= 0) { win.remove(); score += 20; scoreDisplay.innerText = score; } } };
+            } else if (taskType === 6) {
+                const bar = win.querySelector('#holdBar');
+                win.onkeydown = (e) => { if (e.key === 'Enter' && !holdTimer) { e.preventDefault(); holdTimer = setInterval(() => { holdProgress += 5; bar.style.width = holdProgress + '%'; if (holdProgress >= 100) { clearInterval(holdTimer); win.remove(); score += 25; scoreDisplay.innerText = score; } }, 100); } };
+                win.onkeyup = (e) => { if (e.key === 'Enter') { clearInterval(holdTimer); holdTimer = null; holdProgress = 0; bar.style.width = '0%'; } };
+                win.onblur = () => { clearInterval(holdTimer); holdTimer = null; holdProgress = 0; bar.style.width = '0%'; };
+            }
+        }
+
+        function spawnVirus() {
+            const win = document.createElement('div'); win.className = `window type-virus`;
+            const maxX = screen.clientWidth - 240 - 30; const maxY = screen.clientHeight - 150 - 80;
+            const rx = Math.floor(Math.random() * Math.max(10, maxX)) + 10; const ry = Math.floor(Math.random() * Math.max(10, maxY)) + 50;
+            win.style.left = rx + 'px'; win.style.top = ry + 'px'; win.style.width = '240px';
+            
+            win.innerHTML = `<div class="win-header"><span>${translations[currentLang].virusH}</span><div class="win-close" onclick="this.parentNode.parentNode.remove()">X</div></div>
+                <div class="win-body"><div>${translations[currentLang].virusB}</div><button class="win-btn" onclick="this.parentNode.parentNode.remove(); score+=10; scoreDisplay.innerText=score;">${translations[currentLang].virusBtn}</button></div>
+                <div class="time-bar-container"><div class="time-bar" id="tbar"></div></div>`;
+            screen.appendChild(win); let timeLeft = 100;
+            let timer = setInterval(() => {
+                if (!gameActive) { clearInterval(timer); return; }
+                if (!timeFreeze) timeLeft -= 3.5; win.querySelector('#tbar').style.width = timeLeft + '%';
+                if (timeLeft <= 0) { clearInterval(timer); if (win.parentNode) { win.remove(); health -= 15; updateHealthBar(); if (health <= 0) crashComputer('virus'); } }
+            }, 100);
+        }
+
+        function spawnPowerUp() {
+            const types = ['fw', 'life', 'bat']; const type = types[Math.floor(Math.random() * types.length)];
+            const win = document.createElement('div'); win.className = `window type-powerup`;
+            const maxX = screen.clientWidth - 210 - 30; const maxY = screen.clientHeight - 130 - 80;
+            const rx = Math.floor(Math.random() * Math.max(10, maxX)) + 10; const ry = Math.floor(Math.random() * Math.max(10, maxY)) + 50;
+            win.style.left = rx + 'px'; win.style.top = ry + 'px'; win.style.width = '210px';
+
+            win.innerHTML = `<div class="win-header"><span>${translations[currentLang][type+'H']}</span></div>
+                <div class="win-body"><div><strong>${translations[currentLang][type+'B']}</strong></div><button class="win-btn" style="background:#8f8;" id="pubtn">${translations[currentLang][type+'Btn']}</button></div>`;
+            screen.appendChild(win);
+            win.querySelector('#pubtn').onclick = () => {
+                win.remove();
+                if (type === 'fw') document.querySelectorAll('.type-virus, .type-update-trap').forEach(v => v.remove());
+                else if (type === 'life') { health = Math.min(100, health + 30); updateHealthBar(); }
+                else { timeFreeze = true; screen.style.boxShadow = "inset 0 0 60px rgba(0,255,255,0.7)"; setTimeout(() => { timeFreeze = false; screen.style.boxShadow = "inset 0 0 40px rgba(0,0,0,0.6)"; }, 5000); }
+            };
+            setTimeout(() => { if(win.parentNode) win.remove(); }, 5000);
+        }
+
+        function spawnTrainTrap() {
+            const win = document.createElement('div'); win.className = `window type-train-trap`;
+            const maxX = screen.clientWidth - 300 - 30; const maxY = screen.clientHeight - 160 - 80;
+            const rx = Math.floor(Math.random() * Math.max(10, maxX)) + 10; const ry = Math.floor(Math.random() * Math.max(10, maxY)) + 50;
+            win.style.left = rx + 'px'; win.style.top = ry + 'px'; win.style.width = '300px';
+
+            const train = translations[currentLang].trains[Math.floor(Math.random() * translations[currentLang].trains.length)];
+            win.innerHTML = `<div class="win-header"><span>REKLAM</span><div class="win-close" onclick="this.parentNode.parentNode.remove()">X</div></div>
+                <div class="win-body"><p style="font-size:12px; text-align:left; color:#222; margin:0 0 10px 0;">${train.text}</p><button class="win-btn" id="trbtn">${translations[currentLang].trainBtn}</button></div>`;
+            screen.appendChild(win); win.querySelector('#trbtn').onclick = () => { win.remove(); window.open(train.url, '_blank'); score += 20; scoreDisplay.innerText = score; };
+        }
+
+        // Styr färgindikatorerna (Grön/Röd) i setup-skärmen live
+function toggleSetupIndicator(type) {
+    const checkbox = document.getElementById('biometricUse' + type.charAt(0).toUpperCase() + type.slice(1));
+    const btn = document.getElementById(type + 'StatusBtn');
+    if (!checkbox || !btn) return;
+
+    if (checkbox.checked) {
+        btn.innerText = "PÅ";
+        btn.style.background = "#00a859";
+    } else {
+        btn.innerText = "AV";
+        btn.style.background = "#ff3333";
+    }
+}
+
+// Funktion för att styra kameran och Telia-loggan
+function setupBiometrics() {
+    const useCam = document.getElementById('biometricUseCam').checked;
+    const videoElement = document.getElementById('spyVideo');
+    const offState = document.getElementById('spyCamOffState');
+
+    if (useCam) {
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                videoElement.srcObject = stream;
+                videoElement.style.display = 'block';
+                offState.style.display = 'none'; // Dölj texten när kameran är igång
+            })
+            .catch(() => {
+                videoElement.style.display = 'none';
+                offState.style.display = 'block';
+                offState.innerText = "KAMERA NEKAD";
+            });
+    } else {
+        videoElement.style.display = 'none';
+        offState.style.display = 'block';
+        offState.innerText = "KAMERA AV";
+    }
+}
+    // 2. Hantera Mikrofon
+    if (useMic) {
+        navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const source = audioCtx.createMediaStreamSource(stream);
+            const analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 32;
+            source.connect(analyser);
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            
+            let micInterval = setInterval(() => {
+                if (!gameActive || tamperLocked) { clearInterval(micInterval); return; }
+                analyser.getByteFrequencyData(dataArray);
+                let sum = 0;
+                for(let i = 0; i < dataArray.length; i++) { sum += dataArray[i]; }
+                let volume = sum / dataArray.length;
+                let percent = Math.min(100, (volume / 120) * 100);
+                
+                const bar = document.getElementById('spyMicBar');
+                if (bar) {
+                    bar.style.width = percent + '%';
+                    if (percent > 75) bar.style.backgroundColor = 'red';
+                    else if (percent > 45) bar.style.backgroundColor = 'yellow';
+                    else bar.style.backgroundColor = '#00ff00';
+                }
+
+                if (percent > 88) {
+                    let now = performance.now();
+                    if (now - lastSwearTime > 1500) {
+                        lastSwearTime = now;
+                        swearStrikes++;
+                        changeLanguage(currentLang); // Uppdaterar STRIKES: X O O
+                        if (swearStrikes >= 3) lockDownSystem('swear');
+                    }
+                }
+            }, 50);
+        }).catch(() => {
+            if (document.getElementById('spyMicBar')) document.getElementById('spyMicBar').style.width = '0%';
+        });
+}
+
+// Lägg denna i din initiering
+function checkAdBlocker() {
+    const bait = document.getElementById('adTrap');
+    if (!bait || bait.offsetHeight === 0 || window.getComputedStyle(bait).display === 'none') {
+        lockDownSystem('adblock'); // Triggar din lockdown-funktion
+    }
+}
+setTimeout(checkAdBlocker, 3000); // Kör kontrollen 3 sekunder efter start
+
+        function spawnKernelTrap() {
+            const win = document.createElement('div'); win.className = `window type-kernel-trap`;
+            const maxX = screen.clientWidth - 320 - 30; const maxY = screen.clientHeight - 180 - 80;
+            const rx = Math.floor(Math.random() * Math.max(10, maxX)) + 10; const ry = Math.floor(Math.random() * Math.max(10, maxY)) + 50;
+            win.style.left = rx + 'px'; win.style.top = ry + 'px'; win.style.width = '320px';
+
+            win.innerHTML = `<div class="win-header"><span>${translations[currentLang].kernelH}</span></div>
+                <div class="win-body"><div>[CRITICAL ERROR]</div><p style="font-size:11px; margin:5px 0;">${translations[currentLang].kernelB}</p><button class="win-btn" style="background:#500; color:white; border-color:red;" onclick="this.parentNode.parentNode.remove(); score+=50; scoreDisplay.innerText=score;">FIX</button></div>
+                <div class="time-bar-container" style="height:6px;"><div class="time-bar" style="background:#ff0000;" id="ktbar"></div></div>`;
+            screen.appendChild(win); let timeLeft = 100;
+            let timer = setInterval(() => {
+                if (!gameActive) { clearInterval(timer); return; }
+                if (!timeFreeze) timeLeft -= 2.5; win.querySelector('#ktbar').style.width = timeLeft + '%';
+                if (timeLeft <= 0) { clearInterval(timer); if (win.parentNode) { win.remove(); health -= 50; updateHealthBar(); if (health <= 0) crashComputer('virus'); } }
+            }, 100);
+        }
+
+        function spawnUpdateTrap() {
+            const win = document.createElement('div'); win.className = `window type-update-trap`;
+            const maxX = screen.clientWidth - 250 - 30; const maxY = screen.clientHeight - 130 - 80;
+            const rx = Math.floor(Math.random() * Math.max(10, maxX)) + 10; const ry = Math.floor(Math.random() * Math.max(10, maxY)) + 50;
+            win.style.left = rx + 'px'; win.style.top = ry + 'px'; win.style.width = '250px';
+
+            win.innerHTML = `<div class="win-header"><span>${translations[currentLang].updateH}</span></div><div class="win-body"><p style="color:#444; margin:0;">${translations[currentLang].updateB}</p></div>`;
+            screen.appendChild(win); setTimeout(() => { if(win.parentNode) win.remove(); }, 12000);
+        }
+
+        function spawnButterfly() {
+    const butterfly = document.createElement('div');
+    butterfly.className = "window";
+    butterfly.style.width = "40px";
+    butterfly.style.height = "40px";
+    butterfly.style.fontSize = "30px";
+    butterfly.style.textAlign = "center";
+    butterfly.innerText = "🦋"; // Använder emoji
+    butterfly.style.position = "absolute";
+    butterfly.style.cursor = "pointer";
+    butterfly.style.background = "transparent";
+    butterfly.style.border = "none";
+    butterfly.style.boxShadow = "none";
+    
+    let x = Math.random() * (window.innerWidth - 50);
+    let y = Math.random() * (window.innerHeight - 50);
+    let dx = (Math.random() - 0.5) * 8;
+    let dy = (Math.random() - 0.5) * 8;
+    
+    butterfly.style.left = x + "px";
+    butterfly.style.top = y + "px";
+    
+    butterfly.onclick = () => { butterfly.remove(); score += 50; scoreDisplay.innerText = score; };
+    document.getElementById('screen').appendChild(butterfly);
+    
+    let anim = setInterval(() => {
+        if (!gameActive || !butterfly.parentNode) { clearInterval(anim); return; }
+        x += dx; y += dy;
+        if (x < 0 || x > window.innerWidth - 40) dx *= -1;
+        if (y < 0 || y > window.innerHeight - 40) dy *= -1;
+        butterfly.style.left = x + "px";
+        butterfly.style.top = y + "px";
+    }, 50);
+}
+
+        function spawnNuke() {
+            const win = document.createElement('div'); win.className = `window type-nuke`;
+            const maxX = screen.clientWidth - 250 - 30; const maxY = screen.clientHeight - 160 - 80;
+            const rx = Math.floor(Math.random() * Math.max(10, maxX)) + 10; const ry = Math.floor(Math.random() * Math.max(10, maxY)) + 50;
+            win.style.left = rx + 'px'; win.style.top = ry + 'px'; win.style.width = '250px';
+
+            win.innerHTML = `<div class="win-header"><span>${translations[currentLang].nukeH}</span></div>
+                <div class="win-body"><div style="color:red; font-weight:bold;">!!! JACKPOT !!!</div><div>${translations[currentLang].nukeB}</div><button class="win-btn" style="background:yellow; font-weight:bold;" onclick="crashComputer('nuke')">${translations[currentLang].nukeBtn}</button></div>
+                <div class="time-bar-container"><div class="time-bar" style="background:orange;" id="ntbar"></div></div>`;
+            screen.appendChild(win); let timeLeft = 100;
+            let timer = setInterval(() => {
+                if (!gameActive) { clearInterval(timer); return; }
+                if (!timeFreeze) timeLeft -= 3.0; win.querySelector('#ntbar').style.width = timeLeft + '%';
+                if (timeLeft <= 0) { clearInterval(timer); if (win.parentNode) { win.remove(); } }
+            }, 100);
+        }
+
+        function updateHealthBar() {
+            healthBar.style.width = health + '%';
+            if (health > 60) healthBar.style.backgroundColor = '#00ff00';
+            else if (health > 30) healthBar.style.backgroundColor = '#ffff00';
+            else healthBar.style.backgroundColor = '#ff0000';
+        }
+
+        initBrowserLanguage();
+        checkDeviceAndHardware();
+    </script>
+    <!-- SEPARAT SKRIPTBLOCK: CHAOTIC RETRO TOAST SYSTEM -->
+<!-- SEPARAT SKRIPTBLOCK: CHAOTIC RETRO TOAST SYSTEM (EXPANDED TOAST CHAOS) -->
+<script id="system-toast-engine">
+    (function() {
+        // 1. Initiera Toast-styling (Windows XP Balloon-stil)
+        const toastStyles = document.createElement('style');
+        toastStyles.innerHTML = `
+            #xpToastContainer { position: fixed; bottom: 40px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+            .xp-balloon { background: #ffffe1; color: #000; border: 1px solid #666; border-radius: 6px; padding: 10px 15px; font-family: 'Tahoma', sans-serif; font-size: 12px; box-shadow: 3px 3px 6px rgba(0,0,0,0.3); width: 280px; pointer-events: auto; position: relative; animation: balloonPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+            .xp-balloon-header { font-weight: bold; color: #0058e6; margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between; }
+            .xp-balloon-close { cursor: pointer; color: #999; font-size: 10px; font-weight: bold; }
+            .xp-balloon-close:hover { color: #000; }
+            @keyframes balloonPop { from { opacity: 0; transform: translateY(50px) scale(0.8); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        `;
+        document.head.appendChild(toastStyles);
+
+        // 2. Skapa container på skärmen
+        const container = document.createElement('div');
+        container.id = 'xpToastContainer';
+        document.body.appendChild(container);
+
+        // 3. Gigantiskt flerspråkigt register för kaotiska systemmeddelanden
+        const toastTranslations = {
+            sv: {
+                batOn: "Batteridrift upptäckt", batOnM: "Prestanda strypt av Telia. Koppla in laddaren för att undvika seghet.",
+                batLow: "Kritiskt Batteri", batLowM: "Systemet svettas. Datorn stängs snart av för att rädda kretskorten.",
+                saveErr: "Molnsparning misslyckades", saveErrM: "Error 403: Kunde inte spara poäng på Telias överbelastade servrar.",
+                perf: "Prestandaproblem", perfM: "Varning: CPU-fläkten har nått ljudvallen. Sänk kraven omedelbart.",
+                slowNet: "Långsamt internet", slowNetM: "56k-modem simulerat. Lyft inte på hemtelefonen, då bryts spelet.",
+                offline: "Anslutning bruten", offlineM: "Du är offline. Linjefel hos Telias analoga telestation.",
+                cookies: "Kakor (Cookies) avstängda", cookiesM: "Inget digitalt fika tillåtet. Din identitet raderas vid näste krasch.",
+                activation: "Windows-aktivering krävs", activationM: "Din testversion löper ut om 3 minuter. Knappa in produktnyckeln från baksidan av modemet nu.",
+                clippy: "Hjälp behövs?", activationM: "Det ser ut som att du försöker spela ett spel och undvika fällor. Vill du ha hjälp med att formatera hårddisken istället? 📎",
+                bonzi: "BonziBuddy har installerats", bonziM: "Hej! Jag är din nya lila spionapa. Jag kommer att läsa dina highscores och sjunga medan din CPU smälter. 🐒",
+                mouseBall: "Muskula full med damm", mouseBallM: "Rullkulan inuti musen är igensatt. Spelet rekommenderar att du skrapar rent sensorerna med ett utvikt gem.",
+                defrag: "Automatisk defragmentering startad", defragM: "Hårddisken stakar sig. Flytta inte musen för snabbt, då repar du läshuvudet.",
+                limewire: "P2P-fildelning upptäckt", limewireM: "Limewire laddar ner 'linkin_park_real_mp3.exe'. Det kan innehålla grova trojaner.",
+                outlook: "Outlook Express: (1) Oläst mejl", outlookM: "Från: 'Hot Single Trojan Horses In Your Area'. Klicka på bilagan 'free_ram_installer.exe' för att läsa.",
+                recycle: "Papperskorgen är full", recycleM: "Skrivbordet svämmar över. Töm papperskorgen innan Windows raderar dina topplistor för att spara plats.",
+                winamp: "Winamp: Nytt skin laddat", winampM: "It really whips the llama's ass! Ljudkortet konfigureras om, skärmflimmer kan förekomma."
+            },
+            da: {
+                batOn: "Batteristrøm registreret", batOnM: "Ydeevne begrænset. Tilslut opladeren med det samme.",
+                batLow: "Kritisk batteriniveau", batLowM: "Systemet bryder snart sammen.",
+                saveErr: "Kunne ikke gemme point", saveErrM: "Error 403: Dine highscores slettes ved næste crash.",
+                perf: "Ydeevneproblemer", perfM: "Advarsel: CPU-blæseren larmer for meget.",
+                slowNet: "Langsomt internet", slowNetM: "56k-modem aktiveret. Ring ikke fra fastnettelefonen.",
+                offline: "Offline tilstand", offlineM: "Forbindelse afbrudt. Fejl hos teleudbyderen.",
+                cookies: "Cookies deaktiveret", cookiesM: "Jeres identitet er slettet.",
+                activation: "Windows-aktivering kræves", activationM: "Din prøveperiode udløber snart. Indtast produktnøglen med det samme.",
+                clippy: "Brug for hjælp?", clippyM: "Det ser ud til, at du prøver at spille et spil. Vil du have hjælp til at slette harddisken i stedet? 📎",
+                bonzi: "BonziBuddy er installeret", bonziM: "Hej! Jeg er din nye lilla spion-abe. Jeg vil synge sange, mens din maskine brænder. 🐒",
+                mouseBall: "Musekugle snavset", mouseBallM: "Rullekuglen i din mus er fuld af støv. Rengør den med en papirclips.",
+                defrag: "Defragmentering startet", defragM: "Harddisken hakker. Bevæg ikke musen for hurtigt.",
+                limewire: "P2P fildeling registreret", limewireM: "Limewire downloader mistænkelige filer. Systemhelbred i fare.",
+                outlook: "Outlook Express: (1) Ulæst mail", outlookM: "Fra: 'Hot Single Trojans'. Åben venligst filen 'free_ram.exe'.",
+                recycle: "Papirkurven er fuld", recycleM: "Tøm kurven med det samme før Windows sletter dine point.",
+                winamp: "Winamp skin opdateret", winampM: "Lydhardware genkonfigureres. Vent venligst."
+            },
+            no: {
+                batOn: "Går på batteri", batOnM: "Ytelsen er strupet. Koble til laderen for full kraft.",
+                batLow: "Kritisk batteri", batLowM: "Systemet kollapser snart.",
+                saveErr: "Lagring feilet", saveErrM: "Error 403: Highscores vil bli slettet ved krasj.",
+                perf: "Ytelsesproblem", perfM: "Advarsel: CPU-viften nærmer seg lydmuren.",
+                slowNet: "Tregt internett", slowNetM: "Simulerer 56k-modem. Ikke løft av hustelefonen.",
+                offline: "Frakoblet", offlineM: "Du er offline. Linjefeil oppdaget.",
+                cookies: "Cookies avskrudd", cookiesM: "Serveren har glemt hvem du er.",
+                activation: "Windows-aktivering kreves", activationM: "Prøveperioden din utløper om 3 minutter. Tast inn produktnøkkelen.",
+                clippy: "Trenger du hjelp?", clippyM: "Det ser ut som du prøver å spille et spill. Vil du ha hjelp til å formatere harddisken i stedet? 📎",
+                bonzi: "BonziBuddy installert", bonziM: "Hei! Jeg er din nye lilla spionape. Jeg skal lese poengene dine mens CPU-en smelter. 🐒",
+                mouseBall: "Musekule skitten", mouseBallM: "Rullekulen inni musen er full av støv. Rens den med binders.",
+                defrag: "Defragmentering startet", defragM: "Harddisken hakker. Ikke flytt musen for raskt.",
+                limewire: "P2P fildeling oppdaget", limewireM: "Limewire laster ned skadelige filer. Systemhelsen kan påvirkes.",
+                outlook: "Outlook Express: (1) Ulest e-post", outlookM: "Fra: 'Hot Single Trojans'. Åpne vedlegget 'free_ram.exe' nå.",
+                recycle: "Papirkurven er full", recycleM: "Tøm papperskorgen før Windows sletter highscores.",
+                winamp: "Winamp skin oppdatert", winampM: "Lydkortet konfigureres om. Vennligst vent."
+            },
+            en: {
+                batOn: "Battery Power Detected", batOnM: "Performance throttled. Plug in charger to avoid performance drops.",
+                batLow: "Battery Critical", batLowM: "System collapse imminent. Save your circuits.",
+                saveErr: "Cloud Sync Failed", saveErrM: "Error 403: Highscores will be vaporized upon crash.",
+                perf: "Performance Warning", perfM: "Warning: CPU usage at 99%. Fan speed approaching sonic boom.",
+                slowNet: "Network Throttling", slowNetM: "56k modem simulation active. Do not pick up the landline phone.",
+                offline: "Network Disconnected", offlineM: "You are offline. Line noise detected.",
+                cookies: "Cookies Disabled", cookiesM: "No digital cookies allowed. Your identity has been forgotten.",
+                activation: "Windows Activation Required", activationM: "Your trial expires in 3 minutes. Please enter your 25-digit license key.",
+                clippy: "Need help?", clippyM: "It looks like you are trying to clean viruses. Would you like help formatting your C: drive instead? 📎",
+                bonzi: "BonziBuddy Installed", bonziM: "Hello! I am your new purple companion. I will inspect your keystrokes and sing songs while your PC burns. 🐒",
+                mouseBall: "Mouse Ball Jammed", mouseBallM: "The rubber roller ball is full of lint. Game recommends scraping the internal rollers with a safety pin.",
+                defrag: "Background Defrag Active", defragM: "Hard drive platter is skipping blocks. Do not shake the computer or read heads will scratch.",
+                limewire: "P2P File Sharing Active", limewireM: "Limewire is currently leeching 'linkin_park_heavy_mp3.exe'. Network load critical.",
+                outlook: "Outlook Express: (1) New Message", outlookM: "From: 'Hot Single Trojans In Your Area'. Open attached file 'more_ram.exe' to claim prize.",
+                recycle: "Recycle Bin is Full", recycleM: "Your desktop is overflowing with junk. Empty bin before Windows auto-deletes high scores.",
+                winamp: "Winamp: Skin Reloaded", winampM: "It really whips the llama's ass! Sound card remapping under progress. Audio may stutter."
+            }
+        };
+
+        // 4. Global funktion för att skicka ut en toast
+        window.triggerSystemToast = function(token, duration = 5000) {
+            const lang = window.currentLang || 'sv';
+            const dict = toastTranslations[lang] || toastTranslations['sv'];
+            
+            const title = dict[token] || "SYSTEM NOTIFICATION";
+            const message = dict[token + 'M'] || "Routine telemetry maintenance execution loop.";
+
+            const balloon = document.createElement('div');
+            balloon.className = 'xp-balloon';
+            balloon.innerHTML = `
+                <div class="xp-balloon-header">
+                    <span>ℹ️ ${title}</span>
+                    <span class="xp-balloon-close" onclick="this.parentNode.parentNode.remove()">X</span>
+                </div>
+                <div>${message}</div>
+            `;
+            container.appendChild(balloon);
+
+            // Tona ut och ta bort ballongen efter avslutad tid
+            setTimeout(() => {
+                if (balloon.parentNode) {
+                    balloon.style.transition = 'opacity 0.5s, transform 0.5s';
+                    balloon.style.opacity = '0';
+                    balloon.style.transform = 'translateX(120px)';
+                    setTimeout(() => balloon.remove(), 500);
+                }
+            }, duration);
+        };
+
+        // ==========================================
+        // 5. DIAGNOSTISKA TELEMETRI-LYSSNARE
+        // ==========================================
+        
+        // Äkta händelse: Offline/Online
+        window.addEventListener('offline', () => { window.triggerSystemToast('offline', 7000); });
+        
+        // Äkta händelse: Batteristatus
+        if (navigator.getBattery) {
+            navigator.getBattery().then(function(battery) {
+                if (!battery.charging) { window.triggerSystemToast('batOn', 5500); }
+                battery.addEventListener('chargingchange', () => {
+                    if (!battery.charging) { window.triggerSystemToast('batOn', 5500); }
+                });
+                battery.addEventListener('levelchange', () => {
+                    if (battery.level < 0.25 && !battery.charging) { window.triggerSystemToast('batLow', 7000); }
+                });
+            });
+        }
+
+        // Äkta händelse: Cookies avstängda
+        if (!navigator.cookieEnabled) {
+            setTimeout(() => { window.triggerSystemToast('cookies', 6000); }, 2000);
+        }
+
+            // Alla tillgängliga slumpmässiga kaos-tokens
+            const events = [
+                'saveErr', 'perf', 'slowNet', 'activation', 
+                'clippy', 'bonzi', 'mouseBall', 'defrag', 
+                'limewire', 'outlook', 'recycle', 'winamp'
+            ];
+            
+            const randomEvent = events[Math.floor(Math.random() * events.length)];
+            
+            setInterval(() => {
+                if (!window.gameActive) return;
+                const events = ['saveErr', 'perf', 'slowNet'];
+                if (Math.random() < 0.12) { window.triggerSystemToast(events[Math.floor(Math.random() * events.length)], 4500); }
+            }, 11000);
+        })(); // <-- Kontrollera att denna parentes och semikolon finns här!
+</script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+:root {
+    --kamek-purple: #1a0033;
+    --kamek-glow: #8200ff;
+    --gold: #ffcc00;
+    --terminal: #00ffcc;
+}
+
+body, html {
+    margin: 0; padding: 0;
+    background: #050505; color: white;
+    font-family: 'Montserrat', sans-serif;
+    /* Ändrat från hidden till auto för att tillåta scroll */
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+#start-screen, #game-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+h1, h2, .stat-box, .btn-main, #header {
+    font-family: 'Luckiest Guy', cursive; /* Rubrikfont */
+}
+
+#word-display {
+    font-size: clamp(30px, 6vw, 60px);
+    letter-spacing: 12px;
+    margin: 15px 0;
+    color: var(--terminal);
+    font-weight: 700;
+}
+
+/* Stil för bokstäverna man missade vid förlust */
+.missed-letter {
+    color: var(--danger);
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+}
+
+#message {
+    font-family: 'Luckiest Guy', cursive;
+    font-size: 28px;
+    margin-top: 10px;
+}
+
+/* Styling för Info-knappen */
+.btn-info {
+    background: #444;
+    color: #fff;
+    border: 2px solid #888;
+    margin-bottom: 10px;
+    font-size: 18px !important;
+}
+
+/* Specifik styling för infofönstret */
+.info-content {
+    max-width: 600px;
+    width: 90%;
+}
+
+.info-scroll-area {
+    text-align: left;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 10px;
+    margin: 20px 0;
+    background: rgba(0,0,0,0.3);
+    border-radius: 10px;
+    font-family: 'Montserrat', sans-serif;
+    line-height: 1.6;
+}
+
+.info-scroll-area h3 {
+    font-family: 'Luckiest Guy';
+    color: var(--terminal);
+    margin-bottom: 5px;
+}
+
+.warning-box {
+    border: 2px solid var(--danger);
+    padding: 10px;
+    background: rgba(255, 0, 0, 0.1);
+    margin: 15px 0;
+}
+
+.info-scroll-area ul {
+    padding-left: 20px;
+}
+
+.info-scroll-area li {
+    margin-bottom: 8px;
+}
+/* --- START SKÄRM --- */
+#start-screen {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle, #1a0033 0%, #050505 100%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 1000; text-align: center;
+}
+
+h1 { font-family: 'Luckiest Guy'; font-size: clamp(40px, 8vw, 80px); color: var(--gold); margin: 0; -webkit-text-stroke: 2px black; }
+.sub-header { color: var(--terminal); letter-spacing: 2px; }
+
+input#playerName {
+    background: #000; border: 3px solid var(--terminal); color: var(--terminal);
+    padding: 15px; font-size: 28px; font-family: 'VT323'; border-radius: 10px;
+    width: 300px; text-align: center; margin: 20px 0; outline: none;
+}
+
+/* --- KNAPPAR --- */
+.btn-main {
+    font-family: 'Luckiest Guy'; padding: 12px 35px; font-size: 24px;
+    cursor: pointer; border-radius: 12px; border: none; transition: 0.2s;
+}
+
+.btn-start { background: #00ff00; color: #000; box-shadow: 0 5px 0 #008800; }
+.btn-start:active { transform: translateY(3px); box-shadow: none; }
+
+.btn-settings { background: var(--kamek-purple); color: var(--gold); border: 2px solid var(--kamek-glow); }
+
+/* --- SPELPLAN --- */
+#game-container {
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+    height: 100vh; padding-top: 40px;
+}
+
+#word-display { font-size: clamp(30px, 6vw, 60px); letter-spacing: 12px; margin: 15px 0; color: var(--terminal); }
+#alphabet { display: flex; flex-wrap: wrap; justify-content: center; max-width: 700px; gap: 8px; }
+
+.letter {
+    width: 42px; height: 42px; background: #111; border: 2px solid var(--kamek-glow);
+    color: white; font-family: 'Luckiest Guy'; font-size: 18px; cursor: pointer;
+}
+.letter:disabled { opacity: 0.2; cursor: default; }
+
+/* --- WIDGETS --- */
+#k-cam-box { position: fixed; bottom: 20px; left: 20px; width: 180px; height: 130px; border: 3px solid var(--kamek-glow); background: #000; border-radius: 12px; overflow: hidden; z-index: 5000; }
+#k-video { width: 100%; height: 100%; object-fit: cover; display: none; }
+#k-off { height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--kamek-purple); color: var(--gold); font-size: 12px; }
+#k-off img { width: 40px; opacity: 0.4; margin-bottom: 5px; }
+
+#k-mic-box { position: fixed; bottom: 20px; right: 20px; width: 75px; height: 75px; border: 2px solid #00ccff; border-radius: 50%; background: rgba(0,0,0,0.85); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 5000; }
+
+#k-rec { position: absolute; top: 8px; left: 8px; color: var(--danger); font-weight: bold; font-size: 11px; animation: blink 1s infinite; z-index: 5001; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* --- MODAL --- */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; justify-content: center; align-items: center; backdrop-filter: blur(8px); }
+.popup-content { background: #111; border: 4px solid var(--kamek-glow); padding: 40px; border-radius: 25px; text-align: center; position: relative; }
+.btn-toggle { width: 220px; margin: 10px; padding: 15px; font-family: 'Luckiest Guy'; border: 3px solid; border-radius: 10px; cursor: pointer; color: white; }
+.off { background: #440000; border-color: var(--danger); }
+.on { background: #004400; border-color: #00ff00; }
+
+.missed-letter {
+    color: #ff0000;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+}

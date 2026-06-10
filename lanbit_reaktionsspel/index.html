@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STATION 24 - REFLEX PROTOCOL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Snabb CSS-injektion för flagggränssnittet */
+        .lang-container {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            gap: 8px;
+            z-index: 100;
+        }
+        .flag-btn {
+            background: #111;
+            border: 2px solid #333;
+            padding: 4px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+        .flag-btn:hover {
+            transform: scale(1.1);
+            border-color: #00ffcc;
+        }
+        .flag-btn.active {
+            border-color: #ffcc00;
+            background: #222;
+            box-shadow: 0 0 8px rgba(255,204,0,0.4);
+        }
+        .flag-btn svg {
+            width: 32px;
+            height: 20px;
+            border-radius: 2px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="lang-container">
+        <button class="flag-btn" onclick="setLanguage('sv')" title="Svenska">
+            <svg viewBox="0 0 16 10">
+                <rect width="16" height="10" fill="#006aa7"/>
+                <rect width="2" height="10" x="5" fill="#fecc00"/>
+                <rect width="16" height="2" y="4" fill="#fecc00"/>
+            </svg>
+        </button>
+        <button class="flag-btn" onclick="setLanguage('en')" title="English">
+            <svg viewBox="0 0 50 30">
+                <clipPath id="t"><path d="M0,0 v30 h50 v-30 z"/></clipPath>
+                <path d="M0,0 L50,30 M50,0 L0,30" stroke="#fff" stroke-width="6" clip-path="url(#t)"/>
+                <path d="M0,0 L50,30 M50,0 L0,30" stroke="#c8102e" stroke-width="4" clip-path="url(#t)"/>
+                <path d="M25,0 v30 M0,15 h50" stroke="#fff" stroke-width="10"/>
+                <path d="M25,0 v30 M0,15 h50" stroke="#c8102e" stroke-width="6"/>
+            </svg>
+        </button>
+        <button class="flag-btn" onclick="setLanguage('da')" title="Dansk">
+            <svg viewBox="0 0 37 28">
+                <rect width="37" height="28" fill="#c8102e"/>
+                <rect width="4" height="28" x="12" fill="#fff"/>
+                <rect width="37" height="4" y="12" fill="#fff"/>
+            </svg>
+        </button>
+        <button class="flag-btn" onclick="setLanguage('no')" title="Norsk">
+            <svg viewBox="0 0 22 16">
+                <rect width="22" height="16" fill="#ba0c2f"/>
+                <rect width="4" height="16" x="6" fill="#fff"/>
+                <rect width="22" height="4" y="6" fill="#fff"/>
+                <rect width="2" height="16" x="7" fill="#00205b"/>
+                <rect width="22" height="2" y="7" fill="#00205b"/>
+            </svg>
+        </button>
+    </div>
+
+    <div id="start-screen">
+        <h1>STATION 24: REFLEX</h1>
+        <p id="lbl-sub-header" class="sub-header">--- SENSORISK NERFVERIFIERING ---</p>
+        
+        <input type="text" id="playerName" placeholder="Alias (Lämna tomt för Gäst)..." maxlength="12">
+        
+        <div class="menu-buttons">
+            <button id="btn-how-play" class="btn-main btn-info" onclick="openInfo()">❓ HUR SPELAR JAG?</button>
+            <button id="startButton" class="btn-main btn-start" onclick="beginProtocol()">STARTA PROTOKOLL</button>
+        </div>
+
+        <div id="leaderboard-mini">
+            <h3 id="lbl-leaderboard">TOPPLISTA (MS)</h3>
+            <div id="leaderboard-content">Laddar ranking...</div>
+        </div>
+    </div>
+
+    <div id="game-container" style="display:none;">
+        <div id="ui-bar">
+            <div id="lbl-best" class="stat-box">⏱️ BÄSTA: <span id="best-ms">---</span> ms</div>
+            <div id="lbl-operator" class="stat-box">👤 OPERATÖR: <span id="current-op">Gäst</span></div>
+        </div>
+
+        <div id="flash-area" onclick="handleInput()">
+            <div id="status-text">VÄNTA PÅ SIGNAL...</div>
+        </div>
+
+        <div id="result-area" style="display:none; text-align:center; margin-top:20px;">
+            <div id="reflex-result" style="font-size: 50px; font-family: 'Luckiest Guy';">--- MS</div>
+            <div id="rating-display" style="font-size: 30px; margin: 10px 0;"></div>
+            
+            <div id="post-game-btns" style="margin-top: 20px;">
+                <button id="btn-again" class="btn-main btn-start" onclick="resetTest()">SPELA IGEN</button>
+                <button id="btn-back" class="btn-main btn-info" onclick="goBack()">TILLBAKA</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="info-modal" class="modal-overlay">
+        <div class="popup-content">
+            <h2 id="lbl-modal-title">REDAKTIONELLA ORDER</h2>
+            <div class="info-scroll">
+                <p id="lbl-rule-1"><strong>1.</strong> Klicka på skärmen när den byter färg till grön.</p>
+                <p id="lbl-rule-2"><strong>2.</strong> Tjuvstart leder till omedelbar <strong>DNF</strong>.</p>
+                <p id="lbl-rule-3"><strong>⚠️ VARNING:</strong> Innehåller blinkande ljus och plötsliga ljud (yay.mp3, tuta.mp3).</p>
+                <p id="lbl-rule-4"><strong>🔒 KAMEK:</strong> Inga styrplattor, inget fusk, inget flikbyte.</p>
+            </div>
+            <button id="btn-understand" class="btn-main btn-start" onclick="closeInfo()">FÖRSTÅTT</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

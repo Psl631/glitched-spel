@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Station 24 - THE BOSS HQ</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="flashplayer.png">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+</head>
+<body>
+    <noscript>
+        <div style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;color:red;z-index:9999999;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-family:'Press Start 2P';padding:20px;">
+            <h1>[ SYSTEM ERROR ]</h1>
+            <p>JavaScript måste vara aktiverat för att köra Station 24 Protocol.</p>
+        </div>
+    </noscript>
+
+    <script>
+    (function() {
+        var ua = navigator.userAgent;
+        var blocked = false;
+        var title = "[ TERMINAL-FEL ]";
+        var message = "";
+        var subMessage = "";
+        var errorCode = "HARDWARE_INCOMPATIBLE_V4.1";
+
+        // --- 1. DETEKTERING ---
+        
+        // Gammal Browser (IE eller avsaknad av modern JS-support)
+        var isIE = /*@cc_on!@*/false || !!document.documentMode;
+        var isAncient = false;
+        try { eval("var t = function() { let x = 1; };"); } catch (e) { isAncient = true; }
+
+        // Enhetstyper
+        var isMobile = /iPhone|Android|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+        var isTablet = /iPad|PlayBook|Silk/i.test(ua) || (navigator.maxTouchPoints > 0 && /Macintosh/.test(ua));
+        var isConsole = /PlayStation|Nintendo|Xbox/i.test(ua);
+        var isTV = /SmartTV|Tizen|Web0S|Roku|AppleTV|DLNA|LGBrowser/i.test(ua);
+        var isCar = /Tesla|CarBrowser/i.test(ua);
+
+        // --- 2. HUMOR & HÅN (Fokus på Dator-krav) ---
+
+        if (isIE || isAncient) {
+            blocked = true;
+            title = "[ SYSTEM-ARKEOLOGI ]";
+            message = "Din webbläsare är ett fornlämning.";
+            subMessage = "Station 24 Protocol kräver en modern terminal. Uppdatera din dator eller använd en maskin från detta årtionde.";
+            errorCode = "UPGRADE_REQUIRED_NOW";
+        } 
+        else if (isCar) {
+            blocked = true;
+            title = "[ FORDONSTERMINAL NEKAD ]";
+            message = "Försöker du hacka Station 24 från förarsätet?";
+            subMessage = "Parkera bilen och anslut via en riktig stationär dator (Windows/Mac/Linux). Vi stöder inte rullande hårdvara.";
+            errorCode = "DRIVE_BY_ACCESS_DENIED";
+        }
+        else if (isTV) {
+            blocked = true;
+            title = "[ MEDIABOX-VARNING ]";
+            message = "En TV är till för att se på film, inte för seriöst arbete.";
+            subMessage = "Operatör PSL631 kräver en arbetsstation med mus och tangentbord. Soffan är inte en godkänd kommandocentral.";
+            errorCode = "TV_NOT_A_COMPUTER";
+        }
+        else if (isConsole) {
+            blocked = true;
+            title = "[ KONSOL-BEGRÄNSNING ]";
+            message = "Lämna din leksak och hämta en riktig dator.";
+            subMessage = "Station 24 körs endast på 'Master Race'-hårdvara. Windows, Mac eller Linux är ett krav för att dekryptera dessa data.";
+            errorCode = "CONSOLE_HARDWARE_WEAK";
+        }
+        else if (isMobile) {
+            blocked = true;
+            title = "[ FICK-LEKSAK DETEKTERAD ]";
+            message = "Din skärm är för liten för denna intelligensnivå.";
+            subMessage = "Station 24 är inte ett mobilspel. Anslut via en PC, Mac eller Linux-terminal för att få åtkomst.";
+            errorCode = "DESKTOP_ONLY_SECTOR";
+        }
+        else if (isTablet) {
+            blocked = true;
+            title = "[ PEKSKÄRMS-FÖRBUD ]";
+            message = "Kladdiga fingrar på glaset är inte professionellt.";
+            subMessage = "En Padda är inte en dator. Operatör PSL631 kräver fysiska tangenter och riktig CPU-kraft. Byt till en laptop eller desktop.";
+            errorCode = "TABLET_ACCESS_REJECTED";
+        }
+
+        // --- 3. EXEKVERING AV BLOCKERING ---
+        if (blocked) {
+            document.write(`
+                <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; color:#ff0000; z-index:99999999; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:'Press Start 2P', cursive; text-align:center; padding:30px; border:15px solid #ff0000; box-sizing:border-box;">
+                    <div style="border: 4px solid #ff0000; padding: 30px; background: rgba(30,0,0,0.8); box-shadow: 0 0 50px #ff0000; max-width:850px;">
+                        <h1 style="font-size:1.8rem; margin-bottom:30px; text-shadow: 5px 5px #550000;">${title}</h1>
+                        <p style="color:#fff; font-family:'VT323'; font-size:2.4rem; margin-bottom:20px; line-height:1.2;">${message}</p>
+                        <p style="color:yellow; font-family:'VT323'; font-size:1.6rem; margin-bottom:30px; border-top:1px dashed #ff0000; padding-top:20px;">${subMessage}</p>
+                        <div style="font-family:'VT323'; font-size:1.1rem; color:#666; letter-spacing:1px;">
+                            SYSTEM_REQUIREMENTS: PC / MAC / LINUX<br>
+                            ACCESS_STATUS: TERMINATED<br>
+                            ERROR_CODE: ${errorCode}
+                        </div>
+                    </div>
+                </div>
+            `);
+            window.stop();
+        }
+    })();
+</script>
+
+    <div class="main-container">
+        <div class="monitor-frame">
+            <div class="screen-content">
+                <div class="scanlines"></div>
+                <div id="beep-overlay"></div>
+
+                <div id="game-window">
+                    
+                    <div id="instructions-screen" class="screen hidden">
+                        <h2 style="color: #00ff00; font-family: 'Press Start 2P'; font-size: 1.1rem; margin-bottom: 15px; text-shadow: 3px 3px #000;">INSTRUKTIONER & PROTOKOLL</h2>
+
+<div style="text-align: left; font-family: 'VT323'; font-size: 1.25rem; line-height: 1.4; padding: 25px; color: #fff; background: rgba(0,20,0,0.95); border: 2px solid var(--terminal-green); margin-bottom: 20px; overflow-y: auto; max-height: 380px; width: 95%; box-shadow: inset 0 0 20px rgba(0,255,0,0.2);">
+    
+    <div style="border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px; background: rgba(50,0,0,0.4);">
+        <h3 style="color: #ff0000; margin: 0 0 10px 0; font-family: 'Press Start 2P'; font-size: 0.7rem;">⚠️ SENSORISK VARNING</h3>
+        <p style="margin: 0; font-size: 1.1rem;">
+            Station 24 Protocol innehåller <strong>snabba ljusblixtar</strong>, <strong>skakande skärmeffekter</strong> och <strong>plötsliga höga ljud</strong> vid felaktiga svar eller systemfel. Operatörer med ljuskänslighet eller epilepsi bör iaktta försiktighet.
+        </p>
+    </div>
+
+    <h3 style="color: yellow; margin: 0 0 10px 0; border-bottom: 1px solid yellow;">1. VÄLJ TERMINAL-LÄGE</h3>
+    <p>Innan boot-sekvensen startar måste ett läge väljas:</p>
+    <ul style="padding-left: 20px; margin-bottom: 20px;">
+        <li><strong>[ TURNERING ]</strong>: För data-insamling. Du har <strong>oändligt med energi (liv)</strong> och kan inte bli utlåst på grund av felaktiga svar.</li>
+        <li><strong>[ KLASSISK ]</strong>: Den sanna prövningen. Du startar med <strong>3 liv</strong>. Varje felaktigt svar orsakar systemskada och drar ett liv.</li>
+    </ul>
+
+    <h3 style="color: yellow; margin: 20px 0 10px 0; border-bottom: 1px solid yellow;">2. SYSTEM-ASSISTANS (LIVLINOR)</h3>
+    <p>Du har tillgång till fyra verktyg. Varje verktyg kan endast användas <strong>en gång</strong> per session:</p>
+    <ul style="padding-left: 20px; margin-bottom: 20px;">
+        <li><strong>50/50</strong>: Eliminerar hälften av de felaktiga mål-parametrarna.</li>
+        <li><strong>BYT FRÅGA</strong>: Kallar in ett nytt datapaket (ny fråga).</li>
+        <li><strong>ANALYS</strong>: PSL631 ger dig den första bokstaven i rätt svar.</li>
+        <li><strong>REBOOT</strong>: Reparerar systemet och ger <strong>+1 liv</strong> (Endast tillgängligt i Klassiskt läge).</li>
+<li><strong>Varning:</strong> Användning av livlinor diskvalificerar dig från Stjärnvinsten.</li>
+    </ul>
+
+<h3 style="color: #00ffff; margin: 20px 0 10px 0; border-bottom: 1px solid #00ffff;">3. BELÖNINGAR (STATION 24 LOOT)</h3>
+    <p>Operatör PSL631 har fastställt följande vinst-parametrar:</p>
+    <ul style="padding-left: 20px; margin-bottom: 20px;">
+        <li><strong style="color: gold;">[ GULDMYNT ]</strong>: Erhålls genom att överleva och klara hela <strong>Classic-läget</strong>.</li>
+        <li><strong style="color: #00ff00;">[ TURNERINGSVINST ]</strong>: Tilldelas den operatör som har <strong>flest poäng</strong> i turnerings-protokollet.</li>
+        <li><strong style="color: #ff00ff;">[ STJÄRNVINSTEN ]</strong>: Den legendariska vinsten! Kräver <strong>30/30 rätt</strong> utan att använda en <strong>enda livlina</strong> under hela sessionen.</li>
+    </ul>
+
+    <h3 style="color: #ff0000; margin: 20px 0 10px 0; border-bottom: 1px solid #ff0000;">4. ANTI-CHEAT (KAMEK LOCKDOWN)</h3>
+    <p>Säkerhetssystemet Kamek övervakar din terminal i realtid:</p>
+    <ul style="padding-left: 20px;">
+        <li><strong>Fokus-förlust</strong>: Om du byter flik eller minimerar fönstret (för att t.ex. googla) låses terminalen omedelbart.</li>
+        <li><strong>Obehörig input</strong>: Användning av högerklick eller utvecklarverktyg (F12) leder till omedelbar diskvalificering.</li>
+        <li><strong>Konsekvens</strong>: Vid överträdelse avbryts quizet och du tvingas till en total system-återställning.</li>
+    </ul>
+</div>
+
+<button class="menu-btn" onclick="hideInstructions()" style="width: 300px;">BEKRÄFTA PROTOKOLL 🚀</button>
+                    </div>
+
+                    <div id="start-screen" class="screen">
+                        <h1 class="glitch" data-text="STATION 24">STATION 24</h1>
+                        <div class="main-menu-container">
+                            <div id="rules-box">
+                                <h3 id="rules-title">--- TURNERINGSREGLER ---</h3>
+                                <ul id="rules-list">
+                                    <li>[!] INGEN GOOGLE - Vi ser om du fuskar via flikbyte.</li>
+                                    <li>[!] KAMEK SER ALLT - Systemet låses vid misstänkt beteende.</li>
+                                    <li>[!] NAMNFILTER - Olämpliga namn flaggas.</li>
+                                </ul>
+                            </div>
+
+                            <div id="mode-selection" style="margin: 15px 0; display: flex; gap: 10px; justify-content: center;">
+                                <button onclick="setMode('tournament')" class="mode-btn" id="btn-tournament">
+                                    [ TURNERING ]<br><small>Oändligt liv | 3 Livlinor</small>
+                                </button>
+                                <button onclick="setMode('classic')" class="mode-btn" id="btn-classic">
+                                    [ KLASSISK ]<br><small>3 Liv | 4 Livlinor</small>
+                                </button>
+                            </div>
+
+                            <div class="start-controls">
+                                <label id="label-gamer-tag">DITT GAMER-TAG:</label>
+                                <input type="text" id="player-name" placeholder="Skriv här..." maxlength="15">
+                                <button id="start-button" class="menu-btn" onclick="startQuiz()">BOOT PROTOCOL [ START ]</button>
+                                <button id="how-to-play-btn" class="menu-btn" onclick="showInstructions()" style="margin-top: 10px; background: #222; border-color: #555; font-size: 0.7rem;">[ HUR SPELAR JAG? ]</button> <button class="open-settings-btn" onclick="openMediaPopup()">🎥 INSTÄLLNINGAR</button>
+                            </div>
+                        </div>
+                        
+<div id="media-modal-overlay" class="modal-overlay">
+    <div class="setup-box popup-content">
+        <button class="close-popup" onclick="closeMediaPopup()">X</button>
+        
+        <h1>MEDIA-KONTROLL</h1>
+        <p>Aktivera hårdvara för turneringen:</p>
+        
+        <div class="toggle-container">
+            <button id="toggle-cam" class="btn-toggle btn-off" onclick="toggleMediaState('cam')">
+                📸 KAMERA: <span id="status-cam">AV</span>
+            </button>
+
+            <button id="toggle-mic" class="btn-toggle btn-off" onclick="toggleMediaState('mic')">
+                🎤 MIKROFON: <span id="status-mic">AV</span>
+            </button>
+        </div>
+
+        <button class="btn-start-game" onclick="confirmAndStart()">SPARA & AKTIVERA</button>
+    </div>
+</div>
+<style>
+.btn-toggle {
+    font-family: 'Luckiest Guy', cursive;
+    font-size: 18px;
+    padding: 15px 25px;
+    border: 3px solid #333;
+    border-radius: 12px;
+    cursor: pointer;
+    min-width: 180px;
+    transition: all 0.2s;
+    color: white;
+}
+
+/* AV-läge (Röd) */
+.btn-off {
+    background: #440000;
+    border-color: #ff0000;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
+}
+
+/* PÅ-läge (Grön) */
+.btn-on {
+    background: #004400;
+    border-color: #00ff00;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
+    transform: translateY(-2px);
+}
+
+.btn-start-game {
+    width: 100%;
+    background: #ffcc00;
+    color: black;
+    font-family: 'Luckiest Guy';
+    font-size: 28px;
+    padding: 20px;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    border-bottom: 5px solid #b89500;
+}
+
+/* Bakgrunden som täcker hela skärmen */
+.modal-overlay {
+    display: none; /* Dold som standard */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85); /* Mörk genomskinlig bakgrund */
+    backdrop-filter: blur(5px); /* Gör bakgrunden suddig */
+    z-index: 20000;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Innehållet i rutan */
+.popup-content {
+    position: relative;
+    width: 90%;
+    max-width: 500px;
+    animation: popupAnimation 0.3s ease-out;
+}
+
+@keyframes popupAnimation {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Stäng-knappen i hörnet (X) */
+.close-popup {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: #ffcc00;
+    font-size: 24px;
+    cursor: pointer;
+    font-family: 'Luckiest Guy', cursive;
+}
+
+.toggle-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 25px 0;
+}
+
+.open-settings-btn {
+    padding: 10px 20px;
+    font-family: 'Luckiest Guy';
+    background: #1a0033;
+    color: #ffcc00;
+    border: 2px solid #8200ff;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+.btn-start-game:hover {
+    background: #ffe066;
+}
+
+.btn-start-game:active {
+    transform: translateY(3px);
+    border-bottom: none;
+}</style>
+<script>
+var configCam = false;
+var configMic = false;
+
+// 1. VÄXLA MELLAN PÅ/AV
+function toggleMediaState(type) {
+    if (type === 'cam') {
+        configCam = !configCam;
+        var btn = document.getElementById('toggle-cam');
+        var status = document.getElementById('status-cam');
+        
+        btn.className = configCam ? 'btn-toggle btn-on' : 'btn-toggle btn-off';
+        status.innerText = configCam ? 'PÅ' : 'AV';
+    } else {
+        configMic = !configMic;
+        var btn = document.getElementById('toggle-mic');
+        var status = document.getElementById('status-mic');
+        
+        btn.className = configMic ? 'btn-toggle btn-on' : 'btn-toggle btn-off';
+        status.innerText = configMic ? 'PÅ' : 'AV';
+    }
+}
+
+// Öppna popuprutan
+function openMediaPopup() {
+    document.getElementById('media-modal-overlay').style.display = 'flex';
+}
+
+// Stäng popuprutan
+function closeMediaPopup() {
+    document.getElementById('media-modal-overlay').style.display = 'none';
+}
+
+// Uppdaterad confirmAndStart som även stänger fönstret
+async function confirmAndStart() {
+    if (!configCam && !configMic) {
+        if (!confirm("Ingen media vald. Fortsätt ändå?")) return;
+    }
+
+    // Startar kameran/micken (från din universella modul)
+    initKamekMedia(configCam, configMic);
+    
+    // Stänger popupen efter aktivering
+    closeMediaPopup();
+    
+}
+</script>
+                    </div>
+
+                    <div id="loading-container" class="screen hidden">
+                        <div class="loading-content">
+                            <div class="spinner"></div>
+                            <div class="loading-text">KONFIGURERAR...</div>
+                        </div>
+                    </div>
+
+                    <div id="quiz-screen" class="screen hidden">
+                        <div id="progress" style="color: var(--terminal-green); font-family: 'VT323'; font-size: 1.4rem; margin-bottom: 10px;">
+                            STATUS: PROTOKOLL 1/30
+                        </div>
+
+                        <div class="quiz-header" style="width: 100%; display: flex; flex-direction: column; align-items: center; margin-bottom: 10px;">
+                            <div id="lives-container" style="display: flex; gap: 5px; margin-bottom: 5px;"></div>
+                            <div id="question-category" style="color: yellow; font-family: 'VT323'; font-size: 1.2rem; text-transform: uppercase;">
+                                [ SYSTEM-KATEGORI ]
+                            </div>
+                        </div>
+
+                        <h2 id="question-text" class="question" style="margin: 15px 0; min-height: 60px; color: #fff; font-family: 'VT323'; font-size: 1.8rem; text-align: center;"></h2>
+                        
+                        <div id="options-grid" class="options-grid"></div>
+
+                        <div class="lifelines" style="margin-top: 20px;">
+                            <button id="fifty-fifty-btn" class="lifeline-btn" onclick="useFiftyFifty()">50/50</button>
+                            <button id="skip-btn" class="lifeline-btn" onclick="useSkipQuestion()">BYT FRÅGA</button>
+                            <button id="analysis-btn" class="lifeline-btn" onclick="useAnalysis()">ANALYS</button>
+                            <button id="reboot-btn" class="lifeline-btn" onclick="useReboot()">REBOOT</button>
+                        </div>
+
+                        <div id="feedback" style="min-height: 25px; margin-top: 10px; font-family: 'Press Start 2P'; font-size: 0.7rem;"></div>
+                    </div>
+
+                    <div id="result-screen" class="screen hidden"></div>
+
+                    <div id="kamek-screen" class="screen hidden"></div>
+
+                </div> </div> </div> </div> <script src="script.js"></script>
+<div id="kamek-media-bridge">
+    <div id="kamek-cam-widget">
+        <div id="kamek-rec-dot">● REC</div>
+        <video id="kamek-video" autoplay playsinline muted></video>
+        <div id="kamek-cam-off">
+            <img src="kamek.jfif" onerror="this.src='https://via.placeholder.com/60?text=KAMEK'">
+            <p>KAMERA AVSTÄNGD</p>
+        </div>
+    </div>
+
+    <div id="kamek-mic-widget">
+        <div class="kamek-bars">
+            <div class="k-bar"></div><div class="k-bar"></div>
+            <div class="k-bar"></div><div class="k-bar"></div>
+        </div>
+        <span>AUDIO LIVE</span>
+    </div>
+</div>
+
+<style>
+    /* Kamerafönster nere till vänster */
+    #kamek-cam-widget {
+        position: fixed; bottom: 20px; left: 20px; width: 200px; height: 140px;
+        background: #000; border: 3px solid #8200ff; border-radius: 12px;
+        overflow: hidden; z-index: 9999; box-shadow: 0 0 15px rgba(130,0,255,0.4);
+    }
+    #kamek-video { width: 100%; height: 100%; object-fit: cover; display: none; }
+    #kamek-cam-off { 
+        width: 100%; height: 100%; display: flex; flex-direction: column; 
+        justify-content: center; align-items: center; background: #1a0033; color: #ffcc00; 
+    }
+    #kamek-cam-off img { width: 50px; height: 50px; border-radius: 50%; border: 1px solid #ffcc00; margin-bottom: 5px; opacity: 0.6; }
+    #kamek-cam-off p { margin: 0; font-family: 'VT323', monospace; font-size: 14px; }
+    #kamek-rec-dot { 
+        position: absolute; top: 8px; left: 8px; color: red; font-family: Arial; 
+        font-weight: bold; font-size: 12px; display: none; animation: k-blink 1s infinite;
+    }
+    @keyframes k-blink { 50% { opacity: 0; } }
+
+    /* Mic-staplar nere till höger */
+    #kamek-mic-widget {
+        position: fixed; bottom: 20px; right: 20px; width: 80px; height: 80px;
+        background: rgba(26,0,51,0.9); border: 2px solid #00ccff; border-radius: 50%;
+        display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 9999;
+    }
+    .kamek-bars { display: flex; align-items: flex-end; height: 25px; gap: 3px; }
+    .k-bar { width: 4px; background: #00ccff; height: 5px; border-radius: 2px; transition: height 0.05s; }
+    #kamek-mic-widget span { font-size: 9px; color: #00ccff; margin-top: 4px; font-family: sans-serif; }
+
+    /* Universell Toast */
+    .k-toast {
+        position: fixed; top: 20px; right: 20px; background: #1a0033; color: #ffcc00;
+        border: 2px solid #ffcc00; padding: 15px; border-radius: 10px; 
+        font-family: 'Luckiest Guy', cursive; z-index: 10000; animation: k-slide 0.3s ease-out;
+    }
+    @keyframes k-slide { from { transform: translateX(100%); } to { transform: translateX(0); } }
+</style>
+
+<script>
+var kamekStrikes = 0;
+var kamekForbidden = ["fan", "jävla", "skit", "helvete", "jävlar", "skitstövel", "idiot", "fuck", "shit", "damn", "bitch"];
+
+async function initKamekMedia(useCam, useMic) {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: useCam, audio: useMic });
+        
+        if (useCam) {
+            const v = document.getElementById('kamek-video');
+            v.srcObject = stream;
+            v.style.display = 'block';
+            document.getElementById('kamek-cam-off').style.display = 'none';
+            document.getElementById('kamek-rec-dot').style.display = 'block';
+        }
+        
+        if (useMic) {
+            document.getElementById('kamek-mic-widget').style.display = 'flex';
+            setupKamekVisualizer(stream);
+            setupKamekEar();
+        }
+
+        kamekToast("✅ SYSTEMET ÄR LIVE");
+    } catch (e) {
+        kamekToast("❌ ÅTKOMST NEKAD ELLER INGEN ENHET");
+    }
+}
+
+function setupKamekVisualizer(stream) {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const src = ctx.createMediaStreamSource(stream);
+    const ana = ctx.createAnalyser();
+    ana.fftSize = 32;
+    src.connect(ana);
+    const data = new Uint8Array(ana.frequencyBinCount);
+    const bars = document.querySelectorAll('.k-bar');
+
+    function draw() {
+        ana.getByteFrequencyData(data);
+        bars.forEach((b, i) => {
+            let h = Math.max(4, (data[i]/255)*25);
+            b.style.height = h + "px";
+            b.style.background = data[i] > 200 ? "red" : "#00ccff";
+        });
+        requestAnimationFrame(draw);
+    }
+    draw();
+}
+
+function setupKamekEar() {
+    const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!Speech) return;
+    const rec = new Speech();
+    rec.continuous = true; rec.lang = 'sv-SE';
+    rec.onresult = (e) => {
+        const txt = e.results[e.results.length-1][0].transcript.toLowerCase();
+        if (kamekForbidden.some(w => txt.includes(w))) {
+            kamekStrikes++;
+            if (kamekStrikes < 3) kamekToast("⚠️ VARNING #" + kamekStrikes + ": STÄDA MUNNEN!");
+            else kamekPurpleLockdown();
+        }
+    };
+    rec.start();
+}
+
+function kamekToast(m) {
+    const t = document.createElement('div'); t.className = 'k-toast';
+    t.innerHTML = m; document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+}
+
+function kamekPurpleLockdown() {
+    // Fryser spelet och raderar allt
+    if (window.stop) window.stop();
+    document.body.innerHTML = `
+        <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#1a0033;display:flex;flex-direction:column;justify-content:center;align-items:center;color:white;font-family:Arial;border:15px double #8200ff;box-sizing:border-box;z-index:1000000;">
+            <img src="kamek.jfif" style="width:150px;border:5px solid #ffcc00;border-radius:50%;box-shadow:0 0 30px #8200ff;">
+            <h1 style="font-family:'Luckiest Guy';font-size:50px;color:#ffcc00;margin:20px 0;">LÅST AV KAMEK</h1>
+            <div style="background:rgba(0,0,0,0.5);padding:30px;border-radius:20px;border:1px dashed #8200ff;">
+                <p style="font-size:35px;font-style:italic;">"Svordomar tillåts inte."</p>
+            </div>
+            <p style="margin-top:40px;color:#8200ff;font-family:monospace;font-weight:bold;">SYSTEM_ERROR: TOXIC_OPERATOR_DETECTED</p>
+            <p style="color:red;font-weight:bold;font-size:24px;">RESULTAT: 0 POÄNG REGISTRERADE</p>
+            <button onclick="location.reload()" style="margin-top:20px;padding:10px 30px;font-family:'Luckiest Guy';cursor:pointer;background:#ffcc00;border:none;border-radius:10px;">FÖRSÖK IGEN</button>
+        </div>`;
+}
+</script>
+<div id="audio-interface" style="position: fixed; bottom: 20px; right: 20px; z-index: 99999; cursor: pointer; user-select: none;">
+    <div id="boombox-container" style="position: relative; width: 80px; height: 80px;">
+        <img src="bandspelare.jfif" id="boombox-img" alt="Musik" style="width: 100%; height: 100%; border-radius: 12px; border: 3px solid #ffcc00; box-shadow: 0 0 20px rgba(0,0,0,0.8); opacity: 0.5; transform: scale(0.9); transition: all 0.3s;">
+        
+        <div id="status-cross" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); border-radius: 12px;">
+            <span style="color: #ff0000; font-size: 60px; font-weight: bold; text-shadow: 2px 2px 4px #000;">✕</span>
+        </div>
+    </div>
+    <div id="track-info" style="position: absolute; bottom: 90px; right: 0; background: rgba(0,0,0,0.8); color: #ffcc00; padding: 5px 10px; border-radius: 5px; font-size: 12px; font-family: monospace; white-space: nowrap; display: none;">
+        SPELAR: INGET
+    </div>
+</div>
+
+<script>
+// --- KONFIGURATION ---
+const KAMEK_TRACKS = [
+    'bowsers_galaxy.mp3',
+    'gerudo_valley.mp3',
+    'gusty_garden.mp3',
+    'coconut_mall.mp3',
+    'pokemon_main.mp3',
+    'mario64_slider.mp3',
+    'mk64_rr.mp3',
+    'mk64_raceway.mp3'
+];
+
+const jukebox = new Audio();
+jukebox.loop = true;
+jukebox.volume = 0.5; // Balanserad volym
+
+let musicActive = false; // MUTAD SOM STANDARD
+
+const uiContainer = document.getElementById('audio-interface');
+const uiImg = document.getElementById('boombox-img');
+const uiCross = document.getElementById('status-cross');
+const uiInfo = document.getElementById('track-info');
+
+// Funktion för att slumpa och starta musik
+function playRandomTrack() {
+    const randomIdx = Math.floor(Math.random() * KAMEK_TRACKS.length);
+    const trackName = KAMEK_TRACKS[randomIdx];
+    jukebox.src = trackName;
+    
+    jukebox.play().then(() => {
+        uiInfo.innerText = "SPELAR: " + trackName.replace('.mp3', '').toUpperCase();
+        uiInfo.style.display = 'block';
+        setTimeout(() => { uiInfo.style.display = 'none'; }, 3000);
+    }).catch(err => console.log("Interaktion krävs"));
+}
+
+// Växla ljud på/av
+function toggleMusic() {
+    musicActive = !musicActive;
+    
+    if (musicActive) {
+        // Sätt på musik
+        if (!jukebox.src) playRandomTrack();
+        else jukebox.play();
+        
+        uiImg.style.opacity = "1";
+        uiImg.style.transform = "scale(1.1)";
+        uiCross.style.display = "none";
+    } else {
+        // Tysta musik
+        jukebox.pause();
+        uiImg.style.opacity = "0.5";
+        uiImg.style.transform = "scale(0.9)";
+        uiCross.style.display = "flex";
+    }
+}
+
+// Lyssnare för klick
+uiContainer.addEventListener('click', toggleMusic);
+
+// Lyssnare för tangentbord "M"
+document.addEventListener('keydown', (e) => {
+    if (e.key.toLowerCase() === 'm') {
+        toggleMusic();
+    }
+});
+</script>
+<style>
+/* --- UNIVERSAL JUKEBOX STYLING --- */
+#audio-interface {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 99999;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.3s ease;
+}
+
+#boombox-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+#boombox-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    border: 3px solid #ffcc00;
+    box-shadow: 0 0 20px rgba(0,0,0,0.8);
+    opacity: 0.5; /* Muted standard */
+    transform: scale(0.9);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* När musiken är aktiv */
+#audio-interface.active #boombox-img {
+    opacity: 1;
+    transform: scale(1.1);
+    box-shadow: 0 0 30px rgba(255, 204, 0, 0.4);
+}
+
+#status-cross {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.4);
+    border-radius: 12px;
+    pointer-events: none;
+}
+
+#status-cross span {
+    color: #ff0000;
+    font-size: 60px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px #000;
+}
+
+#track-info {
+    position: absolute;
+    bottom: 90px;
+    right: 0;
+    background: rgba(0,0,0,0.9);
+    color: #ffcc00;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-family: 'Luckiest Guy', cursive, sans-serif;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    display: none;
+    border: 1px solid #ffcc00;
+    pointer-events: none;
+}
+</style>
+</body>
+</html>

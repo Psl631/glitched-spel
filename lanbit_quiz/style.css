@@ -1,0 +1,350 @@
+/* ===========================================================
+   STATION 24: TERMINAL PROTOCOL v43.0 - CLEAN SYSTEM
+   =========================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+
+:root {
+    --terminal-green: #00ff00;
+    --error-red: #ff0000;
+    --bg-black: #050505;
+    --neon-pink: #ff00ff;
+    --monitor-border: #333;
+}
+
+#instructions-screen ul {
+    list-style-type: square;
+    color: #00ffcc;
+}
+
+#instructions-screen li {
+    margin-bottom: 8px;
+}
+
+#instructions-screen strong {
+    color: #fff;
+}
+
+/* Denna container måste tvingas att fylla hela monitorn */
+#game-window {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 450px; /* Tvingar fram en yta */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.screen {
+    width: 100%;
+    height: 100%;
+    flex: 1; /* Mycket viktigt: fyller ut game-window */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Stil för svarsknapparna så de syns tydligt */
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    width: 100%;
+    max-width: 600px;
+    margin-top: 10px;
+}
+
+/* --- 1. GRUNDSTIL --- */
+body {
+    background: linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.9)), 
+                url('lanbit_bg.jfif') no-repeat center center fixed;
+    background-size: cover;
+    color: var(--terminal-green);
+    font-family: 'VT323', monospace;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    overflow: hidden; /* Förhindrar scroll under quiz */
+}
+
+
+@keyframes bootSequence {
+    from { opacity: 0; filter: blur(5px); }
+    to { opacity: 1; filter: blur(0); }
+}
+
+/* --- 3. MONITOR & CRT EFFEKT --- */
+.monitor-frame {
+    width: 95%;
+    max-width: 800px;
+    background: #1a1a1a;
+    padding: 15px;
+    border: 10px solid var(--monitor-border);
+    border-radius: 10px;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 1);
+}
+
+.screen-content {
+    background: var(--bg-black);
+    padding: 30px;
+    position: relative;
+    border: 2px solid #111;
+    min-height: 450px;
+    display: flex;
+    flex-direction: column;
+}
+
+.scanlines {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%);
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* --- 4. TYPOGRAFI --- */
+.glitch {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 2.2rem;
+    text-align: center;
+    color: #fff;
+    text-shadow: 3px 0 var(--neon-pink);
+    margin-bottom: 30px;
+}
+
+.question {
+    font-size: 1.8rem;
+    text-align: center;
+    color: #fff;
+    min-height: 80px;
+}
+
+/* --- 5. INTERAKTIVA ELEMENT --- */
+#player-name {
+    background: #000;
+    border: 2px solid var(--terminal-green);
+    color: #fff;
+    padding: 10px;
+    font-family: 'VT323';
+    font-size: 1.5rem;
+    text-align: center;
+    width: 250px;
+    margin-bottom: 20px;
+    outline: none;
+}
+
+.menu-btn, .option-btn {
+    background: transparent;
+    color: var(--terminal-green);
+    border: 2px solid var(--terminal-green);
+    padding: 12px 20px;
+    font-family: 'VT323';
+    font-size: 1.6rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.menu-btn:hover, .option-btn:hover {
+    background: var(--terminal-green);
+    color: #000;
+    box-shadow: 0 0 15px var(--terminal-green);
+}
+
+/* --- 6. QUIZ GRID & FEEDBACK (Kritiskt!) --- */
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Semikolon saknades här */
+    gap: 15px;
+    width: 100%;
+    margin-top: 20px;
+} /* Måsvinge saknades här */
+
+.correct-flash {
+    background: var(--terminal-green) !important;
+    color: #000 !important;
+}
+
+.wrong-flash {
+    background: var(--error-red) !important;
+    color: #fff !important;
+    border-color: #fff !important;
+}
+
+/* --- 7. RESULTAT & BILDER --- */
+#toad-sad-container {
+    text-align: center;
+    margin: 20px 0;
+}
+
+#sad-toad-img {
+    width: 120px;
+    border: 2px solid var(--error-red);
+}
+
+/* Preloader Bar */
+.loader-container {
+    width: 200px;
+    height: 15px;
+    border: 2px solid var(--terminal-green);
+    margin: 20px auto;
+}
+
+#loader-fill {
+    height: 100%;
+    background: var(--terminal-green);
+    width: 0%;
+}
+
+/* Fixar så dekorationer inte blockerar klick */
+#toad-guide {
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Styling för den skrollbara Kamek-rutan */
+div::-webkit-scrollbar {
+    width: 10px;
+}
+div::-webkit-scrollbar-track {
+    background: #000;
+}
+div::-webkit-scrollbar-thumb {
+    background: #f00;
+    border: 2px solid #000;
+}
+
+/* Säkerställ att texten inte klipper i mobilen */
+#question-text {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+#quiz-screen {
+    max-height: 80vh; /* Boxen tar max upp 80% av skärmens höjd */
+    overflow-y: auto;  /* Aktiverar skrollning nedåt om innehållet är för långt */
+    padding-right: 10px; /* Ger plats för skrollisten så den inte täcker texten */
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Två kolumner */
+    gap: 15px;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.option-btn {
+    background: #111;
+    border: 2px solid #00ff00;
+    color: #00ff00;
+    padding: 15px;
+    font-family: 'VT323', monospace;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.option-btn:hover {
+    background: #00ff00;
+    color: #000;
+}
+
+/* Stil för använda livlinor */
+.lifeline-container button.used {
+    background: #222 !important;     /* Mörk bakgrund */
+    color: #444 !important;          /* Grå text */
+    border-color: #333 !important;   /* Mörk kant */
+    cursor: not-allowed;             /* Visar att den inte går att klicka på */
+    opacity: 0.5;                    /* Gör den halvgenomskinlig */
+    pointer-events: none;            /* Inaktiverar alla klick-funktioner */
+    filter: grayscale(100%);         /* Tar bort alla färger */
+    box-shadow: none !important;     /* Tar bort eventuella glödeffekter */
+}
+
+/* --- Kamek Vrede / Fel Svar Effekter --- */
+
+/* Klass som läggs på monitor-frame eller main-container */
+.screen-damage {
+    animation: screen-shake 0.3s ease-in-out, red-flash 0.3s steps(2);
+    pointer-events: none; /* Förhindra klick under animationen */
+}
+
+/* Skak-animation */
+@keyframes screen-shake {
+    0% { transform: translate(0, 0); }
+    10% { transform: translate(-10px, 5px); }
+    20% { transform: translate(10px, -5px); }
+    30% { transform: translate(-5px, 10px); }
+    40% { transform: translate(5px, -10px); }
+    50% { transform: translate(-10px, 5px); }
+    60% { transform: translate(10px, -5px); }
+    70% { transform: translate(-5px, 10px); }
+    80% { transform: translate(5px, -10px); }
+    90% { transform: translate(-10px, 5px); }
+    100% { transform: translate(0, 0); }
+}
+
+/* Rött blink-animation (steps(2) gör det retro-hackigt) */
+@keyframes red-flash {
+    0% { background-color: transparent; }
+    50% { background-color: rgba(255, 0, 0, 0.4); }
+    100% { background-color: transparent; }
+}
+
+/* Styling för BÖÖÖÖP-texten */
+#beep-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #ff0000;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 4rem;
+    text-shadow: 5px 5px 0px #000;
+    z-index: 100;
+    letter-spacing: 10px;
+    display: none; /* Dold som standard */
+}
+
+/* Gör resultatlistan skrollbar */
+#results-screen {
+    max-height: 80vh;          /* Begränsa höjden till 80% av skärmen */
+    overflow-y: auto;          /* Aktivera vertikal skrollning */
+    padding-right: 10px;       /* Plats för skrollisten */
+    scrollbar-width: thin;     /* Snyggare skrollist i Firefox */
+    scrollbar-color: #ff0000 #000; /* Röd skrollist på svart bakgrund */
+}
+
+/* Custom skrollist för Chrome/Edge/Safari (Retro-stil) */
+#results-screen::-webkit-scrollbar {
+    width: 8px;
+}
+
+#results-screen::-webkit-scrollbar-track {
+    background: #000;
+}
+
+#results-screen::-webkit-scrollbar-thumb {
+    background: #ff0000;
+    border-radius: 0px;
+    border: 1px solid #fff;
+}
+
+/* Gör knappen grå och halvgenomskinlig */
+.lifeline-btn.used, .option-btn.used {
+    filter: grayscale(100%) brightness(0.7);
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: auto; /* Viktigt för att XP-DONG ska kunna klickas fram! */
+    border-color: #555 !important;
+    color: #888 !important;
+}

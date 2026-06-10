@@ -1,0 +1,41 @@
+_mat_sun_glow_s3
+================
+  Textures:
+    - P_ms_radgrad_i
+        Scale: 4, 1
+    - P_spectrum_x2
+        Offset: 0, -0.5
+        Scale: 1, 2.200000047683716
+
+  Ambient Colors:
+    - 128, 128, 128, 50
+
+  Constant Colors:
+    - 255, 255, 255, 14
+    - 255, 255, 255, 30
+    - 255, 48, 0, 255
+
+  Color Registers:
+    - 52, 44, 0, 255
+    - 44, 44, 44, 255
+
+
+
+_mat_sun_glow_s6
+================
+  Textures:
+    - P_sun_spreadline6ss
+        Rotation: -0.8830530716879788
+    - P_sun_spreadline6ss
+        Scale: -1, 1
+        Rotation: -0.5030671102023377
+
+  Ambient Colors:
+    - 128, 128, 128, 50
+
+  Constant Colors:
+    - 197, 55, 0, 255
+
+  Material Colors:
+    - 210, 255, 255, 255
+    - 210, 255, 255, 255

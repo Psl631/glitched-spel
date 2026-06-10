@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<title>2.5D Space Shooter</title>
+<style>
+    body {
+        margin: 0;
+        overflow: hidden;
+        background: black;
+        font-family: Arial, sans-serif;
+    }
+
+    #gameCanvas {
+        background: radial-gradient(circle, #020d1a, #000000);
+        display: block;
+        margin: 0 auto;
+    }
+
+    #healthBarContainer {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        width: 200px;
+        height: 20px;
+        border: 2px solid white;
+        z-index: 5;
+    }
+
+    #healthBar {
+        height: 100%;
+        width: 100%;
+        background: lime;
+    }
+
+    #crosshair {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        border: 2px solid white;
+        border-radius: 50%;
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+        z-index: 5;
+    }
+
+    #startScreen,
+    #settingsScreen {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: black;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        z-index: 10;
+    }
+
+    #settingsScreen {
+        display: none;
+    }
+
+    #startScreen h1,
+    #settingsScreen h1 {
+        font-size: 60px;
+        margin-bottom: 20px;
+    }
+
+    #startScreen button,
+    #settingsScreen button {
+        padding: 15px 30px;
+        font-size: 20px;
+        border: 2px solid white;
+        background: transparent;
+        color: white;
+        cursor: pointer;
+    }
+
+    #startScreen button:hover,
+    #settingsScreen button:hover {
+        background: white;
+        color: black;
+    }
+
+    #settingsScreen label {
+        font-size: 18px;
+    }
+
+    #settingsScreen input[type=range],
+    #settingsScreen select {
+        width: 300px;
+    }
+</style>
+</head>
+<body>
+
+<div id="startScreen">
+    <h1>SPACE SHOOTER</h1>
+    <button id="startButton">STARTA SPELET</button>
+    <button id="settingsButton">INSTÄLLNINGAR</button>
+</div>
+
+<div id="settingsScreen">
+    <h1>INSTÄLLNINGAR</h1>
+
+    <label>Ljudvolym</label>
+    <input type="range" id="volumeSlider" min="0" max="100" value="100">
+
+    <label>Mus-känslighet</label>
+    <input type="range" id="mouseSensitivity" min="1" max="5" value="2">
+
+    <label>Gamepad-känslighet</label>
+    <input type="range" id="gamepadSensitivity" min="1" max="5" value="2">
+
+    <label>Svårighetsgrad</label>
+    <select id="difficultySelect">
+        <option value="normal">Normal</option>
+        <option value="hard">Hard</option>
+        <option value="insane">Insane</option>
+    </select>
+
+    <button id="backButton">TILLBAKA</button>
+</div>
+
+<canvas id="gameCanvas" width="900" height="600"></canvas>
+<div id="healthBarContainer"><div id="healthBar"></div></div>
+<div id="crosshair"></div>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+const crosshair = document.getElementById("crosshair");
+
+const startScreen = document.getElementById("startScreen");
+const settingsScreen = document.getElementById("settingsScreen");
+
+let gameStarted = false;
+
+/* ===========================
+   SETTINGS
+=========================== */
+let volume = 1.0;
+let mouseSens = 2;
+let gamepadSens = 2;
+let difficulty = "normal";
+
+document.getElementById("volumeSlider").addEventListener("input", e => {
+    volume = e.target.value / 100;
+});
+
+document.getElementById("mouseSensitivity").addEventListener("input", e => {
+    mouseSens = Number(e.target.value);
+});
+
+document.getElementById("gamepadSensitivity").addEventListener("input", e => {
+    gamepadSens = Number(e.target.value);
+});
+
+document.getElementById("difficultySelect").addEventListener("change", e => {
+    difficulty = e.target.value;
+});
+
+/* ===========================
+   START & MENY
+=========================== */
+document.getElementById("startButton").addEventListener("click", () => {
+    startScreen.style.display = "none";
+    settingsScreen.style.display = "none";
+    gameStarted = true;
+});
+
+document.getElementById("settingsButton").addEventListener("click", () => {
+    startScreen.style.display = "none";
+    settingsScreen.style.display = "flex";
+});
+
+document.getElementById("backButton").addEventListener("click", () => {
+    settingsScreen.style.display = "none";
+    startScreen.style.display = "flex";
+});
+
+/* ===========================
+   PLAYER
+=========================== */
+const player = {
+    x: canvas.width / 2,
+    y: canvas.height - 120,
+    speed: 5,
+    size: 30,
+    hp: 100,
+    maxHp: 100,
+    cooldown: 0
+};
+
+/* ===========================
+   INPUT
+=========================== */
+const keys = {};
+document.addEventListener("keydown", e => keys[e.key] = true);
+document.addEventListener("keyup", e => keys[e.key] = false);
+
+let mouseX = canvas.width / 2;
+let mouseY = canvas.height / 2;
+
+document.addEventListener("mousemove", e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    crosshair.style.left = mouseX + "px";
+    crosshair.style.top = mouseY + "px";
+});
+
+/* ===========================
+   SHOOTING
+=========================== */
+const bullets = [];
+document.addEventListener("mousedown", () => shoot());
+document.addEventListener("keydown", e => { if (e.key === " ") shoot(); });
+
+function shoot() {
+    if (player.cooldown > 0) return;
+
+    bullets.push({
+        x: player.x,
+        y: player.y,
+        size: 6,
+        speed: 10,
+        damage: 10
+    });
+
+    player.cooldown = 10;
+
+    crosshair.style.transform = "translate(-50%, -50%) scale(1.5)";
+    setTimeout(() => {
+        crosshair.style.transform = "translate(-50%, -50%) scale(1)";
+    }, 100);
+}
+
+/* ===========================
+   ENEMIES & WAVES
+=========================== */
+const enemies = [];
+let wave = 1;
+let enemiesToSpawn = 5;
+let bossSpawned = false;
+
+function spawnEnemy() {
+    let hpBoost = difficulty === "hard" ? 1.5 : difficulty === "insane" ? 2 : 1;
+    let dmgBoost = difficulty === "hard" ? 1.3 : difficulty === "insane" ? 1.7 : 1;
+
+    enemies.push({
+        x: Math.random() * canvas.width,
+        y: -40,
+        size: 30,
+        speed: 1 + Math.random() * 1.5,
+        hp: 20 * hpBoost,
+        damage: 10 * dmgBoost
+    });
+}
+
+function spawnBoss() {
+    let hpBoost = difficulty === "hard" ? 1.5 : difficulty === "insane" ? 2 : 1;
+    let dmgBoost = difficulty === "hard" ? 1.3 : difficulty === "insane" ? 1.7 : 1;
+
+    enemies.push({
+        x: canvas.width / 2,
+        y: 100,
+        size: 80,
+        speed: 1,
+        hp: 500 * hpBoost,
+        damage: 25 * dmgBoost,
+        boss: true
+    });
+}
+
+/* ===========================
+   GAMEPAD
+=========================== */
+let gamepad = null;
+
+window.addEventListener("gamepadconnected", (e) => {
+    gamepad = navigator.getGamepads()[e.gamepad.index];
+    console.log("Gamepad ansluten:", gamepad.id);
+});
+
+function handleGamepad() {
+    const pads = navigator.getGamepads();
+    if (!pads) return;
+
+    gamepad = pads[0];
+    if (!gamepad) return;
+
+    const lx = gamepad.axes[0];
+    const ly = gamepad.axes[1];
+
+    player.x += lx * player.speed;
+    player.y += ly * player.speed;
+
+    const rx = gamepad.axes[2];
+    const ry = gamepad.axes[3];
+
+    if (Math.abs(rx) > 0.2 || Math.abs(ry) > 0.2) {
+        mouseX = player.x + rx * 300 * gamepadSens;
+        mouseY = player.y + ry * 300 * gamepadSens;
+
+        crosshair.style.left = mouseX + "px";
+        crosshair.style.top = mouseY + "px";
+    }
+
+    const rt = gamepad.buttons[7];
+    if (rt && rt.pressed) shoot();
+}
+
+/* ===========================
+   CROSSHAIR FÄRG
+=========================== */
+function updateCrosshairColor() {
+    let aimingAtEnemy = false;
+
+    enemies.forEach(e => {
+        const dx = mouseX - e.x;
+        const dy = mouseY - e.y;
+        const dist = Math.hypot(dx, dy);
+
+        if (dist < e.size) {
+            aimingAtEnemy = true;
+        }
+    });
+
+    crosshair.style.borderColor = aimingAtEnemy ? "red" : "white";
+}
+
+/* ===========================
+   UPDATE
+=========================== */
+function update() {
+    if (keys["w"] || keys["ArrowUp"]) player.y -= player.speed;
+    if (keys["s"] || keys["ArrowDown"]) player.y += player.speed;
+    if (keys["a"] || keys["ArrowLeft"]) player.x -= player.speed;
+    if (keys["d"] || keys["ArrowRight"]) player.x += player.speed;
+
+    player.x = Math.max(0, Math.min(canvas.width, player.x));
+    player.y = Math.max(0, Math.min(canvas.height, player.y));
+
+    if (player.cooldown > 0) player.cooldown--;
+
+    handleGamepad();
+
+    if (!bossSpawned) {
+        if (enemies.length < enemiesToSpawn) spawnEnemy();
+        if (wave >= 4 && enemies.length === 0) {
+            spawnBoss();
+            bossSpawned = true;
+        }
+    }
+
+    bullets.forEach((b, i) => {
+        b.y -= b.speed;
+        if (b.y < 0) bullets.splice(i, 1);
+    });
+
+    enemies.forEach((e, i) => {
+        e.y += e.speed;
+
+        if (Math.hypot(player.x - e.x, player.y - e.y) < e.size) {
+            player.hp -= e.damage;
+            enemies.splice(i, 1);
+        }
+
+        bullets.forEach((b, j) => {
+            if (Math.hypot(b.x - e.x, b.y - e.y) < e.size) {
+                e.hp -= b.damage;
+                bullets.splice(j, 1);
+
+                if (e.hp <= 0) {
+                    enemies.splice(i, 1);
+                    if (!e.boss && enemies.length === 0) {
+                        wave++;
+                        enemiesToSpawn += 3;
+                    }
+                }
+            }
+        });
+    });
+
+    const hpPercent = (player.hp / player.maxHp) * 100;
+    document.getElementById("healthBar").style.width = hpPercent + "%";
+
+    updateCrosshairColor();
+
+    if (player.hp <= 0) {
+        alert("GAME OVER");
+        location.reload();
+    }
+}
+
+/* ===========================
+   DRAW
+=========================== */
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "cyan";
+    ctx.beginPath();
+    ctx.moveTo(player.x, player.y - player.size);
+    ctx.lineTo(player.x - player.size / 2, player.y + player.size);
+    ctx.lineTo(player.x + player.size / 2, player.y + player.size);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = "yellow";
+    bullets.forEach(b => {
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.size, 0, Math.PI * 2);
+        ctx.fill();
+    });
+
+    enemies.forEach(e => {
+        ctx.fillStyle = e.boss ? "red" : "orange";
+        ctx.beginPath();
+        ctx.arc(e.x, e.y, e.size, 0, Math.PI * 2);
+        ctx.fill();
+    });
+}
+
+/* ===========================
+   MAIN LOOP
+=========================== */
+function loop() {
+    if (gameStarted) {
+        update();
+        draw();
+    }
+    requestAnimationFrame(loop);
+}
+loop();
+</script>
+
+</body>
+</html>

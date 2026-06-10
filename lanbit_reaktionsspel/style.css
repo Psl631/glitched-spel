@@ -1,0 +1,101 @@
+:root {
+    --kamek-purple: #1a0033;
+    --kamek-glow: #8200ff;
+    --gold: #ffcc00;
+    --terminal: #00ffcc;
+    --danger: #ff0000;
+}
+
+body, html {
+    margin: 0; padding: 0; width: 100%; height: 100%;
+    background: #050505; color: white;
+    font-family: 'Montserrat', sans-serif;
+    overflow-y: auto; overflow-x: hidden;
+}
+
+/* --- START SKÄRM --- */
+#start-screen {
+    min-height: 100vh; display: flex; flex-direction: column; 
+    align-items: center; justify-content: center;
+    background: radial-gradient(circle, #1a0033 0%, #050505 100%);
+    text-align: center; padding: 20px;
+}
+
+h1 { font-family: 'Luckiest Guy'; font-size: 70px; color: var(--gold); margin: 0; -webkit-text-stroke: 2px black; }
+.sub-header { color: var(--terminal); font-weight: bold; letter-spacing: 2px; }
+
+input#playerName {
+    background: #000; border: 3px solid var(--terminal); color: var(--terminal);
+    padding: 15px; font-size: 24px; font-family: 'Montserrat'; border-radius: 10px;
+    width: 300px; text-align: center; margin: 20px 0; outline: none;
+}
+
+.btn-main {
+    font-family: 'Luckiest Guy'; padding: 15px 40px; font-size: 24px;
+    cursor: pointer; border-radius: 12px; border: none; margin: 5px; transition: 0.2s;
+}
+
+.btn-start { background: #00ff00; color: #000; box-shadow: 0 5px 0 #008800; }
+.btn-info { background: #444; color: white; font-size: 18px; }
+
+/* --- SPELPLAN --- */
+#game-container {
+    height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+
+#ui-bar {
+    width: 100%; padding: 20px; display: flex; justify-content: space-around;
+    position: fixed; top: 0; background: rgba(0,0,0,0.8); border-bottom: 2px solid var(--kamek-glow);
+}
+
+.stat-box { font-family: 'Luckiest Guy'; color: var(--gold); font-size: 22px; }
+
+#flash-area {
+    width: 90vw; max-width: 800px; height: 400px;
+    background: #111; border: 5px solid #333; border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: background 0.05s;
+}
+
+#status-text { font-family: 'Luckiest Guy'; font-size: 40px; color: #333; pointer-events: none; }
+
+#result-display { margin-top: 30px; font-size: 30px; font-family: 'Luckiest Guy'; color: var(--terminal); }
+
+/* --- KAMEK LOCKDOWN / MODALS --- */
+.modal-overlay {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.95); z-index: 10000; justify-content: center; align-items: center;
+}
+
+.popup-content {
+    background: #111; border: 4px solid var(--kamek-glow); padding: 40px;
+    border-radius: 25px; text-align: center; max-width: 500px;
+}
+
+/* Betygs-färger */
+.rating-star { color: #00ffcc; text-shadow: 0 0 15px #00ffcc; } /* Stjärnvinst */
+.rating-gold { color: #ffcc00; text-shadow: 0 0 15px #ffcc00; } /* Guldmynt */
+.rating-avg  { color: #cccccc; }                                /* Genomsnitt */
+.rating-bad  { color: #ff6600; }                                /* Dålig */
+.rating-useless { color: #ff0000; animation: shake 0.2s infinite; } /* Usel */
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+}
+
+#result-area {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.info-scroll { text-align: left; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; margin: 20px 0; }
+
+.flash-ready { background: #00ff00 !important; }
+.flash-ready #status-text { color: #000 !important; }

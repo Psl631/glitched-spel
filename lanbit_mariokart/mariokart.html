@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MK World - The Insult Edition</title>
+    <style>
+        body {
+            background-color: rgba(0, 0, 0, 0); 
+            color: white;
+            font-family: 'Futura', 'Verdana', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            transition: background-color 0.4s ease;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        #track-name { font-size: 35px; color: #ffcc00; text-transform: uppercase; font-weight: bold; text-shadow: 2px 2px 4px #000; }
+        #timer { font-size: 180px; font-weight: 900; text-shadow: 6px 6px 0px #000; font-variant-numeric: tabular-nums; margin: 5px 0; }
+        #next-target { font-size: 32px; font-weight: bold; text-shadow: 2px 2px 4px #000; margin-bottom: 15px; padding: 10px 30px; border-radius: 15px; }
+
+        .gold-label { color: #d4af37; border: 3px solid #d4af37; }
+        .silver-label { color: #c0c0c0; border: 3px solid #c0c0c0; }
+        .bronze-label { color: #cd7f32; border: 3px solid #cd7f32; }
+        .fail-label { color: #ff0000; border: 3px solid #ff0000; background: rgba(50,0,0,0.6); }
+
+        #status { font-size: 45px; font-weight: bold; letter-spacing: 2px; text-shadow: 2px 2px 4px #000; text-align: center; max-width: 90%; }
+
+        .menu { display: none; gap: 15px; margin-top: 20px; z-index: 100; flex-wrap: wrap; justify-content: center; max-width: 800px; }
+        .btn {
+            padding: 12px 24px; font-size: 20px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer;
+            text-shadow: 1px 1px 2px #000; box-shadow: 0 4px 10px rgba(0,0,0,0.5); transition: transform 0.1s;
+        }
+        .btn:active { transform: scale(0.95); }
+        .btn-win { background: #28a745; color: white; }
+        .btn-lose { background: #dc3545; color: white; }
+        .btn-place { background: #444; color: white; font-size: 16px; padding: 10px 15px; }
+
+        .warning-blink { animation: blinker 0.4s linear infinite; }
+        @keyframes blinker { 50% { background-color: rgba(255, 69, 0, 0.6); } }
+
+        .failed-anim { animation: shake 0.1s infinite; }
+        @keyframes shake {
+            0% { transform: translate(3px, 3px); }
+            50% { transform: translate(-4px, -3px); }
+            100% { transform: translate(3px, -3px); }
+        }
+    </style>
+</head>
+<body onclick="handleGlobalClick()">
+
+    <div id="track-name">READY...</div>
+    <div id="timer">00:00.00</div>
+    <div id="next-target" class="gold-label">TARGET GOLD: --:--.--</div>
+    <div id="status">PRESS SPACE</div>
+
+    <div id="win-menu" class="menu">
+        <button class="btn btn-win" onclick="handleWinDecision(true)">YES, I WON (1ST)</button>
+        <button class="btn btn-lose" onclick="handleWinDecision(false)">NO, I LOST</button>
+    </div>
+
+    <div id="place-menu" class="menu"></div>
+
+    <script>
+        const insults = {
+            gold: ["FINALLY, A COMPETENT DRIVER!", "DON'T GET USED TO IT.", "LUCK OR SKILL? PROBABLY LUCK.", "THE SNAIL IS ANGRY NOW."],
+            silver: ["NOT FAST ENOUGH FOR GOLD, HUH?", "KAMEK LET YOU WIN THIS ONE.", "SILVER IS JUST FIRST PLACE FOR LOSERS.", "ALMOST DECENT."],
+            bronze: ["MAMMA MIA, YOU'RE SLOW!", "THAT WAS PAINFUL TO WATCH.", "DID YOU STEER WITH YOUR FEET?", "RETIREMENT HOME PACE."],
+            fail_2_5: ["EMOTIONAL DAMAGE!", "THE LIBRARIAN IS JUDGING YOU.", "SNAIL PACE DETECTED.", "MY GRANDMA DRIVES FASTER."],
+            fail_6_12: ["ABSOLUTE GARBAGE.", "JUST UNINSTALL THE GAME.", "KAMEK HACKED YOUR BRAIN.", "ARE YOU EVEN TRYING?"],
+            fail_13_24: ["WASTED. LITERALLY WASTED.", "GET OUT OF THE LIBRARY.", "YOU ARE THE SNAIL.", "DELETING CHANNEL IN 3... 2... 1..."]
+        };
+
+        const trackList = [
+            { name: "Moo Moo Meadows", gold: 118, silver: 130, bronze: 145 },
+            { name: "Starview Peak", gold: 152, silver: 165, bronze: 180 },
+            { name: "Boo Cinema", gold: 165, silver: 180, bronze: 198 },
+            { name: "Bowser's Castle", gold: 180, silver: 195, bronze: 215 }
+        ];
+
+        const sounds = {
+            gold: new Audio('08 - 0019 - Yippee.wav'),
+            silver: new Audio('kamek_laughv2.mp3'),
+            bronze: new Audio('0A - 000B - Mamma Mia.wav'),
+            mario_death: new Audio('mario_death_sound.mp3'),
+            wasted: new Audio('gta_v_wasted_sound.mp3'),
+            start: new Audio('go.mp3'),
+            fail_timer: new Audio('mk64_loser.wav')
+        };
+
+        let currentTrackIndex = 0;
+        let startTime, timerInterval;
+        let running = false;
+        let lastPhase = 'ready';
+        let isMenuOpen = false;
+
+        function getRandomInsult(type) {
+            const list = insults[type];
+            return list[Math.floor(Math.random() * list.length)];
+        }
+
+        function formatTime(seconds) {
+            let mins = Math.floor(seconds / 60);
+            let secs = Math.floor(seconds % 60);
+            let ms = Math.floor((seconds % 1) * 100);
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}.${ms.toString().padStart(2, '0')}`;
+        }
+
+        function handleGlobalClick() {
+            if(!running && !isMenuOpen) nextTrack();
+        }
+
+        function updateTrackDisplay() {
+            const track = trackList[currentTrackIndex];
+            document.getElementById('track-name').innerText = track.name;
+            document.getElementById('next-target').innerText = "TARGET GOLD: " + formatTime(track.gold);
+            document.getElementById('next-target').className = "gold-label";
+            document.getElementById('win-menu').style.display = "none";
+            document.getElementById('place-menu').style.display = "none";
+            document.body.style.backgroundColor = "transparent";
+            document.getElementById('status').innerText = "READY";
+            document.getElementById('timer').innerText = "00:00.00";
+            document.body.classList.remove('warning-blink');
+            document.getElementById('status').classList.remove('failed-anim');
+            isMenuOpen = false;
+        }
+
+        function nextTrack() {
+            currentTrackIndex = (currentTrackIndex + 1) % trackList.length;
+            updateTrackDisplay();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (!running && !isMenuOpen) {
+                    startTimer();
+                } else if (running) {
+                    stopTimer();
+                }
+            }
+        });
+
+        function startTimer() {
+            startTime = Date.now();
+            running = true;
+            lastPhase = 'gold';
+            sounds.start.play();
+            document.body.style.backgroundColor = "rgba(212, 175, 55, 0.4)"; 
+            document.getElementById('status').innerText = "GOLD PACE";
+            timerInterval = setInterval(updateTimer, 10);
+        }
+
+        function stopTimer() {
+            running = false;
+            clearInterval(timerInterval);
+            document.body.classList.remove('warning-blink');
+            document.getElementById('win-menu').style.display = "flex";
+            document.getElementById('status').innerText = "DID YOU WIN?";
+            isMenuOpen = true;
+        }
+
+        function handleWinDecision(wonFirst) {
+            document.getElementById('win-menu').style.display = "none";
+            if (wonFirst) finishRace(1);
+            else showPlaceMenu();
+        }
+
+        function showPlaceMenu() {
+            const menu = document.getElementById('place-menu');
+            menu.innerHTML = '';
+            for (let i = 2; i <= 24; i++) {
+                const b = document.createElement('button');
+                b.className = 'btn btn-place';
+                b.innerText = i + 'th';
+                b.onclick = () => finishRace(i);
+                menu.appendChild(b);
+            }
+            menu.style.display = 'flex';
+            document.getElementById('status').innerText = "HOW BAD WAS IT?";
+        }
+
+        function finishRace(place) {
+            document.getElementById('place-menu').style.display = "none";
+            const statusEl = document.getElementById('status');
+            const targetEl = document.getElementById('next-target');
+
+            if (place === 1) {
+                if (lastPhase === 'gold') {
+                    statusEl.innerText = getRandomInsult('gold');
+                    sounds.gold.play();
+                } else if (lastPhase === 'silver') {
+                    statusEl.innerText = getRandomInsult('silver');
+                    sounds.silver.play();
+                } else if (lastPhase === 'bronze') {
+                    statusEl.innerText = getRandomInsult('bronze');
+                    sounds.bronze.play();
+                } else {
+                    statusEl.innerText = "TOO SLOW FOR THE CHART!";
+                    sounds.mario_death.play();
+                }
+            } else {
+                document.body.style.backgroundColor = "rgba(255, 0, 0, 0.7)";
+                targetEl.innerText = "DISQUALIFIED";
+                targetEl.className = "fail-label";
+                statusEl.classList.add('failed-anim');
+
+                if (place >= 2 && place <= 5) {
+                    statusEl.innerText = getRandomInsult('fail_2_5');
+                    sounds.bronze.play();
+                } else if (place >= 6 && place <= 12) {
+                    statusEl.innerText = getRandomInsult('fail_6_12');
+                    sounds.mario_death.play();
+                } else if (place >= 13 && place <= 24) {
+                    statusEl.innerText = getRandomInsult('fail_13_24');
+                    sounds.wasted.play();
+                }
+            }
+        }
+
+        function updateTimer() {
+            const currentTime = (Date.now() - startTime) / 1000;
+            const track = trackList[currentTrackIndex];
+            const targetEl = document.getElementById('next-target');
+            document.getElementById('timer').innerText = formatTime(currentTime);
+
+            let timeUntilNext = 0;
+            if (lastPhase === 'gold') timeUntilNext = track.gold - currentTime;
+            else if (lastPhase === 'silver') timeUntilNext = track.silver - currentTime;
+            else if (lastPhase === 'bronze') timeUntilNext = track.bronze - currentTime;
+
+            if (timeUntilNext > 0 && timeUntilNext <= 4) document.body.classList.add('warning-blink');
+            else document.body.classList.remove('warning-blink');
+
+            if (currentTime >= track.gold && lastPhase === 'gold') {
+                lastPhase = 'silver';
+                targetEl.innerText = "TARGET SILVER: " + formatTime(track.silver);
+                targetEl.className = "silver-label";
+                changePhase("rgba(192, 192, 192, 0.4)", "SILVER PACE", sounds.silver);
+            } else if (currentTime >= track.silver && lastPhase === 'silver') {
+                lastPhase = 'bronze';
+                targetEl.innerText = "TARGET BRONZE: " + formatTime(track.bronze);
+                targetEl.className = "bronze-label";
+                changePhase("rgba(205, 127, 50, 0.4)", "BRONZE PACE", sounds.bronze);
+            } else if (currentTime >= track.silver && lastPhase === 'bronze' && currentTime >= track.bronze) {
+                lastPhase = 'failed';
+                targetEl.innerText = "OUT OF TIME!";
+                targetEl.className = "fail-label";
+                changePhase("rgba(255, 0, 0, 0.6)", "DNF - ABSOLUTELY PATHETIC", sounds.fail_timer);
+                document.getElementById('status').classList.add('failed-anim');
+            }
+        }
+
+        function changePhase(color, statusText, soundEffect) {
+            document.body.style.backgroundColor = color;
+            document.getElementById('status').innerText = statusText;
+            soundEffect.play();
+        }
+
+        updateTrackDisplay();
+    </script>
+</body>
+</html>

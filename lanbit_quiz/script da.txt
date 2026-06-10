@@ -1,0 +1,666 @@
+/* ===========================================================
+   STATION 24: OPERATÖR PSL631 PROTOCOL v41.0 - FULLSTÄNDIG
+   =========================================================== */
+
+// DEBUG-VERKTYG: Hittar vilket element som saknas
+const originalGetId = document.getElementById;
+document.getElementById = function(id) {
+    const el = originalGetId.call(document, id);
+    if (!el) console.warn(`VARNING: Elementet med ID "${id}" saknas i din HTML!`);
+    return el;
+};
+
+// --- 1. FRÅGEDATABAS ---
+const questions = [
+   // --- LANBIT & NORDISKA LAN ---
+    { q: "Hvad er verdens største levende organisme målt i areal?", a: ["En honningsvamp i Oregon", "Den blåhval", "Great Barrier Reef", "En kæmpe sequoia"], r: "En honningsvamp i Oregon", cat: "NATUR" },
+{ q: "Hvilket år brød Berlinmuren sammen?", a: ["1987", "1989", "1991", "1993"], r: "1989", cat: "HISTORIE" },
+{ q: "Hvad er den kemiske betegnelse for guld?", a: ["Ag", "Au", "Pt", "Pb"], r: "Au", cat: "VIDENSKAB" },
+{ q: "Hvilket hav er det dybeste i verden?", a: ["Atlanterhavet", "Stillehavet", "Det Indiske Ocean", "Sydhavet"], r: "Stillehavet", cat: "GEOGRAFI" },
+{ q: "Hvilket dyr har den stærkeste bidkraft i dyreriget?", a: ["Løve", "Saltvandskrokodille", "Flodhest", "Tiger"], r: "Saltvandskrokodille", cat: "DYR" },
+{ q: "Hvilket sprog har flest ord i moderne brug?", a: ["Engelsk", "Mandarin", "Arabisk", "Tysk"], r: "Engelsk", cat: "SPROG" },
+{ q: "Hvilket metal leder elektricitet bedst?", a: ["Kobber", "Guld", "Sølv", "Aluminium"], r: "Sølv", cat: "VIDENSKAB" },
+{ q: "Hvilken planet har den længste dag målt i jordtimer?", a: ["Venus", "Mars", "Merkur", "Jupiter"], r: "Venus", cat: "UNIVERSET" },
+{ q: "Hvilket land opfandt papir?", a: ["Indien", "Kina", "Egypten", "Persien"], r: "Kina", cat: "HISTORIE" },
+{ q: "Hvad er hovedingrediensen i traditionel hummus?", a: ["Linser", "Kikærter", "Bønner", "Ris"], r: "Kikærter", cat: "MAD" },
+
+{ q: "Hvilket dyr kan sove i op til tre år under ekstreme forhold?", a: ["Skildpadde", "Sneglen", "Koala", "Flagermus"], r: "Sneglen", cat: "DYR" },
+{ q: "Hvilket land har verdens længste kystlinje?", a: ["Canada", "Australien", "Indonesien", "Rusland"], r: "Canada", cat: "GEOGRAFI" },
+{ q: "Hvilket element udgør størstedelen af Jordens atmosfære?", a: ["Oxygen", "Kvælstof", "Argon", "CO₂"], r: "Kvælstof", cat: "VIDENSKAB" },
+{ q: "Hvilken by kaldes 'Den Evige Stad'?", a: ["Athen", "Rom", "Istanbul", "Jerusalem"], r: "Rom", cat: "HISTORIE" },
+{ q: "Hvilket land drikker mest kaffe pr. indbygger?", a: ["Italien", "Finland", "Brasilien", "USA"], r: "Finland", cat: "MAD" },
+{ q: "Hvilket organ kan regenerere sig selv?", a: ["Hjertet", "Leveren", "Lungerne", "Nyrerne"], r: "Leveren", cat: "BIOLOGI" },
+{ q: "Hvilket dyr har verdens største øjne?", a: ["Struds", "Kæmpeblæksprutte", "Hvalros", "Haj"], r: "Kæmpeblæksprutte", cat: "DYR" },
+{ q: "Hvilket land opfandt saunaen?", a: ["Sverige", "Finland", "Norge", "Estland"], r: "Finland", cat: "KULTUR" },
+{ q: "Hvilket år blev FN grundlagt?", a: ["1943", "1945", "1947", "1950"], r: "1945", cat: "HISTORIE" },
+{ q: "Hvilket dyr kan ikke hoppe?", a: ["Elefant", "Giraf", "Næsehorn", "Flodhest"], r: "Elefant", cat: "DYR" },
+
+{ q: "Hvilket land har flest vulkaner?", a: ["Japan", "Indonesien", "USA", "Island"], r: "Indonesien", cat: "GEOGRAFI" },
+{ q: "Hvad er verdens mest talte modersmål?", a: ["Engelsk", "Hindi", "Spansk", "Mandarin"], r: "Mandarin", cat: "SPROG" },
+{ q: "Hvilket dyr har den længste migrationsrute?", a: ["Blåhval", "Laks", "Monarksommerfugl", "Sild"], r: "Monarksommerfugl", cat: "DYR" },
+{ q: "Hvilket land har verdens ældste monarki?", a: ["Japan", "Danmark", "Storbritannien", "Thailand"], r: "Japan", cat: "HISTORIE" },
+{ q: "Hvilken gas bruges i neonreklamer?", a: ["Argon", "Neon", "Krypton", "Helium"], r: "Neon", cat: "VIDENSKAB" },
+{ q: "Hvilket hav er det mindste?", a: ["Det Arktiske Hav", "Det Indiske Ocean", "Atlanterhavet", "Sydhavet"], r: "Det Arktiske Hav", cat: "GEOGRAFI" },
+{ q: "Hvilket dyr har den hurtigste slagfrekvens på vingerne?", a: ["Kolibri", "Bi", "Myg", "Svale"], r: "Kolibri", cat: "DYR" },
+{ q: "Hvilket land producerer mest vin?", a: ["Frankrig", "Italien", "Spanien", "USA"], r: "Italien", cat: "MAD" },
+{ q: "Hvilket instrument har både strenge og tangenter?", a: ["Piano", "Harpe", "Cembalo", "Guitar"], r: "Piano", cat: "MUSIK" },
+{ q: "Hvilket år blev euroen indført som fysisk valuta?", a: ["1999", "2000", "2002", "2004"], r: "2002", cat: "POLITIK" },
+
+{ q: "Hvilket dyr har den længste hals i forhold til kroppen?", a: ["Giraf", "Svanen", "Flamingo", "Slange"], r: "Svanen", cat: "DYR" },
+{ q: "Hvilket land har verdens største olieproduktion?", a: ["USA", "Saudi-Arabien", "Rusland", "Iran"], r: "USA", cat: "ØKONOMI" },
+{ q: "Hvilket metal bruges mest i elektronik?", a: ["Kobber", "Guld", "Sølv", "Aluminium"], r: "Kobber", cat: "TEKNOLOGI" },
+{ q: "Hvilket land har flest UNESCO‑verdensarvssteder?", a: ["Kina", "Italien", "Spanien", "Frankrig"], r: "Italien", cat: "KULTUR" },
+{ q: "Hvilket dyr har den hurtigste reaktionstid?", a: ["Gepard", "Mantisreje", "Ørn", "Kobra"], r: "Mantisreje", cat: "DYR" },
+{ q: "Hvad er den største planet i solsystemet?", a: ["Jupiter", "Saturn", "Uranus", "Neptun"], r: "Jupiter", cat: "UNIVERSET" },
+{ q: "Hvilket land opfandt kompasset?", a: ["Kina", "Grækenland", "Indien", "Tyrkiet"], r: "Kina", cat: "HISTORIE" },
+{ q: "Hvilket dyr kan ændre køn efter behov?", a: ["Klovnfisk", "Haj", "Sæl", "Skildpadde"], r: "Klovnfisk", cat: "BIOLOGI" },
+{ q: "Hvilket land har verdens største befolkning?", a: ["Indien", "Kina", "USA", "Indonesien"], r: "Indien", cat: "GEOGRAFI" },
+{ q: "Hvilket dyr har den længste levetid?", a: ["Galapagosskildpadde", "Grønlandshval", "Elefant", "Albatros"], r: "Grønlandshval", cat: "DYR" },
+
+{ q: "Hvilket land opfandt demokratiet?", a: ["Rom", "Grækenland", "Egypten", "Persien"], r: "Grækenland", cat: "HISTORIE" },
+{ q: "Hvilket dyr har flest tænder?", a: ["Haj", "Delfin", "Snegl", "Krokodille"], r: "Snegl", cat: "DYR" },
+{ q: "Hvilket land har verdens største ørken (ikke sandørken)?", a: ["Antarktis", "Sahara", "Gobi", "Arktis"], r: "Antarktis", cat: "GEOGRAFI" },
+{ q: "Hvilket dyr kan løbe hurtigst?", a: ["Gepard", "Pronghorn", "Løve", "Hest"], r: "Gepard", cat: "DYR" },
+{ q: "Hvilket land har verdens ældste universitet i drift?", a: ["Italien", "Marokko", "Egypten", "Spanien"], r: "Marokko", cat: "HISTORIE" },
+{ q: "Hvilket dyr har den største hjerne i forhold til kroppen?", a: ["Myrer", "Delfin", "Menneske", "Blæksprutte"], r: "Myrer", cat: "DYR" },
+{ q: "Hvilket land producerer mest kakao?", a: ["Ghana", "Elfenbenskysten", "Brasilien", "Nigeria"], r: "Elfenbenskysten", cat: "MAD" },
+{ q: "Hvilket dyr har den højeste blodtryk?", a: ["Giraf", "Elefant", "Haj", "Hest"], r: "Giraf", cat: "DYR" },
+{ q: "Hvilket land har flest øer?", a: ["Indonesien", "Sverige", "Filippinerne", "Norge"], r: "Sverige", cat: "GEOGRAFI" },
+{ q: "Hvilket dyr har den stærkeste muskel i forhold til størrelse?", a: ["Myre", "Bille", "Rotte", "Frø"], r: "Myre", cat: "DYR" },
+
+{ q: "Hvilket land opfandt skak?", a: ["Indien", "Persien", "Kina", "Tyrkiet"], r: "Indien", cat: "KULTUR" },
+{ q: "Hvilket dyr har den længste tunge i forhold til kroppen?", a: ["Myresluger", "Giraf", "Flagermus", "Frø"], r: "Frø", cat: "DYR" },
+{ q: "Hvilket land har verdens største sø (areal)?", a: ["Kaspiske Hav", "Lake Superior", "Lake Victoria", "Bajkalsøen"], r: "Kaspiske Hav", cat: "GEOGRAFI" },
+{ q: "Hvilket dyr kan overleve i rummet i kort tid?", a: ["Tardigrade", "Bille", "Edderkop", "Skorpion"], r: "Tardigrade", cat: "VIDENSKAB" },
+{ q: "Hvilket land har verdens højeste gennemsnitlige IQ ifølge flere studier?", a: ["Japan", "Singapore", "Sydkorea", "Taiwan"], r: "Singapore", cat: "SAMFUND" },
+{ q: "Hvilket dyr har den hurtigste slagkraft?", a: ["Mantisreje", "Gorilla", "Hest", "Ørn"], r: "Mantisreje", cat: "DYR" },
+{ q: "Hvilket land har verdens største økonomi?", a: ["USA", "Kina", "Japan", "Tyskland"], r: "USA", cat: "ØKONOMI" },
+{ q: "Hvilket dyr har den længste hale?", a: ["Giraf", "Kænguru", "Spermhval", "Lemur"], r: "Spermhval", cat: "DYR" },
+{ q: "Hvilket land har verdens største skovområde?", a: ["Brasilien", "Rusland", "Canada", "USA"], r: "Rusland", cat: "GEOGRAFI" },
+{ q: "Hvilket dyr har den hurtigste puls?", a: ["Kolibri", "Mus", "Hamster", "Flagermus"], r: "Kolibri", cat: "DYR" }
+];
+
+// --- 2. KONSTRUKTION & UI-TEXTER ---
+const forbiddenWordsArr = [
+    "neger", "nigger", "svartskalle", "blatte", "fitta", "kuk", "hora", "slampa", "bög", "jävel", "helvete", "skit", "idiot", "mongo", "retard",
+    "pucko", "luder", "arsle", "bitch", "faggot", "kukhuvud", "piss", "knulla", "våldtäkt", "pedofil", "hitler", "stalin", "nazist", "is", "isis",
+    "bajs", "kiss", "rumpa", "anus", "stjärt", "prutt", "toalett", "toa", "avföring", "urin", "balle", "pung", "bröst", "tuttar", "penis", "vagina"
+];
+
+const ui = {
+    startBtn: "BOOT PROTOCOL 🚀",
+    gamerTag: "DITT GAMER-TAG:",
+    scoreText: "av 30 poäng.",
+    kamekTitle: "DU BLEV FÅNGAD! 🪄✨",
+    kamekFoul: "Du försökte fuska eller lämna sidan. Som straff har Kamek spelat sitt skratt och stängt ner ditt quiz.",
+    kamekReason: "Anledning: ",
+    reboot: "FÖRSÖK IGEN 🚀",
+    correct: "RÄTT SVAR!",
+    wrong: "FEL SVAR!",
+    perfect: "BETYG: MVG++ (30/30) – PERFEKT! Operatör Psl631 skickar luftskeppet. Hämta din vinst!",
+    high: "BETYG: MVG – STRÅLANDE! Du är en elit-gamer.",
+    average: "BETYG: VG – VÄL GODKÄNT. Kamek skrattar åt din insats, men du är ändå bra.",
+    low: "BETYG: G – GODKÄNT. Du klarade dig, men du måste öva mer.",
+    fail: "BETYG: IG – UNDERKÄNT. Resultatet räckte inte ända fram.",
+    critical: "BETYG: IG- (TOTALT MISSLYCKANDE). Toad gråter.",
+    batteryLow: "⚠️ [VARNING] STRÖMFÖRSÖRJNING BRUTEN. ANSLUT LADDARE FÖR OPTIMAL TERMINALPRESTANDA.",
+    noInternet: "[VARNING] Offline: Dina resultat sparas inte till molnet och istället sparas lokalt**",
+    adBlock: "[SYSTEM] AdBlock detekterad, stäng av för maximal prestanda",
+    nameWarning: "[SYSTEM] Ditt namn flaggades som offensivt och har ändrats till 'Gäst'",
+    syncing: "[SYSTEM] SYNKRONISERAR MED MOLNET...",
+    syncComplete: "[SYSTEM] DATA ÖVERFÖRD TILL CENTRALEN"
+};
+
+/**
+ * Navigeringsfunktioner för Instruktionsskärmen
+ */
+function showInstructions() {
+    // Spela ljud om det finns
+    if (sfx.boop) playSound(sfx.boop);
+    
+    // Växla skärmar
+    document.getElementById("start-screen").classList.add("hidden");
+    document.getElementById("instructions-screen").classList.remove("hidden");
+}
+
+function hideInstructions() {
+    if (sfx.boop) playSound(sfx.boop);
+    
+    document.getElementById("instructions-screen").classList.add("hidden");
+    document.getElementById("start-screen").classList.remove("hidden");
+}
+
+// --- 3. VARIABLER ---
+let playerName = "";
+let score = 0;
+let currentIdx = 0;
+let lives = 3;
+let maxLives = 3;
+let shuffledQuestions = []; // LÄGG TILL DENNA RAD
+let currentMode = 'tournament';
+let lifelines = {
+    fiftyFifty: true,
+    skip: true,
+    analysis: true,
+    reboot: true
+};
+let questionStartTime = 0;
+let stats = { answerTimes: [], categories: {} };
+window.quizActive = false;
+
+// --- 4. LJUD & SFX ---
+const sfx = {
+    pling: new Audio('pling.mp3'),
+    boop: new Audio('boooop.mp3'),
+    kamek: new Audio('kamek.mp3'),
+    denied: new Audio('denied.wav'), // Windows XP DONG-ljudet
+    gameOver: new Audio('mario_game_over.mp3'),
+    hacker: new Audio('hacker.mp3'),
+    glitch: new Audio('reboot.mp3'),
+    warp: new Audio('skip.mp3'),
+    ana: new Audio('analysis.mp3'),
+    yay: new Audio('yay.mp3'),
+    cash: new Audio('cash_register.mp3'),
+    trombone: new Audio('sad_trombone.mp3'),
+    loser: new Audio('mk64_loser.wav')
+};
+
+function playSound(audio) {
+    if (!audio) return;
+    audio.currentTime = 0;
+    audio.play().catch(() => {});
+}
+
+// --- 5. SYSTEMFUNKTIONER ---
+function showToast(msg, color) {
+    const toast = document.createElement("div");
+    toast.style = `position:fixed; top:20px; right:20px; background:${color}; color:white; padding:15px; font-family:'VT323'; z-index:10000; border:2px solid white; box-shadow:5px 5px 0px black; pointer-events:none;`;
+    toast.innerHTML = msg;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 6000);
+}
+
+async function checkSystemStatus() {
+    // Sekundär kontroll för mobila enheter
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMobile) {
+        document.body.innerHTML = `<div style="background:black; color:red; height:100vh; display:flex; align-items:center; justify-content:center; font-family:'Press Start 2P'; text-align:center; padding:20px;">[ SYSTEM ERROR ]<br><br>MOBIL ENHET EJ TILLÅTEN</div>`;
+        return;
+    }
+
+    if (!navigator.onLine) {
+        showToast(ui.noInternet, "#ff0000");
+    }
+
+    // AdBlock-detektering
+    const adTest = document.createElement('div');
+    adTest.innerHTML = '&nbsp;';
+    adTest.className = 'adsbygoogle';
+    adTest.style.position = 'absolute';
+    adTest.style.left = '-999px';
+    document.body.appendChild(adTest);
+
+    window.setTimeout(() => {
+        if (adTest.offsetHeight === 0) {
+            showToast(ui.adBlock, "#6600cc");
+        }
+        adTest.remove();
+    }, 100);
+
+    // Batteristatus
+    if ('getBattery' in navigator) {
+        navigator.getBattery().then(battery => {
+            const checkBattery = () => { if (!battery.charging) showToast(ui.batteryLow, "#ff6600"); };
+            battery.addEventListener('chargingchange', checkBattery);
+            checkBattery();
+        });
+    }
+}
+
+function sanitizeName(name) {
+    let clean = name.trim();
+    if (!clean || clean.toLowerCase() === "gäst") return "Gäst";
+    const allowedPattern = /^[a-zA-ZåäöÅÄÖ0-9]+$/;
+    if (!allowedPattern.test(clean) || forbiddenWordsArr.some(word => clean.toLowerCase().includes(word))) {
+        showToast(ui.nameWarning, "red");
+        return "Gäst";
+    }
+    return clean.length > 15 ? clean.substring(0, 15) : clean;
+}
+
+function setMode(mode) {
+    currentMode = mode;
+    document.querySelectorAll('.mode-btn').forEach(b => b.style.borderColor = "#333");
+    const activeBtn = document.getElementById('btn-' + (mode === 'tournament' ? 'tournament' : 'classic'));
+    if (activeBtn) activeBtn.style.borderColor = "#00ff00";
+}
+
+function updateLivesUI() {
+    const container = document.getElementById("lives-container");
+    if (!container) return;
+    container.innerHTML = "";
+    if (currentMode === 'tournament') {
+        container.innerHTML = "<span style='color:gold; font-family:VT323;'>[ OÄNDLIGA LIV ]</span>";
+        return;
+    }
+    for (let i = 1; i <= maxLives; i++) {
+        const heart = document.createElement("img");
+        heart.style.width = "25px";
+        heart.src = i <= lives ? "heart_full.png" : "heart_empty.png";
+        container.appendChild(heart);
+    }
+}
+
+// --- 6. SPEL-LOGIK ---
+function startQuiz() {
+    console.log("System: Initierar uppstart...");
+    
+    const nameInput = document.getElementById("player-name");
+    if (!nameInput) return; // Säkerhetskoll
+
+    playerName = sanitizeName(nameInput.value);
+    
+    // Hämta skärmarna
+    const startScreen = document.getElementById("start-screen");
+    const loadingScreen = document.getElementById("loading-container");
+    const quizScreen = document.getElementById("quiz-screen");
+
+    // Steg 1: Dölj start, visa laddning
+    if (startScreen) startScreen.classList.add("hidden");
+    if (loadingScreen) loadingScreen.classList.remove("hidden");
+
+    // Steg 2: Vänta 1.5 sekunder (simulerad laddning)
+    setTimeout(() => {
+        if (loadingScreen) loadingScreen.classList.add("hidden");
+        if (quizScreen) quizScreen.classList.remove("hidden");
+
+// --- HÄR ÄR FIXEN: AKTIVERA KAMEK ---
+        window.quizActive = true; 
+        // ------------------------------------
+
+        // Blanda frågor och starta
+        shuffledQuestions = [...questions].sort(() => Math.random() - 0.5);
+        currentIdx = 0;
+        score = 0;
+        
+        // Starta gränssnittet
+        if (typeof updateLivesUI === "function") updateLivesUI();
+        showQuestion();
+    }, 1500);
+}
+
+function showQuestion() {
+    const q = shuffledQuestions[currentIdx];
+    questionStartTime = Date.now(); // För statistik
+    
+    // Uppdatera texter
+    document.getElementById("progress").innerText = `STATION 24 - PROTOKOLL ${currentIdx + 1} / 30`;
+    
+    const catDisplay = document.getElementById("question-category");
+    if (catDisplay) catDisplay.innerText = `[ KATEGORI: ${q.cat || "ALLMÄNT"} ]`;
+
+    document.getElementById("question-text").innerText = q.q;
+    
+    // Hitta rätt container (options-grid)
+    const grid = document.getElementById("options-grid");
+    grid.innerHTML = ""; // Rensa gamla knappar
+    
+    // Slumpa ordningen på svarsalternativen för just denna fråga
+    const randomizedAnswers = [...q.a].sort(() => Math.random() - 0.5);
+    
+    randomizedAnswers.forEach(alt => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        // Vi lägger texten i en span för att matcha CSS-styling om det behövs
+        btn.innerHTML = `<span>${alt}</span>`; 
+        btn.onclick = () => checkAnswer(alt, btn);
+        grid.appendChild(btn);
+    });
+}
+
+function checkAnswer(choice, btn) {
+    const q = shuffledQuestions[currentIdx];
+    const allBtns = document.querySelectorAll('.option-btn');
+    const timeTaken = (Date.now() - questionStartTime) / 1000;
+    stats.answerTimes.push(timeTaken);
+
+    // Inaktivera alla knappar direkt
+    allBtns.forEach(b => b.style.pointerEvents = 'none');
+
+    const monitor = document.querySelector('.monitor-frame'); // Eller .main-container
+    const beepText = document.getElementById('beep-overlay');
+
+    if (choice === q.r) {
+        score++;
+        playSound(sfx.pling);
+        btn.classList.add("correct-flash");
+        
+        // Gå vidare efter normal delay
+        setTimeout(nextQuestion, 1500);
+    } else {
+        // --- DRAMATISKT FEL-SVAR PROTOKOLL ---
+        
+        // 1. Spela ljudet omedelbart
+        playSound(sfx.boop); 
+
+        // 2. Aktivera skärmskakning och rött blink
+        if (monitor) monitor.classList.add('screen-damage');
+        
+        // 3. Visa BÖÖÖÖP-texten
+        if (beepText) beepText.style.display = 'block';
+
+        // 4. Markera den klickade knappen som fel
+        btn.classList.add("wrong-flash");
+
+        // 5. Visa det rätta svaret för spelaren
+        allBtns.forEach(b => { 
+            if(b.innerText.trim() === q.r) b.classList.add("correct-flash"); 
+        });
+
+        // Hantera liv i Classic Mode
+        if (currentMode === 'classic') {
+            lives--;
+            updateLivesUI()
+            if (lives <= 0) { 
+                // Om liven är slut, städa upp effekten och visa Game Over
+                setTimeout(() => {
+                    cleanupWrongAnswerEffects(monitor, beepText);
+                    showGameOver();
+                }, 1400); // Lite längre delay för att Game Over ska kännas
+                return; // Avbryt här
+            }
+        }
+
+        // Gå vidare till nästa fråga efter att effekten är klar
+        setTimeout(() => {
+            cleanupWrongAnswerEffects(monitor, beepText);
+            nextQuestion();
+        }, 1800); // Längre delay (0.3s skak + tid att läsa rätt svar)
+    }
+}
+
+// Hjälpfunktion för att städa upp CSS-klasser och text
+function cleanupWrongAnswerEffects(monitor, beepText) {
+    if (monitor) monitor.classList.remove('screen-damage');
+    if (beepText) beepText.style.display = 'none';
+}
+
+// Hjälpfunktion för att hantera stegen till nästa fråga
+function nextQuestion() {
+    currentIdx++;
+    if (currentIdx < 30) {
+        showQuestion();
+    } else {
+        showResults();
+    }
+}
+
+function showGameOver() {
+    window.quizActive = false;
+    playSound(sfx.gameOver);
+    document.getElementById("quiz-screen").classList.add("hidden");
+    const res = document.getElementById("result-screen");
+    res.classList.remove("hidden");
+    res.innerHTML = `
+        <h1 style="color:red; font-family:'Press Start 2P';">GAME OVER</h1>
+        <p style="font-family:VT323; font-size:1.5rem;">Systemet fick slut på energi (liv).</p>
+        <p style="color:yellow; font-family:VT323;">Poäng: ${score}/30</p>
+        <button onclick="location.reload()" class="menu-btn" style="margin-top:20px;">ÅTERSTÄLL TERMINAL 🚀</button>
+    `;
+}
+
+// Central varningsfunktion för använda livlinor
+function triggerLifelineWarning() {
+    if (sfx.denied) {
+        sfx.denied.currentTime = 0;
+        sfx.denied.play().catch(e => console.log("Ljud blockerat:", e));
+    }
+    showToast("LIVLINA REDAN ANVÄND", "#ff0000");
+    
+    const quizScreen = document.getElementById("quiz-screen");
+    if (quizScreen) {
+        quizScreen.classList.add("error-shake");
+        setTimeout(() => quizScreen.classList.remove("error-shake"), 500);
+    }
+}
+
+// 1. 50/50
+function useFiftyFifty() {
+    console.log("Försöker använda 50/50...");
+    if (!lifelines.fiftyFifty) { triggerLifelineWarning(); return; }
+    
+    playSound(sfx.hacker);
+    const currentQ = shuffledQuestions[currentIdx];
+    const buttons = Array.from(document.querySelectorAll(".option-btn"));
+    
+    let removed = 0;
+    buttons.sort(() => Math.random() - 0.5).forEach(btn => {
+        if (btn.innerText !== currentQ.r && removed < 2) {
+            btn.style.visibility = "hidden";
+            removed++;
+        }
+    });
+
+    lifelines.fiftyFifty = false;
+    const btnElement = document.getElementById("fifty-fifty-btn");
+    if (btnElement) btnElement.classList.add("used");
+    showToast("50/50 AKTIVERAD", "#00ff00");
+}
+
+// 2. SKIP (Byt fråga)
+function useSkipQuestion() {
+    console.log("Försöker använda Skip...");
+    if (!lifelines.skip) { triggerLifelineWarning(); return; }
+    
+    playSound(sfx.skip);
+    lifelines.skip = false;
+    const btnElement = document.getElementById("skip-btn");
+    if (btnElement) btnElement.classList.add("used");
+
+    currentIdx++;
+    if (currentIdx < shuffledQuestions.length) {
+        showQuestion();
+    } else {
+        showResults();
+    }
+}
+
+// 3. ANALYS (Tips)
+function useAnalysis() {
+    console.log("Försöker använda Analys...");
+    if (!lifelines.analysis) { triggerLifelineWarning(); return; }
+    
+    playSound(sfx.analysis);
+    const currentQ = shuffledQuestions[currentIdx];
+    showToast(`ANALYS: SVARET BÖRJAR PÅ "${currentQ.r.charAt(0)}"`, "#00ccff");
+    
+    lifelines.analysis = false;
+    const btnElement = document.getElementById("analysis-btn");
+    if (btnElement) btnElement.classList.add("used");
+}
+
+// 4. REBOOT (Extra liv)
+function useReboot() {
+    console.log("Försöker använda Reboot...");
+    if (!lifelines.reboot) { triggerLifelineWarning(); return; }
+    
+    if (lives >= 3) {
+        showToast("SYSTEMET REDAN OPTIMERAT (FULLA LIV)", "#ffffff");
+        return;
+    }
+
+    playSound(sfx.reboot);
+    lives++;
+    if (typeof updateLivesUI === "function") updateLivesUI();
+    
+    lifelines.reboot = false;
+    const btnElement = document.getElementById("reboot-btn");
+    if (btnElement) btnElement.classList.add("used");
+}
+
+// --- 8. AVSLUT & RESULTAT ---
+function showResults() {
+    window.quizActive = false;
+    document.getElementById("quiz-screen").classList.add("hidden");
+    const res = document.getElementById("result-screen");
+    res.classList.remove("hidden");
+    res.innerHTML = `<p style="color:cyan; font-family:'VT323';">${ui.syncing}</p><div class="fake-progress-bar"></div>`;
+
+    setTimeout(() => {
+        res.innerHTML = `
+            <h2 id="result-header">ANALYS SLUTFÖRD</h2>
+            <div id="toad-sad-container" class="hidden"><img src="sad_toad.jfif" style="width:100px; border:2px solid red;"></div>
+            <p id="result-score" style="font-size:1.8rem; color:#fff;">${playerName}: ${score}/30</p>
+            <p id="result-comment" style="color:yellow; font-size:1.1rem; font-family:VT323;"></p>
+            <div id="advanced-stats" style="font-family:VT323; text-align:left; border-top:1px solid #333; padding-top:10px;"></div>
+            <div id="leaderboard-display"></div>
+            <button class="menu-btn" onclick="location.reload()" style="margin-top:20px;">OMSTART 🚀</button>
+        `;
+        
+        const avgTime = (stats.answerTimes.reduce((a,b)=>a+b,0) / stats.answerTimes.length).toFixed(1);
+        const comment = document.getElementById("result-comment");
+        
+        if (score === 30) { comment.innerText = ui.perfect; playSound(sfx.yay); }
+        else if (score >= 23) { comment.innerText = ui.high; playSound(sfx.cash); }
+        else if (score >= 14) { comment.innerText = ui.average; playSound(sfx.kamek); }
+        else if (score >= 6) { comment.innerText = ui.fail; playSound(sfx.trombone); }
+        else { comment.innerText = ui.critical; playSound(sfx.loser); document.getElementById("toad-sad-container").classList.remove("hidden");
+        showToast("VARNING: MEKANISKT DISKFEL DETEKTERAT", "#ff0000");}
+
+        document.getElementById("advanced-stats").innerHTML = `
+            <p>> SNITT-TID PER FRÅGA: ${avgTime}s</p>
+            <p>> PRECISION: ${Math.round((score/30)*100)}%</p>
+        `;
+        updateLeaderboard();
+        showToast(ui.syncComplete, "green");
+    }, 2000);
+}
+
+function updateLeaderboard() {
+    let lb = JSON.parse(localStorage.getItem('station24_lb')) || [];
+    lb.push({ name: playerName, score: score });
+    lb.sort((a,b) => b.score - a.score);
+    localStorage.setItem('station24_lb', JSON.stringify(lb.slice(0, 5)));
+    let html = "<h3>--- HALL OF FAME ---</h3>";
+    lb.slice(0,5).forEach((e, i) => { html += `<p>${i + 1}. ${e.name} - ${e.score} XP</p>`; });
+    document.getElementById("leaderboard-display").innerHTML = html;
+}
+
+/* ===========================================================
+   KAMEK AGGRESSIVE ANTI-CHEAT PROTOCOL (LOCKDOWN v4.1)
+   =========================================================== */
+
+// 1. Detektera flikbyte eller om fönstret tappar fokus
+window.addEventListener('blur', () => { 
+    if (window.quizActive) {
+        triggerKamekVrede("DETEKTERAD FOKUS-FÖRLUST (FÖRSÖK TILL GOOGLING)"); 
+    }
+});
+
+// 2. Blockera högerklick (förhindra "Inspektera")
+window.addEventListener('contextmenu', (e) => {
+    if (window.quizActive) {
+        e.preventDefault();
+        triggerKamekVrede("HÖGERKLICK DETEKTERAT (FÖRBJUDEN ÅTGÄRD)");
+    }
+});
+
+// --- KAMEK STYRPLATTA-DETEKTOR ---
+window.addEventListener('wheel', (e) => {
+    // Kollar om scroll-värdet inte är ett heltal eller om delta-värdet är för litet, vilket indikerar en trackpad
+    if (window.quizActive && (!Number.isInteger(e.deltaY) || (Math.abs(e.deltaY) > 0 && Math.abs(e.deltaY) < 20))) {
+        triggerKamekVrede("STYRPLATTA_ANVÄNDS - Sluta smeka din laptop! Använd en riktig datormus för Station 24 Protocol. Kamek accepterar endast mekanisk precision!");
+    }
+}, { passive: false });
+
+// 3. Blockera F12 och Ctrl+Shift+I / Ctrl+Shift+J / Ctrl+U
+window.addEventListener('keydown', (e) => {
+    if (!window.quizActive) return;
+
+    // F12
+    if (e.keyCode === 123) {
+        e.preventDefault();
+        triggerKamekVrede("F12 DETEKTERAT (SYSTEMINTRÅNGSFÖRSÖK)");
+    }
+    
+    // Ctrl+Shift+I (Inspektera), Ctrl+Shift+J (Console), Ctrl+Shift+C (Element)
+    if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
+        e.preventDefault();
+        triggerKamekVrede("DEVELOPER TOOLS GENVÄG DETEKTERAD");
+    }
+
+    // Ctrl+U (Visa källkod)
+    if (e.ctrlKey && e.keyCode === 85) {
+        e.preventDefault();
+        triggerKamekVrede("SOURCE VIEW DETEKTERAD");
+    }
+});
+
+// 4. Den uppdaterade övertagningsfunktionen (Skrollbar & Lugnt pulserande)
+function triggerKamekVrede(reason) {
+    window.quizActive = false;
+    
+    // Stoppa all annan musik och spela Kameks skratt
+    Object.values(sfx).forEach(sound => { sound.pause(); sound.currentTime = 0; });
+    playSound(sfx.kamek);
+    
+    // Injicera CSS för det lugna pulserandet
+    const styleInject = document.createElement('style');
+    styleInject.innerHTML = `
+        @keyframes kamek-pulse {
+            0% { border-color: #ff0000; box-shadow: 0 0 20px #550000; }
+            50% { border-color: #550000; box-shadow: 0 0 10px #220000; }
+            100% { border-color: #ff0000; box-shadow: 0 0 20px #550000; }
+        }
+        .kamek-overlay {
+            animation: kamek-pulse 2.5s infinite ease-in-out; /* Lugn puls */
+        }
+    `;
+    document.head.appendChild(styleInject);
+    document.title = "🛑 Quiz avbrutet av Kamek";
+    
+    // Rensa sidan och lås den i rött/svart kaos (nu skrollbar via overflow-y: auto)
+    document.body.innerHTML = `
+        <div class="kamek-overlay" style="background:#000; color:#ff0000; height:100vh; width:100vw; position:fixed; top:0; left:0; z-index:9999999; display:block; font-family:'Press Start 2P', cursive; text-align:center; padding:20px; border: 15px solid #ff0000; box-sizing: border-box; overflow-y: auto; -webkit-overflow-scrolling: touch;">
+            
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100%; padding: 20px 0;">
+                
+                <h1 style="font-size:2.8rem; margin-bottom: 30px; text-shadow: 8px 8px #550000; line-height: 1.1;">${ui.kamekTitle}</h1>
+                
+                <div style="background: red; padding: 10px; margin-bottom: 30px; display: inline-block;">
+                    <img src="kamek.jfif" style="width:220px; display:block; border:5px solid black;">
+                </div>
+
+                <p style="font-family:'VT323'; font-size:2.2rem; color:yellow; background: black; padding: 15px; border: 2px dashed yellow; margin-bottom: 20px; max-width: 90%;">
+                    ÖVERTRÄDELSE: ${reason}
+                </p>
+                
+                <p style="font-family:'VT323'; color:#fff; font-size:1.4rem; margin-top: 20px; max-width: 750px; line-height: 1.3; margin-bottom: 10px;">
+                    ${ui.kamekFoul}<br>Ditt deltagande i Station 24 har avbrutits och Operatör Psl631 har informerats.
+                </p>
+
+                <div style="margin-top:40px; margin-bottom: 40px;">
+                    <button onclick="location.reload()" style="background:#ff0000; color:white; border:4px solid white; padding:20px 40px; cursor:pointer; font-family:'Press Start 2P'; font-size:1.1rem; box-shadow: 5px 5px 0px #550000; transition: transform 0.1s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        ${ui.reboot}
+                    </button>
+                </div>
+
+                <div style="width:100%; opacity:0.3; font-size:0.6rem; letter-spacing:2px; font-family: 'Press Start 2P';">
+                    ERROR_CODE: CHEAT_DETECTED_STATION_24_V4.1
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// --- 6. INITIALISERING ---
+window.addEventListener('load', () => {
+    // Kontrollera att funktionen finns innan vi kör den
+    if (typeof checkSystemStatus === "function") {
+        checkSystemStatus();
+    } else {
+        console.error("System check failed: Function not found.");
+    }
+});
+
+// VARNING: Se till att det INTE finns några extra tecken eller måsvingar under denna rad!

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STATION 24 - Turneringsregler 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0c;
+            --card-bg: #16161e;
+            --accent: #ffcc00;
+            --text: #e0e0e0;
+            --danger: #ff4444;
+            --kamek: #8200ff;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container { max-width: 1000px; margin: 0 auto; }
+
+        h1, h2, h3 {
+            font-family: 'Luckiest Guy', cursive;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        h1 { font-size: 3.5rem; text-align: center; margin-bottom: 20px; text-shadow: 3px 3px 0 #000; }
+        
+        .nav-back {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: bold;
+            border: 1px solid var(--accent);
+            padding: 5px 15px;
+            border-radius: 5px;
+        }
+
+        .section {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid #333;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .rule-item { margin-bottom: 15px; padding-left: 25px; position: relative; }
+        .rule-item::before { content: "◈"; position: absolute; left: 0; color: var(--accent); }
+
+        .important {
+            border: 2px solid var(--danger);
+            background: rgba(255, 68, 68, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .medical-warning {
+            color: #ffcc00;
+            font-size: 24px;
+            font-weight: bold;
+            border: 3px solid #ffcc00;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(0,0,0,0.4);
+        }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { text-align: left; padding: 15px; border-bottom: 1px solid #333; }
+        th { color: var(--accent); font-family: 'Luckiest Guy'; font-size: 1.2rem; }
+        
+        .tiebreaker { font-size: 0.85rem; color: #888; font-style: italic; display: block; margin-top: 5px; }
+        .kamek-badge { background: var(--kamek); color: white; padding: 2px 8px; border-radius: 5px; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="index.html" class="nav-back">← TILLBAKA TILL TERMINALEN</a>
+
+    <h1>PROTOKOLL: STATION 24</h1>
+
+    <div class="medical-warning">
+        ⚠️ MEDICINSK VARNING: Vissa spel innehåller intensiva stroboskopljus. Rekommenderas ej för personer med epilepsi eller liknande tillstånd.
+    </div>
+
+    <div class="section">
+        <h2>📂 ALLMÄNNA TURNERINGSDIREKTIV</h2>
+        <div class="rule-item"><strong>LÄGE:</strong> Spelare kan välja mellan <strong>CASUAL</strong> (för träning) och <strong>TOURNAMENT</strong> (för poängregistrering).</div>
+        <div class="rule-item"><strong>HARDWARE LOCK:</strong> Endast stationär PC med mus/tangentbord eller godkänd handkontroll. Trackpads detekteras och blockeras omedelbart.</div>
+        <div class="important">
+            <strong>LOCKDOWN-PROTOKOLL:</strong> Vid detektering av fusk, flikbyte eller toxiskt beteende (svordomar i mic) aktiveras <strong>Purple Lockdown</strong>. Sessionen ogiltigförklaras direkt.
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🏆 OFFICIELLA TÄVLINGSREGLER</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>SPELMODUL</th>
+                    <th>VINNANDE KRITERIUM</th>
+                    <th>TIEBREAKER</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Memory</strong></td>
+                    <td>Minst antal sekunder (32 kort / 16 par)</td>
+                    <td><span class="tiebreaker">Antal drag (lägst vinner)</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Quiz</strong></td>
+                    <td>Turneringsläge (flest rätt vinner)</td>
+                    <td><span class="tiebreaker">Svarstid per fråga</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Hänga Gubbe</strong></td>
+                    <td>Längst vinst-streak (antal ord i rad)</td>
+                    <td><span class="tiebreaker">Total tid använd</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Base Defense</strong></td>
+                    <td>Högst totalpoäng</td>
+                    <td><span class="tiebreaker">Nådd Wave-nivå</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Math Mayhem</strong></td>
+                    <td>Högst totalpoäng under stress</td>
+                    <td><span class="tiebreaker">Antal lösta ekvationer</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Reaktionsspel</strong></td>
+                    <td>Snabbast reaktionstid (ms)</td>
+                    <td><span class="tiebreaker">Genomsnitt över 5 försök</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Keyboard Warrior</strong></td>
+                    <td>Högst poäng (CPM)</td>
+                    <td><span class="tiebreaker">Noggrannhet (%)</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Spam Clicker</strong></td>
+                    <td>Flest klick inom exakt 10 sekunder</td>
+                    <td><span class="tiebreaker">Klick-stabilitet (Jitter)</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>📡 SENSORER & ÖVERVAKNING</h2>
+        <p>Kameks Integrity Monitor övervakar din session:</p>
+        <div class="rule-item"><strong>Audio Ear:</strong> Svordomar triggar varningar. Strike 3 = Omedelbar utkastning.</div>
+        <div class="rule-item"><strong>Visual Watch:</strong> Kameran bekräftar operatörens närvaro. AFK = Lockdown.</div>
+        <div class="rule-item"><strong>Macro Shield:</strong> Detekterar omänsklig klick-precision (Turbo-knappar är bannlysta).</div>
+    </div>
+
+    <p style="text-align: center; opacity: 0.5; font-size: 0.9rem; font-family: monospace;">
+        OPERATÖR PSL631 // REVISION: 2026-05-10 // STATION 24 SECURE DOC
+    </p>
+</div>
+
+<script>
+    // Kamek Device Purge - Blockerar mobila enheter
+    (function() {
+        var ua = navigator.userAgent.toLowerCase();
+        if (/iphone|ipad|android|blackberry/i.test(ua)) {
+            document.body.innerHTML = '<div style="background:#1a0033; color:#ffcc00; text-align:center; padding:100px; font-family: Luckiest Guy, cursive; border: 10px solid #8200ff; height:100vh;"><h1>ACCESS DENIED</h1><p>Kamek hånar din mobil! Gå till en riktig stationär terminal för att läsa protokollet.</p></div>';
+        }
+    })();
+</script>
+
+</body>
+</html>

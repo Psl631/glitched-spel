@@ -1,0 +1,23 @@
+<div id="instructions-modal" class="modal">
+    <div class="modal-content">
+        <h2 id="instr-title">Spelinstruktioner / Game Instructions</h2>
+        
+        <div class="lang-selector">
+            <button onclick="updateInstrLang('sv')">SE</button>
+            <button onclick="updateInstrLang('no')">NO</button>
+            <button onclick="updateInstrLang('da')">DK</button>
+            <button onclick="updateInstrLang('en')">EN</button>
+        </div>
+
+        <ul id="instr-list">
+            </ul>
+        
+        <div class="game-info">
+            <p><strong>Boss Battle:</strong> Fokusera eld på specifika komponenter för att låsa upp nästa fas.</p>
+            <p><strong>Power-ups:</strong> Samla uppgraderingar för att överleva!</p>
+        </div>
+
+        <button onclick="closeInstructions()">OK</button>
+    </div>
+</div>
+

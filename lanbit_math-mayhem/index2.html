@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+    <meta charset="UTF-8">
+    <title>Station 24 - Math Mayhem ULTRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
+<script>
+// --- KAMEK BROWSER PURGE: ANTI-FOSSIL PROTOKOLL (ES5) ---
+(function() {
+    var ua = navigator.userAgent.toLowerCase();
+    var reason = "";
+    var mockery = "";
+
+    // 1. INTERNET EXPLORER (Alla versioner)
+    var isIE = !!document.documentMode || ua.indexOf("msie") > -1 || ua.indexOf("trident") > -1;
+    
+    // 2. GAMLA MS EDGE (EdgeHTML - versioner innan Chromium-bytet)
+    // Gamla Edge har "edge/", nya har "edg/"
+    var isOldEdge = ua.indexOf("edge/") > -1;
+
+    // 3. GAMLA SAFARI (Versioner äldre än 16.0)
+    var isSafari = ua.indexOf("safari") > -1 && ua.indexOf("chrome") === -1;
+    var isOldSafari = false;
+    if (isSafari) {
+        var safariVerMatch = ua.match(/version\/(\d+)/);
+        if (safariVerMatch && parseInt(safariVerMatch[1]) < 16) {
+            isOldSafari = true;
+        }
+    }
+
+    // --- LOGIK FÖR VAL AV HÅN ---
+    if (isIE) {
+        reason = "INTERNET_EXPLORER_ARKIVERAD";
+        mockery = "Internet Explorer? Museet ringde och vill ha tillbaka sin programvara! Operatör PSL631 kan praktiskt taget höra ditt 56k-modem skrika av smärta. Uppgradera eller försvinn, din mänskliga fossil!";
+    } 
+    else if (isOldEdge) {
+        reason = "LEGACY_EDGE_SKROTAD";
+        mockery = "Kör du gamla Edge? Den där webbläsaren dog snabbare än en Goomba under en känga! Installera en webbläsare med en riktig motor (Chromium) innan Kamek förvandlar din dator till ett askfat.";
+    } 
+    else if (isOldSafari) {
+        reason = "STENÅLDERS_SAFARI_UPPTÄCKT";
+        mockery = "Din Safari-version är så gammal att den fortfarande tror att Steve Jobs är vid liv. Safari 16+ krävs för att ens nudda Station 24-protokollet. Din frukt har ruttnat - hämta en ny!";
+    }
+
+    // --- EXECUTE LOCKDOWN OM FOSSIL HITTAS ---
+    if (reason !== "") {
+        var h = "";
+        h += '<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#2e0000;color:#fff;z-index:30000000;display:block;text-align:center;padding:40px;font-family:Arial, sans-serif;border:15px double #ff0000;box-sizing:border-box; overflow-y:auto;">';
+        h += '<img src="kamek.jfif" style="width:180px;border-radius:30px;border:5px solid #ffcc00;margin-bottom:20px;filter:drop-shadow(0 0 15px #ff0000);">';
+        h += '<h1 style="font-size:42px;color:#ff0000;margin:10px 0;font-weight:900;text-transform:uppercase;letter-spacing:-2px;">[ MJUKVARU-FOSSIL DETEKTERAD ]</h1>';
+        h += '<div style="background:#ff0000;display:inline-block;padding:10px 30px;border-radius:15px;font-weight:bold;margin-bottom:30px;font-size:20px;box-shadow:0 0 20px rgba(255,0,0,0.5);">STATUS: ÅTKOMST NEKAD</div>';
+        h += '<div style="background:rgba(0,0,0,0.4);padding:40px;border-radius:30px;max-width:800px;margin:0 auto;border:2px solid #ffcc00;">';
+        h += '<p style="font-size:26px;color:#ffcc00;margin-bottom:20px;font-weight:bold;">Kamek hånar din antika mjukvara:</p>';
+        h += '<p style="font-size:32px;line-height:1.4;font-style:italic;color:#fff;">"' + mockery + '"</p>';
+        h += '<hr style="border:0;border-top:3px dashed #ff0000;margin:30px 0;">';
+        h += '<p style="font-size:22px;text-align:left;"><span style="color:#ff0000;font-weight:bold;">SYSTEM_ERROR:</span> <span style="font-family:monospace;background:#111;padding:4px 10px;border:1px solid #444;">' + reason + '</span></p>';
+        h += '</div>';
+        h += '<p style="margin-top:50px;opacity:0.5;font-size:16px;letter-spacing:2px;font-weight:bold;">OPERATOR PSL631 // BROWSER_INTEGRITY_CHECK_FAILED // SEKTOR_24</p>';
+        h += '</div>';
+
+        document.write(h);
+        if (window.stop) window.stop();
+        document.execCommand("Stop");
+        throw new Error("Lockdown: Outdated browser engine.");
+    }
+})();
+
+// --- KAMEK ULTRA-SENSITIVE HARDWARE PURGE (ES5) ---
+(function() {
+    var ua = navigator.userAgent.toLowerCase();
+    var platform = navigator.platform.toLowerCase();
+    var isMobile = /iphone|ipod|android|blackberry|iemobile/i.test(ua);
+    var isTablet = /ipad|playbook|silk/i.test(ua) || (navigator.maxTouchPoints > 0 && ua.indexOf("macintosh") > -1);
+    
+    var reason = "";
+    var mockery = "";
+
+    // 1. BILAR (Tesla, etc.)
+    if (ua.indexOf("tesla") > -1 || ua.indexOf("carbrowser") > -1) {
+        reason = "RULLANDE_TRAFIKFARA_DETEKTERAD";
+        mockery = "SLÅ AV MOTORN! Din Tesla är inte en matte-stuga. Händerna på ratten innan du krockar in i stordatormatrisen! Operatör PSL631 stöder inte rullande hårdvara.";
+    }
+    // 2. SMART-TV (Tizen, WebOS, GoogleTV)
+    else if (ua.indexOf("smarttv") > -1 || ua.indexOf("tizen") > -1 || ua.indexOf("web0s") > -1 || ua.indexOf("googletv") > -1 || ua.indexOf("appletv") > -1) {
+        reason = "SOFFPOTATIS_ANOMALI";
+        mockery = "Soffan är inte en godkänd kommandocentral! Att räkna matte med en fjärrkontroll är som att äta soppa med gaffel. Gå upp ur soffan och hämta en riktig terminal!";
+    }
+    // 3. SPELKONSOLER
+    else if (ua.indexOf("playstation") > -1 || ua.indexOf("xbox") > -1 || ua.indexOf("nintendo") > -1) {
+        reason = "KONSOL_BONDE_I_SEKTORN";
+        mockery = "Gå tillbaka till din handkontroll och din auto-aim, din lilla konsol-bonde! Station 24 kräver mekanisk precision, inte knappar gjorda för småbarn.";
+    }
+    // 4. macOS ÄLDRE ÄN SEQUOIA (15.0)
+    else if (ua.indexOf("mac os x") > -1 && !isTablet) {
+        var macVerMatch = ua.match(/mac os x (\d+)[_.](\d+)/);
+        if (macVerMatch) {
+            var major = parseInt(macVerMatch[1]);
+            if (major < 15) {
+                reason = "RUTTEN_FRUKT_FOSSIL";
+                mockery = "macOS " + major + "? Din Mac är så gammal att den borde kolsyras! Sequoia (15.0) är minimum för att exekvera dessa algoritmer. Uppdatera eller bli raderad!";
+            }
+        }
+    }
+    // 5. WINDOWS-FOSSILER
+    else if (ua.indexOf("windows nt") > -1) {
+        var winVer = parseFloat(ua.split("windows nt ")[1]);
+        if (winVer < 10.0) {
+            reason = "WINDOWS_FRÅN_KRITAPERIODEN";
+            mockery = "Windows " + (winVer < 6.2 ? "7" : "8") + "? Jag kan praktiskt taget höra ditt 56k-modem skrika av smärta. Din dator hör hemma på ett museum, inte i Station 24!";
+        }
+    }
+    // 6. CHROME OS (Även nyaste)
+    else if (ua.indexOf("cros") > -1) {
+        reason = "GLORIFIERAD_WEBBLÄSARE";
+        mockery = "En Chromebook? Det är som att försöka vinna ett Formel 1-lopp med en trampbil. Kamek accepterar endast riktiga operativsystem!";
+    }
+    // 7. PADDOR (TABLETS)
+    else if (isTablet) {
+        reason = "KLADDIGA_FINGRAR_PÅ_GLASET";
+        mockery = "Sluta kladda på skärmen! En padda är en leksak för barn som vill se på tecknat. Station 24 Protocol kräver en riktig mus!";
+    }
+    // 8. MOBILER
+    else if (isMobile) {
+        reason = "MOBIL_TERMINAL_UPPTÄCKT";
+        mockery = "Din skärm är för liten för den här nivån av intelligens. Math Mayhem är inte ett mobilspel för Goombas!";
+    }
+
+    // --- EXECUTE LOCKDOWN ---
+    if (reason !== "") {
+        var h = "";
+        h += '<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#140028;color:#fff;z-index:20000000;display:block;text-align:center;padding:40px;font-family:Arial, sans-serif;border:12px solid #ff0000;box-sizing:border-box; overflow-y:auto;">';
+        h += '<img src="kamek.jfif" style="width:160px;border-radius:25px;border:5px solid #ffcc00;margin-bottom:20px;box-shadow:0 0 20px #ff0000;">';
+        h += '<h1 style="font-size:38px;color:#ff0000;margin:10px 0;font-weight:900;text-transform:uppercase;">[ HÅRDVARU-RENSNING AKTIV ]</h1>';
+        h += '<div style="background:#ff0000;display:inline-block;padding:8px 25px;border-radius:12px;font-weight:bold;margin-bottom:25px;letter-spacing:2px;">STATUS: TERMINERAD</div>';
+        h += '<div style="background:rgba(255,255,255,0.05);padding:35px;border-radius:25px;max-width:750px;margin:0 auto;border:3px dashed #ff0000;">';
+        h += '<p style="font-size:24px;color:#ffcc00;margin-bottom:15px;font-weight:bold;">Kamek hånar din usla utrustning:</p>';
+        h += '<p style="font-size:30px;line-height:1.5;font-style:italic;color:#fff;">"' + mockery + '"</p>';
+        h += '<hr style="border:0;border-top:2px solid #ff0000;margin:25px 0;">';
+        h += '<p style="font-size:20px;text-align:left;"><span style="color:#ff0000;font-weight:bold;">FELKOD:</span> <span style="font-family:monospace;background:#333;padding:2px 8px;">' + reason + '</span></p>';
+        h += '</div>';
+        h += '<p style="margin-top:50px;opacity:0.4;font-size:14px;letter-spacing:1px;">OPERATOR PSL631 // HARDWARE_INTEGRITY_CHECK_FAILED // STATION_24</p>';
+        h += '</div>';
+
+        document.write(h);
+        if (window.stop) window.stop();
+        document.execCommand("Stop");
+        throw new Error("Lockdown: Hardware violation.");
+    }
+})();
+</script>
+    <style>
+        html, body {
+            margin: 0; padding: 0; min-height: 100vh;
+            background-image: url('lanbit_bg.jfif'); background-size: cover;
+            background-position: center; background-attachment: fixed;
+            font-family: 'Luckiest Guy', cursive; color: white;
+            display: flex; flex-direction: column; align-items: center;
+            overflow-y: auto; /* Tillåter rullning nedåt endast om det behövs */
+    overflow-x: hidden; /* Förhindrar rullning i sidled helt */; transition: background-color 0.2s;
+        }
+        /* --- HOW TO PLAY: STATION 24 EDITION --- */
+.modal { 
+    display: none; position: fixed; z-index: 100001; 
+    left: 0; top: 0; width: 100%; height: 100%; 
+    background-color: rgba(0,0,0,0.95); 
+}
+.modal-content { 
+    background-color: #140028; color: #eee; margin: 2% auto; 
+    padding: 40px; border: 6px solid #ffcc00; width: 90%; 
+    max-width: 800px; border-radius: 30px; font-family: Arial, sans-serif; 
+    line-height: 1.5; max-height: 90vh; overflow-y: auto; 
+    box-shadow: 0 0 50px rgba(255, 204, 0, 0.2);
+}
+.modal-content h2 { 
+    font-family: 'Luckiest Guy', cursive; color: #ffcc00; 
+    font-size: 50px; text-align: center; margin-bottom: 20px;
+    -webkit-text-stroke: 1.5px black; 
+}
+.modal-content h3 { 
+    font-family: 'Luckiest Guy', cursive; color: #00ccff; 
+    border-bottom: 2px solid #333; padding-bottom: 5px; margin-top: 25px;
+}
+
+.toxic-toast {
+    background: linear-gradient(to right, #ff0000, #990000);
+    color: white; border: 2px solid gold; font-family: 'Luckiest Guy';
+    padding: 10px; border-radius: 10px; animation: shake 0.5s;
+}
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    50% { transform: translateX(10px); }
+    75% { transform: translateX(-10px); }
+    100% { transform: translateX(0); }
+}
+
+.warning-box { 
+    background: rgba(255, 0, 0, 0.15); border-left: 5px solid #ff0000; 
+    padding: 15px; margin: 15px 0; border-radius: 5px;
+}
+.rule-list { list-style-type: none; padding: 0; }
+.rule-list li { margin-bottom: 10px; padding-left: 25px; position: relative; }
+.rule-list li::before { content: "▶"; position: absolute; left: 0; color: #ffcc00; }
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; align-items: flex-end; pointer-events: none; }
+        @keyframes vibrate { 0% { transform: translate(0); } 20% { transform: translate(-5px, 5px) rotate(-5deg); } 40% { transform: translate(-5px, -5px) rotate(5deg); } 60% { transform: translate(5px, 5px) rotate(-5deg); } 80% { transform: translate(5px, -5px) rotate(5deg); } 100% { transform: translate(0); } }
+        .vibrate-clock { width: 150px; animation: vibrate 0.1s infinite; margin-bottom: 20px; }
+
+#camera-container::after {
+    content: "● REC";
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    color: red;
+    font-family: monospace;
+    font-size: 12px;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+/* Media Setup Panel */
+.media-setup {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    border-radius: 20px;
+    border: 2px solid #ffcc00;
+    margin: 20px 0;
+}
+.media-btn {
+    font-family: 'Luckiest Guy', cursive;
+    padding: 12px 20px;
+    margin: 5px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.media-btn:hover { transform: scale(1.05); }
+
+/* Mic Visualizer i hörnet */
+#mic-visualizer-container {
+    display: none; position: fixed; bottom: 20px; right: 20px; 
+    width: 90px; height: 90px; z-index: 10001; 
+    background: rgba(20, 0, 40, 0.9); border: 2px solid #00ccff; 
+    border-radius: 50%; flex-direction: column; align-items: center; justify-content: center;
+    box-shadow: 0 0 15px #00ccff;
+}
+.bar { width: 4px; background: #00ccff; border-radius: 2px; transition: height 0.05s; }
+
+        @keyframes timerBlink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+        .timer-panic { color: #ff0000 !important; text-shadow: 0 0 20px #ff0000; animation: timerBlink 0.2s infinite; font-size: 40px; }
+        .bg-panic { background-color: #440000 !important; transition: background-color 0.1s; }
+        .toast { background: rgba(0, 0, 0, 0.95); color: white; padding: 15px 25px; border-radius: 15px; margin-bottom: 10px; border: 4px solid #ffcc00; font-size: 22px; box-shadow: 0 5px 15px rgba(0,0,0,0.8); min-width: 250px; text-align: center; animation: toastIn 0.3s forwards; }
+        @keyframes toastIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        #lockdown-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(20, 0, 40, 0.98); z-index: 10000000; display: flex; justify-content: center; align-items: center; font-family: 'Luckiest Guy', cursive; overflow-y: auto; /* Tillåter rullning nedåt endast om det behövs */
+    overflow-x: hidden; /* Förhindrar rullning i sidled helt */}
+        .lockdown-content { background: #000; border: 8px solid #ffcc00; box-shadow: 0 0 70px #ff0000; width: 90%; max-width: 600px; max-height: 85vh; padding: 30px; display: flex; flex-direction: column; align-items: center; text-align: center; border-radius: 30px; }
+        .scroll-box { overflow-y: auto; width: 100%; margin: 15px 0; padding-right: 10px; color: white; font-size: 1.2rem; }
+        .kamek-avatar { width: 130px; border: 4px solid #ffcc00; border-radius: 20px; }
+        .lockdown-title { color: #ff0000; font-size: 2.5rem; -webkit-text-stroke: 1.5px black; margin: 10px 0; }
+        .violation-badge { background: #ff0000; color: #fff; padding: 5px 15px; border-radius: 10px; font-size: 0.8rem; }
+        .reason-container { margin-top: 20px; }
+        .restart-btn { background: #00ff00; color: #000; border: 4px solid black; padding: 15px 40px; font-family: 'Luckiest Guy'; font-size: 1.5rem; cursor: pointer; margin-top: 20px; border-radius: 15px; }
+        .restart-btn:hover { background: #fff; transform: scale(1.05); }
+        .lockdown-footer { margin-top: 20px; opacity: 0.3; font-size: 0.8rem; color: #fff; font-family: Arial; }
+        #alarm-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(139, 0, 0, 0.95); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; }
+        #start-screen, #end-screen, #leaderboard-screen { background: rgba(0, 0, 0, 0.9); padding: 30px; border-radius: 30px; margin: 20px auto; text-align: center; border: 8px solid #ffcc00; max-width: 600px; z-index: 200; }
+        #end-screen, #leaderboard-screen { display: none; }
+        .btn-start { background-color: #00ff00; color: black; cursor: pointer; width: 80%; font-size: 28px; border-radius: 15px; padding: 15px; }
+        #game-container { display: none; width: 95%; max-width: 800px; text-align: center; margin-top: 20px; }
+        #math-card { background: rgba(0, 0, 0, 0.85); padding: 40px; border-radius: 30px; border: 8px solid #00ccff; }
+        #question { font-size: 100px; margin: 10px 0; color: #ffcc00; text-shadow: 5px 5px #000; }
+        .answer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .answer-btn { background: #fff; color: #333; padding: 25px; font-size: 40px; cursor: pointer; border-radius: 20px; font-family: 'Luckiest Guy'; }
+        #snooze-input { font-size: 35px; text-align: center; border: 5px solid #ffcc00; font-family: 'Luckiest Guy'; margin-top: 20px; }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+<div id="toast-container"></div>
+<div id="lockdown-overlay" style="display:none;">
+    <div class="lockdown-content">
+        <img src="kamek.jfif" alt="Kamek" class="kamek-avatar">
+        <h1 class="lockdown-title">FUSK DETEKTERAT!</h1>
+        <div class="violation-badge">TERMINAL_STATUS: LÅST</div>
+        <div class="scroll-box">
+            <p id="lockdown-mockery">Nyehehehe! Tror du att du kan lura Kamek?</p>
+            <div class="reason-container">
+                <span style="font-family: 'Luckiest Guy'; color: #ff0000; font-size: 1.2rem;">DETEKTERAT FEL:</span><br>
+                <p id="lockdown-reason-text" style="font-family: Arial, sans-serif; font-weight: bold; color: #333; background: #eee; padding: 10px; border-radius: 5px; margin-top: 10px;">INGEN_SPECIFIK_ANLEDNING</p>
+            </div>
+        </div>
+        <button onclick="location.reload()" class="restart-btn">STARTA OM</button>
+        <div class="lockdown-footer">ERR_LOG_V4.6 // STATION_24_CORE</div>
+    </div>
+</div>
+
+<div id="start-screen">
+    <h1>MATH MAYHEM ULTRA</h1>
+    <div style="background:rgba(255,0,0,0.2); padding:15px; border-radius:15px; margin-bottom:15px; font-size: 18px;">
+        <strong style="color:#ffcc00;">KAMEK LOCKDOWN:</strong> Flikbyte eller DevTools låser spelet! Spelet går vidare vid både rätt och fel svar.
+    </div>
+    <input type="text" id="player-name" placeholder="DITT NAMN, DIN GOOMBA?" style="font-size:25px; padding:10px; width:80%; text-align:center; border-radius: 10px;">
+    <br>
+    <button class="btn-start" onclick="startGame()">STARTA TURNERING</button>
+    <button style="background:#ffcc00; font-family:'Luckiest Guy'; padding:10px; border-radius:10px; cursor:pointer;" onclick="toggleInstructions(true)">HUR SPELAR JAG?</button> 
+    <button style="background:#00ccff; font-family:'Luckiest Guy'; padding:10px; border-radius:10px; cursor:pointer;" onclick="showLeaderboard()">TOPPLISTA</button>
+<div class="media-setup">
+    <p style="color: #ffcc00; margin-bottom: 10px;">TURNERINGS-MODULER (VALFRITT)</p>
+    <button class="media-btn" style="background:#00ff00;" onclick="requestMediaAccess(true, true)">🎤+📸 AKTIVERA ALLT</button>
+    <button class="media-btn" style="background:#00ccff;" onclick="requestMediaAccess(false, true)">🎤 ENDAST MIC</button>
+</div>
+</div>
+
+<div id="game-container">
+    <div style="font-size: 28px; margin-bottom: 10px;">
+        SPELARE: <span id="display-name"></span> | POÄNG: <span id="display-score">0</span> | TID: <span id="timer">60</span>s
+    </div>
+    <div id="math-card">
+        <div id="question">?</div>
+        <div class="answer-grid" id="answer-options"></div>
+    </div>
+</div>
+
+<div id="alarm-overlay">
+    <img src="clock.jfif" id="alarm-img" class="vibrate-clock">
+    <h1 id="alarm-msg" style="font-size: 70px; margin-bottom:10px; text-align: center;">VAKNA!!!</h1>
+    <div id="alarm-task-area" style="text-align: center;"></div>
+    <button id="main-snooze" onclick="snooze()" style="display:none; background:#ffcc00; font-size:40px; padding:20px 40px; font-family:'Luckiest Guy'; border-radius: 15px; border: 5px solid white; cursor: pointer;">SNOOZE!</button>
+</div>
+
+<div id="leaderboard-screen">
+    <h1>TOPPLISTA - STATION 24</h1>
+    <div id="high-score-content"></div>
+    <button style="background:#ffcc00; font-family:'Luckiest Guy'; padding:15px; border-radius:10px; margin-top: 20px;" onclick="location.reload()">TILLBAKA</button>
+</div>
+
+<div id="end-screen">
+    <h1 id="end-title"></h1>
+    <p id="end-message" style="font-size: 30px;"></p>
+    <button style="background:#ffcc00; font-family:'Luckiest Guy'; font-size:25px; padding:15px; border-radius:10px;" onclick="location.reload()">MENY</button>
+</div>
+
+<div id="instructions-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="toggleInstructions(false)">STÄNG [X]</span>
+        <h2>PROTOKOLL: STATION 24</h2>
+        
+        <div style="text-align: left;">
+            <p style="background: #ffcc00; color: #000; padding: 10px; border-radius: 10px; text-align: center; font-weight: bold; font-family: 'Luckiest Guy';">
+                VÄLKOMMEN OPERATÖR. LÄS NOGA - DITT SYSTEM BEROR PÅ DET.
+            </p>
+
+            <div style="background: rgba(255, 204, 0, 0.1); border: 2px solid #ffcc00; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+        <strong>⚠️ SENSORISK VARNING:</strong> Hög auditiv stress. Innehåller skarpa varningssignaler och loopande larm som ökar i volym tills ekvationen är löst.
+    </div>
+    <ul style="text-align: left; line-height: 1.4;">
+        <li><strong>Mål:</strong> Lös så många ekvationer som möjligt innan tiden tar slut.</li>
+        <li><strong>Stressfaktor:</strong> Fel svar eller tvekan triggar högljudda "Snooze"-larm.</li>
+        <li><strong>Vinstkriterium:</strong> Högst poäng (Antal lösta ekvationer är tiebreaker).</li>
+    </ul>
+    <p style="font-style: italic; color: #ffcc00;">"Nyehehehe! Kan du räkna medan jag skriker i dina öron?"</p>
+
+            <h3>🧠 MATEMATISK ELITTRÄNING</h3>
+            <ul class="rule-list">
+                <li><b>Rätt svar:</b> Ger 150+ poäng och +2 sekunder extra tid.</li>
+                <li><b>Fel svar:</b> Drar av 5 sekunder och triggar ett hånfullt systemmeddelande från Kamek.</li>
+                <li><b>Bonus:</b> Ju högre poäng, desto svårare blir talen (multiplikation, division och kvadratrötter låses upp).</li>
+            </ul>
+
+            <h3>🎥 DELTAGAR-KAMERA (FRIVILLIGT)</h3>
+            <p>Inför YouTube-inspelningen väljer du själv din sekretessnivå:</p>
+            <ul class="rule-list">
+                <li><b>KAMERA PÅ:</b> Du medverkar med bild i sändningen. Le mot Kamek!</li>
+                <li><b>KAMERA AV:</b> Helt frivilligt. En <b>'CLASSIFIED'</b>-overlay täcker ditt flöde för att skydda din identitet.</li>
+            </ul>
+
+            <h3>🚨 ALARMSYSTEMET (SNOOZE-MODULER)</h3>
+            <p>När larmet går pausas spelet. Du MÅSTE utföra en uppgift för att fortsätta:</p>
+            <ul class="rule-list">
+                <li><b>KASTA UT KLOCKAN:</b> Klicka och DRA klockikonen helt utanför skärmkanten!</li>
+                <li><b>JAGA PRICKEN:</b> Klicka på de rörliga gula cirklarna innan de försvinner.</li>
+                <li><b>STAVA:</b> Skriv in det hemliga lösenordet (t.ex. KAMEK) exakt.</li>
+                <li><b>SPAMMA Q:</b> Tryck snabbt på Q-tangenten 10 gånger.</li>
+                <li><b>HÅLL KEY:</b> Håll nere en specifik tangent (A, S, D eller F) i 2 sekunder.</li>
+            </ul>
+
+            <h3>🔒 KAMEK LOCKDOWN (DIREKT UTKASTNING)</h3>
+            <div class="warning-box">
+                <p style="color: #ff0000; font-weight: bold; margin-top: 0;">Följande handlingar låser terminalen omedelbart:</p>
+                <ul class="rule-list">
+                    <li><b>Fusk-tangenter:</b> ESC (Paus), F12 (DevTools), Ctrl+U eller Högerklick.</li>
+                    <li><b>Flikbyte:</b> Om du lämnar fönstret eller byter flik förlorar du direkt.</li>
+                    <li><b>Styrplatta:</b> Endast fysisk mus är tillåten. Sidledsrullning eller "zoom" på pekplatta detekteras!</li>
+                    <li><b>Tids-manipulering:</b> Systemet känner av om du försöker använda "Speedhacks".</li>
+                </ul>
+            </div>
+
+            <h3>📡 SENSORY & SYSTEMVARNINGAR (TOASTS)</h3>
+            <p>Håll koll på meddelandena i övre högra hörnet:</p>
+            <ul class="rule-list">
+                <li><b>🪫 Batteri:</b> Varning vid 30%. Vid <20% nekas spel utan laddare.</li>
+                <li><b>🚀 Prestanda:</b> Om din FPS sjunker under 15 i 5 sekunder ("Potatis-dator") låses spelet.</li>
+                <li><b>🌐 Nätverk:</b> Varning vid offline-läge eller extremt långsam anslutning.</li>
+                <li><b>💾 Lagring:</b> Varning om din disk är full eller om Cookies är avstängda.</li>
+            </ul>
+
+            <h3>💻 HÅRDVARUKRAV</h3>
+            <p>Station 24 accepterar endast Elit-PC. Följande enheter hånar Kamek och blockerar direkt:</p>
+            <ul class="rule-list">
+                <li><b>Apple:</b> Kräver macOS Sequoia (15.0) eller nyare.</li>
+                <li><b>Windows:</b> Kräver version 10 eller 11.</li>
+                <li><b>Blockerade:</b> Mobiler, Paddor, Spelkonsoler, Smart-TV och Bilar (Tesla).</li>
+            </ul>
+        </div>
+
+        <button onclick="toggleInstructions(false)" style="background:#00ff00; color: black; padding: 20px; font-family:'Luckiest Guy'; border-radius:20px; cursor:pointer; margin-top: 30px; border: 5px solid black; font-size: 30px; width: 100%;">FÖRSTÅTT. STARTA SYSTEMET!</button>
+    </div>
+</div>
+<div id="mic-visualizer-container" style="display: none; position: fixed; bottom: 20px; right: 20px; width: 100px; height: 100px; z-index: 10001; background: rgba(0,0,0,0.6); border: 2px solid #00ccff; border-radius: 15px; padding: 10px; flex-direction: column; align-items: center; justify-content: center;">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#00ccff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+        <line x1="12" y1="19" x2="12" y2="23"></line>
+        <line x1="8" y1="23" x2="16" y2="23"></line>
+    </svg>
+    
+    <div id="mic-bars" style="display: flex; align-items: flex-end; gap: 3px; height: 30px; margin-top: 10px;">
+        <div class="bar" style="width: 4px; height: 5px; background: #00ccff; transition: height 0.05s;"></div>
+        <div class="bar" style="width: 4px; height: 5px; background: #00ccff; transition: height 0.05s;"></div>
+        <div class="bar" style="width: 4px; height: 5px; background: #00ccff; transition: height 0.05s;"></div>
+        <div class="bar" style="width: 4px; height: 5px; background: #00ccff; transition: height 0.05s;"></div>
+        <div class="bar" style="width: 4px; height: 5px; background: #00ccff; transition: height 0.05s;"></div>
+    </div>
+</div>
+
+<div id="mic-visualizer-container">
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#00ccff" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+    <div id="mic-bars" style="display:flex; align-items:flex-end; gap:2px; height:20px; margin-top:5px;">
+        <div class="bar" style="height:3px;"></div><div class="bar" style="height:3px;"></div><div class="bar" style="height:3px;"></div><div class="bar" style="height:3px;"></div>
+    </div>
+</div>
+<div id="camera-container" style="position: fixed; bottom: 20px; left: 20px; width: 200px; height: 150px; border: 4px solid #ffcc00; z-index: 500; background: #000;">
+    <video id="webcam-feed" autoplay playsinline muted style="position:fixed; bottom:20px; left:20px; width:150px; border:2px solid #ffcc00; border-radius:10px; display:none; z-index:10001;"></video>
+    
+    <div id="camera-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #140028; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border: 2px solid #ff0000;">
+        <img src="kamek.jfif" style="width: 60px; opacity: 0.7; margin-bottom: 5px;">
+        <p style="font-family: Arial; font-size: 12px; color: #ff0000; font-weight: bold; margin: 0;">CLASSIFIED<br>OPERATOR</p>
+    </div>
+</div>
+
+
+<script>
+    let score = 0, timeLeft = 60, currentAnswer = 0, gameActive = false, alarmActive = false, currentPlayer = "";
+    let timerInterval, currentAlarmAudio, blurTimeout, alarmTaskInterval;
+    let qSpamCount = 0, holdStartTime = 0, targetHoldKey = "", snoozeMode = "";
+
+    const HAN_LISTA = ["MEN HERREGUD, KAN DU INTE RÄKNA?", "KAMEK SKRATTAR ÅT DIN DUMHET!", "MIN MORMOR ÄR SNABBARE ÄN DIG!", "SÄMRE ÄN EN GOOMBA!"];
+
+    function showToast(text, color) {
+        const container = document.getElementById('toast-container');
+        const t = document.createElement('div');
+        t.className = 'toast'; t.style.borderColor = color; t.innerText = text;
+        container.appendChild(t);
+        setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 500); }, 3000);
+    }
+
+    function saveHighScore(name, finalScore) {
+        let scores = JSON.parse(localStorage.getItem('math_mayhem_scores')) || [];
+        scores.push({ name: name, score: finalScore });
+        scores.sort((a, b) => b.score - a.score);
+        localStorage.setItem('math_mayhem_scores', JSON.stringify(scores.slice(0, 10)));
+    }
+
+    function toggleInstructions(show) { document.getElementById('instructions-modal').style.display = show ? 'block' : 'none'; }
+    window.onclick = (e) => { if (e.target == document.getElementById('instructions-modal')) toggleInstructions(false); };
+
+    function showLeaderboard() {
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('leaderboard-screen').style.display = 'block';
+        const scores = JSON.parse(localStorage.getItem('math_mayhem_scores')) || [];
+        document.getElementById('high-score-content').innerHTML = scores.map((s, i) => `<div style="font-size:24px; margin: 10px 0;">${i+1}. ${s.name} - ${s.score} PT</div>`).join('');
+    }
+
+// --- STATION 24 MEDIA ENGINE ---
+var audioCtx, analyser, dataArray, micStream;
+var badWordCount = 0;
+var forbiddenWords = ["fan", "jävla", "skit", "helvete", "idiot", "pucko", "mupp"];
+
+async function requestMediaAccess(useVideo, useAudio) {
+    var constraints = { 
+        video: useVideo ? { width: 640, height: 480 } : false, 
+        audio: useAudio 
+    };
+
+    try {
+        // Försök hämta strömmen
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        showToast("✅ SYSTEMET ONLINE", "#00ff00");
+
+        if (useAudio) {
+            setupMicVisualizer(stream);
+            setupVoiceWatcher();
+        }
+        
+        if (useVideo) {
+            var videoEl = document.getElementById('webcam-feed');
+            if (videoEl) {
+                videoEl.srcObject = stream;
+                videoEl.style.display = 'block';
+                // Starta ansiktsvakt i bakgrunden utan att blockera
+                setupFaceWatcher(videoEl).catch(e => console.log("Face-API delay:", e));
+            }
+        }
+    } catch (err) {
+        // HÄR FÅR VI SVARET PÅ VARFÖR DET NEKAS
+        console.error("Media Error Detail:", err.name);
+        
+        if (err.name === "NotAllowedError") {
+            showToast("❌ NEKAD: DU KLICKADE NEJ ELLER HAR BLOCKERAT I INSTÄLLNINGAR", "red");
+        } else if (err.name === "NotFoundError") {
+            showToast("❌ FEL: HITTAR INGEN KAMERA/MIKROFON", "orange");
+        } else if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+            showToast("❌ SÄKERHETSFEL: HTTPS KRÄVS FÖR MEDIA!", "red");
+        } else {
+            showToast("❌ MEDIA-FEL: " + err.name, "red");
+        }
+    }
+}
+// 1. LJUD-VISUALISERING (STRECKEN)
+function setupMicVisualizer(stream) {
+    var container = document.getElementById('mic-visualizer-container');
+    if (container) container.style.display = 'flex';
+
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    var source = audioCtx.createMediaStreamSource(stream);
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 32;
+    source.connect(analyser);
+    
+    var bufferLength = analyser.frequencyBinCount;
+    dataArray = new Uint8Array(bufferLength);
+
+    function update() {
+        if (!analyser) return;
+        analyser.getByteFrequencyData(dataArray);
+        var bars = document.querySelectorAll('.bar');
+        
+        for (var i = 0; i < bars.length; i++) {
+            var val = dataArray[i];
+            var h = Math.max(3, (val / 255) * 25); // Skala höjd
+            bars[i].style.height = h + "px";
+            // Bli röd vid högt ljud
+            bars[i].style.background = val > 200 ? "#ff0000" : "#00ccff";
+        }
+        requestAnimationFrame(update);
+    }
+    update();
+}
+
+// 2. SVORDOMSFILTER (SPEECH RECOGNITION)
+function setupVoiceWatcher() {
+    var Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!Speech) return;
+
+    var rec = new Speech();
+    rec.continuous = true;
+    rec.lang = 'sv-SE';
+    rec.interimResults = false;
+
+    rec.onresult = function(e) {
+        var text = e.results[e.results.length - 1][0].transcript.toLowerCase();
+        console.log("Kamek hörde:", text);
+
+        var found = forbiddenWords.some(function(w) { return text.indexOf(w) !== -1; });
+
+        if (found && gameActive) {
+            badWordCount++;
+            if (badWordCount >= 3) {
+                triggerKamek("VÅRDSLÖST_SPRÅKBRUK", "Tvätta munnen med tvål! Station 24 kräver en operatör med klass. Nyehehehe!");
+                rec.stop();
+            } else {
+                showToast("🙊 VAKTA DITT SPRÅK! (" + badWordCount + "/3)", "red");
+            }
+        }
+    };
+
+    rec.onerror = function(e) { console.log("Mic Error:", e.error); };
+    rec.start();
+}
+
+// 3. AFK-VAKT (FACE DETECTION)
+async function setupFaceWatcher(video) {
+    if (typeof faceapi === 'undefined') {
+        console.log("Face-API saknas.");
+        return;
+    }
+
+    // Laddar modellen från CDN
+    await faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/');
+    
+    var absenceTicks = 0;
+    var faceInterval = setInterval(async function() {
+        if (!gameActive) return;
+
+        var detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
+        
+        if (detections.length === 0) {
+            absenceTicks++;
+            if (absenceTicks === 5) showToast("⚠️ VARNING: OPERATÖR EJ DETEKTERAD!", "orange");
+            if (absenceTicks >= 12) { // Ca 12 sekunder utan ansikte
+                triggerKamek("OPERATÖR_SAKNAS", "En operatör lämnar aldrig sin post! Terminalen låst för din säkerhet.");
+                clearInterval(faceInterval);
+            }
+        } else {
+            absenceTicks = 0;
+        }
+    }, 1000);
+}
+
+    /* --- TOTAL KAMEK LOCKDOWN --- */
+    (function() {
+        var ua = navigator.userAgent.toLowerCase();
+        var isIE = !!document.documentMode;
+        var isMobile = /iphone|android|blackberry|iemobile/i.test(ua);
+        var isTablet = /ipad|playbook|silk/i.test(ua) || (navigator.maxTouchPoints > 0 && /macintosh/.test(ua));
+        var isCar = /tesla|carbrowser/i.test(ua);
+        var isTV = /smarttv|tizen|web0s|roku/i.test(ua);
+        var isConsole = /playstation|nintendo|xbox/i.test(ua);
+
+        window.triggerKamek = function(reason, mockery) {
+            if (!gameActive) return;
+            gameActive = false; clearInterval(timerInterval);
+            if (currentAlarmAudio) currentAlarmAudio.pause();
+            document.getElementById('lockdown-overlay').style.display = 'flex';
+            document.getElementById('lockdown-reason-text').innerText = reason;
+            document.getElementById('lockdown-mockery').innerText = mockery;
+            new Audio('kamek.mp3').play().catch(()=>{});
+            window.stop();
+        };
+
+        document.addEventListener("DOMContentLoaded", function() {
+            if (isIE) triggerKamek("INTERNET_EXPLORER_DETEKTERAD", "Internet Explorer? Museet ringde och vill ha tillbaka sin programvara. Byt till en riktig dator!");
+            else if (isCar) triggerKamek("FORDONSTERMINAL_DETEKTERAD", "Parkera bilen innan du krockar terminalen. PSL631 stöder inte rullande hårdvara.");
+            else if (isTV) triggerKamek("SMART_TV_DETEKTERAD", "Soffan är inte en godkänd kommandocentral. En TV är till för att se på film, inte för seriöst arbete.");
+            else if (isConsole) triggerKamek("KONSOL_DETEKTERAD", "Gå tillbaka till din aim-assist, konsol-bonde. Station 24 körs endast på 'Master Race'-hårdvara.");
+            else if (isTablet) triggerKamek("PADDA_DETEKTERAD", "Kladdiga fingrar på glaset är inte professionellt. En Padda är inte en dator.");
+            else if (isMobile) triggerKamek("MOBIL_DETEKTERAD", "Sitter du på toaletten? Din skärm är för liten för denna intelligensnivå. Station 24 är inte ett mobilspel.");
+        });
+
+        window.addEventListener('blur', () => { if (gameActive) triggerKamek("FLIKBYTE_ELLER_FOKUSFÖRLUST", "Du försökte lämna fönstret! Google kan inte hjälpa dig här."); });
+        window.addEventListener('keydown', (e) => {
+            const isF12 = e.key === "F12", isSource = (e.ctrlKey && e.key.toLowerCase() === 'u'), isInspect = (e.ctrlKey && e.shiftKey && "IJC".includes(e.key.toUpperCase())), isEsc = e.key === "Escape";
+            if ((isF12 || isSource || isInspect || isEsc) && gameActive) {
+                e.preventDefault();
+                const reason = isEsc ? "PAUS_FÖRSÖK_STÖDS_EJ" : "UTVECKLARVERKTYG_DETEKTERADE";
+                const mock = isEsc ? "Det finns ingen paus i Station 24! Kamek ser dina desperata försök!" : "Försöker du hacka källkoden? Din lilla hacker-goomba!";
+                triggerKamek(reason, mock);
+            }
+            if (alarmActive) {
+                if (snoozeMode === "Q_SPAM" && e.key.toLowerCase() === 'q') { qSpamCount++; document.getElementById('alarm-msg').innerText = "SPAMMA Q: " + (10 - qSpamCount); if (qSpamCount >= 10) snooze(); }
+                if (snoozeMode === "HOLD_KEY" && e.key.toUpperCase() === targetHoldKey && holdStartTime === 0) holdStartTime = Date.now();
+            }
+        });
+        window.addEventListener('keyup', (e) => { if (alarmActive && snoozeMode === "HOLD_KEY" && e.key.toUpperCase() === targetHoldKey) holdStartTime = 0; });
+    })();
+
+// --- SMART KAMEK WHEEL-SENSOR V2 ---
+window.addEventListener('wheel', function(e) {
+    if (!gameActive) return;
+
+    // Vi kollar efter horisontell rullning (deltaX). 
+    // En vanlig mus rullar bara vertikalt. En pekplatta rullar nästan alltid lite i sidled också.
+    var isTrackpad = Math.abs(e.deltaX) > 0;
+    
+    // Vi kollar även efter "Pinch-to-zoom" (Ctrl + Wheel) som är unikt för pekplattor
+    var isPinch = e.ctrlKey;
+
+    if (isPinch) {
+        e.preventDefault();
+        triggerKamek("ZOOM_FÖRSÖK", "Nyehehe! Försöker du zooma in på mina hemligheter? Använd glasögon istället!");
+    } 
+    else if (isTrackpad && Math.abs(e.deltaX) > 5) {
+        // Vi tillåter ett litet spelrum (5) för att undvika felskott från känsliga möss
+        triggerKamek("STYRPLATTA_DETEKTERAD", "Kameks sensorer känner av ett sidleds-svep! Station 24 kräver en hederlig gammal mus med rullhjul.");
+    }
+}, { passive: false });
+
+    function startGame() {
+        currentPlayer = document.getElementById('player-name').value.trim() || "Gäst";
+        document.getElementById('display-name').innerText = currentPlayer.toUpperCase();
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('game-container').style.display = 'block';
+        gameActive = true; score = 0; timeLeft = 60;
+        startTimer(); generateQuestion();
+    }
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            if (!alarmActive && gameActive) {
+                timeLeft--;
+                const tEl = document.getElementById('timer'); tEl.innerText = timeLeft;
+                if (timeLeft <= 10 && timeLeft > 0) { tEl.classList.add('timer-panic'); if (timeLeft % 2 === 0) document.body.classList.add('bg-panic'); else document.body.classList.remove('bg-panic'); }
+                else { tEl.classList.remove('timer-panic'); document.body.classList.remove('bg-panic'); }
+                if (Math.random() < (0.08 + score/40000) && timeLeft > 10) triggerAlarm();
+                if (timeLeft <= 0) endGame("TIDEN SLUT!");
+            }
+        }, 1000);
+    }
+
+    function generateQuestion() {
+        let diff = Math.floor(score / 2000), ops = ['+', '-', '*'];
+        if (score > 2000) ops.push('/');
+        if (score > 4000) ops.push('%');
+        if (score > 6000) ops.push('^', 'sqrt');
+        const op = ops[Math.floor(Math.random() * ops.length)];
+        let n1, n2;
+        if (op === '/') { n2 = Math.floor(Math.random()*9)+2; currentAnswer = Math.floor(Math.random()*10)+1; n1 = currentAnswer * n2; document.getElementById('question').innerText = n1 + " / " + n2; }
+        else if (op === '%') { let p = [10, 20, 25, 50, 75]; n2 = p[Math.floor(Math.random()*p.length)]; n1 = (Math.floor(Math.random()*10)+1)*20; currentAnswer = (n2/100)*n1; document.getElementById('question').innerText = n2 + "% AV " + n1; }
+        else if (op === '^') { n1 = Math.floor(Math.random()*10)+2; currentAnswer = Math.pow(n1, 2); document.getElementById('question').innerText = n1 + "²"; }
+        else if (op === 'sqrt') { currentAnswer = Math.floor(Math.random()*11)+2; n1 = currentAnswer*currentAnswer; document.getElementById('question').innerText = "√" + n1; }
+        else if (op === '*') { n1 = Math.floor(Math.random()*(10+diff))+2; n2 = Math.floor(Math.random()*(10+diff))+2; currentAnswer = n1*n2; document.getElementById('question').innerText = n1 + " × " + n2; }
+        else if (op === '-') { n1 = Math.floor(Math.random()*(50+diff))+20; n2 = Math.floor(Math.random()*19)+2; currentAnswer = n1-n2; document.getElementById('question').innerText = n1 + " - " + n2; }
+        else { n1 = Math.floor(Math.random()*(50+diff))+2; n2 = Math.floor(Math.random()*(50+diff))+2; currentAnswer = n1+n2; document.getElementById('question').innerText = n1 + " + " + n2; }
+        setupOptions(currentAnswer);
+    }
+
+    function setupOptions(correct) {
+        let opts = [correct];
+        while(opts.length < 4) { let a = correct + (Math.floor(Math.random()*16)-8); if(a > 0 && !opts.includes(a)) opts.push(a); }
+        opts.sort(() => Math.random()-0.5);
+        const grid = document.getElementById('answer-options'); grid.innerHTML = '';
+        opts.forEach(o => {
+            const b = document.createElement('button'); b.className = 'answer-btn'; b.innerText = o;
+            b.onclick = () => {
+                if (o === correct) { score += 150 + (Math.floor(score/1000)*10); timeLeft += 2; new Audio('pling.mp3').play().catch(()=>{}); }
+                else { new Audio('kamek.mp3').play().catch(()=>{}); showToast(HAN_LISTA[Math.floor(Math.random()*HAN_LISTA.length)], "purple"); timeLeft -= 5; }
+                document.getElementById('display-score').innerText = score;
+                generateQuestion();
+            };
+            grid.appendChild(b);
+        });
+        if (Math.random() < 0.20) { setTimeout(() => { const btns = Array.from(grid.children).sort(() => Math.random()-0.5); grid.innerHTML = ''; btns.forEach(btn => grid.appendChild(btn)); new Audio('kamek_laugh.mp3').play().catch(()=>{}); }, 1500); }
+    }
+
+    function triggerAlarm() {
+    alarmActive = true; 
+    const overlay = document.getElementById('alarm-overlay'), 
+          taskArea = document.getElementById('alarm-task-area'), 
+          mainBtn = document.getElementById('main-snooze'),
+          alarmImg = document.getElementById('alarm-img');
+
+    overlay.style.display = 'flex'; 
+    taskArea.innerHTML = ''; 
+    
+    // --- MODIFIERING: Nollställ knappen och klockan varje gång ---
+    mainBtn.style.display = 'none'; 
+    mainBtn.onclick = snooze; // Återställ till vanlig snooze
+    alarmImg.style.transform = "translate(0, 0)";
+    alarmImg.style.cursor = "default";
+    alarmImg.onmousedown = null; 
+
+    // Lägg till DRAG_AWAY i listan
+    let modes = ["SIMPLE", "DOT", "WORD", "MULTI_CLICK", "HOLD_KEY", "Q_SPAM", "DRAG_AWAY"]; 
+    snoozeMode = modes[Math.floor(Math.random() * modes.length)];
+
+    if (snoozeMode === "SIMPLE") { 
+        document.getElementById('alarm-msg').innerText = "VAKNA!!!"; 
+        mainBtn.style.display = 'block'; // Visa knappen för vanliga larm
+    } 
+    else if (snoozeMode === "MULTI_CLICK") { 
+        let c = 6 + Math.floor(score/5000); 
+        document.getElementById('alarm-msg').innerText = "KLICKA " + c + " GÅNGER!"; 
+        mainBtn.style.display = 'block'; 
+        mainBtn.onclick = () => { c--; document.getElementById('alarm-msg').innerText = "KLICKA " + c + " GÅNGER!"; if(c<=0) snooze(); }; 
+    }
+    else if (snoozeMode === "DRAG_AWAY") {
+        document.getElementById('alarm-msg').innerText = "KASTA UT KLOCKAN!";
+        initDragSnooze(alarmImg); // Aktivera drag-funktionen
+    }
+    else if (snoozeMode === "DOT") {
+        let dots = 1 + Math.floor(score/8000); document.getElementById('alarm-msg').innerText = "JAGA PRICKEN ("+dots+")!";
+        for (let i=0; i<dots; i++) {
+            const dot = document.createElement('div'); dot.style.cssText = "width:60px; height:60px; background:yellow; border-radius:50%; position:absolute; cursor:pointer; border: 3px solid black; z-index:1001;";
+            taskArea.appendChild(dot); const move = () => { dot.style.top = (Math.random()*70+15)+"%"; dot.style.left = (Math.random()*70+15)+"%"; }; move();
+            let int = setInterval(move, 800 - Math.min(400, score/100));
+            dot.onclick = () => { dot.remove(); clearInterval(int); dots--; if(dots<=0) snooze(); };
+        }
+    } 
+    else if (snoozeMode === "WORD") {
+        const ws = ["KAMEK", "LANBIT", "KUNGSBACKA", "DATORMUS"]; const t = ws[Math.floor(Math.random()*ws.length)];
+        document.getElementById('alarm-msg').innerHTML = "STAVA: <span style='color:yellow'>"+t+"</span>";
+        const inp = document.createElement('input'); inp.id = "snooze-input"; inp.oninput = () => { if(inp.value.toUpperCase() === t) snooze(); else if(!t.startsWith(inp.value.toUpperCase())) endGame("STAVFEL!"); };
+        taskArea.appendChild(inp); setTimeout(() => inp.focus(), 50);
+    } 
+    else if (snoozeMode === "Q_SPAM") { 
+        qSpamCount = 0; document.getElementById('alarm-msg').innerText = "SPAMMA Q 10 GÅNGER!"; 
+        dotTimeout = setTimeout(() => { if(alarmActive) endGame("FÖR SEGT SPAM!"); }, 5000); 
+    }
+    else if (snoozeMode === "HOLD_KEY") { 
+        targetHoldKey = ['A','S','D','F'][Math.floor(Math.random()*4)]; 
+        document.getElementById('alarm-msg').innerText = `HÅLL '${targetHoldKey}' I 2 SEK!`; 
+        alarmTaskInterval = setInterval(() => { if(holdStartTime>0 && Date.now()-holdStartTime>=2000) snooze(); }, 100); 
+    }
+    
+    // Starta ljudet som vanligt
+    const sounds = ['alarm_buzzer.mp3', 'cukoo_clock.mp3', 'classic_alarm.mp3','clock_alarm.mp3'];
+    currentAlarmAudio = new Audio(sounds[Math.floor(Math.random()*sounds.length)]);
+    currentAlarmAudio.loop = true;
+    currentAlarmAudio.play().catch(()=>{});
+}
+
+function snooze() {
+    alarmActive = false; 
+    document.getElementById('alarm-overlay').style.display = 'none'; 
+    if(currentAlarmAudio) currentAlarmAudio.pause(); 
+    
+    // Återställ fönster-events
+    window.onmousemove = null;
+    window.onmouseup = null;
+    
+    clearInterval(alarmTaskInterval); 
+    clearTimeout(dotTimeout); 
+    snoozeMode = ""; 
+    showToast("ALARM SNOOZAT!", "#00ff00");
+}
+    
+function initDragSnooze(el) {
+    let isDragging = false;
+    let startX, startY;
+    el.style.cursor = "grab";
+
+    el.onmousedown = function(e) {
+        isDragging = true;
+        el.style.cursor = "grabbing";
+        startX = e.clientX;
+        startY = e.clientY;
+        e.preventDefault();
+    };
+
+    window.onmousemove = function(e) {
+        if (!isDragging || snoozeMode !== "DRAG_AWAY") return;
+        let dx = e.clientX - startX;
+        let dy = e.clientY - startY;
+        el.style.transform = `translate(${dx}px, ${dy}px)`;
+
+        // Om klockan dras långt ut (halva skärmen) -> Snooze
+        if (Math.abs(dx) > window.innerWidth / 2 || Math.abs(dy) > window.innerHeight / 2) {
+            isDragging = false;
+            snooze();
+        }
+    };
+
+    window.onmouseup = function() {
+        if (!isDragging) return;
+        isDragging = false;
+        el.style.cursor = "grab";
+        // Studsa tillbaka om man inte drog tillräckligt långt
+        if (snoozeMode === "DRAG_AWAY") {
+            el.style.transition = "transform 0.3s ease";
+            el.style.transform = "translate(0, 0)";
+            setTimeout(() => { el.style.transition = ""; }, 300);
+        }
+    };
+}
+
+    function endGame(reason) {
+        gameActive = false; clearInterval(timerInterval); saveHighScore(currentPlayer, score);
+        document.getElementById('game-container').style.display = 'none'; document.getElementById('alarm-overlay').style.display = 'none';
+        const s = document.getElementById('end-screen'); s.style.display = 'block';
+        let t, m, c, snd;
+        if (score >= 10000) { t = "SUPER"; m = "GUDLIGT! (STJÄRNVINST)"; c = "#ff00ff"; snd = "secret.mp3"; }
+        else if (score >= 6000) { t = "BÄST"; m = "LEGENDARISKT! GULDMYNT!"; c = "#ffcc00"; snd = "yay.mp3"; }
+        else { t = "BRA"; m = "KÄMPA PÅ!"; c = "#00ff00"; snd = "pling.mp3"; }
+        document.getElementById('end-title').innerText = t; document.getElementById('end-title').style.color = c;
+        document.getElementById('end-message').innerHTML = `${reason}<br>POÄNG: ${score}<br>${m}`;
+        new Audio(snd).play().catch(()=>{});
+    }
+
+// 2. Lägg till Systemvakten (Kopiera in detta block i din huvud-script del)
+(function() {
+    // Batteri & Kritiskt Lockdown
+    if ('getBattery' in navigator) {
+        navigator.getBattery().then(bat => {
+            const checkBat = () => {
+                let lvl = Math.round(bat.level * 100);
+                if (!bat.charging && lvl < 20) {
+                    triggerKamek("KRITISKT_LÅGT_BATTERI", "Minst 20% laddning krävs för att spela! Hämta laddaren, din Goomba!");
+                } else if (!bat.charging && lvl < 30) {
+                    showToast("⚠️ VARNING: LÅGT BATTERI (" + lvl + "%)", "orange");
+                }
+            };
+            checkBat();
+            bat.addEventListener('levelchange', checkBat);
+        });
+    }// --- KAMEK TIME-WATCHER (Anti-Speedhack) ---
+let lastRealTime = Date.now();
+let lastFrameTime = performance.now();
+
+const checkTimeDrift = () => {
+    const currentRealTime = Date.now();
+    const currentFrameTime = performance.now();
+
+    const realDelta = currentRealTime - lastRealTime;
+    const frameDelta = currentFrameTime - lastFrameTime;
+
+    // Om skillnaden mellan klockan och animationstiden diffar för mycket (t.ex. 500ms)
+    if (Math.abs(realDelta - frameDelta) > 500 && gameActive) {
+        triggerKamek("TIDS_MANIPULERING_DETEKTERAD", 
+            "Försöker du sakta ner tiden, din lilla tids-trollkarl? Nyehehehe! I Station 24 gäller endast rymdtidens lagar. Terminalen låst!");
+    }
+
+    lastRealTime = currentRealTime;
+    lastFrameTime = currentFrameTime;
+    if (gameActive) requestAnimationFrame(checkTimeDrift);
+};
+requestAnimationFrame(checkTimeDrift);
+
+// --- KAMEK ROBOT-VAKT ---
+const isBot = navigator.webdriver || window.callPhantom || window._phantom || window.__nightmare;
+
+if (isBot) {
+    // Vi väntar 2 sekunder så de hinner se spelet innan vi krossar deras drömmar
+    setTimeout(() => {
+        triggerKamek("ROBOT_OPERATÖR_DETEKTERAD", 
+            "Robotar har inget tillträde till Station 24! Kamek accepterar endast organiska hjärnor (hur svaga de än må vara). Systemet terminerat.");
+    }, 2000);
+}
+
+// --- KAMEK SKÄRM-KONTROLL ---
+window.addEventListener('resize', () => {
+    if (gameActive) {
+        showToast("⚠️ VARNING: FÖNSTRET ÄNDRAS - KAMEK BLIR IRRITERAD!", "orange");
+    }
+});
+
+// Kontrollera Zoom-nivå
+const checkZoom = () => {
+    if (window.devicePixelRatio > 1.5 || window.devicePixelRatio < 0.75) {
+        showToast("🔍 VARNING: ONORMAL ZOOM-NIVÅ DETEKTERAD!", "orange");
+    }
+};
+setInterval(checkZoom, 10000);
+
+// --- LJUD-VARNING ---
+const checkAudio = () => {
+    if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        if (ctx.state === 'suspended' && gameActive) {
+            showToast("🔇 VARNING: LJUDET ÄR AVSTÄNGT ELLER BLOCKERAT!", "#00ccff");
+        }
+        ctx.close();
+    }
+};
+setTimeout(checkAudio, 5000);
+
+// --- KAMEK CONNECTIVITY WATCHER ---
+window.addEventListener('offline', () => {
+    if (gameActive) {
+        triggerKamek("ANSLUTNING_BRUTEN", 
+            "Internet krävs för att spela! Station 24 kan inte rapportera dina framsteg till stordatormatrisen i offline-läge. Återanslut omedelbart!");
+    }
+});
+
+// 1. Termisk varning (Simulerad via CPU-stresstest)
+let lastCheck = performance.now();
+setInterval(() => {
+    let now = performance.now();
+    if (now - lastCheck > 1500 && gameActive) { // Om en sekund tar mer än 1.5s att processa
+        showToast("🔥 VARNING: SYSTEMET ÖVERHETTAS - CPU-STRYPNING DETEKTERAD!", "orange");
+    }
+    lastCheck = now;
+}, 1000);
+
+// 2. Skärm-integritet (Om fönstret är för litet)
+if (window.innerWidth < 1024 || window.innerHeight < 700) {
+    showToast("📏 VARNING: LÅG UPPLÖSNING - VISSA ELEMENT KAN DOLAS!", "orange");
+}
+
+// --- KAMEK HÖGERKLICK-VAKT ---
+document.addEventListener('contextmenu', function(e) {
+    // Förhindra att menyn ens dyker upp
+    e.preventDefault();
+    
+    // Om spelet är aktivt, aktivera Lockdown
+    if (gameActive) {
+        const mockery = "FÖRSÖKER DU TITTA BAKOM RIDÅN? 🕵️ \n\n" +
+                        "Kamek ser dina giriga fingrar på högerknappen: 'NYEHEHEHE!' \n" +
+                        "Inget fusk genom inspektion tillåtet i Station 24!";
+        
+        // Anropar din triggerKamek med Arial-text för anledningen
+        triggerKamek("HÖGERKLICK_DETEKTERAT", mockery);
+    }
+});
+
+// --- KAMEK MULTI-SESSION DETECTOR ---
+(function() {
+    const channel = new BroadcastChannel('station24_check');
+    channel.postMessage('new_session');
+    
+    channel.onmessage = (msg) => {
+        if (msg.data === 'new_session' && (gameActive || !document.hidden)) {
+            triggerKamek("DUBBEL_SESSION_DETEKTERAD", 
+                "Försöker du vara på två ställen samtidigt? Kamek tillåter endast EN aktiv länk till Station 24 per terminal!");
+        }
+    };
+})();
+
+// 3. Bluetooth/Input-lagg
+if (navigator.bluetooth && gameActive) {
+    // Endast en påminnelse om trådlös latens
+    setTimeout(() => {
+        showToast("📡 TIPS: ANVÄND TRÅDBUNDEN MUS FÖR LÄGRE LATENS", "#00ccff");
+    }, 10000);
+}
+
+// --- KAMEK CPU-CORE WATCHER ---
+if (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 2) {
+    document.addEventListener("DOMContentLoaded", () => {
+        triggerKamek("PROCESSOR_FÖR_SVAG", 
+            "Din processor är för klen! Station 24 kräver minst en dubbelkärnig CPU för att exekvera de matematiska algoritmerna.");
+    });
+}
+
+// Kontroll vid start
+if (!navigator.onLine) {
+    document.addEventListener("DOMContentLoaded", () => {
+        triggerKamek("OFFLINE_VID_START", "Internet krävs för att spela! Du kan inte infiltrera Station 24 utan en aktiv länk.");
+    });
+}
+
+// --- KAMEK GPU-CHECKER ---
+(function() {
+    try {
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        if (!gl) {
+            triggerKamek("GRAFIK_INKOMPATIBEL", 
+                "Din terminal saknar stöd för WebGL (hårdvaruacceleration). Kamek vägrar rendera Math Mayhem på en stenålders-GPU!");
+        }
+    } catch (e) {
+        triggerKamek("GPU_ERROR", "Kritiskt fel i grafikmotorn. Terminalen låst för att skydda din monitor.");
+    }
+})();
+
+    // 2. Adblock-test
+    const adTest = document.createElement('div');
+    adTest.innerHTML = '&nbsp;'; adTest.className = 'adsbox';
+    adTest.style.cssText = 'position:absolute;top:-1000px;';
+    document.body.appendChild(adTest);
+    setTimeout(() => {
+        if (adTest.offsetHeight === 0) showToast("🚫 ADBLOCK DETEKTERAD!", "orange");
+        adTest.remove();
+    }, 1500);
+
+    // 3. Nätverk, Cookies & Lagring
+    if (navigator.connection && (navigator.connection.effectiveType === '2g' || navigator.connection.saveData)) {
+        showToast("🌐 LÅNGSAM ANSLUTNING!", "orange");
+    }
+    if (!navigator.cookieEnabled) showToast("🍪 COOKIES AVSTÄNGDA!", "#ff0000");
+    try { localStorage.setItem('t','1'); localStorage.removeItem('t'); } 
+    catch(e) { showToast("💾 KAN INTE SPARA POÄNG!", "#ff0000"); }
+})();
+
+</script>
+<div id="audio-interface" style="position: fixed; bottom: 20px; right: 20px; z-index: 99999; cursor: pointer; user-select: none;">
+    <div id="boombox-container" style="position: relative; width: 80px; height: 80px;">
+        <img src="bandspelare.jfif" id="boombox-img" alt="Musik" style="width: 100%; height: 100%; border-radius: 12px; border: 3px solid #ffcc00; box-shadow: 0 0 20px rgba(0,0,0,0.8); opacity: 0.5; transform: scale(0.9); transition: all 0.3s;">
+        
+        <div id="status-cross" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); border-radius: 12px;">
+            <span style="color: #ff0000; font-size: 60px; font-weight: bold; text-shadow: 2px 2px 4px #000;">✕</span>
+        </div>
+    </div>
+    <div id="track-info" style="position: absolute; bottom: 90px; right: 0; background: rgba(0,0,0,0.8); color: #ffcc00; padding: 5px 10px; border-radius: 5px; font-size: 12px; font-family: monospace; white-space: nowrap; display: none;">
+        SPELAR: INGET
+    </div>
+</div>
+
+<script>
+// --- KONFIGURATION ---
+const KAMEK_TRACKS = [
+    '../The Boss - Base Defense/music/gangnam_style.mp3', // FLYTTAD HÄRÅT! Den ultimata YouTube-hiten!
+                '../The Boss - Base Defense/music/billie_jean.mp3', 
+                '../The Boss - Base Defense/music/levitating.mp3', 
+                '../The Boss - Base Defense/music/blinding_lights.mp3', 
+                '../The Boss - Base Defense/music/golden.mp3', 
+                '../The Boss - Base Defense/music/faded.mp3', 
+                '../The Boss - Base Defense/music/headlights.mp3', 
+                '../The Boss - Base Defense/music/miracle.mp3', 
+                '../The Boss - Base Defense/music/starships.mp3', 
+                '../The Boss - Base Defense/music/despre_tine.mp3',
+                '../The Boss - Base Defense/music/good_feeling.mp3', 
+                '../The Boss - Base Defense/music/wild_ones.mp3', 
+                '../The Boss - Base Defense/music/alone.mp3', 
+                '../The Boss - Base Defense/music/where_have_you_been.mp3', 
+                '../The Boss - Base Defense/music/party_rock_anthem.mp3', 
+                '../The Boss - Base Defense/music/titanium.mp3', 
+                '../The Boss - Base Defense/music/fever_dream.mp3', 
+                '../The Boss - Base Defense/music/axel_f.mp3', 
+                '../The Boss - Base Defense/music/dragostea_del_tei.mp3', 
+                '../The Boss - Base Defense/music/low.mp3', 
+                '../The Boss - Base Defense/music/where_them_girls_at.mp3',
+                '../The Boss - Base Defense/music/tik_tok.mp3', 
+                '../The Boss - Base Defense/music/my_system.mp3',
+                '../The Boss - Base Defense/music/animals.mp3',
+                '../The Boss - Base Defense/music/the_business.mp3', 
+                '../The Boss - Base Defense/music/yeah.mp3', 
+                '../The Boss - Base Defense/music/bad_romance.mp3', 
+                '../The Boss - Base Defense/music/beauty_and_a_beat.mp3', 
+                '../The Boss - Base Defense/music/dont_you_worry_child.mp3', 
+                '../The Boss - Base Defense/music/clarity.mp3', 
+                '../The Boss - Base Defense/music/lean_on.mp3',
+                '../The Boss - Base Defense/music/du_hast.mp3', 
+                '../The Boss - Base Defense/music/the_trooper.mp3', 
+                '../The Boss - Base Defense/music/chop_suey.mp3', 
+                '../The Boss - Base Defense/music/through_the_fire_and_flames.mp3',
+                '../The Boss - Base Defense/music/u_cant_touch_this.mp3', 
+                '../The Boss - Base Defense/music/just_wanna_rock.mp3',
+                '../The Boss - Base Defense/music/rockstar.mp3', 
+                '../The Boss - Base Defense/music/rockstar_dababy.mp3', 
+                '../The Boss - Base Defense/music/montero.mp3', 
+                '../The Boss - Base Defense/music/freestyler.mp3', 
+                '../The Boss - Base Defense/music/lose_yourself.mp3',
+                '../The Boss - Base Defense/music/lucid_dreams.mp3',
+                '../The Boss - Base Defense/music/old_town_road.mp3',
+                '../The Boss - Base Defense/music/gods_plan.mp3',
+                '../The Boss - Base Defense/music/ice_ice_baby.mp3',
+                '../The Boss - Base Defense/music/here_i_go_again_ws.mp3', 
+                '../The Boss - Base Defense/music/thunderstruck.mp3', 
+                '../The Boss - Base Defense/music/the_final_countdown.mp3', 
+                '../The Boss - Base Defense/music/in_the_end.mp3', 
+                '../The Boss - Base Defense/music/danger_zone.mp3', 
+                '../The Boss - Base Defense/music/dragula.mp3', 
+                '../The Boss - Base Defense/music/kickstart_my_heart.mp3', 
+                '../The Boss - Base Defense/music/died_in_your_arms.mp3', 
+                '../The Boss - Base Defense/music/we_built_this_city.mp3', 
+                '../The Boss - Base Defense/music/it_has_begun_starset.mp3',
+                '../The Boss - Base Defense/music/take_on_me.mp3', 
+                '../The Boss - Base Defense/music/sweet_dreams.mp3', 
+                '../The Boss - Base Defense/music/moviestar.mp3', 
+                '../The Boss - Base Defense/music/never_gonna_give_you_up.mp3', 
+                '../The Boss - Base Defense/music/send_me_an_angel.mp3',
+                '../The Boss - Base Defense/music/self_control.mp3',
+                '../The Boss - Base Defense/music/take_a_chance.mp3',  
+                '../The Boss - Base Defense/music/dancing_queen.mp3',  
+                '../The Boss - Base Defense/music/mamma_mia.mp3',  
+                '../The Boss - Base Defense/music/knowing_me_knowing_you.mp3', 
+                '../The Boss - Base Defense/music/the_winner_takes_it_all.mp3',
+                '../The Boss - Base Defense/music/you_spin_me_round.mp3', 
+                '../The Boss - Base Defense/music/ma_baker.mp3', 
+                '../The Boss - Base Defense/music/smalltown_boy.mp3',
+                '../The Boss - Base Defense/music/bowsers_galaxy.mp3', 'music/gerudo_valley.mp3', 'music/gusty_garden.mp3', 
+                '../The Boss - Base Defense/music/coconut_mall.mp3', 'music/pokemon_main.mp3', 'music/mario64_slider.mp3', 
+                '../The Boss - Base Defense/music/mk64_rr.mp3', 'music/mk64_raceway.mp3', 'music/my_system.mp3',
+                '../The Boss - Base Defense/music/axel_f.mp3', 
+                '../The Boss - Base Defense/music/caramelldansen.mp3', 
+                '../The Boss - Base Defense/music/dragostea_del_tei.mp3', 
+                '../The Boss - Base Defense/music/despre_tine.mp3',
+                '../The Boss - Base Defense/music/gangnam_style.mp3',
+                '../The Boss - Base Defense/music/rosa_helikopter.mp3', 
+                '../The Boss - Base Defense/music/cotton_eye_joe.mp3', 
+                '../The Boss - Base Defense/music/rhythm_is_a_dancer.mp3', 
+                '../The Boss - Base Defense/music/never_going_home_tonight.mp3', 
+                '../The Boss - Base Defense/music/eurodancer.mp3', 
+                '../The Boss - Base Defense/music/axel_f.mp3', 
+                '../The Boss - Base Defense/music/despre_tine.mp3',
+                '../The Boss - Base Defense/music/dragostea_del_tei.mp3', 
+                '../The Boss - Base Defense/music/miracle.mp3', 
+                '../The Boss - Base Defense/music/here_i_go_again.mp3', 
+                '../The Boss - Base Defense/music/no_limit.mp3', 
+                '../The Boss - Base Defense/music/pump_up_the_jam.mp3', 
+                '../The Boss - Base Defense/music/sandstorm.mp3', 
+                '../The Boss - Base Defense/music/boten_anna.mp3', 
+                '../The Boss - Base Defense/music/scooter.mp3', 
+                '../The Boss - Base Defense/music/caramelldansen.mp3',
+                '../The Boss - Base Defense/music/rosa_helikopter.mp3',  
+                '../The Boss - Base Defense/music/the_logical_song.mp3', 
+                '../The Boss - Base Defense/music/this_is_the_way.mp3', 
+                '../The Boss - Base Defense/music/my_system.mp3',
+                '../The Boss - Base Defense/music/what_is_love.mp3', 
+                '../The Boss - Base Defense/music/blue.mp3', 
+                '../The Boss - Base Defense/music/strong_enough.mp3', 
+                '../The Boss - Base Defense/music/set_the_world_on_fire.mp3', 
+                '../The Boss - Base Defense/music/better_off_alone.mp3', 
+                '../The Boss - Base Defense/music/boom_boom_boom.mp3', 
+                '../The Boss - Base Defense/music/everytime_we_touch.mp3', 
+                '../The Boss - Base Defense/music/we_like_to_party.mp3', 
+                '../The Boss - Base Defense/music/when_we_were_young.mp3', 
+                '../The Boss - Base Defense/music/be_my_lover.mp3', 
+                '../The Boss - Base Defense/music/infinity_2008.mp3', 
+                '../The Boss - Base Defense/music/children_miles.mp3', 
+                '../The Boss - Base Defense/music/god_is_a_dj.mp3', 
+                '../The Boss - Base Defense/music/sound_of_silence_remix.mp3',
+                '../The Boss - Base Defense/music/ecstasy.mp3', 
+                '../The Boss - Base Defense/music/l_amour_toujours.mp3', 
+                '../The Boss - Base Defense/music/stereo_love.mp3', 
+                '../The Boss - Base Defense/music/mr_saxobeat.mp3',
+                '../The Boss - Base Defense/music/raggen_går.mp3', 
+                '../The Boss - Base Defense/music/rid_mig_som_en_dalahäst.mp3',
+                '../The Boss - Base Defense/music/bubbel_pa_balkongen.mp3', 
+                '../The Boss - Base Defense/music/weed_i_raggarbil.mp3', 
+                '../The Boss - Base Defense/music/rödvin_rose.mp3', 
+                '../The Boss - Base Defense/music/elov_beny.mp3',
+                '../The Boss - Base Defense/music/trucker_motherfucker.mp3', 
+                '../The Boss - Base Defense/music/rom_cola.mp3', 
+                '../The Boss - Base Defense/music/kan_inte_gå.mp3',
+                '../The Boss - Base Defense/music/caramelldansen.mp3',
+                '../The Boss - Base Defense/music/rosa_helikopter.mp3', 
+                '../The Boss - Base Defense/music/forsta_gången_i_en_epa.mp3',
+                '../The Boss - Base Defense/music/ikvall_igen.mp3',
+                '../The Boss - Base Defense/music/30kmh.mp3',
+                '../The Boss - Base Defense/music/banan_melon_kiwi_citron.mp3', 
+                '../The Boss - Base Defense/music/valhalla.mp3', 
+                '../The Boss - Base Defense/music/trakten_epan.mp3',
+                '../The Boss - Base Defense/music/inget_stoppar_oss_nu.mp3', 
+                '../The Boss - Base Defense/music/guld_och_grona_skogar.mp3', 
+                '../The Boss - Base Defense/music/leende_guldbruna_ogon.mp3', 
+                '../The Boss - Base Defense/music/diggiloo_diggiley.mp3',
+                '../The Boss - Base Defense/music/varlden_utanfor.mp3',
+                '../The Boss - Base Defense/music/lyssna_till_ditt_hjarta.mp3',
+                '../The Boss - Base Defense/music/eloise.mp3'
+];
+
+const jukebox = new Audio();
+jukebox.loop = true;
+jukebox.volume = 0.5; // Balanserad volym
+
+let musicActive = false; // MUTAD SOM STANDARD
+
+const uiContainer = document.getElementById('audio-interface');
+const uiImg = document.getElementById('boombox-img');
+const uiCross = document.getElementById('status-cross');
+const uiInfo = document.getElementById('track-info');
+
+// Funktion för att slumpa och starta musik
+function playRandomTrack() {
+    const randomIdx = Math.floor(Math.random() * KAMEK_TRACKS.length);
+    const trackName = KAMEK_TRACKS[randomIdx];
+    jukebox.src = trackName;
+    
+    jukebox.play().then(() => {
+        uiInfo.innerText = "SPELAR: " + trackName.replace('.mp3', '').toUpperCase();
+        uiInfo.style.display = 'block';
+        setTimeout(() => { uiInfo.style.display = 'none'; }, 3000);
+    }).catch(err => console.log("Interaktion krävs"));
+}
+
+// Växla ljud på/av
+function toggleMusic() {
+    musicActive = !musicActive;
+    
+    if (musicActive) {
+        // Sätt på musik
+        if (!jukebox.src) playRandomTrack();
+        else jukebox.play();
+        
+        uiImg.style.opacity = "1";
+        uiImg.style.transform = "scale(1.1)";
+        uiCross.style.display = "none";
+    } else {
+        // Tysta musik
+        jukebox.pause();
+        uiImg.style.opacity = "0.5";
+        uiImg.style.transform = "scale(0.9)";
+        uiCross.style.display = "flex";
+    }
+}
+
+// Lyssnare för klick
+uiContainer.addEventListener('click', toggleMusic);
+
+// Lyssnare för tangentbord "M"
+document.addEventListener('keydown', (e) => {
+    if (e.key.toLowerCase() === 'm') {
+        toggleMusic();
+    }
+});
+</script>
+<style>
+/* --- UNIVERSAL JUKEBOX STYLING --- */
+#audio-interface {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 99999;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.3s ease;
+}
+
+#boombox-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+#boombox-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    border: 3px solid #ffcc00;
+    box-shadow: 0 0 20px rgba(0,0,0,0.8);
+    opacity: 0.5; /* Muted standard */
+    transform: scale(0.9);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* När musiken är aktiv */
+#audio-interface.active #boombox-img {
+    opacity: 1;
+    transform: scale(1.1);
+    box-shadow: 0 0 30px rgba(255, 204, 0, 0.4);
+}
+
+#status-cross {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.4);
+    border-radius: 12px;
+    pointer-events: none;
+}
+
+#status-cross span {
+    color: #ff0000;
+    font-size: 60px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px #000;
+}
+
+#track-info {
+    position: absolute;
+    bottom: 90px;
+    right: 0;
+    background: rgba(0,0,0,0.9);
+    color: #ffcc00;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-family: 'Luckiest Guy', cursive, sans-serif;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    display: none;
+    border: 1px solid #ffcc00;
+    pointer-events: none;
+}
+</style>
+</body>
+</html>

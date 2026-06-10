@@ -1,0 +1,179 @@
+function runDiagnostics() {
+            const fill = document.getElementById('loading-bar-fill');
+            const txt = document.getElementById('diag-status-text');
+
+            // Steg 1: RAM-minne (25% klart)
+            setTimeout(() => {
+                if (fill) fill.style.width = "25%";
+                if (txt) txt.innerText = "CHECKING PHYSICAL MEMORY (RAM)... OK";
+                
+                // Steg 2: CPU-kärnor (50% klart)
+                setTimeout(() => {
+                    if (fill) fill.style.width = "50%";
+                    if (txt) txt.innerText = "VERIFYING CPU ARCHITECTURE CORES... OK";
+                    
+                    // Steg 3: OS & Säkerhet (75% klart)
+                    setTimeout(() => {
+                        if (fill) fill.style.width = "75%";
+                        if (txt) txt.innerText = "SECURING OS ARCHITECTURE TUNNELS... OK";
+                        
+                        // Steg 4: WebGL & GPU-kontroll (100% klart)
+                        setTimeout(() => {
+                            if (fill) fill.style.width = "100%";
+                            if (txt) txt.innerText = "INITIALIZING 3D WEBGL GRAPHICS CORE... READY";
+
+                            
+                            // Kör nätverkskontrollen direkt när filen laddas i webbläsaren
+                            verifyElmiaNetwork();
+                            
+                            // Kör hårdvarubevakningen och rensa laddskärmen efter en kort fördröjning
+                            setTimeout(() => {
+                                let canvas = document.createElement('canvas');
+                                let gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                                
+                                if (!gl) {
+                                    triggerHardwareBanScreen("no_webgl");
+                                    return;
+                                }
+
+                                let gpuString = "";
+                                let debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                                if (debugInfo) {
+                                    gpuString = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL).toLowerCase();
+                                }
+
+                                let ua = navigator.userAgent.toLowerCase();
+                                let hardwareReport = (ua + " " + gpuString);
+                                let banKey = null;
+
+                                if (navigator.deviceMemory && navigator.deviceMemory < 4) { banKey = "low_ram"; }
+                                if (!banKey && (gpuString === "" || gpuString.includes("software renderer") || gpuString.includes("swiftshader"))) { banKey = "no_gpu"; }
+                                if (!banKey) {
+                                    if (hardwareReport.includes("celeron")) banKey = "celeron";
+                                    else if (hardwareReport.includes("pentium")) banKey = "pentium";
+                                    else if (hardwareReport.includes("atom")) banKey = "atom";
+                                }
+                                if (!banKey && navigator.hardwareConcurrency) {
+                                    if (navigator.hardwareConcurrency === 1) banKey = "single_core";
+                                    else if (navigator.hardwareConcurrency < 4) banKey = "slow_cores";
+                                }
+                                if (!banKey) {
+                                    const botKeywords = ['googlebot', 'google-x', 'bingbot', 'yandexbot', 'ahrefsbot', 'spider', 'crawler', 'scrap', 'headless'];
+                                    let isBotAgent = botKeywords.some(keyword => ua.includes(keyword)) || navigator.webdriver;
+                                    if (isBotAgent) banKey = "bot";
+                                }
+                                if (!banKey) {
+                                    if (hardwareReport.includes("playstation") || hardwareReport.includes("nintendo") || hardwareReport.includes("wii") || hardwareReport.includes("xbox")) banKey = "console";
+                                    else if (hardwareReport.includes("smart-tv") || hardwareReport.includes("smarttv") || hardwareReport.includes("googletv") || hardwareReport.includes("appletv") || hardwareReport.includes("tizen") || hardwareReport.includes("webos") || ua.includes("lg netcast") || ua.includes("vizio")) banKey = "tv";
+                                    else if (hardwareReport.includes("quest ") || hardwareReport.includes("oculus") || hardwareReport.includes("vive") || hardwareReport.includes("pico") || hardwareReport.includes("openvr") || ua.includes("vision pro") || ua.includes(" xr ") || ua.includes("spatial")) banKey = "vr";
+                                    else if (hardwareReport.includes("tesla") || hardwareReport.includes("carplay") || hardwareReport.includes("automotive") || ua.includes("polestar") || ua.includes("volvo_car") || ua.includes("infotainment")) banKey = "car";
+                                    else if (hardwareReport.includes("watch") || hardwareReport.includes("wear os") || ua.includes("wearable") || ua.includes("applewatch") || ua.includes("fitbit")) banKey = "smartwatch";
+                                    else if (hardwareReport.includes("cros") || hardwareReport.includes("chromebook")) banKey = "chromebook";
+                                    else if (hardwareReport.includes("kindle") || hardwareReport.includes("nook") || hardwareReport.includes("bookeen") || ua.includes("kobo") || ua.includes("ereader")) banKey = "ereader";
+                                    else if (hardwareReport.includes("alexa") || hardwareReport.includes("hub") || hardwareReport.includes("smart-home") || ua.includes("smarthome") || ua.includes("refrigerator") || ua.includes("washer") || ua.includes("dryer") || ua.includes("printer") || ua.includes("smart-oven")) banKey = "smarthome";
+                                    else if (hardwareReport.includes("steam deck") || hardwareReport.includes("steamos")) banKey = "steamdeck";
+                                    else if (ua.includes("anbernic") || ua.includes("miyoo") || ua.includes("powkiddy") || ua.includes("retroid pocket")) banKey = "retro_handheld";
+                                    else if (ua.includes("point of sale") || ua.includes("pos-terminal") || ua.includes("izettle") || ua.includes("clover-device") || ua.includes("kiosk-mode")) banKey = "pos_terminal";
+                                    else if (hardwareReport.includes("linux") && !hardwareReport.includes("android")) banKey = "linux";
+                                    else if (/android|iphone|ipad|ipod|iemobile|blackberry|kindle/i.test(ua)) banKey = "mobile";
+                                }
+                                if (!banKey) {
+                                    if (ua.includes("windows")) { if (!ua.includes("windows nt 10.0")) banKey = "old_windows"; }
+                                    else if (ua.includes("macintosh")) {
+                                        let match = ua.match(/mac os x (\d+)[_.](\d+)/);
+                                        if (match) { let majorVersion = parseInt(match[1]); if (majorVersion < 15 && !ua.includes("version/15") && !ua.includes("version/16")) banKey = "old_mac"; }
+                                    } else if (!ua.includes("mac") && !ua.includes("win")) { banKey = "invalid_os"; }
+                                }
+
+                                if (banKey) { 
+                                    triggerHardwareBanScreen(banKey);
+                                } else { 
+                                    document.getElementById('diagnostic-screen').style.display = 'none';
+                                    document.getElementById('start-screen').style.display = 'block';
+                                    updateLeaderboardUI();
+                                }
+                            }, 600); // Andrum efter 100% klart innan menyn laddas
+                        }, 400);
+                    }, 400);
+                }, 400);
+            }, 400);
+        }
+
+        function triggerHardwareBanScreen(banType) {
+            document.getElementById('diagnostic-screen').style.display = 'none';
+            const failDiv = document.createElement('div');
+            failDiv.className = 'hardware-fail-screen';
+            
+            const insults = {
+                console: "KONSOL-NOOB DETEKTERAD! 🎮<br><br>Kamek hånar dig: 'Försöker du köra ett Station 24-spel på din spelkonsol? Vad blir nästa drag, att styra lasern med en Guitar Hero-gitarr? Koppla ur handkontrollen och skaffa en PC!'",
+                tv: "SMART-TV DETEKTERAD! 📺<br><br>Kamek asgarvar: 'Står du alltså i LAN-hallen och spelar med en TV-fjärrkontroll?! Tror du att min avancerade 3D-kärna är någon slö Netflix-app? Packa ihop och gå hem!'",
+                vr: "VR-HEADSET AVSTÄNGT! 🥽<br><br>Kamek morrar: 'Ta av dig cyklopet! Du kan inte gömma dig i virtuell verklighet när mina glitch-virus anfaller muren i ren 3D-kod via skärmen!'",
+                car: "FORDONS-TERMINAL BLOCKERAD! 🚗<br><br>Kamek flinar: 'Spelar du i bilen?! Försöker du drifta runt muren via instrumentpanelen på din Tesla? Parkera fordonet, det här är en turnering för riktiga skrivbordsriggar!'",
+                smartwatch: "SMARTWATCH-SKÄRM FÖR LITEN! ⌚<br><br>Kamek asgarvar: 'En smartklocka?! Hur hade du tänkt träffa drönarna på en skärm stor som ett frimärke? Ska du svepa med lillfingret? Patetiskt!'",
+                chromebook: "CHROMEBOOK-VRAK DETEKTERAT! 🪵<br><br>Kamek spyr: 'En Chromebook? Den där lilla plastleksaken drivs av en glorifierad mobilprocessor och ren vilja. Den smälter om jag startar Three.js-scenen!'",
+                ereader: "LÄSPLATTA REJEKTAD! 📖<br><br>Kamek suckar: 'En läsplatta?! Tänkte du sitta och läsa en e-bok medan min armé raderar servern? Skärmens uppdateringsfrekvens är ju långsammare än en snigel!'",
+                smarthome: "SMART-HEM TERMINAL HACKAD! 🏠<br><br>Kamek garvar: 'Försöker du spela på kökets smarta kylskåp eller en röstassistent? Gå och diska istället, terminalen är låst!'",
+                mobile: "MOBIL/PADDA SPÄRRAD! 📱<br><br>Kamek skriker: 'Svep-fuskare! Inga touchskärmar eller mobiler är tillåtna i nätverks-gridet. Det krävs en fysisk datormus för att hålla lasern stabil!'",
+                old_windows: "GENTLEMÄN KÖR INTE WINDOWS 7/8! 💾<br><br>Kamek hånar: 'Operativsystemet är ett museum! Windows 10 eller 11 krävs för att mina cyber-portar ska kunna öppnas säkert. Uppdatera din rigg!'",
+                old_mac: "MACOS SEQUOIA+ KRÄVS! 🍏<br><br>Kamek väser: 'Din Mac kör ett föråldrat OS. Systemet kräver krypteringstunnlarna i macOS 15 Sequoia eller senare för att hålla virusen stångna!'",
+                retro_handheld: "RETRO-EMULATOR DETEKTERAD! 🕹️💀<br><br>Kamek spyr galla: 'Försöker du rensa Station 24 på en handhållen kinesisk emulator-padda?! Tror du att ditt lilla Anbernic- eller Miyoo-kretskort klarar av att rita upp min avancerade 3D-rymd? Gå och spela Tetris istället, den här skärmen är LÅST!'",
+                pos_terminal: "KASSATERMINAL KAPAD! 💳💸<br><br>Kamek asgarvar: 'Men hallå?! Har du skruvat loss en kortläsare eller självbetjäningsskärm från Glitched Merch Shop i Lobby Syd för att spela på?! Tänkte du blippa din laser eller trycka in PIN-koden för att rensa virusen? Sätt tillbaka terminalen innan crewet griper dig!'",
+                vpn_detected: "NÄTVERKS-SABOTAGE DETEKTERAT! 🌐🔒<br><br>Kamek väser av skratt: 'Nyhehehe! Tror du att du kan dölja din IP-adress bakom en krypterad VPN-tunnel under min turnering?! Trodde du att du satt i Frankfurt eller New York och hackade min mainframe?! <br><br> Din VPN-anslutning skapar nätverks-jitter och döljer din äkta terminal-nod! Koppla omedelbart ur din NordVPN, ExpressVPN eller proxy-tunnel och kör på Elmias rena, råa LAN-lina. Inga anonyma fuskare tillåts i Station 24!'",
+                single_core: "ENKÄRNIG STENÅLDERS-CPU DETEKTERAD! 🪨<br><br>Kamek asgarvar: 'En enda kärna?! Haha, du kan ju inte ens multitaska! Om du försöker andas samtidigt som du rör musen kommer din processor att börja brinna. Spring till tippen med det där kretskortet!'",
+                slow_cores: "FÖR FÅ TRÅDAR (MINST CORE i3 KRÄVS)! 🪵<br><br>Kamek suckar: 'Hårdvarukollen rapporterar under 4 logiska trådar. Din hårdvara orkar inte synka spelslingan under turneringen. Terminalen låst!'",
+                bot: "AUTOMATISERAD AGENT UPPTÄCKT! 🕷️<br><br>Kamek asgarvar: 'Försöker Googlebot eller ett externt skrapverktyg krypa igenom min Station 24-server?! Tror du att dina tröga algoritmer kan spela bort mina glitch-virus?! Glöm det! Inga AI-spindlar eller Headless-agenter får infektera turneringen, här krävs det äkta biologiska fingrar!'",
+                celeron: "CELERON UPPTÄCKT! 🐌<br><br>Kamek asgarvar: 'En Celeron?! Försöker du köra min 3D-cybervärld på ett förglömt kassaapparat-chip från 2011? Skaffa en i3 innan du sätter dig i Hall D!'",
+                pentium: "PENTIUM DETECTED! 🏛️<br><br>Kamek hånar dig: 'Åh, ett museiföremål! Körde din pappa Mario Kart på den här i förra årtusendet? Den här guld-Pentiumen duger inte ens till att boota muren!'",
+                atom: "INTEL ATOM INSIDE! 🔬<br><br>Kamek spyr: 'En Atom-processor? Har du skruvat loss skärmen från en gammal skrotad mini-netbook? Systemet vägrar starta på mikroskopisk energi!'",
+                a6: "AMD A6 OVERLOAD! 🪵<br><br>Kamek flinar: 'En gammal A6:a? Du försöker driva avancerad 3D-grafik med två bitar blött trä och ett gammalt cykelhjul. Terminalen stängs av!'",
+                linux: "LINUX-PENGUIN DETECTED! 🐧<br><br>Kamek asgarvar: 'Ett pingvinsystem? Försöker du köra min högpresterande 3D-terminal på ett operativsystem byggt av och för programmerare? Ingen plats för Linux på LAN:et, gå och kompilera en kernel någon annanstans!'",
+    steamdeck: "STEAM DECK KASTAD! 🎮<br><br>Kamek skriker: 'Gaming är 100x bättre på en riktig PC! Försöker du använda en Steam Deck som en musmatta? Kasta den där handhållna leksaken i papperskorgen – här kör vi seriös e-sport med mus och tangentbord!'",
+                radeon: "INTEGRERAD RADEON GRUNDSTÖTT! 🡫<br><br>Kamek rycker på axlarna: 'Det där integrerade Radeon-chippet delas med ditt RAM och svettas ihälen av bara grid-mönstret. Terminalen kräver dedikerad kraft!'",
+                speed_hack: "TIDSKONTROLL DETEKTERAD! ⏳❌<br><br>Kamek asgarvar: 'Försöker du manipulera klockan med Cheat Engine för att köra mitt virus-grid i slow-motion?! Jag kontrollerar tiden i denna 3D-rymd, inte du! Terminalen är permanent LÅST!'",
+                name_injection: "KODINJEKTION AVVISAD! 🛑🧬<br><br>Kamek väser: 'Försöker du skriva HTML-kod och skript i ditt spelarnamn?! Tror du att du kan hacka poängtavlan med en simpel injektion? Gå och lär dig koda på riktigt, fuskare!'",
+                autoclicker: "TURBO-KLICK DETEKTERAT! 🖱️⚡<br><br>Kamek hånar dig: 'Ingen mänsklig hand klickar 60 gånger i sekunden! Stäng av din autoclicker eller ditt makro omedelbart. I den här turneringen krävs det äkta muskler!'",
+                screenshot_ban: "SKÄRMDUMP BLOCKERAD! 📸🚫<br><br>Kamek flinar hånfullt: 'Försöker du ta en skärmdump eller spara ner Victory-canvasen?! Tänkte du skicka bilden till dina kompisar så de kan hämta gratis figurer i Lobby Syd? Glöm det, bildfångst är spärrat under turneringen!'",
+                invalid_os: "OTILLÅTET OPERATIVSYSTEM! 🛑<br><br>Kamek blockerar dig: 'Det där systemet har inte klarat säkerhetskontrollen i Hall D. Endast Windows 10+ eller Mac Sequoia+ är godkänt för turneringsbruk!'"
+            };
+
+            const activeInsult = insults[banType] || "SYSTEM INADEQUATE: PLATFORM NOT SUPPORTED.";
+
+            failDiv.innerHTML = `
+                <h1 style="color:var(--danger); font-size: 40px; margin: 0 0 10px 0; text-shadow: 2px 2px black;">UNIT DISQUALIFIED</h1>
+                <h2 style="font-family:'luckiest guy'; font-size:28px; color:var(--primary); margin-bottom:15px; text-transform:uppercase;">
+                    "Qwerty är ledsen och vill inte starta detta spel på din enhet"
+                </h2>
+                <canvas id="sad-qwerty-canvas" width="160" height="160"></canvas>
+                <p style="font-family:'Montserrat'; font-size:16px; max-width:550px; line-height:1.6; background:rgba(0,0,0,0.6); padding:20px; border-radius:12px; border:2px dashed var(--danger); margin:0 auto;">${activeInsult}</p>
+                <button onclick="window.location.reload()" class="btn-start" style="margin-top:25px; background:var(--danger); box-shadow:0 5px 0 #800000;">SKANNA IGEN / RESCAN 🔄</button>
+            `;
+            document.body.appendChild(failDiv);
+
+            const sCanvas = document.getElementById('sad-qwerty-canvas');
+            if (sCanvas) {
+                const ctx = sCanvas.getContext('2d');
+                ctx.clearRect(0, 0, 160, 160);
+                ctx.translate(80, 80);
+                ctx.fillStyle = "#ffffff";
+                ctx.beginPath(); ctx.arc(0, 5, 26, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 8; ctx.lineCap = "round";
+                ctx.beginPath();
+                ctx.moveTo(-18, -15); ctx.lineTo(-28, -24);
+                ctx.moveTo(18, -15); ctx.lineTo(28, -24);
+                ctx.moveTo(-18, 25); ctx.lineTo(-26, 36);
+                ctx.moveTo(18, 25); ctx.lineTo(26, 36);
+                ctx.stroke();
+                ctx.strokeStyle = "#000000"; ctx.lineWidth = 3.5;
+                ctx.beginPath();
+                ctx.moveTo(-11, -3); ctx.lineTo(-5, 2);
+                ctx.moveTo(11, -3); ctx.lineTo(5, 2);
+                ctx.stroke();
+                ctx.strokeStyle = "#111111"; ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.moveTo(-4, 12); ctx.lineTo(4, 18);
+                ctx.moveTo(4, 12); ctx.lineTo(-4, 18);
+                ctx.stroke();
+                ctx.fillStyle = "#00ffcc";
+                ctx.beginPath(); ctx.rect(-9, 4, 3, 16); ctx.rect(6, 4, 3, 16); ctx.fill();
+            }
+        }

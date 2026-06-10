@@ -1,0 +1,2814 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Station 24 - N. Gin Boss Battle ULTRA 3D</title>
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=VT323&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script>
+        (function() {
+            var isIE = /*@cc_on!@*/false || !!document.documentMode || navigator.userAgent.indexOf('MSIE') !== -1 || navigator.userAgent.indexOf('Trident') !== -1;
+            var isOldSafari = false;
+            var ua = navigator.userAgent;
+            if (ua.indexOf('Safari') !== -1 && ua.indexOf('Chrome') === -1) {
+                var match = ua.match(/Version\/(\d+)\./);
+                if (match && parseInt(match[1], 10) < 13) {
+                    isOldSafari = true;
+                }
+            }
+            
+            var isUnsupported = false;
+            var hasAudio = !!(window.AudioContext || window.webkitAudioContext);
+            var hasLocalStorage = false;
+            try {
+                hasLocalStorage = typeof window.localStorage !== "undefined";
+            } catch (e) {
+                hasLocalStorage = true;
+            }
+
+            if (!window.Promise || !window.fetch || !hasAudio || !hasLocalStorage) {
+                isUnsupported = true;
+            }
+
+            if (isIE || isOldSafari || isUnsupported) {
+                window.__legacy_browser_error = true;
+                var lang = "en";
+                var browserLang = navigator.language || navigator.userLanguage;
+                if (browserLang) {
+                    var code = browserLang.slice(0, 2);
+                    if (["sv", "da", "no", "en"].indexOf(code) !== -1) {
+                        lang = code;
+                    }
+                }
+                
+                var messages = {
+                    sv: {
+                        ie: "INTERNET EXPLORER HAR GÅTT I GRAVEN! 🪦<br>Kamek säger: 'Sluta spela på ett digitalt museum!'",
+                        safari: "RUTTET ÄPPLE! 🍎<br>Din gamla Safari-webbläsare stöds inte av Station 24. Uppdatera din fruktkorg!",
+                        other: "DIN WEBBLÄSARE STÖDS EJ! 🚫<br>Uppgradera din retro-terminal till en modern webbläsare!"
+                    },
+                    en: {
+                        ie: "INTERNET EXPLORER IS DEAD! 🪦<br>Kamek says: 'Stop playing in a digital museum!'",
+                        safari: "ROTTEN APPLE! 🍎<br>Your old Safari browser is not supported by Station 24. Update your fruit basket!",
+                        other: "YOUR BROWSER IS NOT SUPPORTED! 🚫<br>Upgrade your retro terminal to a modern browser!"
+                    },
+                    da: {
+                        ie: "INTERNET EXPLORER ER GÅET I GRAVEN! 🦦<br>Kamek siger: 'Stop med at spille på et digitalt museum!'",
+                        safari: "RÅDDENT ÆBLE! 🍎<br>Din gamle Safari-browser understøttes ikke af Station 24. Opdater din frugtkurv!",
+                        other: "DIN BROWSER UNDERSTØTTES IKKE! 🚫<br>Opgrader din retro-terminal to en moderne browser!"
+                    },
+                    no: {
+                        ie: "INTERNET EXPLORER ER DØD OG BEGRAVET! 🪦<br>Kamek sier: 'Slutt å spille på et digitalt museum!'",
+                        safari: "RÅTTENT EPLE! 🍎<br>Din gamle Safari-nettleser støttes ikke av Station 24. Oppdater fruktkurven din!",
+                        other: "NETTLESEREN DIN STØTTES IKKE! 🚫<br>Oppgrader retroterminalen din til en moderne nettleser!"
+                    }
+                };
+                
+                var msg = messages[lang].other;
+                if (isIE) msg = messages[lang].ie;
+                else if (isOldSafari) msg = messages[lang].safari;
+
+                var blockerHtml = '<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#10001a;color:#ffcc00;font-family:sans-serif;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:20px;box-sizing:border-box;border:15px solid #ff0033;z-index:9999999;">' +
+                    '<h1 style="font-size:42px;margin:0 0 20px 0;color:#ff0033;font-weight:bold;letter-spacing:2px;font-family:sans-serif;">LEGACY BROWSER DETECTED</h1>' +
+                    '<div style="background:rgba(0,0,0,0.85);padding:40px;border-radius:20px;border:3px dashed #ffcc00;max-width:650px;font-size:24px;line-height:1.6;box-shadow:0 0 30px rgba(255,0,0,0.5);font-family:sans-serif;">' + msg + '</div>' +
+                    '</div>';
+
+                document.write(blockerHtml);
+            }
+        })();
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #00ffcc;
+            --gold: #ffcc00;
+            --kamek-glow: #8200ff;
+            --danger: #ff0033;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #030008;
+            font-family: 'Luckiest Guy', cursive;
+            user-select: none;
+            color: white;
+        }
+
+        #gameCanvas {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 1 !important;
+            display: block !important;
+        }
+
+        #hudCanvas {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 5 !important;
+            pointer-events: none;
+        }
+
+        .crt-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 6px 100%;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0.45;
+        }
+
+        #hud-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: calc(100% - 40px);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .stat-box {
+            padding: 10px 18px;
+            border: 3px solid var(--gold);
+            background: rgba(5, 0, 10, 0.85);
+            font-size: 18px;
+            border-radius: 10px;
+            text-shadow: 2px 2px #000;
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.25);
+            pointer-events: auto;
+        }
+
+        #boss-health-widget {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40%;
+            min-width: 300px;
+            background: rgba(5, 0, 10, 0.9);
+            border: 4px solid #ff0033;
+            border-radius: 14px;
+            padding: 10px 15px;
+            z-index: 12;
+            box-shadow: 0 0 25px rgba(255, 0, 51, 0.45);
+            text-align: center;
+        }
+
+        #boss-name {
+            font-size: 20px;
+            color: #ff0033;
+            text-shadow: 2px 2px 0 black;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+
+        .health-bar-bg {
+            width: 100%;
+            height: 16px;
+            background: #1a0005;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 2px solid #52000c;
+        }
+
+        .health-bar-fill {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #ff0033 0%, #ff6600 100%);
+            box-shadow: 0 0 10px #ff0033;
+            transition: width 0.1s ease;
+        }
+
+        #boss-part-status {
+            font-family: 'VT323', monospace;
+            font-size: 14px;
+            color: var(--gold);
+            margin-top: 5px;
+            text-transform: uppercase;
+        }
+
+        #player-health-widget {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            width: 380px;
+            background: rgba(5, 0, 10, 0.95);
+            border: 3px solid var(--primary);
+            border-radius: 16px;
+            padding: 12px 18px;
+            z-index: 10;
+            box-shadow: 0 0 25px rgba(0, 255, 204, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        #player-shield-title {
+            font-size: 13px;
+            color: var(--primary);
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: bold;
+            letter-spacing: 1px;
+            transition: color 0.3s ease;
+        }
+
+        #hud-ship-icon-wrapper {
+            width: 52px;
+            height: 52px;
+            flex-shrink: 0;
+            background: rgba(0, 255, 204, 0.05);
+            border: 2px solid var(--primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-color 0.3s ease, background 0.3s ease;
+        }
+
+        #volume-panel {
+            position: absolute;
+            top: 180px;
+            right: 20px;
+            background: rgba(5, 0, 10, 0.95);
+            border: 3px solid var(--gold);
+            border-radius: 14px;
+            padding: 14px;
+            z-index: 100;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 12px;
+            pointer-events: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 200px;
+            box-shadow: 0 0 25px rgba(255, 204, 0, 0.3);
+        }
+
+        #start-screen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(5, 0, 10, 0.97);
+            padding: 35px;
+            border: 8px solid var(--gold);
+            border-radius: 30px;
+            text-align: center;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 0 40px rgba(130, 0, 255, 0.5);
+            max-height: 90vh;
+            overflow-y: auto;
+            z-index: 99999 !important;
+            pointer-events: auto !important;
+            cursor: default !important;
+        }
+
+        #start-screen h1 {
+            font-size: 44px;
+            color: var(--gold);
+            -webkit-text-stroke: 2px black;
+            margin-top: 0;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 0px #000;
+        }
+
+        .blink-animation {
+            animation: blinker 1s linear infinite;
+            filter: drop-shadow(0 0 5px red);
+        }
+
+        @keyframes blinker {
+            50% { opacity: 0; }
+        }
+
+        #start-screen h2 {
+            font-size: 22px;
+            color: #ff0033;
+            margin-bottom: 25px;
+            font-family: 'VT323', monospace;
+            letter-spacing: 2px;
+        }
+
+        .language-selector-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin: 15px 0 25px 0;
+        }
+
+        .flag-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            background: #120024;
+            border: 3px solid var(--kamek-glow);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--gold);
+            font-size: 12px;
+            font-weight: bold;
+            font-family: 'Luckiest Guy', sans-serif;
+        }
+
+        .flag-button:hover {
+            background: #250044;
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .flag-button svg {
+            width: 40px;
+            height: 26px;
+            border-radius: 4px;
+            margin-bottom: 4px;
+            border: 1.5px solid var(--gold);
+        }
+
+        input#playerName {
+            padding: 10px;
+            font-size: 20px;
+            border-radius: 10px;
+            border: 4px solid var(--kamek-glow);
+            text-align: center;
+            width: 80%;
+            background: #120024;
+            color: white;
+            font-family: 'Luckiest Guy';
+            margin-top: 5px;
+        }
+
+        .btn-start {
+            font-family: 'Luckiest Guy', cursive;
+            background: #00ff00;
+            font-size: 26px;
+            padding: 15px 40px;
+            border: 4px solid black;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #00aa00;
+            transition: transform 0.1s;
+        }
+        .btn-start:active { transform: translateY(5px); box-shadow: none; }
+
+        .btn-secondary {
+            font-family: 'Luckiest Guy', cursive;
+            background: #00ccff;
+            font-size: 18px;
+            padding: 8px 20px;
+            border: 3px solid black;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #0088cc;
+            margin-top: 10px;
+        }
+
+        #kamek-cam-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 150px;
+            height: 110px;
+            background: #000;
+            border: 3px solid var(--kamek-glow);
+            border-radius: 12px;
+            overflow: hidden;
+            z-index: 99;
+            box-shadow: 0 0 15px rgba(130,0,255,0.4);
+        }
+
+        #kamek-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        #kamek-cam-off {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #0c0017;
+            color: var(--gold);
+        }
+
+        #kamek-cam-off p {
+            margin: 5px 0 0 0;
+            font-family: 'VT323', monospace;
+            font-size: 12px;
+        }
+
+        #kamek-mic-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 185px;
+            width: 60px;
+            height: 60px;
+            background: rgba(12,0,23,0.9);
+            border: 2px solid #00ccff;
+            border-radius: 50%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 99;
+        }
+
+        /* Tvinga bort pekaren över hela spelytan */
+#gameCanvas, body {
+    cursor: none !important;
+}
+
+/* Om du har ett HUD-lager, se till att det inte aktiverar pilen */
+#hudCanvas {
+    pointer-events: none !important;
+    cursor: none !important;
+}
+
+        .kamek-bars {
+            display: flex;
+            align-items: flex-end;
+            height: 18px;
+            gap: 2px;
+        }
+
+        .k-bar {
+            width: 3px;
+            background: #00ccff;
+            height: 3px;
+            border-radius: 1px;
+            transition: height 0.05s;
+        }
+
+        #diagnostic-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #040008;
+            z-index: 2000000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-family: 'VT323', monospace;
+            box-sizing: border-box;
+            padding: 40px;
+            border: 10px solid var(--kamek-glow);
+        }
+
+        #diag-log {
+            width: 100%;
+            max-width: 550px;
+            font-size: 24px;
+            text-align: left;
+            line-height: 1.8;
+        }
+
+        .lockdown-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(40, 0, 75, 0.98);
+            z-index: 1000000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            box-sizing: border-box;
+            color: var(--gold);
+            border: 15px solid var(--danger);
+            text-align: center;
+        }
+
+        .lockdown-overlay svg {
+            width: 150px;
+            height: 150px;
+            border: 6px solid var(--danger);
+            background: #110022;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .lockdown-overlay p {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 18px;
+            max-width: 600px;
+            line-height: 1.6;
+            color: white;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px dashed var(--gold);
+            margin-bottom: 20px;
+        }
+
+        .lockdown-overlay button {
+            padding: 12px 35px;
+            font-family: 'Luckiest Guy', cursive;
+            background: var(--gold);
+            color: black;
+            font-size: 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #b89500;
+        }
+
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: flex-end;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: rgba(5, 0, 10, 0.95);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin-top: 8px;
+            border: 2px solid var(--gold);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            animation: toastSlideIn 0.3s ease-out forwards;
+        }
+
+        @keyframes toastSlideIn {
+            from { transform: translateX(120%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100000;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.94);
+            backdrop-filter: blur(8px);
+            overflow-y: auto;
+            padding: 40px 0;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #111;
+            border: 2px solid #00ffcc;
+            padding: 40px;
+            color: #eee;
+            max-width: 600px;
+            border-radius: 15px;
+            text-align: left;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+            line-height: 1.6;
+        }
+
+        #instructions-modal .modal-content, 
+        #instructions-modal #instr-title, 
+        #instructions-modal p, 
+        #instructions-modal li,
+        #instructions-modal button {
+            font-family: Helvetica, Arial, sans-serif !important;
+        }
+
+        #instr-title {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .medical-warning {
+            color: var(--gold);
+            font-size: 15px;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 12px;
+            border: 2px solid var(--gold);
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        #radio-container {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            width: 70px;
+            cursor: pointer;
+            z-index: 10001;
+            transition: transform 0.2s ease;
+        }
+        #radio-container:hover { transform: scale(1.1); }
+        #radio-cross {
+            display: none;
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 110%; height: 5px;
+            background-color: var(--danger);
+            transform: translate(-50%, -50%) rotate(45deg);
+            box-shadow: 0 0 5px black;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div class="crt-overlay"></div>
+
+    <div id="danger-vignette" style="
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: radial-gradient(circle, rgba(255,0,51,0) 40%, rgba(255,0,51,0.65) 100%);
+        z-index: 999;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    "></div>
+
+    <div id="diagnostic-screen">
+        <h1 style="font-size: 40px; color: var(--gold); margin-bottom: 25px; text-shadow: 0 0 10px var(--gold); text-align: center;">STATION 24 - BOSS MODULE CHECK v5.0</h1>
+        <div id="diag-log">
+            <p id="diag-ram">Checking physical memory (RAM)...</p>
+            <p id="diag-cpu" style="display:none;">Checking CPU core counts...</p>
+            <p id="diag-os" style="display:none;">Verifying OS architecture security...</p>
+            <p id="diag-disk" style="display:none;">Scanning local HDD sector capacity...</p>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <div id="hud-container" style="display: none;">
+        <div class="stat-box" style="border-color: var(--primary);">
+            <span id="score-label">SCORE</span>: <span id="score-display">0</span>
+        </div>
+        <div id="battery-indicator" style="display: none; position: absolute; top: 10px; right: 10px; z-index: 100;">
+            <img src="battery-low.svg" id="battery-icon" alt="Lågt batteri">
+        </div>
+        <div class="stat-box" style="border-color: #00ccff; margin-left: 10px;">
+            <span id="mag-label">AMMO</span>: <span id="ammo-display">30 / 120</span>
+        </div>
+        <div class="stat-box" style="border-color: #ff3300; margin-left: 10px;">
+            <span id="rocket-label">ROCKETS</span>: <span id="rocket-display">3</span>
+        </div>
+        <button class="stat-box" style="border-color: var(--kamek-glow); background: #1a0033; color: var(--gold); cursor: pointer;" onclick="location.href='index3.html'">
+            ↩ <span id="quit-label">AVBRYT</span>
+        </button>
+    </div>
+
+    <div id="boss-health-widget" style="display: none;">
+        <div id="boss-name">N. GIN MECHA-STRIKER</div>
+        <div class="health-bar-bg">
+            <div class="health-bar-fill" id="boss-hp-bar"></div>
+        </div>
+        <div id="boss-part-status">ACTIVE COMPONENT: SHOULDER ARTILLERY</div>
+    </div>
+
+    <div id="player-health-widget" style="display: none;">
+        <div id="hud-ship-icon-wrapper">
+            <svg id="hud-ship-svg" viewBox="0 0 40 40" style="width: 36px; height: 36px; filter: drop-shadow(0 0 4px var(--primary)); transition: filter 0.3s ease;">
+                <polygon points="20,4 34,30 20,25 6,30" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linejoin="round"/>
+                <line x1="12" y1="22" x2="28" y2="22" stroke="var(--primary)" stroke-width="1.5"/>
+                <polygon points="20,10 24,18 20,16 16,18" fill="var(--primary)"/>
+            </svg>
+        </div>
+        <div style="flex-grow: 1; display: flex; flex-direction: column;">
+            <div id="player-shield-title">
+                <span id="shield-label">INTEGRITY (SHIELD)</span>
+                <span><span id="player-hp-display">100</span>%</span>
+            </div>
+            <div class="health-bar-bg" style="border-color: #005544; background: #001a14; height: 16px;">
+                <div class="health-bar-fill" id="player-hp-bar" style="background: linear-gradient(90deg, #00ffcc 0%, #00ff66 100%); box-shadow: 0 0 10px var(--primary); width: 100%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="volume-panel" style="display: none;">
+        <div style="font-family: 'Luckiest Guy'; color: var(--gold); font-size: 14px; text-align: center; margin-bottom: 4px;" id="sound-panel-title">LJUDINSTÄLLNINGAR</div>
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; color: white;">
+                <span id="vol-music-label">MUSIK</span>
+                <button id="mute-music-btn" onclick="window.toggleMusicMute()" style="background: var(--kamek-glow); border: none; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold;">MUTE</button>
+            </div>
+            <input type="range" id="music-volume-slider" min="0" max="1" step="0.05" value="0.5" oninput="window.changeMusicVolume(this.value)" style="width: 100%; accent-color: var(--kamek-glow); cursor: pointer;">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 5px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; color: white;">
+                <span id="vol-sfx-label">EFFEKTER (SFX)</span>
+                <button id="mute-sfx-btn" onclick="window.toggleSfxMute()" style="background: var(--primary); border: none; color: black; padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold;">MUTE</button>
+            </div>
+            <input type="range" id="sfx-volume-slider" min="0" max="1" step="0.05" value="0.6" oninput="window.changeSfxVolume(this.value)" style="width: 100%; accent-color: var(--primary); cursor: pointer;">
+        </div>
+        <button onclick="window.audio.nextTrack()" style="background: var(--gold); border: none; color: black; padding: 6px; border-radius: 6px; font-family: 'Luckiest Guy'; font-size: 12px; cursor: pointer; margin-top: 8px; width: 100%;">NÄSTA LÅT ⏭️</button>
+    </div>
+
+    <div id="start-screen">
+        <h1 id="h1-title">N. GIN BOSS MODE</h1>
+        <h2>3D RETRO SPACE ENGAGEMENT</h2>
+
+        <div class="language-selector-grid">
+            <button class="flag-button" onclick="window.setLanguage('sv')" title="Svenska">
+                <svg viewBox="0 0 16 10">
+                    <rect width="16" height="10" fill="#006aa7"/>
+                    <rect width="2" height="10" x="5" fill="#fecc00"/>
+                    <rect width="16" height="2" y="4" fill="#fecc00"/>
+                </svg>
+                <span>Svenska</span>
+            </button>
+            <button class="flag-button" onclick="window.setLanguage('en')" title="English">
+                <svg viewBox="0 0 50 30">
+                    <clipPath id="t"><path d="M0,0 v30 h50 v-30 z"/></clipPath>
+                    <path d="M0,0 L50,30 M50,0 L0,30" stroke="#fff" stroke-width="6" clip-path="url(#t)"/>
+                    <path d="M0,0 L50,30 M50,0 L0,30" stroke="#c8102e" stroke-width="4" clip-path="url(#t)"/>
+                    <path d="M25,0 v30 M0,15 h50" stroke="#fff" stroke-width="10"/>
+                    <path d="M25,0 v30 M0,15 h50" stroke="#c8102e" stroke-width="6"/>
+                </svg>
+                <span>English</span>
+            </button>
+            <button class="flag-button" onclick="window.setLanguage('da')" title="Dansk">
+                <svg viewBox="0 0 37 28">
+                    <rect width="37" height="28" fill="#c8102e"/>
+                    <rect width="4" height="28" x="12" fill="#fff"/>
+                    <rect width="37" height="4" y="12" fill="#fff"/>
+                </svg>
+                <span>Dansk</span>
+            </button>
+            <button class="flag-button" onclick="window.setLanguage('no')" title="Norsk">
+                <svg viewBox="0 0 22 16">
+                    <rect width="22" height="16" fill="#ba0c2f"/>
+                    <rect width="4" height="16" x="6" fill="#fff"/>
+                    <rect width="22" height="4" y="6" fill="#fff"/>
+                    <rect width="2" height="16" x="7" fill="#00205b"/>
+                    <rect width="22" height="2" y="7" fill="#00205b"/>
+                </svg>
+                <span>Norsk</span>
+            </button>
+        </div>
+
+        <div class="difficulty-selector" style="margin-bottom: 15px;">
+            <label for="difficulty" style="color: white; font-family: sans-serif;">Difficulty:</label>
+            <select id="difficulty" style="padding: 10px; font-family: sans-serif;">
+                <option value="easy">Easy</option>
+                <option value="normal" selected>Normal</option>
+                <option value="hard">Hard</option>
+            </select>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="playerName" id="name-label" style="color: white; display: block; margin-bottom: 5px;">SKRIV DITT NAMN:</label>
+            <input type="text" id="playerName" placeholder="Skriv här..." maxlength="12">
+        </div>
+
+        <div id="player-selection" style="margin-bottom: 15px;">
+            <p id="label-player-count">ANTAL SPELARE:</p>
+            <button class="btn-secondary" id="btn-p1" onclick="setPlayerCount(1)">1 SPELARE</button>
+            <button class="btn-secondary" id="btn-p2" onclick="setPlayerCount(2)">2 SPELARE</button>
+        </div>
+
+        <div id="control-selection" style="margin-bottom: 15px;">
+            <p id="label-control-sel">VÄLJ KONTROLL:</p>
+            <button class="btn-secondary" id="btn-mouse" onclick="setControlType('mouse')">MUS + TANGENTBORD</button>
+            <button class="btn-secondary" id="btn-gamepad" onclick="setControlType('gamepad')">HANDKONTROLL</button>
+        </div>
+
+        <div style="margin: 20px 0; background: rgba(130, 0, 255, 0.15); padding: 15px; border-radius: 15px; border: 2px dashed var(--kamek-glow); text-align: left;">
+            <h3 style="margin-top: 0; color: var(--gold); text-align: center; font-size: 16px;" id="sensors-title">TURNERINGS-SENSORER (VALFRITT)</h3>
+            <div style="display: flex; flex-direction: column; gap: 10px; font-family: 'Montserrat', sans-serif; font-size: 13px;">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                    <input type="checkbox" id="use-camera-checkbox" style="width: 18px; height: 18px; accent-color: var(--kamek-glow);">
+                    <span id="label-use-camera">Aktivera Webbkamera (Face Tracking)</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                    <input type="checkbox" id="use-mic-checkbox" style="width: 18px; height: 18px; accent-color: var(--kamek-glow);">
+                    <span id="label-use-mic">Aktivera Mikrofon (Scream Attack)</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="medical-warning" id="medical-warning-text">
+            ⚠️ MEDICINSK VARNING: Spelet innehåller skakningar och stroboskopeffekter i 3D-rymden. Rekommenderas ej för personer med epilepsi.
+        </div>
+
+        <button class="btn-start" id="start-btn" onclick="window.startGame()">START BOSS FIGHT</button>
+        <br>
+        <button class="btn-secondary" id="rules-btn" onclick="showInstructions()">INSTRUKTIONER</button>
+    </div>
+
+    <div id="defeat-modal" class="modal">
+    <div class="modal-content" style="border-color: #ff0033; box-shadow: 0 0 50px rgba(255, 0, 51, 0.6); text-align: center;">
+        <h1 id="defeat-title" style="color: #ff0033; font-family: 'Luckiest Guy'; font-size: 3.5em; margin-top: 0; text-shadow: 3px 3px 0px #000;"></h1>
+        <p id="defeat-desc" style="font-family: 'Montserrat', sans-serif; font-size: 18px; color: #fff;"></p>
+        <div style="background: rgba(0,0,0,0.6); padding: 20px; border-radius: 12px; margin: 20px 0; border: 2px solid #ff0033; font-family: 'VT323', monospace; font-size: 24px; text-align: left; line-height: 1.5;">
+            <div><span id="defeat-score-label"></span>: <span id="defeat-score" style="color: #ffcc00;">0</span></div>
+            <div><span id="defeat-player-label"></span>: <span id="defeat-player" style="color: #ff0033;">-</span></div>
+            <div><span id="defeat-phase-label"></span>: <span id="defeat-phase" style="color: #ffcc00;">-</span></div>
+        </div>
+        <button onclick="window.closeGameOverModals();" class="btn-start" id="defeat-btn" style="width: 100%; box-shadow: 0 5px 0 #aa0000; background: #ff0033; color: white;"></button>
+    </div>
+</div>
+
+<div id="victory-modal" class="modal">
+    <div class="modal-content">
+        <h1 id="victory-title" style="text-align: center; color: var(--gold);"></h1>
+        <p id="victory-desc" style="text-align: center;"></p>
+        <div style="font-size: 20px; margin: 20px 0; text-align: center;">
+            <div><span id="victory-score-label"></span>: <span id="victory-score">0</span></div>
+            <div><span id="victory-player-label"></span>: <span id="victory-player"></span></div>
+        </div>
+        <button class="btn-start" style="background:var(--gold); color:black; width:100%;" onclick="window.closeGameOverModals();" id="victory-btn"></button>
+    </div>
+</div>
+
+    <div id="radio-container" onclick="window.toggleMusic(event)">
+        <svg viewBox="0 0 100 60" style="background:#1a1a1a; border-radius:10px; border:3px solid var(--gold);">
+            <rect x="5" y="5" width="90" height="15" fill="#333" rx="3" />
+            <circle cx="20" cy="40" r="12" fill="#444" stroke="#fff" stroke-width="2"/>
+            <circle cx="20" cy="40" r="4" fill="#000" />
+            <circle cx="80" cy="40" r="12" fill="#444" stroke="#fff" stroke-width="2"/>
+            <circle cx="80" cy="40" r="4" fill="#000" />
+            <rect x="38" y="32" width="24" height="16" fill="#111" stroke="#555" rx="2"/>
+            <line x1="42" y1="40" x2="58" y2="40" stroke="var(--gold)" stroke-width="3"/>
+            <rect x="15" y="9" width="70" height="7" fill="#00ffcc" opacity="0.8"/>
+            <line x1="50" y1="8" x2="50" y2="17" stroke="red" stroke-width="2"/>
+        </svg>
+        <div id="radio-cross"></div>
+    </div>
+
+    <div id="kamek-cam-widget">
+        <video id="kamek-video" autoplay playsinline muted></video>
+        <div id="kamek-cam-off">
+            <svg viewBox="0 0 24 24" width="30" height="30" fill="var(--gold)">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+            </svg>
+            <p id="cam-off-label">CAMERA FEED LOCK</p>
+        </div>
+    </div>
+    <div id="kamek-mic-widget">
+        <div class="kamek-bars">
+            <div class="k-bar"></div><div class="k-bar"></div>
+            <div class="k-bar"></div><div class="k-bar"></div>
+        </div>
+    </div>
+
+    <div id="lockdown-overlay" class="lockdown-overlay">
+        <svg viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="40" fill="#2d0052"/>
+            <polygon points="20,40 50,5 80,40" fill="#8200ff" stroke="#fff" stroke-width="2"/>
+            <ellipse cx="50" cy="40" rx="30" ry="6" fill="#00ffcc"/>
+            <polygon points="35,55 45,60 35,62" fill="yellow"/>
+            <polygon points="65,55 55,60 65,62" fill="yellow"/>
+            <circle cx="40" cy="58" r="2" fill="red"/>
+            <circle cx="60" cy="58" r="2" fill="red"/>
+            <path d="M 40,75 Q 50,65 60,75" stroke="#ff0033" stroke-width="4" fill="none"/>
+        </svg>
+        <h1 id="lockdown-title">CHEAT DETECTED!</h1>
+        <p id="lockdown-msg">System locked.</p>
+        <button onclick="window.location.reload()">RESTART TERMINAL</button>
+    </div>
+
+    <div id="instructions-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="instr-title" style="text-align: center; color: #00ffcc; margin-top:0;">Spelguide</h2>
+            <h3 style="color: #fff; margin-bottom:5px;">Kontroller</h3>
+            <p id="instr-controls" style="margin-top:0; font-size:14px;"></p>
+            <h3 style="color: #fff; margin-bottom:5px;">Hur man spelar</h3>
+            <p id="instr-goal" style="margin-top:0; font-size:14px;"></p>
+            <h3 style="color: #fff; margin-bottom:5px;">Hälsa & Power-ups</h3>
+            <p id="instr-health" style="margin-top:0; font-size:14px;"></p>
+            <p id="instr-powerups" style="margin-top:0; font-size:14px;"></p>
+            <h3 style="color: #ffcc00; margin-bottom:5px;">Sensorisk varning</h3>
+            <p id="instr-sensory" style="margin-top:0; font-size:14px;"></p>
+            <button onclick="closeInstructions()" style="width: 100%; padding: 15px; margin-top: 20px; cursor: pointer; background: #00ffcc; border: none; font-weight: bold; color:black; border-radius:8px;">OK - Jag förstår</button>
+        </div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+    <canvas id="hudCanvas"></canvas>
+
+    <script>
+        // ==========================================================================
+        // GLOBAL STATE & DECLARATIONS
+        // ==========================================================================
+        let scene, camera, renderer, starfield;
+        let bossGroup = null;
+        let bossMaterials = {};
+        let hudCanvas, hudCtx;
+        let clock = null;
+        let keys = {};
+        let gamepadFoundAtLeastOnce = false;
+        let shipMesh = null;
+        let flight = { x: 0, y: -4.5, z: 8 };
+        let explosionParticles = [];
+        let gameState = 'START';
+        let lastButtonStates = [[], []];
+        let lastBatteryLevel = 1.0;
+        let score = 0;
+        let ammoInMag = 30;
+        const magSize = 30;
+        let ammoReserve = 120;
+        let rocketCount = 3;
+        let isReloading = false;
+        let playerHealth = 100;
+        let bossHealth = 100;
+        let bossStage = 0;
+        let isBossSpawned = false; 
+        let isTransitioningBoss = false;
+        let controlType = 'mouse';
+        let isInfiniteAmmo = true;
+        let bossTransitionProgress = 0;
+        let players = [
+            { id: 0, role: 'PILOT_AND_GUNNER', active: true },
+            { id: 1, role: 'GUNNER_ONLY', active: false }
+        ];
+        let playerCount = 1;
+        let p2Sight = { x: window.innerWidth/2, y: window.innerHeight/2 };
+        let gp2Active = false;
+        let lastPoll = Date.now();
+        let lastGamepadTimestamp = 0;
+        let gameStartTime = Date.now();
+        let currentPlayerName = "Gäst";
+        let shakeIntensity = 0;
+        
+        const difficultyConfig = {
+            easy: { bossHp: 70, spawnRate: 0.5, attackSpeed: 0.5, flashIntensity: 0 },
+            normal: { bossHp: 100, spawnRate: 1.0, attackSpeed: 1.0, flashIntensity: 1 },
+            hard: { bossHp: 150, spawnRate: 2.0, attackSpeed: 1.5, flashIntensity: 2 }
+        };
+        let boss = { isAttacking: false, attackTimer: 0 };
+        let activeDifficulty = 'normal';
+
+        let minions = [];
+        let minionsDefeatedCount = 0;
+        const totalMinionsToDefeat = 8;
+        let powerUps = [];
+        let tripleShotTime = 0;
+        let shieldTime = 0;
+        let mousePx = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+        let laserBeams = [];
+        let playerRockets = [];
+        let bossProjectiles = [];
+
+       let bossComponents = {
+    leftShoulder:  { x: -9,  y: 7,  z: -40, hp: 30, active: false, size: 5, name: "SHOULDER_L" },
+    rightShoulder: { x: 9,   y: 7,  z: -40, hp: 30, active: false, size: 5, name: "SHOULDER_R" },
+    leftArm:       { x: -14, y: -2, z: -40, hp: 40, active: false, size: 4, name: "ARM_L" },
+    rightArm:      { x: 14,  y: -2, z: -40, hp: 40, active: false, size: 4, name: "ARM_R" },
+    powerCore:     { x: 0,   y: 2,  z: -40, hp: 80, active: false, size: 6, name: "CORE" }
+};
+
+        let micStream = null;
+        let micAnalyser = null;
+        let micDataArray = null;
+
+        const translations = {
+            sv: {
+                score: "POÄNG",
+                ammo: "MAGASIN",
+                rocket_label: "RAKETER",
+                player_name: "SKRIV DITT NAMN:",
+                placeholder_name: "Gäst...",
+                medical_warning: "⚠️ MEDICINSK VARNING: Spelet innehåller skakningar och stroboskopeffekter i 3D-rymden. Rekommenderas ej för personer med epilepsi.",
+                start_game: "STARTA STRIDEN",
+                reloading_warning: "LADDA OM [R] NU!",
+        no_rockets: "SLUT PÅ RAKETER!",
+                instructions: "INSTRUKTIONER",
+                quit_label: "AVBRYT",
+                shield_label: "INTEGRITET (SKÖLD)",
+                camera_off_label: "KAMERA INAKTIV",
+                reloading: "🔄 LADDAR OM VAPENSYSTEM...",
+                reloaded_ready: "✅ STRIDSREDO!",
+                laser_hot: "⚠️ SENSORVÄRME KRITISK!",
+                lockdown_title: "TERMINAL LÅST!",
+                escape_locked: "ESCAPE ÄR SPÄRRAT PÅ LAN!",
+                devtools_forbidden: "DEVTOOLS FÖRBJUDET! Hacker-fasoner loggade.",
+                lost_focus: "INGEN FUSKPAUS TILLÅTEN! Kamek attackerar.",
+                tab_switch_detected: "FLIKBYTE DETEKTERAT! Kamek ser allt.",
+                trackpad_lockdown: "SLUTA SMEKA DIN LAPTOP! 🚫\n\nKamek hånar din styrplatta: 'NYEHEHEHE!'\nDu måste ha en riktig datormus för att rikta laserartilleriet på LAN:et!",
+                ups_warning: "⚠️ STRÖMAVBROTT / NÖDSTRÖM UPS REDO!",
+                mode_asymmetric: "ASYMMETRISK: Kapten & Skytt",
+                p2_connected: "🎮 SPELARE 2 ANSLUTEN!",
+                gunner_hån: "Kamek hånar: 'Skytten sover? Sikta bättre, din amatör!'",
+                
+                good_luck: "MÅ KAOS VARA MED DIG, {name}!",
+                stage0_msg: "FAS 0: Skjut ner Kameks anfallande rymddrönare!",
+                stage1_msg: "FAS 1: Skjut ner båda axelmissil-poddarna!",
+                stage2_msg: "FAS 2: Se upp för laser-svepen! Skjut gatlingarmarna!",
+                stage3_msg: "FAS 3: BRÖSTPLÅTEN REVENGERAD! Skjut kärnan nu!",
+                boss_warning: "⚠️ VARNING: GIGANTISK MECHA NÄRMAR SIG!",
+                victory_msg: "🏆 KAOS SEGER! Du förintade N. Gins Mecha!",
+                defeat_msg: "💀 DITT SKEPP BLEV RUMSDAMM!",
+                
+                diag_ram: "Analyserar fysiskt arbetsminne (RAM)...",
+                diag_cpu: "Söker efter processorkärnor (i5/Ryzen 5)...",
+                diag_os: "Kontrollerar operativsystemets säkerhetsarkitektur...",
+                diag_disk: "Skannar efter ledigt lagringsutrymme på HDD...",
+                diag_ok: "OK!",
+                diag_fail: "MISLYCKADES!",
+                device_hw_ram_fail: "KATASTROFAL BRIST: För lite RAM-minne! 💥\nN. Gin Boss Mode kräver minst 4GB RAM för att inte krascha webbläsaren.",
+                device_hw_cpu_cores_fail: "CPU-MISSLYKKANDE: För få fysiska processorkärnor! 🚴\nMinst 4 trådar krävs.",
+                device_hw_os_linux: "HACKER LOCKDOWN: Linux (Pingvinsystem) spärrat i turneringszonen!",
+                device_hw_os_chromeos: "SKOLDATOR BANNAD: ChromeOS upptäckt! Gör läxorna istället.",
+                device_hw_storage_fail: "HDD INTEGRITETSFEL: Ledigt utrymme kritiskt lågt!",
+                device_mobile: "MOBIL DETEKTERAD! 🚫\nDetta 3D-rymdslag kräver mus, tangentbord och äkta prestanda. Kasta telefonen!",
+                device_tablet: "SURFPLATTA UPPTÄCKT! 👶\nGå och titta på barn-tv istället för å flyga stridsskepp!",
+                device_smarttv: "SMART-TV UPPTÄCKT! 📺\nDin TV-processor är en brödrost. Återgå till att se på kattklipp.",
+                device_console: "KONSOL DETEKTERST! Spelet styrs med tangentbord och mus.",
+                device_car: "BILSKÄRM DETEKTERAD! 🚗\nTesla-piloter rekommenderas datorskärm på LAN:et!",
+                device_refrigerator: "SMART KYLSKÅP DETEKTERAD! 🧊\nFörsöker du spela arkad på kylskåpsdörren? Stäng mjölkpaketet!",
+                device_smartwatch: "SMARTKLOCKA DETEKTERAD! ⌚\nSkärmen är mindre än en enkrona, skaffa ett mikroskop.",
+                device_smarthome: "SMART HEM-SKÄRM DETEKTERAD! Kamek skrattar ihjäl sig åt din termostat.",
+                device_unknown: "OKÄND TEKNOLOGI DETEKTERAD!",
+                // VR / AR
+                device_mixed_reality: "Kamek hånar: 'VR-glasögon? Jag behöver inte virtuell verklighet för att se att du inte hör hemma här!'",
+    
+    // Kiosker & Offentliga terminaler
+    device_kiosk: "Kamek hånar: 'Försöker du spela på en bankomat eller en informationsskärm? Gå och köp en biljett istället!'",
+    
+    // Skrivare & Kontorsmaskiner (med webbläsare!)
+    device_printer: "Kamek hånar: 'En skrivare? Ska du skriva ut en hög med förlorade liv eller vad är planen?!'",
+
+                manual_title: "STRIDSOPERATÖR: N. GIN PROTOKOLLET",
+                manual_warning_text: "⚠️ MEDICINSK VARNING: Innehåller kraftiga explosioner och 3D-laserblixtar.",
+                controls_title: "🎮 KONTROLLER",
+                controls_desc: "<strong>[W, A, S, D]</strong> eller <strong>Piltangenter</strong>: Flyg upp/vänster/ner/höger för att ducka lasrar.<br><strong>Musen</strong>: Sikta siktet mot bossens lysande delar.<br><strong>Vänsterklick</strong>: Skjut laser.<br><strong>Högerklick</strong>: Skjut tung raket.<br><strong>[R]</strong>: Ladda om vapensystemen.",
+                boss_stages_title: "⚙️ MECH STRATEGIPLAN",
+                boss_stages_desc: "<strong>FAS 1:</strong> Förstör de gula missil-poddarna på axlarna.<br><strong>FAS 2:</strong> Undvik gatling-lasrarna som dras tvärs över skärmen och skjut armlederna.<br><strong>FAS 3:</strong> Centralplåten exploderar! Skjut kärnan nu.",
+
+                sensors_title: "TURNERINGS-SENSORER (VALFRITT)",
+                use_stored_powerup: "⚡ POWER-UP AKTIVERAD!",
+                no_powerup_stored: "INGEN POWER-UP LAGRAD!",
+                toast_controller_lost: "⚠️ KONTROLL TAPPAD ANSLUTNING!",
+                toast_charge_battery: "⚠️ LADDA BATTERIET! Kontrollen har dött.",
+                controller_unsupported: "🎮⚠️ HANDKONTROLL STÖDS EJ (FÖR FÅ KNAPPAR!)",
+                mock_low_battery: "Kamek hånar: 'Lågt batteri?! Hämta laddaren, din slöfock! Vill du verkligen att striden ska ta slut nu?'",
+                controller_unsupported: "⚠️ HAR DU EN USB-KABEL? Din kontroll har för mycket fördröjning.",
+                mock_nes: "Kamek hånar: 'En NES-kontroll? Ska du spela med två knappar i en 3D-strid? Lycka till, rymd-amatör!'",
+        mock_snes: "Kamek hånar: 'SNES? Visst, du har fler knappar nu, men var är spakarna? Ska du styra mitt skepp med en D-pad? Sött!'",
+        mock_n64: "Kamek hånar: 'N64? Är det här ett museum? Jag behöver inte en styrspak som glappar mer än mina egna ben!'",
+        mock_gamecube: "Kamek hånar: 'GameCube? En lila matlåda med knappar utspridda som konfetti? Den är inte byggd för den här galaxens hastigheter!'",
+        mock_dreamcast: "Kamek hånar: 'Dreamcast? Drömmer du om att vinna? Du kommer vakna upp i rymddamm innan du ens hittat startknappen!'",
+        mock_genesis: "Kamek hånar: 'Sega Genesis? Gör en tjänst och gå tillbaka till 90-talet, du får inte ens fart på mitt skepp!'",
+        mock_saturn: "Kamek hånar: 'Sega Saturn? Jag har sett mer avancerad teknik i en kaffebryggare! Vill du köra ett varv i museet?'",
+        mock_ps1_classic: "Kamek hånar: 'En original PlayStation-kontroll utan spakar? Hur planerar du att styra i 3D? Med telepati? Patetiskt!'",
+                label_use_camera: "Aktivera Webbkamera (Face Tracking)",
+                defeat_title: "DU MISSLYCKADES",
+        victory_title: "🏆 SEGER! 🏆",
+        victory_msg: "🏆 KAOS SEGER! Du förintade N. Gins Mecha!",
+        victory_btn: "ÅTERVÄND TILL LOBBYN",
+        defeat_btn: "FÖRSÖK IGEN 🔄",
+        defeat_hån: [
+            "Du misslyckades! Är du säker på att du inte är en rymddrönare?",
+            "Du misslyckades! Ett barn hade flugit bättre än så där.",
+            "Du misslyckades! Kamek skrattar åt din kassa flygförmåga.",
+            "Du misslyckades! Kanske dags att byta ut musen mot en kontroller?"
+        ],
+                label_use_mic: "Aktivera Mikrofon (Scream Attack)",
+                player_count_label: "ANTAL SPELARE:",
+        p1: "1 SPELARE",
+        p2: "2 SPELARE (Mus + Dosa)",
+        control_sel_label: "VÄLJ KONTROLL:",
+        mouse_kb: "MUS + TANGENTBORD",
+        gamepad: "HANDKONTROLL",
+                sound_panel_title: "LJUDINSTÄLLNINGAR",
+                vol_music_label: "MUSIK",
+                vol_sfx_label: "EFFEKTER (SFX)",
+                now_playing: "🎵 SPELAR NU",
+                music_muted: "Musik avstängd 🔇",
+                music_unmuted: "Musik aktiverad 🔊",
+                sfx_muted: "Effekter avstängda 🔇",
+                sfx_unmuted: "Effekter aktiverade 🔊",
+                instr_title: "Spelguide",
+instr_controls: "Kontroller: Använd WASD för att styra...",
+instr_goal: "Mål: Besegra bossen...",
+instr_health: "Hälsa & Power-ups...",
+instr_powerups: "Power-ups...",
+instr_sensory: "Sensorisk varning...",
+                powerup_heal: "❤️ HÄLSA & SKÖLD REGENERERAD!",
+                powerup_triple: "⚡ TRIPPELSKOTT AKTIVERAT!",
+                powerup_shield: "🛡️ OÖVERVINNLIG RETRO-SKÖLD AKTIV!",
+                powerup_rockets: "🚀 TUNGE RAKETER INLADDADE (+2)!",
+                powerup_ammo: "📦 LASERAMMUNITION PÅFYLLD (+60)!",
+                trackpad_lockdown_warning: "⚠️ STYRPLATTA DETEKTERAD: Använd en fysisk mus för bättre precision!",
+                controller_connected: "🎮 HANDKONTROLL DETEKTERAD"
+            },
+            en: {
+                score: "SCORE",
+                ammo: "AMMO",
+                rocket_label: "ROCKETS",
+                player_name: "ENTER YOUR NAME:",
+                placeholder_name: "Guest...",
+                medical_warning: "⚠️ MEDICAL WARNING: This game contains shaking and strobe effects in 3D space. Not recommended for people with epilepsy.",
+                start_game: "START BOSS FIGHT",
+                instructions: "INSTRUCTIONS",
+                quit_label: "QUIT",
+                shield_label: "SHIELD INTEGRITY",
+                camera_off_label: "CAMERA LOCKED",
+                reloading: "🔄 RELOADING WEAPON SYSTEMS...",
+                reloaded_ready: "✅ COMBAT READY!",
+                laser_hot: "⚠️ SENSOR HEAT CRITICAL!",
+                lockdown_title: "TERMINAL LOCKED!",
+                escape_locked: "ESCAPE IS BLOCKED ON LAN!",
+                devtools_forbidden: "DEVTOOLS FORBIDDEN! Hack attempt logged.",
+                lost_focus: "NO CHEAT PAUSING ALLOWED! Kamek is attacking.",
+                tab_switch_detected: "TAB SWITCH DETECTED! Kamek is watching.",
+                controller_connected: "🎮 GAMEPAD DETECTED",
+                trackpad_lockdown: "STOP STROKING YOUR LAPTOP! 🚫\n\nKamek mocks your trackpad: 'NYEHEHEHE!'\nYou must connect a real mouse to guide the tactical laser cannons on this LAN!",
+                ups_warning: "⚠️ POWER OUTAGE / EMERGENCY UPS ARMED!",
+                mock_low_battery: "Kamek mocks: 'Low battery?! Get the charger, you sloth! Do you really want the battle to end now?'",
+                toast_controller_lost: "⚠️ CONTROLLER DISCONNECTED!",
+                toast_charge_battery: "⚠️ CHARGE THE BATTERY! Controller died.",
+                reloading_warning: "RELOAD [R] NOW!",
+        no_rockets: "NO ROCKETS LEFT!",
+                
+                good_luck: "MAY CHAOS BE WITH YOU, {name}!",
+                stage0_msg: "STAGE 0: Shoot down Kamek's invading space drones!",
+                stage1_msg: "STAGE 1: Shoot down both shoulder missile pods!",
+                stage2_msg: "STAGE 2: Dodge the laser sweeps! Target the gatling joints!",
+                stage3_msg: "STAGE 3: HULL BREACHED! Strike the fusions core now!",
+                boss_warning: "⚠️ WARNING: GIANT MECHA DETECTED!",
+                victory_msg: "🏆 VICTORY ACHIEVED! You obliterated N. Gin's Mech!",
+                defeat_msg: "💀 YOUR VESSEL SHATTERED INTO SPACE DUST!",
+                player_count_label: "NUMBER OF PLAYERS:",
+        p1: "1 PLAYER",
+        p2: "2 PLAYERS (Mouse + Keyboard)",
+        control_sel_label: "SELECT CONTROLLER:",
+        mouse_kb: "MOUSE + KEYBOARD",
+        gamepad: "GAMEPAD",
+                mock_nes: "Kamek mocks: 'An NES controller? Playing with two buttons in a 3D battle? Good luck, space-amateur!'",
+        mock_snes: "Kamek mocks: 'SNES? Sure, you have more buttons, but where are the joysticks? Steering with a D-pad? Cute!'",
+        mock_n64: "Kamek mocks: 'N64? Is this a museum? My ship doesn't respond to prehistoric joystick drift!'",
+        mock_gamecube: "Kamek mocks: 'GameCube? A purple lunchbox with buttons scattered like confetti? Not built for these speeds!'",
+        mock_dreamcast: "Kamek mocks: 'Dreamcast? Dreaming of winning? You'll wake up as space dust before you find the start button!'",
+        mock_genesis: "Kamek mocks: 'Sega Genesis? Do yourself a favor and return to the 90s, you aren't catching up to me with that!'",
+        mock_saturn: "Kamek mocks: 'Sega Saturn? I've seen more advanced tech in a coffee maker! Want a tour of the museum?'",
+        mock_ps1_classic: "Kamek mocks: 'Original PS1 controller with no sticks? Planning to steer using telepathy? Pathetic!'",
+        mode_asymmetric: "ASYMMETRIC: Pilot & Gunner",
+                p2_connected: "🎮 PLAYER 2 CONNECTED!",
+                gunner_hån: "Kamek mocks: 'Gunner sleeping? Aim better, amateur!'",
+                defeat_title: "YOU FAILED",
+        victory_title: "🏆 VICTORY! 🏆",
+        victory_msg: "🏆 VICTORY ACHIEVED! You obliterated N. Gin's Mech!",
+        victory_btn: "RETURN TO LOBBY",
+        defeat_btn: "TRY AGAIN 🔄",
+        defeat_hån: [
+            "You failed! Are you sure you're not a space drone?",
+            "You failed! A toddler could have flown better than that.",
+            "You failed! Kamek is laughing at your pathetic flying skills.",
+            "You failed! Maybe swap the mouse for a controller?"
+        ],
+
+                diag_ram: "Analyzing physical memory (RAM)...",
+                diag_cpu: "Looking for processor core counts (i5/Ryzen 5)...",
+                diag_os: "Verifying OS architecture security...",
+                diag_disk: "Scanning available space on HDD...",
+                diag_ok: "PASSED!",
+                diag_fail: "FAILED!",
+                se_stored_powerup: "⚡ POWER-UP ACTIVATED!",
+                no_powerup_stored: "NO POWER-UP STORED!",
+                device_hw_ram_fail: "CRITICAL FAILURE: Too little RAM! 💥\nN. Gin Boss Mode requires at least 4GB RAM to prevent browser panic.",
+                device_hw_cpu_cores_fail: "CPU FAILURE: Too few processor cores! 🚴\nAt least 4 execution threads required.",
+                device_hw_os_linux: "HACKER LOCKDOWN: Linux prohibited in tournament grids!",
+                device_hw_os_chromeos: "SCHOOL LAPTOP BANNED: ChromeOS detected!",
+                device_hw_storage_fail: "HDD INTEGRITY FAULT: Critical low storage space!",
+                device_mobile: "MOBILE DETECTED! 🚫\nThis 3D space engagement requires mouse & keyboard!",
+                device_tablet: "TABLET DETECTED! 👶\nGo watch cartoons instead!",
+                device_smarttv: "SMART TV DETECTED! 📺\nTV browser toaster cannot run this 3D battle.",
+                device_console: "CONSOLE DETECTED! Input keyboard and mouse to play.",
+                device_car: "CAR SCREEN DETECTED! 🚗\nAutopilot is not capable of N. Gin combat!",
+                device_refrigerator: "SMART FRIDGE DETECTED! 🧊\nClose the fridge door first!",
+                device_smartwatch: "SMARTWATCH DETECTED! ⌚\nThe screen is smaller than a coin!",
+                device_smarthome: "SMART HOME DISPLAY DETECTED! Kamek laughs at your smart thermostat.",
+                device_unknown: "UNKNOWN TECHNOLOGY DETECTED!",
+
+                manual_title: "COMBAT OPERATOR: THE N. GIN PROTOCOL",
+                manual_warning_text: "⚠️ MEDICAL WARNING: Contains intense explosions and 3D laser flashes.",
+                controls_title: "🎮 CONTROLS",
+                controls_desc: "<strong>[W, A, S, D]</strong> or <strong>Arrow keys</strong>: Fly up/left/down/right to evade lasers.<br><strong>Mouse</strong>: Aim the reticle at the flashing components.<br><strong>Left Click</strong>: Fire laser.<br><strong>Right Click</strong>: Fire Heavy Rocket.<br><strong>[R]</strong>: Reload weapon systems.",
+                boss_stages_title: "⚙️ MECH STRATEGY PLAN",
+                boss_stages_desc: "<strong>STAGE 1:</strong> Destroy the yellow missile pods on the shoulders.<br><strong>STAGE 2:</strong> Dodge the laser sweeps moving across the screen. Shoot the arm joints.<br><strong>STAGE 3:</strong> Central plating explodes! Strike the fusions core now.",
+
+                sensors_title: "TOURNAMENT SENSORS (OPTIONAL)",
+                controller_unsupported: "🎮⚠️ CONTROLLER NOT SUPPORTED (TOO FEW BUTTONS!)",
+                controller_unsupported: "⚠️ DO YOU HAVE A USB CABLE? Your controller has too much input lag.",
+                label_use_camera: "Enable Webcam (Face Tracking)",
+                label_use_mic: "Enable Microphone (Scream Attack)",
+                sound_panel_title: "SOUND SETTINGS",
+                vol_music_label: "MUSIC",
+                vol_sfx_label: "EFFECTS (SFX)",
+                now_playing: "🎵 NOW PLAYING",
+                music_muted: "Music muted 🔇",
+                music_unmuted: "Music unmuted 🔊",
+                sfx_muted: "SFX muted 🔇",
+                sfx_unmuted: "SFX unmuted 🔊",
+                powerup_heal: "❤️ HP & SHIELD RESTORED!",
+                powerup_triple: "⚡ TRIPLE LASERS ACTIVATED!",
+                powerup_shield: "🛡️ INVULNERABLE RETRO SHIELD ACTIVE!",
+                powerup_rockets: "🚀 HEAVY ROCKETS LOADED (+2)!",
+                powerup_ammo: "📦 LASER AMMO RESTOCKED (+60)!",
+                trackpad_lockdown_warning: "⚠️ TRACKPAD DETECTED: Please use a physical mouse for precision!"
+            },
+            da: {
+                score: "SCORE",
+                ammo: "MAGASIN",
+                rocket_label: "RAKETER",
+                player_name: "SKRIV DIT NAVN:",
+                placeholder_name: "Gæst...",
+                medical_warning: "⚠️ MEDICINSK ADVARSEL: Spillet indeholder rystelser og stroboskopeffekter i 3D-rummet. Anbefales ikke til personer med epilepsi.",
+                start_game: "START STRIDEN",
+                instructions: "INSTRUKTIONER",
+                quit_label: "AVBRYD",
+                shield_label: "INTEGRITET (SKJOLD)",
+                camera_off_label: "KAMERA DEAKTIVERET",
+                reloading: "🔄 GENOPLADER VÅBENSYSTEM...",
+                reloaded_ready: "✅ STRIDSREDO!",
+                laser_hot: "⚠️ SENSORVARME KRITISK!",
+                no_rockets: "SLUT PÅ RAKETER!",
+        reload_now: "GENINDLAD [R] NU!",
+                lockdown_title: "TERMINAL LÅST!",
+                escape_locked: "ESCAPE ER BLOKERET PÅ LAN!",
+                devtools_forbidden: "DEVTOOLS FORBUDT! Hacker-forsøg logget.",
+                lost_focus: "TERMINAL MISTER FOKUS! Ingen fuskpause tilladt.",
+                player_count_label: "ANTAL SPILLERE:",
+        p1: "1 SPILLER",
+        p2: "2 SPILLERE (Mus + Controller)",
+        control_sel_label: "VÆLG KONTROL:",
+        mouse_kb: "MUS + TASTATUR",
+        gamepad: "CONTROLLER",
+                tab_switch_detected: "SKIFT AF FANE DETEKTERET! ...",
+                trackpad_lockdown: "STOP MED AT AE DIN BÆRBARE! 🚫\n\nKamek håner din berøringsplade: 'NYEHEHEHE!'\nDu skal have en rigtig mus til at styre laseren!",
+                ups_warning: "⚠️ STRØMAFBRYDELSE! UPS NØDSTRØM KLAR!",
+                toast_controller_lost: "⚠️ KONTROL AFBRUDT!",
+                toast_charge_battery: "⚠️ OPLAD BATTERIET! Kontrollen er død.",
+                se_stored_powerup: "⚡ POWER-UP AKTIVERET!",
+                no_powerup_stored: "INGEN POWER-UP LAGRET!",
+                mock_low_battery: "Kamek håner: 'Lavt batteri?! Hent opladeren, din dovenbrik! Vil du virkelig have, at kampen slutter nu?'",
+                mode_asymmetric: "ASYMMETRISK: Kaptajn & Skytte",
+                p2_connected: "🎮 SPILLER 2 TILSLUTTET!",
+                gunner_hån: "Kamek håner: 'Skytte sover? Sigt bedre, amatør!'",
+                defeat_title: "DU MISLYKKEDES",
+        victory_title: "🏆 SEJR! 🏆",
+        victory_msg: "🏆 SEJR! Du destruerede N. Gins Mecha!",
+        victory_btn: "TILBAGE TIL LOBBYEN",
+        defeat_btn: "PRØV IGEN 🔄",
+        defeat_hån: [
+            "Du mislykkedes! Er du sikker på, du ikke er en rumdrone?",
+            "Du mislykkedes! Et barn kunne have fløjet bedre end det der.",
+            "Du mislykkedes! Kamek griner af dine elendige evner.",
+            "Du mislykkedes! Måske tid til at skifte musen ud med en controller?"
+        ],
+
+                good_luck: "HELD OG LYKKE, {name}!",
+                stage0_msg: "FAS 0: Skyd Kameks angribende rumdroner ned!",
+                stage1_msg: "FAS 1: Skyd begge skuldermissil-puder ned!",
+                stage2_msg: "FAS 2: Pas på laser-fejene! Skyd armleddene!",
+                stage3_msg: "FAS 3: BRYSTPLADEN SPRÆNGE! Skyd kernen nu!",
+                boss_warning: "⚠️ ADVARSEL: GIGANTISK MECHA DETEKTERET!",
+                victory_msg: "🏆 SEJR! Du destruerede N. Gins Mecha!",
+                defeat_msg: "💀 DITT SKIB BLEV TIL RUMSTØV!",
+                controller_connected: "🎮 SPILKONTROLLER DETEKTERET",
+                controller_unsupported: "🎮⚠️ KONTROL STØTTES IKKE (FOR FÅ KNAPPER!)",
+                controller_unsupported: "⚠️ HAR DU ET USB-KABEL? Din kontrol har for meget forsinkelse.",
+                
+                diag_ram: "Analyserer fysisk arbejdshukommelse (RAM)...",
+                diag_cpu: "Søger efter processorkerner (i5/Ryzen 5)...",
+                diag_os: "Kontrollerer operativsystemets sikkerhetsarkitektur...",
+                diag_disk: "Scanner efter ledig lagerplads på HDD...",
+                diag_ok: "GODKENDT!",
+                diag_fail: "MISLYKKEDES!",
+                device_hw_ram_fail: "KATASTROFAL FEJL: For litt RAM! 💥\nMindst 4GB RAM kræves.",
+                device_hw_cpu_cores_fail: "CPU FEJL: For få processorkerner! 🚴",
+                device_hw_os_linux: "SIKKERHEDS LOCKDOWN: Linux spærret i turneringen!",
+                device_hw_os_chromeos: "SKOLECOMPUTER BANDLYST: ChromeOS detekteret! Lav lektier i stedet.",
+                device_hw_storage_fail: "HDD PLADS CRITICAL LOW!",
+                device_mobile: "MOBIL DETEKTERET! 🚫\nKrav om mus, tastatur og strøm. Smid telefonen!",
+                device_tablet: "TABLET DETEKTERET! 👶\nGå over og se Gurli Gris i stedet.",
+                device_smarttv: "SMART-TV DETEKTERET! 📺\nDin processor er en brødrister. Se kattevideoer i stedet.",
+                device_console: "KONSOL DETEKTERET!",
+                device_car: "BILSKÆRM DETEKTERET! 🚗 Hold øhnene på vejen!",
+                device_refrigerator: "SMART KØLESKAB DETEKTERET! 🧊 Gå hen og luk mælken!",
+                device_smartwatch: "SMARTWATCH DETEKTERET! Skaff et mikroskop.",
+                device_smarthome: "SMART HJEM DETEKTERET!",
+                device_unknown: "UKENDT TEKNOLOGI DETEKTERET!",
+                mock_nes: "Kamek håner: 'En NES-kontrol? Skal du spille med to knapper i en 3D-kamp? Held og lykke, rum-amatør!'",
+        mock_snes: "Kamek håner: 'SNES? Visst, du har flere knapper nu, men hvor er joystickene? Skal du styre med en D-pad? Sött!'",
+        mock_n64: "Kamek håner: 'N64? Er det her et museum? Jeg behøver ikke en pind der drifter mere end mine egne ben!'",
+        mock_gamecube: "Kamek håner: 'GameCube? En lilla madkasse med knapper spredt som konfetti? Ikke bygget til denne galakses hastigheder!'",
+        mock_dreamcast: "Kamek håner: 'Dreamcast? Drømmer du om at vinde? Du vågner op som rumstøv før du har fundet startknappen!'",
+        mock_genesis: "Kamek håner: 'Sega Genesis? Gør dig selv en tjeneste og tag tilbage til 90'erne, du indhenter mig ikke med det skrammel!'",
+        mock_saturn: "Kamek håner: 'Sega Saturn? Jeg har set mere avanceret teknik i en kaffemaskine! Vil du på rundvisning på museet?'",
+        mock_ps1_classic: "Kamek håner: 'En PS1-kontrol uden joysticks? Planlægger du at styre med telepati? Patetisk!'",
+        mock_low_battery: "Kamek håner: 'Lavt batteri?! Hent laderen, din lathans! Vil du virkelig at kampen skal slutte nå?'",
+
+                manual_title: "STRIDSOPERATØR: N. GIN PROTOKOLLET",
+                player_count_label: "ANTAL SPILLERE:",
+        p1: "1 SPILLER",
+        p2: "2 SPILLERE (Mus + Controller)",
+        control_sel_label: "VÆLG KONTROL:",
+        mouse_kb: "MUS + TASTATUR",
+        gamepad: "CONTROLLER",
+                manual_warning_text: "⚠️ MEDICINSK ADVARSEL: Indeholder kraftige ekspektioner og 3D-laserglimt.",
+                controls_title: "🎮 KONTROLLER",
+                controls_desc: "<strong>[W, A, S, D]</strong> eller <strong>Piltaster</strong>: Flyv op/venstre/ned/højre for at undvige.<br><strong>Musen</strong>: Sigt mod de blinkende svage punkter.<br><strong>Venstreklik</strong>: Skyd laser.<br><strong>Højreklik</strong>: Skyd raketer.<br><strong>[R]</strong>: Genoplad.",
+                boss_stages_title: "⚙️ MECH STRATEGIPLAN",
+                boss_stages_desc: "<strong>FAS 1:</strong> Skyd skuldermissil-puderne.<br><strong>FAS 2:</strong> Undvig de vandrette laser-svep. Skyd armleddene.<br><strong>FAS 3:</strong> Brystpladen sprænges! Skyd kernen nu.",
+
+                sensors_title: "TURNERINGS-SENSORER (VALGFRIT)",
+                label_use_camera: "Aktivér Webkamera (Face Tracking)",
+                no_rockets: "SLUTT PÅ RAKETER!",
+        reload_now: "LAD OM [R] NÅ!",
+                label_use_mic: "Aktivér Mikrofon (Scream Attack)",
+                sound_panel_title: "LYDINDSTILLINGER",
+                vol_music_label: "MUSIK",
+                vol_sfx_label: "EFFEKTER (SFX)",
+                now_playing: "🎵 SPILLER NU",
+                music_muted: "Musik dæmpet 🔇",
+                music_unmuted: "Musik aktiveret 🔊",
+                sfx_muted: "Effekter dæmpet 🔇",
+                sfx_unmuted: "Effekter aktiveret 🔊",
+                powerup_heal: "❤️ SUNDHED GENERERET!",
+                powerup_triple: "⚡ TRIPLE LASERE AKTIVERET!",
+                powerup_shield: "🛡️ RETRO SKJOLD AKTIV!",
+                powerup_rockets: "🚀 TUNGE RAKETER TILFØJET (+2)!",
+                powerup_ammo: "📦 LASER AMMUNITION GENOPFYLDT (+60)!",
+                trackpad_lockdown_warning: "⚠️ PEGEFELT DETEKTERET: Brug en rigtig mus til kampen!"
+            },
+            no: {
+                score: "POENG",
+                ammo: "MAGASIN",
+                rocket_label: "RAKETER",
+                player_name: "SKRIV DITT NAMN:",
+                placeholder_name: "Gjest...",
+                medical_warning: "⚠️ MEDISINSK ADVARSEL: Spillet inneholder rystelser og stroboskopeffekter i 3D-rymden. Anbefales ikke for personer med epilepsi.",
+                start_game: "START STRIDEN",
+                instructions: "INSTRUKSJONER",
+                quit_label: "AVBRYT",
+                shield_label: "INTEGRITET (SKJOLD)",
+                camera_off_label: "KAMERA DEAKTIVERT",
+                reloading: "🔄 LADER OM VÅBENSYSTEM...",
+                reloaded_ready: "✅ STRIDSKLAR!",
+                laser_hot: "⚠️ SENSORVARME KRITISK!",
+                lockdown_title: "TERMINAL LÅST!",
+                escape_locked: "ESCAPE ER SPERRET PÅ LAN!",
+                devtools_forbidden: "DEVTOOLS ER FORBUDT! Hacker-forsøk logget.",
+                lost_focus: "TERMINAL MISTER FOKUS! Juksing ikke tillatt.",
+                tab_switch_detected: "FANEBYTTE OPPDAGET! Kamek ser alt.",
+                trackpad_lockdown: "SLUTT Å STRYKE LAPTOPPEN DIN! 🚫\n\nKamek ler av den klumpete styreflaten din: 'NYEHEHEHE!'\nDu må koble til en ekte datamus for å sikte laseren på LAN-et!",
+                ups_warning: "⚠️ STRØMBRUDD! UPS NØDSTRØM SIKRET!",
+                defeat_title: "DU MISLYKKEDES",
+        victory_title: "🏆 SEIER! 🏆",
+        victory_msg: "🏆 SEIER! Du tilintetgjorde N. Gins Mecha!",
+        victory_btn: "TILBAKE TIL LOBBYEN",
+        defeat_btn: "PRØV IGJEN 🔄",
+        defeat_hån: [
+            "Du mislyktes! Er du sikker på at du ikke er en romdrone?",
+            "Du mislyktes! Et barn kunne fløyet bedre enn det der.",
+            "Du mislyktes! Kamek ler av dine elendige evner.",
+            "Du mislyktes! Kanskje på tide å bytte musen mot en kontroller?"
+        ],
+                se_stored_powerup: "⚡ POWER-UP AKTIVERT!",
+                no_powerup_stored: "INGEN POWER-UP LAGRET!",
+                toast_controller_lost: "⚠️ KONTROLLER FRAKOBLET!",
+                toast_charge_battery: "⚠️ LAD BATTERIET! Kontrolleren er død.",
+                mode_asymmetric: "ASYMMETRISK: Kaptein & Skytter",
+                p2_connected: "🎮 SPILLER 2 TILKOBLET!",
+                gunner_hån: "Kamek håner: 'Skytter sover? Sikt bedre, amatør!'",
+                
+                good_luck: "LYKKE TIL, {name}!",
+                stage0_msg: "FAS 0: Skyt ned Kameks angripende romdroner!",
+                stage1_msg: "FAS 1: Skyt ned begge skuldermissil-poddene!",
+                player_count_label: "ANTALL SPILLERE:",
+        p1: "1 SPILLER",
+        p2: "2 SPILLERE (Mus + Kontroller)",
+        control_sel_label: "VELG KONTROLL:",
+        mouse_kb: "MUS + TASTATUR",
+        gamepad: "KONTROLLER",
+                stage2_msg: "FAS 2: Pass deg for lasersveipene! Skyt armleddene!",
+                stage3_msg: "FAS 3: BRYSTPLATINGEN EXPLODERER! Skyt kjernen nå!",
+                boss_warning: "⚠️ ADVARSEL: GIGANTISK MECHA OPPDAGET!",
+                victory_msg: "🏆 SEIER! Du tilintetgjorde N. Gins Mecha!",
+                defeat_msg: "💀 SKIPET DITT BLE TIL ROMSTØV!",
+                controller_connected: "🎮 SPILLKONTROLLER OPPDAGET",
+                controller_unsupported: "🎮⚠️ KONTROLLER STØTTES IKKE (FOR FÅ KNAPPER!)",
+                controller_unsupported: "⚠️ HAR DU EN USB-KABEL? Kontrolleren din har for mye forsinkelse.",
+                mock_nes: "Kamek håner: 'En NES-kontroller? Skal du spille med to knapper i en 3D-kamp? Lykke til, rom-amatør!'",
+        mock_snes: "Kamek håner: 'SNES? Jada, du har flere knapper nå, men hvor er stikkene? Skal du styre med en D-pad? Søtt!'",
+        mock_n64: "Kamek håner: 'N64? Er dette et museum? Jeg trenger ikke en stikke som drifter mer enn mine egne ben!'",
+        mock_gamecube: "Kamek håner: 'GameCube? En lilla matboks med knapper spredt som konfetti? Ikke bygget for denne galaksens hastigheter!'",
+        mock_dreamcast: "Kamek håner: 'Dreamcast? Drømmer du om å vinne? Du våkner opp som romstøv før du har funnet startknappen!'",
+        mock_genesis: "Kamek håner: 'Sega Genesis? Gjør deg selv en tjeneste og dra tilbake til 90-tallet, du tar meg ikke igjen med det skrotet!'",
+        mock_saturn: "Kamek håner: 'Sega Saturn? Jeg har sett mer avansert teknikk i en kaffetrakter! Vil du på omvisning på museet?'",
+        mock_ps1_classic: "Kamek håner: 'En PS1-kontroller uten spaker? Planlegger du å styre med telepati? Patetisk!'",
+                
+                diag_ram: "Analyserer fysisk minne (RAM)...",
+                diag_cpu: "Søker etter prosessorkjerner (i5/Ryzen 5)...",
+                diag_os: "Verifiserer operativsystemets sikkerhetsarkitektur...",
+                diag_disk: "Skanner etter ledig diskplass på HDD...",
+                diag_ok: "GODKJENT!",
+                diag_fail: "MISLYKTES!",
+                device_hw_ram_fail: "KATASTROFAL MANGLER: For lite RAM! 💥\nUnngå spillkræsj på LAN.",
+                device_hw_cpu_cores_fail: "CPU MISSLYKKING: For få prosessorkjerner! 🚴",
+                device_hw_os_linux: "SIKKERHETS LOCKDOWN: Linux spærret i turneringen!",
+                device_hw_os_chromeos: "SKOLE-PC BANNLYST: ChromeOS oppdaget! Gjør lekser isteden.",
+                device_hw_storage_fail: "HDD-FEIL: Diskplass kritisk lav!",
+                device_mobile: "MOBIL OPPDAGET! 🚫\nKrever mus, tastatur og stabil strøm. Kast telefonen!",
+                device_tablet: "NETTBRETT OPPDAGET! 👶\nGå og se på Fantorangen i stedet.",
+                device_smarttv: "SMART-TV OPPDAGET! 📺\nProsessoren din er en brødrister. Se kattevideoer isteden.",
+                device_console: "KONSOL DETEKTERT!",
+                device_car: "BILSKJERM OPPDAGET! 🚗 Hold øynene på vejen!",
+                device_refrigerator: "SMART KJØLESKAP OPPDAGET! 🧊 Gå og lukk melken!",
+                device_smartwatch: "SMARTKLOCKA OPPDAGET! Skaff et mikroskop.",
+                device_smarthome: "SMART HJEM-SKJERM DETEKTERT!",
+                device_unknown: "UKJENT ENHED OPPDAGET! 👽",
+
+                manual_title: "STRIDSOPERATÖR: N. GIN PROTOKOLLET",
+                manual_warning_text: "⚠️ MEDISINSK ADVARSEL: Inneholder kraftige explosions og 3D-laserglimt.",
+                controls_title: "🎮 KONTROLLER",
+                controls_desc: "<strong>[W, A, S, D]</strong> eller <strong>Piltaster</strong>: Fly opp/venstre/ned/høyre for å unnvike lasersveip.<br><strong>Musen</strong>: Sikt mot de blinkende sårbare punktene.<br><strong>Venstreklikkt</strong>: Skyt laser.<br><strong>Høyreklikk</strong>: Skyt tung raket.<br><strong>[R]</strong>: Lader om våpensystemet.",
+                boss_stages_title: "⚙️ MECH STRATEGIPLAN",
+                mock_low_battery: "Kamek håner: 'Lavt batteri?! Hent laderen, din lathans! Vil du virkelig at kampen skal slutte nå?'",
+                boss_stages_desc: "<strong>FAS 1:</strong> Skyt skuldermissil-poddene.<br><strong>FAS 2:</strong> Unnvike de gigantiske lasersveipene. Skyt armleddene.<br><strong>FAS 3:</strong> Sentralplaten sprenges! Skyt kjernen nå.",
+
+                sensors_title: "TURNERINGS-SENSORER (VALGFRIT)",
+                label_use_camera: "Aktiver Webkamera (Face Tracking)",
+                label_use_mic: "Aktiver Mikrofon (Scream Attack)",
+                sound_panel_title: "LYDINNSTILLINGER",
+                vol_music_label: "MUSIKK",
+                vol_sfx_label: "EFFEKTER (SFX)",
+                now_playing: "🎵 SPILLER NÅ",
+                music_muted: "Musikk dempet 🔇",
+                music_unmuted: "Musikk active 🔊",
+                sfx_muted: "Effekter dempet 🔇",
+                sfx_unmuted: "Effekter aktive 🔊",
+                powerup_heal: "❤️ SKJOLD & INTEGRITET GENERERT!",
+                powerup_triple: "⚡ TRIPPELSKUDD AKTIVERT!",
+                powerup_shield: "🛡️ OOVERVINNLIG RETRO-SKJOLD AKTIVT!",
+                powerup_rockets: "🚀 TUNGE RAKETER SIKRET (+2)!",
+                powerup_ammo: "📦 LASER AMMUNISJON HENTET (+60)!",
+                trackpad_lockdown_warning: "⚠️ STYREPLATE DETEKTERT: Bruk en fysisk mus for presis sikting!"
+            }
+        };
+        let currentLang = 'sv'; // ... din logik för språk ...
+
+    function t(key) {
+        return translations[currentLang]?.[key] || translations['en']?.[key] || key;
+    }
+
+    // DEFINIERA DEN HÄR, LÅST TILL GLOBALt WINDOW
+window.setLanguage = function(lang) {
+    if (translations[lang]) {
+        currentLang = lang;
+        try { safeStorage.setItem('gameLanguage', lang); } catch(e) {}
+        initializeUIText();
+        showToast("🌐 LANGUAGE SET!", "var(--primary)");
+    }
+};
+
+        const safeStorage = {
+            _data: {},
+            getItem: function(key) { try { return window.localStorage.getItem(key); } catch (e) { return this._data[key] || null; } },
+            setItem: function(key, value) { try { window.localStorage.setItem(key, value); } catch (e) { this._data[key] = String(value); } }
+        };
+
+        function setControlType(type) {
+            controlType = type;
+            showToast(type === 'mouse' ? "MOUSE MODE SELECTED" : "CONTROLLER MODE SELECTED", "var(--primary)");
+        }
+
+        // ==========================================================================
+        // RETRO AUDIO ENGINE & PLAYLIST (Återställd från v1)
+        // ==========================================================================
+        class SoundEngine {
+            constructor() {
+                this.ctx = null;
+                this.musicVolume = 0.5;
+                this.sfxVolume = 0.6;
+                this.isMusicMuted = false;
+                this.isSfxMuted = false;
+                this.currentSongIndex = 0;
+                this.audioElement = null;
+
+                const rawPaths = [
+                    'music/gangnam_style.mp3', // FLYTTAD HÄRÅT! Den ultimata YouTube-hiten!
+                'music/billie_jean.mp3', 
+                'music/levitating.mp3', 
+                'music/blinding_lights.mp3', 
+                'music/golden.mp3', 
+                'music/faded.mp3', 
+                'music/headlights.mp3', 
+                'music/miracle.mp3', 
+                'music/starships.mp3', 
+                'music/despre_tine.mp3',
+                'music/good_feeling.mp3', 
+                'music/wild_ones.mp3', 
+                'music/alone.mp3', 
+                'music/where_have_you_been.mp3', 
+                'music/party_rock_anthem.mp3', 
+                'music/titanium.mp3', 
+                'music/fever_dream.mp3', 
+                'music/axel_f.mp3', 
+                'music/dragostea_del_tei.mp3', 
+                'music/low.mp3', 
+                'music/where_them_girls_at.mp3',
+                'music/tik_tok.mp3', 
+                'music/my_system.mp3',
+                'music/animals.mp3',
+                'music/the_business.mp3', 
+                'music/yeah.mp3', 
+                'music/bad_romance.mp3', 
+                'music/beauty_and_a_beat.mp3', 
+                'music/dont_you_worry_child.mp3', 
+                'music/clarity.mp3', 
+                'music/lean_on.mp3',
+                'music/du_hast.mp3', 
+                'music/the_trooper.mp3', 
+                'music/chop_suey.mp3', 
+                'music/through_the_fire_and_flames.mp3',
+                'music/u_cant_touch_this.mp3', 
+                'music/just_wanna_rock.mp3',
+                'music/rockstar.mp3', 
+                'music/rockstar_dababy.mp3', 
+                'music/montero.mp3', 
+                'music/freestyler.mp3', 
+                'music/lose_yourself.mp3',
+                'music/lucid_dreams.mp3',
+                'music/old_town_road.mp3',
+                'music/gods_plan.mp3',
+                'music/ice_ice_baby.mp3',
+                'music/here_i_go_again_ws.mp3', 
+                'music/thunderstruck.mp3', 
+                'music/the_final_countdown.mp3', 
+                'music/in_the_end.mp3', 
+                'music/danger_zone.mp3', 
+                'music/dragula.mp3', 
+                'music/kickstart_my_heart.mp3', 
+                'music/died_in_your_arms.mp3', 
+                'music/we_built_this_city.mp3', 
+                'music/it_has_begun_starset.mp3',
+                'music/take_on_me.mp3', 
+                'music/sweet_dreams.mp3', 
+                'music/moviestar.mp3', 
+                'music/never_gonna_give_you_up.mp3', 
+                'music/send_me_an_angel.mp3',
+                'music/self_control.mp3',
+                'music/take_a_chance.mp3',  
+                'music/dancing_queen.mp3',  
+                'music/mamma_mia.mp3',  
+                'music/knowing_me_knowing_you.mp3', 
+                'music/the_winner_takes_it_all.mp3',
+                'music/you_spin_me_round.mp3', 
+                'music/ma_baker.mp3', 
+                'music/smalltown_boy.mp3',
+                'music/bowsers_galaxy.mp3', 'music/gerudo_valley.mp3', 'music/gusty_garden.mp3', 
+                'music/coconut_mall.mp3', 'music/pokemon_main.mp3', 'music/mario64_slider.mp3', 
+                'music/mk64_rr.mp3', 'music/mk64_raceway.mp3', 'music/my_system.mp3',
+                'music/axel_f.mp3', 
+                'music/caramelldansen.mp3', 
+                'music/dragostea_del_tei.mp3', 
+                'music/despre_tine.mp3',
+                'music/gangnam_style.mp3',
+                'music/rosa_helikopter.mp3', 
+                'music/cotton_eye_joe.mp3', 
+                'music/rhythm_is_a_dancer.mp3', 
+                'music/never_going_home_tonight.mp3', 
+                'music/eurodancer.mp3', 
+                'music/axel_f.mp3', 
+                'music/despre_tine.mp3',
+                'music/dragostea_del_tei.mp3', 
+                'music/miracle.mp3', 
+'music/alone_ii.mp3', 
+                'music/alone_iii.mp3', 
+                'music/diamond_heart.mp3', 
+                'music/on_the_floor.mp3', 
+                'music/here_i_go_again.mp3', 
+                'music/no_limit.mp3', 
+                'music/pump_up_the_jam.mp3', 
+                'music/sandstorm.mp3', 
+                'music/boten_anna.mp3', 
+                'music/scooter.mp3', 
+                'music/caramelldansen.mp3',
+                'music/rosa_helikopter.mp3',  
+                'music/the_logical_song.mp3', 
+                'music/this_is_the_way.mp3', 
+                'music/my_system.mp3',
+                'music/what_is_love.mp3', 
+                'music/blue.mp3', 
+                'music/strong_enough.mp3', 
+                'music/set_the_world_on_fire.mp3', 
+                'music/better_off_alone.mp3', 
+                'music/boom_boom_boom.mp3', 
+                'music/everytime_we_touch.mp3', 
+                'music/we_like_to_party.mp3', 
+                'music/when_we_were_young.mp3', 
+                'music/be_my_lover.mp3', 
+                'music/infinity_2008.mp3', 
+                'music/children_miles.mp3', 
+                'music/god_is_a_dj.mp3', 
+                'music/sound_of_silence_remix.mp3',
+                'music/ecstasy.mp3', 
+                'music/l_amour_toujours.mp3', 
+                'music/stereo_love.mp3', 
+                'music/mr_saxobeat.mp3',
+                'music/raggen_går.mp3', 
+                'music/rid_mig_som_en_dalahäst.mp3',
+                'music/bubbel_pa_balkongen.mp3', 
+                'music/weed_i_raggarbil.mp3', 
+                'music/rödvin_rose.mp3', 
+                'music/elov_beny.mp3',
+                'music/trucker_motherfucker.mp3', 
+                'music/rom_cola.mp3', 
+                'music/kan_inte_gå.mp3',
+                'music/caramelldansen.mp3',
+                'music/rosa_helikopter.mp3', 
+                'music/forsta_gången_i_en_epa.mp3',
+                'music/ikvall_igen.mp3',
+                'music/30kmh.mp3',
+                'music/banan_melon_kiwi_citron.mp3', 
+                'music/valhalla.mp3', 
+                'music/trakten_epan.mp3',
+                'music/inget_stoppar_oss_nu.mp3', 
+                'music/guld_och_grona_skogar.mp3', 
+                'music/leende_guldbruna_ogon.mp3', 
+                'music/diggiloo_diggiley.mp3',
+                'music/varlden_utanfor.mp3',
+                'music/lyssna_till_ditt_hjarta.mp3',
+                'music/eloise.mp3'
+                ];
+
+                this.playlist = rawPaths.map(path => {
+                    let name = path.split('/').pop().replace('.mp3', '');
+                    if (name === 'gs') name = "GoldenEye 007 - Temple";
+                    else if (name === 'mk64_rr') name = "Mario Kart 64 - Rainbow Road";
+                    else if (name === 'mk64_raceway') name = "Mario Kart 64 - Raceway Theme";
+                    else if (name === 'mario64_slider') name = "Super Mario 64 - Slider Theme";
+                    else if (name === 'bowsers_galaxy') name = "Super Mario Galaxy - Bowser Battle";
+                    else if (name === 'gusty_garden') name = "Super Mario Galaxy - Gusty Garden";
+                    else name = name.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                    return { name, url: path };
+                });
+
+                this.currentSongIndex = Math.floor(Math.random() * this.playlist.length);
+            }
+
+            init() {
+                if (this.ctx) return;
+                this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                this.audioElement = new Audio();
+                this.audioElement.loop = false;
+                this.audioElement.addEventListener('ended', () => this.nextTrack());
+                this.audioElement.addEventListener('error', () => {
+                    setTimeout(() => this.nextTrack(), 800);
+                });
+            }
+
+            playLaser() {
+                if (!this.ctx || this.isSfxMuted || this.sfxVolume <= 0) return;
+                let osc = this.ctx.createOscillator();
+                let gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.15 * this.sfxVolume, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.start(); osc.stop(this.ctx.currentTime + 0.15);
+            }
+
+            playExplosion() {
+                if (!this.ctx || this.isSfxMuted || this.sfxVolume <= 0) return;
+                let bufferSize = this.ctx.sampleRate * 0.4;
+                let buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                let data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+                let noiseNode = this.ctx.createBufferSource();
+                noiseNode.buffer = buffer;
+
+                let filter = this.ctx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(400, this.ctx.currentTime);
+                filter.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 0.4);
+
+                let gain = this.ctx.createGain();
+                gain.gain.setValueAtTime(0.3 * this.sfxVolume, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.4);
+
+                noiseNode.connect(filter); filter.connect(gain); gain.connect(this.ctx.destination);
+                noiseNode.start(); noiseNode.stop(this.ctx.currentTime + 0.4);
+            }
+
+            playPlayerHit() {
+                if (!this.ctx || this.isSfxMuted || this.sfxVolume <= 0) return;
+                let osc = this.ctx.createOscillator();
+                let gain = this.ctx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(50, this.ctx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.2 * this.sfxVolume, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.start(); osc.stop(this.ctx.currentTime + 0.2);
+            }
+
+            playReload() {
+                if (!this.ctx || this.isSfxMuted || this.sfxVolume <= 0) return;
+                let osc1 = this.ctx.createOscillator();
+                let gain1 = this.ctx.createGain();
+                osc1.frequency.setValueAtTime(1200, this.ctx.currentTime);
+                gain1.gain.setValueAtTime(0.1 * this.sfxVolume, this.ctx.currentTime);
+                gain1.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
+                osc1.connect(gain1); gain1.connect(this.ctx.destination);
+                osc1.start(); osc1.stop(this.ctx.currentTime + 0.05);
+
+                setTimeout(() => {
+                    if (!this.ctx || this.isSfxMuted) return;
+                    let osc2 = this.ctx.createOscillator();
+                    let gain2 = this.ctx.createGain();
+                    osc2.frequency.setValueAtTime(900, this.ctx.currentTime);
+                    gain2.gain.setValueAtTime(0.1 * this.sfxVolume, this.ctx.currentTime);
+                    gain2.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
+                    osc2.connect(gain2); gain2.connect(this.ctx.destination);
+                    osc2.start(); osc2.stop(this.ctx.currentTime + 0.05);
+                }, 200);
+            }
+
+            nextTrack() {
+                if (this.playlist.length > 1) {
+                    let nextIndex;
+                    do {
+                        nextIndex = Math.floor(Math.random() * this.playlist.length);
+                    } while (nextIndex === this.currentSongIndex);
+                    this.currentSongIndex = nextIndex;
+                } else {
+                    this.currentSongIndex = 0;
+                }
+                this.stopMusic();
+                this.startMusic();
+            }
+
+            startMusic() {
+                this.init();
+                if (!this.audioElement) return;
+                const activeSong = this.playlist[this.currentSongIndex];
+                showToast(`${t('now_playing')}: ${activeSong.name}`, "var(--gold)");
+                this.audioElement.src = activeSong.url;
+                this.audioElement.volume = this.isMusicMuted ? 0 : this.musicVolume;
+                this.audioElement.play().catch(() => {});
+            }
+
+            stopMusic() {
+                if (this.audioElement) {
+                    this.audioElement.pause();
+                }
+            }
+        }
+        const audio = new SoundEngine();
+
+        window.changeMusicVolume = function(val) {
+            audio.musicVolume = parseFloat(val);
+            if (audio.audioElement) {
+                audio.audioElement.volume = audio.isMusicMuted ? 0 : audio.musicVolume;
+            }
+        };
+        window.changeSfxVolume = function(val) { audio.sfxVolume = parseFloat(val); };
+        window.toggleMusicMute = function() {
+            audio.isMusicMuted = !audio.isMusicMuted;
+            const btn = document.getElementById('mute-music-btn');
+            if (audio.isMusicMuted) {
+                btn.innerText = "UNMUTE"; btn.style.background = "#555";
+            } else {
+                btn.innerText = "MUTE"; btn.style.background = "var(--kamek-glow)";
+            }
+            if (audio.audioElement) audio.audioElement.volume = audio.isMusicMuted ? 0 : audio.musicVolume;
+        };
+        window.toggleSfxMute = function() {
+            audio.isSfxMuted = !audio.isSfxMuted;
+            const btn = document.getElementById('mute-sfx-btn');
+            if (audio.isSfxMuted) {
+                btn.innerText = "UNMUTE"; btn.style.background = "#555"; btn.style.color = "white";
+            } else {
+                btn.innerText = "MUTE"; btn.style.background = "var(--primary)"; btn.style.color = "black";
+            }
+        };
+
+        function toggleMusic(e) {
+            if (e) e.stopPropagation();
+            const panel = document.getElementById('volume-panel');
+            if (panel) panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+        }
+
+        function updateBatteryStatus(gp) {
+            if (!gp) return;
+            const batteryEl = document.getElementById('battery-indicator');
+            if (!batteryEl) return;
+            const level = gp.battery?.level;
+            if (level !== undefined && level < 0.20) {
+                batteryEl.style.display = 'block';
+                batteryEl.classList.add('blink-animation');
+            } else {
+                batteryEl.style.display = 'none';
+            }
+        }
+
+        function setPlayerCount(count) {
+            playerCount = count;
+            showToast(count === 1 ? "SINGLE PLAYER MODE" : "CO-OP MODE", "var(--gold)");
+        }
+
+        function pollGamepad(gamepads) {
+    if (!gamepads || gameState !== 'PLAYING') return;
+
+    // Hitta den aktiva handkontrollen
+    const gp = gamepads[0] || gamepads[1];
+    if (!gp) return;
+
+    updateBatteryStatus(gp);
+    const deadzone = 0.2;
+
+    // Använd ett fast, stabilt delta-värde för handkontrollen (ca 60 FPS) för att slippa klock-krockar
+    const d = 0.016; 
+
+    // --- 1. STYRA SKEPPET (Vänster spak / DPAD) ---
+    let moveX = Math.abs(gp.axes[0]) > deadzone ? gp.axes[0] : 0;
+    let moveY = Math.abs(gp.axes[1]) > deadzone ? -gp.axes[1] : 0;
+    if (gp.buttons[12]?.pressed) moveY = 1.0;
+    if (gp.buttons[13]?.pressed) moveY = -1.0;
+    if (gp.buttons[14]?.pressed) moveX = -1.0;
+    if (gp.buttons[15]?.pressed) moveX = 1.0;
+
+    flight.x = THREE.MathUtils.clamp(flight.x + moveX * 0.4, -8, 8);
+    flight.y = THREE.MathUtils.clamp(flight.y + moveY * 0.4, -4.5, 4.5);
+
+    // I DIN pollGamepad(), ersätt sikt-delen med denna felsäkra version:
+    let aimX = Math.abs(gp.axes[2]) > deadzone ? gp.axes[2] : 0;
+    let aimY = Math.abs(gp.axes[3]) > deadzone ? gp.axes[3] : 0;
+    
+    // Om axel 3 är 0, testa axel 4 (vanligt på vissa PS/Logitech-kontroller)
+    if (aimY === 0 && gp.axes[4] !== undefined) aimY = gp.axes[4];
+
+    if (aimX !== 0 || aimY !== 0) {
+        const sensitivity = 1000;
+        mousePx.x += aimX * sensitivity * d;
+        mousePx.y += aimY * sensitivity * d;
+    }
+
+    // Tvinga siktet att stanna inom skärmens kanter (Failsafe)
+    if (mousePx.x < 0) mousePx.x = 0;
+    if (mousePx.x > window.innerWidth) mousePx.x = window.innerWidth;
+    if (mousePx.y < 0) mousePx.y = 0;
+    if (mousePx.y > window.innerHeight) mousePx.y = window.innerHeight;
+    // --- 3. KNAPPAR & KAMEK SÄKERHET ---
+    const btnPressed = (b) => gp.buttons[b]?.pressed;
+
+    // KAMEK LOCKDOWN: Start/Paus (Knapp 9)
+    if (btnPressed(9)) {
+        triggerKamekLock('lost_focus');
+        return;
+    }
+
+    // Knapp A -> Skjut Laser
+    if (btnPressed(0) && (!lastButtonStates[0] || !lastButtonStates[0][0])) {
+        firePlayerLaser();
+    }
+    
+    // Knapp X -> Ladda om
+    if (btnPressed(2) && (!lastButtonStates[0] || !lastButtonStates[0][2])) {
+        reload();
+    }
+
+    // Knapp R2 -> Skjut Raket
+    if (btnPressed(7) && (!lastButtonStates[0] || !lastButtonStates[0][7])) {
+        firePlayerRocket();
+    }
+
+    // Spara knapptillstånd
+    if (!lastButtonStates[0]) lastButtonStates[0] = [];
+    for (let b = 0; b < gp.buttons.length; b++) {
+        lastButtonStates[0][b] = gp.buttons[b].pressed;
+    }
+}
+
+        window.addEventListener("gamepaddisconnected", (e) => {
+            if (gameState !== 'PLAYING') return;
+            showToast(t('toast_controller_lost'), "var(--danger)");
+            triggerKamekLock('toast_controller_lost');
+        });
+
+        function toScreenPosition(vector3) {
+            const vector = vector3.clone();
+            vector.project(camera);
+            const x = (vector.x * .5 + .5) * window.innerWidth;
+            const y = (-(vector.y * .5) + .5) * window.innerHeight;
+            return { x, y };
+        }
+
+        async function initKamekMedia(useCam, useMic) {
+            try {
+                if (!useCam && !useMic) {
+                    document.getElementById('kamek-cam-widget').style.display = 'none';
+                    document.getElementById('kamek-mic-widget').style.display = 'none';
+                    return;
+                }
+                const stream = await navigator.mediaDevices.getUserMedia({ video: useCam, audio: useMic });
+                if (useCam) {
+                    document.getElementById('kamek-cam-widget').style.display = 'block';
+                    const v = document.getElementById('kamek-video');
+                    v.srcObject = stream; v.style.display = 'block';
+                    document.getElementById('kamek-cam-off').style.display = 'none';
+                }
+            } catch (e) { console.warn("Sensorer ej tillgängliga."); }
+        }
+
+        function showInstructions() {
+            document.getElementById('instructions-modal').style.display = 'flex';
+            const data = translations[currentLang];
+            document.getElementById('instr-title').innerText = data.instr_title;
+            document.getElementById('instr-controls').innerText = data.instr_controls;
+            document.getElementById('instr-goal').innerText = data.instr_goal;
+            document.getElementById('instr-health').innerText = data.instr_health;
+            document.getElementById('instr-powerups').innerText = data.instr_powerups;
+            document.getElementById('instr-sensory').innerText = data.instr_sensory;
+        }
+        function closeInstructions() { document.getElementById('instructions-modal').style.display = 'none'; }
+
+        function showToast(text, color) {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const div = document.createElement('div');
+            div.className = 'toast'; div.style.borderColor = color; div.innerText = text;
+            container.appendChild(div);
+            setTimeout(() => { div.remove(); }, 3000);
+        }
+
+        function safeRemove(obj) {
+            if (!obj) return;
+            scene.remove(obj);
+            obj.traverse(child => {
+                if (child.isMesh) {
+                    if (child.geometry) child.geometry.dispose();
+                    if (child.material) child.material.dispose();
+                }
+            });
+        }
+
+        function createPlayerShip() {
+            if (shipMesh) safeRemove(shipMesh);
+            const shipGroup = new THREE.Group();
+            const bodyGeo = new THREE.ConeGeometry(1, 4, 4);
+            bodyGeo.rotateX(Math.PI / 2);
+            const bodyMat = new THREE.MeshStandardMaterial({ color: 0xffaa00, roughness: 0.1, metalness: 0.5 });
+            const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
+            bodyMesh.name = "cockpitCore";
+            shipGroup.add(bodyMesh);
+
+            const wingGeo = new THREE.BoxGeometry(3.5, 0.2, 1.5);
+            const wingMat = new THREE.MeshStandardMaterial({ color: 0x00ffcc, roughness: 0.1, metalness: 0.5 });
+            const wingMesh = new THREE.Mesh(wingGeo, wingMat);
+            wingMesh.position.set(0, -0.3, 0);
+            shipGroup.add(wingMesh);
+
+            shipMesh = shipGroup;
+            shipMesh.position.set(flight.x, flight.y, flight.z);
+            scene.add(shipMesh);
+        }
+
+        function firePlayerRocket() {
+            if (!shipMesh || isReloading || rocketCount <= 0) return;
+            rocketCount--;
+            updateAmmoHUD();
+            audio.playLaser();
+
+            const nx = (mousePx.x / window.innerWidth) * 2 - 1;
+            const ny = -(mousePx.y / window.innerHeight) * 2 + 1;
+            const targetPoint = new THREE.Vector3(nx * 20, ny * 15, -40);
+
+            const rocketGroup = new THREE.Group();
+            const rBodyGeo = new THREE.CylinderGeometry(0.3, 0.3, 1.8, 8);
+            rBodyGeo.rotateX(Math.PI / 2);
+            const rBody = new THREE.Mesh(rBodyGeo, new THREE.MeshStandardMaterial({ color: 0xff3300 }));
+            rocketGroup.add(rBody);
+
+            rocketGroup.position.set(shipMesh.position.x, shipMesh.position.y, shipMesh.position.z - 2);
+            rocketGroup.lookAt(targetPoint);
+            const dir = new THREE.Vector3().subVectors(targetPoint, rocketGroup.position).normalize();
+            scene.add(rocketGroup);
+            playerRockets.push({ mesh: rocketGroup, dir: dir, speed: 2.2 });
+        }
+
+        function init3D() {
+            clock = new THREE.Clock();
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 0, 20);
+
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('gameCanvas'), antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            hudCanvas = document.getElementById('hudCanvas');
+            hudCanvas.width = window.innerWidth;
+            hudCanvas.height = window.innerHeight;
+            hudCtx = hudCanvas.getContext('2d');
+
+            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            let dirLight = new THREE.DirectionalLight(0x00ffcc, 1.2);
+            dirLight.position.set(5, 15, 20);
+            scene.add(dirLight);
+
+            // Stjärnhimmel
+            let starCount = 500;
+            let starGeo = new THREE.BufferGeometry();
+            let starPos = new Float32Array(starCount * 3);
+            for (let i = 0; i < starCount * 3; i += 3) {
+                starPos[i] = (Math.random() - 0.5) * 160;
+                starPos[i+1] = (Math.random() - 0.5) * 110;
+                starPos[i+2] = -Math.random() * 200;
+            }
+            starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+            starfield = new THREE.Points(starGeo, new THREE.PointsMaterial({ size: 0.5, color: 0xffffff }));
+            scene.add(starfield);
+
+            // Bossen
+            bossGroup = new THREE.Group();
+            bossGroup.position.set(0, 0, -100);
+            bossMaterials.chest = new THREE.MeshStandardMaterial({ color: 0x444455 });
+            bossGroup.add(new THREE.Mesh(new THREE.BoxGeometry(12, 10, 8), bossMaterials.chest));
+
+            bossMaterials.leftShoulder = new THREE.MeshStandardMaterial({ color: 0xffcc00 });
+            let sLeft = new THREE.Mesh(new THREE.BoxGeometry(4, 3, 5), bossMaterials.leftShoulder);
+            sLeft.position.set(bossComponents.leftShoulder.x, bossComponents.leftShoulder.y, 0);
+            bossGroup.add(sLeft);
+            // Exempel från init3D:
+bossMaterials.leftShoulder = new THREE.MeshStandardMaterial({ color: 0xffcc00, roughness: 0.4 });
+const sGeo = new THREE.BoxGeometry(4, 3, 5);
+const sLeftMesh = new THREE.Mesh(sGeo, bossMaterials.leftShoulder);
+sLeftMesh.name = "leftShoulder"; // Gör att updateGame() kan dölja den
+sLeftMesh.position.set(-9, 7, 0); // Fasta failsafe-siffror (-9 och 7)
+bossGroup.add(sLeftMesh);
+
+            bossMaterials.rightShoulder = new THREE.MeshStandardMaterial({ color: 0xffcc00, roughness: 0.4 });
+const sRightMesh = new THREE.Mesh(sGeo, bossMaterials.rightShoulder);
+sRightMesh.name = "rightShoulder"; // Gör att updateGame() kan dölja den
+sRightMesh.position.set(9, 7, 0); // Fasta failsafe-siffror (9 och 7)
+bossGroup.add(sRightMesh);
+
+            bossMaterials.leftArm = new THREE.MeshStandardMaterial({ color: 0x555566 });
+            let armLeft = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 8, 8), bossMaterials.leftArm);
+            armLeft.position.set(bossComponents.leftArm.x, bossComponents.leftArm.y, 0);
+            bossGroup.add(armLeft);
+
+            bossMaterials.rightArm = new THREE.MeshStandardMaterial({ color: 0x555566 });
+            let armRight = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 8, 8), bossMaterials.rightArm);
+            armRight.position.set(bossComponents.rightArm.x, bossComponents.rightArm.y, 0);
+            bossGroup.add(armRight);
+
+            bossMaterials.powerCore = new THREE.MeshStandardMaterial({ color: 0xff0033 });
+            let coreMesh = new THREE.Mesh(new THREE.SphereGeometry(2.5, 16, 16), bossMaterials.powerCore);
+            coreMesh.position.set(0, 2, 2);
+            bossGroup.add(coreMesh);
+
+            scene.add(bossGroup);
+        }
+
+        
+        function firePlayerLaser() {
+    if (!shipMesh || isReloading || ammoInMag <= 0) {
+        if (ammoInMag <= 0) showToast(t('reloading_warning'), "red");
+        audio.playPlayerHit();
+        return;
+    }
+
+    ammoInMag--;
+    updateAmmoHUD();
+    audio.playLaser();
+
+    // 1. Beräkna musens position i normaliserade koordinater (-1 till 1)
+    const nx = (mousePx.x / window.innerWidth) * 2 - 1;
+    const ny = -(mousePx.y / window.innerHeight) * 2 + 1;
+
+    // 2. Skapa en Raycaster från kameran
+    const raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(new THREE.Vector2(nx, ny), camera);
+
+    // 3. Definiera ett målplan på bossens avstånd (Z = -40)
+    const planeZ = new THREE.Plane(new THREE.Vector3(0, 0, 1), 40);
+    const targetPoint = new THREE.Vector3();
+    
+    // Hitta var rayen träffar planet (där bossen är)
+    if (raycaster.ray.intersectPlane(planeZ, targetPoint)) {
+        // Träff hittades på rätt djup
+    } else {
+        // Fallback om vi siktar ut i tomma intet
+        targetPoint.set(nx * 30, ny * 20, -40);
+    }
+
+    // 4. Skapa laserstrålar som siktar mot targetPoint
+    [-1.5, 1.5].forEach(offsetX => {
+        let laser = new THREE.Group();
+        // Själva laserstrålen
+        let geo = new THREE.BoxGeometry(0.2, 0.2, 3);
+        let mat = new THREE.MeshBasicMaterial({ color: 0x00ffcc });
+        laser.add(new THREE.Mesh(geo, mat));
+        
+        laser.position.set(shipMesh.position.x + offsetX, shipMesh.position.y, shipMesh.position.z - 2);
+        laser.lookAt(targetPoint);
+        
+        // Beräkna riktningen
+        let dir = new THREE.Vector3().subVectors(targetPoint, laser.position).normalize();
+        
+        scene.add(laser);
+        laserBeams.push({ mesh: laser, dir, speed: 2.0 });
+    });
+}
+
+function updateGame() {
+    if (gameState === 'LOCKDOWN') return;
+    if (gameState !== 'PLAYING') return;
+    if (!shipMesh) return; 
+
+    let delta = Math.min(0.1, clock.getDelta());
+
+    // --- 1. FLYGNING (WASD / PILAR) ---
+    const speed = 12 * delta;
+    if (keys['w'] || keys['arrowup'])    flight.y = Math.min(4.5, flight.y + speed);
+    if (keys['s'] || keys['arrowdown'])  flight.y = Math.max(-4.5, flight.y - speed);
+    if (keys['a'] || keys['arrowleft'])  flight.x = Math.max(-8, flight.x - speed);
+    if (keys['d'] || keys['arrowright']) flight.x = Math.min(8, flight.x + speed);
+    
+    shipMesh.position.lerp(new THREE.Vector3(flight.x, flight.y, flight.z), 0.1);
+    shipMesh.rotation.z = -(shipMesh.position.x - flight.x) * 0.4;
+    shipMesh.rotation.x = (shipMesh.position.y - flight.y) * 0.4;
+
+    // --- 2. SKEPPSSKADA & VISUELLA EFFEKTER ---
+    const cockpitCore = shipMesh.getObjectByName("cockpitCore");
+    if (cockpitCore && cockpitCore.material) {
+        const ratio = playerHealth / 100;
+        cockpitCore.material.color.setRGB(
+            (0xff * ratio + 0x15 * (1 - ratio)) / 255,
+            (0xaa * ratio + 0x15 * (1 - ratio)) / 255,
+            (0x00 * ratio + 0x15 * (1 - ratio)) / 255
+        );
+    }
+
+    if (playerHealth < 75 && Math.random() < (0.25 * (1 - playerHealth / 100))) {
+        const isFire = playerHealth < 40 && Math.random() < 0.45;
+        let pMesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.2), new THREE.MeshBasicMaterial({
+            color: isFire ? 0xff5500 : 0x222222
+        }));
+        pMesh.position.copy(shipMesh.position);
+        scene.add(pMesh);
+        explosionParticles.push({ mesh: pMesh, vel: new THREE.Vector3((Math.random()-0.5)*0.1, 0.2, 0.2), life: 0.8 });
+    }
+
+    // --- 3. KAMERASKAKNINGAR ---
+    if (shakeIntensity > 0) {
+        camera.position.x = (Math.random() - 0.5) * Math.min(shakeIntensity, 2.0); 
+        camera.position.y = (Math.random() - 0.5) * Math.min(shakeIntensity, 2.0);
+        shakeIntensity -= 0.1; 
+    } else {
+        camera.position.set(0, 0, 20);
+    }
+
+    // --- 4. STJÄRNOR ---
+    const positions = starfield.geometry.attributes.position.array;
+    for (let i = 2; i < positions.length; i += 3) {
+        positions[i] += 40 * delta;
+        if (positions[i] > 10) positions[i] = -200;
+    }
+    starfield.geometry.attributes.position.needsUpdate = true;
+
+    // --- 5. DRÖNARE / MINIONS (FAS 0) ---
+    if (!isBossSpawned && !isTransitioningBoss) {
+        if (Math.random() < 0.02) { 
+            if (minions.length < 5) { 
+                spawnMinion();
+            }
+        }
+
+        for (let i = minions.length - 1; i >= 0; i--) {
+            let m = minions[i];
+            m.mesh.position.z += 12 * delta; 
+            
+            if (Date.now() - m.lastShot > m.shotCooldown) {
+                if (typeof shootMinionProjectile === 'function') {
+                    shootMinionProjectile(m.mesh.position, shipMesh.position);
+                }
+                m.lastShot = Date.now();
+            }
+            
+            if (m.mesh.position.z > 20) { 
+                safeRemove(m.mesh); 
+                minions.splice(i, 1); 
+            }
+        }
+    }
+
+    // --- 6. POWER-UPS ---
+    for (let i = powerUps.length - 1; i >= 0; i--) {
+        const pu = powerUps[i];
+        pu.mesh.position.z += 12 * delta;
+        if (shipMesh && pu.mesh.position.distanceTo(shipMesh.position) < 2.5) {
+            if (pu.type === 'heal') {
+                playerHealth = Math.min(100, playerHealth + 30);
+                showToast(t('powerup_heal'), "#00ff33");
+            } else if (pu.type === 'ammo_box') {
+                ammoReserve = Math.min(240, ammoReserve + 60);
+                showToast(t('powerup_ammo'), "#00ccff");
+            } else if (pu.type === 'rocket_pickup') {
+                rocketCount = Math.min(10, rocketCount + 2);
+                showToast(t('powerup_rockets'), "#ff3300");
+            }
+            updatePlayerHP(); updateAmmoHUD();
+            safeRemove(pu.mesh); powerUps.splice(i, 1);
+            continue;
+        }
+        if (pu.mesh.position.z > 20) { safeRemove(pu.mesh); powerUps.splice(i, 1); }
+    }
+
+    // --- 7. SPELARENS SKOTT & KOLLISIONER ---
+    for (let i = laserBeams.length - 1; i >= 0; i--) {
+        let l = laserBeams[i];
+        l.mesh.position.addScaledVector(l.dir, l.speed);
+        let hitSomething = false;
+
+        // Om bossen INTE har kommit än (Fas 0 drönare)
+        if (!isBossSpawned) {
+            for (let j = minions.length - 1; j >= 0; j--) {
+                if (l.mesh.position.distanceTo(minions[j].mesh.position) < 2.5) {
+                    hitSomething = true;
+                    create3DExplosion(minions[j].mesh.position.x, minions[j].mesh.position.y, minions[j].mesh.position.z, 0xffaa00);
+                    
+                    if (Math.random() < 0.45) {
+                        spawnPowerUp(minions[j].mesh.position.x, minions[j].mesh.position.y, minions[j].mesh.position.z);
+                    }
+
+                    safeRemove(minions[j].mesh); minions.splice(j, 1);
+                    minionsDefeatedCount++; score += 500;
+                    document.getElementById('score-display').innerText = score;
+                    checkMinionPhaseTransition(); 
+                    break;
+                }
+            }
+        } 
+        // Om bossen FINNS i fältet (Fas 1, 2, 3)
+        else if (bossGroup) {
+            for (let key in bossComponents) {
+                let comp = bossComponents[key];
+                if (!comp.active) continue;
+
+                let worldPartPos = new THREE.Vector3(comp.x, comp.y, comp.z);
+                worldPartPos.applyMatrix4(bossGroup.matrixWorld);
+
+                let dist = l.mesh.position.distanceTo(worldPartPos);
+
+                if (dist < (comp.size + 8.0)) { 
+                    hitSomething = true;
+                    comp.hp -= 1;
+                    
+                    // Hantera hälsomätaren för bossen
+                    let maxHp = (key === 'powerCore') ? 80 : (key.includes('Arm') ? 40 : 30);
+                    let bossHpPercent = (comp.hp / maxHp) * 100;
+                    let bossBar = document.getElementById('boss-hp-bar');
+                    if (bossBar) {
+                        bossBar.style.width = bossHpPercent + '%';
+                        let bColor = bossHpPercent > 50 ? "#ff0033" : (bossHpPercent > 20 ? "#ff9900" : "#ffff00");
+                        bossBar.style.background = bColor;
+                    }
+
+                    if (comp.hp <= 0) {
+                        comp.active = false;
+                        score += 2000;
+                        document.getElementById('score-display').innerText = score;
+
+                        bossGroup.traverse(child => {
+                            if (child.name === comp.name) child.visible = false;
+                        });
+
+                        create3DExplosion(worldPartPos.x, worldPartPos.y, worldPartPos.z, 0xff0033, 40);
+                        spawnPowerUp(worldPartPos.x, worldPartPos.y, worldPartPos.z);
+                        checkBossStageTransitions();
+                    }
+                    break; 
+                }
+            }
+        }
+
+        if (hitSomething || l.mesh.position.z < -150) { 
+            safeRemove(l.mesh); 
+            laserBeams.splice(i, 1); 
+        }
+    }
+
+    // --- 8. INKOMMANDE FIENDESKOTT ---
+    for (let i = bossProjectiles.length - 1; i >= 0; i--) {
+        let p = bossProjectiles[i];
+        p.mesh.position.addScaledVector(p.dir, p.speed);
+        if (shipMesh && p.mesh.position.distanceTo(shipMesh.position) < 2.0) {
+            playerHealth = Math.max(0, playerHealth - 10);
+            shakeIntensity = 5; 
+            updatePlayerHP();
+            safeRemove(p.mesh); bossProjectiles.splice(i, 1);
+            if (playerHealth <= 0) endGame(false);
+            continue;
+        }
+        if (p.mesh.position.z > 20) { safeRemove(p.mesh); bossProjectiles.splice(i, 1); }
+    }
+
+    // --- 9. BOSS INTRO SEKVENSER ---
+    if (isTransitioningBoss) {
+        bossTransitionProgress += delta * 0.5;
+        bossGroup.position.z = THREE.MathUtils.lerp(-100, -40, bossTransitionProgress);
+        if (bossTransitionProgress >= 1.0) {
+            isTransitioningBoss = false; isBossSpawned = true;
+            document.getElementById('boss-health-widget').style.display = 'block';
+        }
+    }
+
+    if (isBossSpawned) executeBossAttacks();
+
+    // --- 10. PARTIKLAR ---
+    for (let i = explosionParticles.length - 1; i >= 0; i--) {
+        let ep = explosionParticles[i];
+        ep.mesh.position.add(ep.vel.clone().multiplyScalar(delta));
+        ep.life -= delta;
+        if (ep.life <= 0) { safeRemove(ep.mesh); explosionParticles.splice(i, 1); }
+    }
+}
+
+        function spawnMinion() {
+            let minion = new THREE.Group();
+            minion.add(new THREE.Mesh(new THREE.ConeGeometry(0.6, 1.6, 4), new THREE.MeshStandardMaterial({ color: 0xff3300 })));
+            minion.position.set((Math.random() - 0.5) * 20, (Math.random() - 0.5) * 10, -60);
+            scene.add(minion);
+            minions.push({ mesh: minion, targetZ: -15 - Math.random() * 5, hp: 2, lastShot: Date.now(), shotCooldown: 2000, offset: Math.random() * 100 });
+        }
+
+        function checkMinionPhaseTransition() {
+            if (minionsDefeatedCount >= totalMinionsToDefeat && !isBossSpawned) {
+                isTransitioningBoss = true;
+                bossStage = 1;
+                bossComponents.leftShoulder.active = true;
+                bossComponents.rightShoulder.active = true;
+                showToast(t('boss_warning'), "red");
+            }
+        }
+
+        function triggerKamekLock(reasonKey) {
+            if (gameState === 'LOCKDOWN') return;
+            gameState = 'LOCKDOWN';
+            audio.stopMusic();
+            document.getElementById('lockdown-overlay').style.display = 'flex';
+            document.getElementById('lockdown-msg').innerText = t(reasonKey);
+        }
+
+        function runDiagnostics() {
+            setTimeout(() => {
+                document.getElementById('diag-ram').innerHTML += " <span style='color:lime'>OK</span>";
+                document.getElementById('diag-cpu').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('diag-cpu').innerHTML += " <span style='color:lime'>OK</span>";
+                    document.getElementById('diag-os').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('diag-os').innerHTML += " <span style='color:lime'>OK</span>";
+                        document.getElementById('diag-disk').style.display = 'block';
+                        setTimeout(() => {
+                            document.getElementById('diag-disk').innerHTML += " <span style='color:lime'>OK</span>";
+                            setTimeout(() => { document.getElementById('diagnostic-screen').style.display = 'none'; }, 400);
+                        }, 300);
+                    }, 300);
+                }, 300);
+            }, 300);
+        }
+
+        function drawRetroSight() {
+    if (gameState !== 'PLAYING' || !hudCtx || !hudCanvas) {
+        if (hudCtx && hudCanvas) hudCtx.clearRect(0, 0, hudCanvas.width, hudCanvas.height);
+        return;
+    }
+
+    hudCtx.clearRect(0, 0, hudCanvas.width, hudCanvas.height);
+
+    // Kollar om musen är över en minion eller boss-del för att färga siktet rött
+    let isTargeting = false;
+
+    // 1. Sök igenom vanliga drönare (Minions)
+    if (!isBossSpawned && !isTransitioningBoss) {
+        for (let m of minions) {
+            if (m && m.mesh) {
+                let pos = toScreenPosition(m.mesh.position);
+                if (Math.hypot(pos.x - mousePx.x, pos.y - mousePx.y) < 40) {
+                    isTargeting = true;
+                    break;
+                }
+            }
+        }
+    }
+    
+    // 2. Sök igenom bossdelar (När bossen lever)
+    if (isBossSpawned && bossGroup) {
+        for (let key in bossComponents) {
+            let comp = bossComponents[key];
+            if (comp.active) {
+                // Räkna ut bossdelens världsposition
+                let worldPos = new THREE.Vector3(comp.x, comp.y, comp.z);
+                worldPos.applyMatrix4(bossGroup.matrixWorld);
+                
+                // Omvandla till 2D-skärmkoordinater
+                let screenPos = toScreenPosition(worldPos);
+                
+                // Om avståndet mellan musen och bossdelen är litet -> Aktivera rött sikte
+                if (Math.hypot(mousePx.x - screenPos.x, mousePx.y - screenPos.y) < 45) {
+                    isTargeting = true;
+                    break; 
+                }
+            }
+        }
+    }
+
+    // --- RITA UT RETRO-SIKTET PÅ SKÄRMEN ---
+    const color = isTargeting ? "red" : "lime";
+    hudCtx.strokeStyle = color;
+    hudCtx.lineWidth = 4;
+
+    // Rita siktets yttre cirkel
+    hudCtx.beginPath();
+    hudCtx.arc(mousePx.x, mousePx.y, 25, 0, Math.PI * 2);
+    hudCtx.stroke();
+
+    // Rita hårkorsets linjer
+    hudCtx.beginPath();
+    hudCtx.moveTo(mousePx.x - 40, mousePx.y);
+    hudCtx.lineTo(mousePx.x + 40, mousePx.y);
+    hudCtx.moveTo(mousePx.x, mousePx.y - 40);
+    hudCtx.lineTo(mousePx.x, mousePx.y + 40);
+    hudCtx.stroke();
+
+    // Rita center-punkten
+    hudCtx.fillStyle = color;
+    hudCtx.beginPath();
+    hudCtx.arc(mousePx.x, mousePx.y, 3, 0, Math.PI * 2);
+    hudCtx.fill();
+}
+        function spawnPowerUp(x, y, z) {
+            const types = ['heal', 'ammo_box', 'rocket_pickup'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            let pu = new THREE.Group();
+            
+            let color = 0x00ff33;
+            if (type === 'ammo_box') color = 0x00ccff;
+            if (type === 'rocket_pickup') color = 0xff3300;
+
+            pu.add(new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.8), new THREE.MeshStandardMaterial({ color: color })));
+            pu.position.set(x, y, z); scene.add(pu);
+            powerUps.push({ mesh: pu, type: type, rotSpeed: 2 });
+        }
+
+        function updateAmmoHUD() {
+            const ad = document.getElementById('ammo-display');
+            if (ad) ad.innerText = `${ammoInMag} / ${ammoReserve}`;
+            const rd = document.getElementById('rocket-display');
+            if (rd) rd.innerText = rocketCount;
+        }
+
+        function reload() {
+            if (isReloading || ammoInMag === magSize || ammoReserve <= 0) return;
+            isReloading = true;
+            showToast(t('reloading'), "white");
+            audio.playReload();
+            setTimeout(() => {
+                let needed = magSize - ammoInMag;
+                let reloaded = Math.min(needed, ammoReserve);
+                ammoInMag += reloaded;
+                if (!isInfiniteAmmo) ammoReserve -= reloaded;
+                isReloading = false;
+                updateAmmoHUD();
+                showToast(t('reloaded_ready'), "lime");
+            }, 1250);
+        }
+
+        function updatePlayerHP() {
+    const hpDisplay = document.getElementById('player-hp-display');
+    const hpBar = document.getElementById('player-hp-bar');
+    const hpWidget = document.getElementById('player-health-widget');
+
+    if (hpDisplay) hpDisplay.innerText = playerHealth;
+    
+    if (hpBar) {
+        hpBar.style.width = playerHealth + '%';
+
+        // Logik för färgskiftning
+        let color = "#00ffcc"; // Neon-cyan
+        if (playerHealth <= 60 && playerHealth > 30) color = "#ffcc00"; // Gul
+        if (playerHealth <= 30) color = "#ff0033"; // Röd
+
+        hpBar.style.background = color;
+        hpBar.style.boxShadow = `0 0 15px ${color}`;
+        
+        if (hpWidget) {
+            hpWidget.style.borderColor = color;
+            hpWidget.style.boxShadow = `0 0 25px ${color}80`; // 80 är transparens
+        }
+    }
+}
+
+        function create3DExplosion(x, y, z, color, count = 15) {
+            audio.playExplosion();
+            for (let i = 0; i < count; i++) {
+                let p = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), new THREE.MeshBasicMaterial({ color: color }));
+                p.position.set(x, y, z); scene.add(p);
+                explosionParticles.push({ mesh: p, vel: new THREE.Vector3((Math.random()-0.5)*2, (Math.random()-0.5)*2, (Math.random()-0.5)*2), life: 1.0 });
+            }
+        }
+
+        function executeBossAttacks() {
+            if (boss.attackTimer > 0) {
+        boss.attackTimer -= 0.05; // Minska timer
+        return; 
+    }
+    
+    // Skjut bara om timern är nere på noll
+    boss.attackTimer = 2.0; // 2 sekunder mellan skotten
+            if (Math.random() > 0.05) return;
+            let bx = 0, by = 5;
+            let proj = new THREE.Mesh(new THREE.SphereGeometry(0.6, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff0033 }));
+            proj.position.set(bx, by, -40); scene.add(proj);
+            let dir = new THREE.Vector3(shipMesh.position.x - bx, shipMesh.position.y - by, shipMesh.position.z - (-40)).normalize();
+            bossProjectiles.push({ mesh: proj, dir, type: 'laser', speed: 1.2 });
+        }
+
+        window.startGame = function() {
+            currentPlayerName = document.getElementById('playerName').value || "Gäst";
+            activeDifficulty = document.getElementById('difficulty').value;
+            
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('hud-container').style.display = 'flex';
+            document.getElementById('player-health-widget').style.display = 'flex';
+            document.body.classList.add('game-active'); // Lägger till klassen som döljer musen
+            
+            gameState = 'PLAYING';
+            playerHealth = 100;
+            ammoInMag = magSize;
+            rocketCount = 3;
+            minionsDefeatedCount = 0;
+            minions = [];
+
+            createPlayerShip();
+            updatePlayerHP();
+            updateAmmoHUD();
+
+            setTimeout(() => { audio.startMusic(); }, 100);
+
+            for (let i = 0; i < 3; i++) spawnMinion();
+        };
+
+        function checkBossStageTransitions() {
+            if (bossStage === 1 && !bossComponents.leftShoulder.active && !bossComponents.rightShoulder.active) {
+                bossStage = 2;
+                bossComponents.leftArm.active = true;
+                bossComponents.rightArm.active = true;
+                showToast(t('stage2_msg'), "var(--primary)");
+            } else if (bossStage === 2 && !bossComponents.leftArm.active && !bossComponents.rightArm.active) {
+                bossStage = 3;
+                bossComponents.powerCore.active = true;
+                showToast(t('stage3_msg'), "var(--danger)");
+            } else if (bossStage === 3 && !bossComponents.powerCore.active) {
+                endGame(true);
+            }
+        }
+
+        function playDefeatMusic() {
+    const audio = new Audio('f6_sad_trombone.mp3'); // Lägg till din fil
+    audio.volume = 0.95;
+    audio.play();
+}
+
+        function endGame(isVictory) {
+    gameState = 'GAMEOVER';
+    audio.stopMusic();
+    
+    // Hämta elementen
+    if (isVictory) {
+        document.getElementById('victory-modal').style.display = 'flex';
+        document.getElementById('victory-player').innerText = currentPlayerName;
+        document.getElementById('victory-score').innerText = score;
+    } else {
+        document.getElementById('defeat-modal').style.display = 'flex';
+        playDefeatMusic();
+        document.getElementById('defeat-player').innerText = currentPlayerName;
+        document.getElementById('defeat-score').innerText = score;
+        document.getElementById('defeat-phase').innerText = bossStage;
+    }
+    
+    // Säkerställ att översättningarna finns (ifall de inte satte sig i initialize)
+    document.getElementById('defeat-title').innerText = t('defeat_title');
+    document.getElementById('victory-title').innerText = t('victory_title');
+}
+
+        function closeGameOverModals() {
+            document.getElementById('victory-modal').style.display = 'none';
+            document.body.classList.remove('game-active'); // Visar musen igen
+            document.getElementById('defeat-modal').style.display = 'none';
+            document.getElementById('hud-container').style.display = 'none';
+            document.getElementById('player-health-widget').style.display = 'none';
+            document.getElementById('boss-health-widget').style.display = 'none';
+            document.getElementById('start-screen').style.display = 'block';
+            gameState = 'START';
+            if (shipMesh) { safeRemove(shipMesh); shipMesh = null; }
+        }
+        window.closeGameOverModals = closeGameOverModals;
+
+        function shootMinionProjectile(startPos, targetPos) {
+    if (gameState !== 'PLAYING') return;
+    let proj = new THREE.Mesh(
+        new THREE.SphereGeometry(0.4, 8, 8), 
+        new THREE.MeshBasicMaterial({ color: 0xff3300 })
+    );
+    proj.position.copy(startPos);
+    scene.add(proj);
+    let dir = new THREE.Vector3().subVectors(targetPos, startPos).normalize();
+    bossProjectiles.push({ mesh: proj, dir: dir, type: 'minion_laser', speed: 0.8 });
+}
+
+        
+
+        function animate() {
+    requestAnimationFrame(animate);
+    if (gameState === 'PLAYING') {
+        // Hämta färsk data från handkontrollen INNAN vi uppdaterar spelet
+        if (typeof navigator.getGamepads === 'function') {
+            pollGamepad(navigator.getGamepads());
+        }
+        
+        updateGame();
+        drawRetroSight();
+        if (renderer && scene && camera) renderer.render(scene, camera);
+    }
+}
+
+        function initializeUIText() {
+            const uiElements = {
+                'h1-title': 'title', 'name-label': 'player_name', 'start-btn': 'start_game', 'rules-btn': 'instructions',
+                'quit-label': 'quit_label', 'score-label': 'score', 'mag-label': 'ammo', 'rocket-label': 'rocket_label',
+                'shield-label': 'shield_label', 'instr-title': 'instr_title', 'instr-controls': 'instr_controls',
+                'defeat-title': 'defeat_title',
+        'defeat-desc': 'defeat_msg',
+        'defeat-score-label': 'score',
+        'defeat-player-label': 'player_name',
+        'defeat-phase-label': 'stage0_msg', // Eller använd en specifik "phase_label"
+        'defeat-btn': 'defeat_btn',
+        'victory-title': 'victory_title',
+        'victory-desc': 'victory_msg',
+        'victory-score-label': 'score',
+        'victory-player-label': 'player_name',
+        'victory-btn': 'victory_btn',
+                'instr-goal': 'instr_goal', 'instr-health': 'instr_health', 'instr-powerups': 'instr_powerups', 'instr-sensory': 'instr_sensory'
+            };
+            Object.keys(uiElements).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = t(uiElements[id]);
+            });
+            const input = document.getElementById('playerName');
+            if (input) input.placeholder = t('placeholder_name');
+        }
+
+        // ==========================================================================
+        // ADVANCED SENSORS & SECURITY SYSTEM (Återställd från v1)
+        // ==========================================================================
+        function isBot() {
+            if (navigator.webdriver === true) return true;
+            const ua = navigator.userAgent.toLowerCase();
+            const botPatterns = [/googlebot/i, /headless/i, /selenium/i, /puppeteer/i, /webdriver/i, /crawl/i, /spider/i];
+            return botPatterns.some(pattern => pattern.test(ua));
+        }
+
+        function checkDeviceSecurity() {
+            const ua = navigator.userAgent.toLowerCase();
+            const platform = navigator.platform.toLowerCase();
+            const deviceMap = [
+                { regex: /android|iphone|ipod|mobile/i, key: 'device_mobile' },
+                { regex: /ipad|tablet/i, key: 'device_tablet' },
+                { regex: /smart-tv/i, key: 'device_smarttv' },
+                { regex: /xbox|nintendo|playstation/i, key: 'device_console' },
+                { regex: /linux/i, key: 'device_hw_os_linux' }
+            ];
+            for (let device of deviceMap) {
+                if (device.regex.test(ua)) {
+                    triggerKamekLock(device.key); return true;
+                }
+            }
+            return false;
+        }
+
+        function setupSecurityListeners() {
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase()))) {
+                    triggerKamekLock('devtools_forbidden'); e.preventDefault();
+                }
+                if (e.key === 'Escape') {
+                    triggerKamekLock('escape_locked'); e.preventDefault();
+                }
+            });
+            window.addEventListener('blur', () => {
+                if (gameState === 'PLAYING') triggerKamekLock('tab_switch_detected');
+            });
+
+            // Autoklicker-skydd
+            let lastClick = 0, clickCount = 0;
+            window.addEventListener('mousedown', () => {
+                let now = Date.now();
+                if (now - lastClick < 50) {
+                    clickCount++;
+                    if (clickCount > 10) triggerKamekLock('trackpad_lockdown');
+                } else { clickCount = 0; }
+                lastClick = now;
+            });
+        }
+
+        window.addEventListener("gamepadconnected", (e) => {
+            const gp = e.gamepad; if (!gp) return;
+            if (gp.buttons.length < 13) {
+                showToast(t('controller_unsupported'), "var(--danger)"); triggerKamekLock('controller_unsupported');
+            } else { showToast(t('controller_connected'), "var(--gold)"); }
+        });
+
+        window.addEventListener('wheel', (e) => {
+            const isTrackpad = !Number.isInteger(e.deltaY) || (Math.abs(e.deltaY) > 0 && Math.abs(e.deltaY) < 20);
+            if (isTrackpad && gameState === 'PLAYING') triggerKamekLock('trackpad_lockdown');
+        }, { passive: false });
+
+        // --- EN ENDASTE WINDOW LOAD HANTERARE SOM STARTAR ALLT KORREKT ---
+        window.addEventListener('load', () => {
+            initializeUIText();
+            if (isBot()) { triggerKamekLock('device_unknown'); return; }
+            if (checkDeviceSecurity()) return;
+            runDiagnostics();
+            setupSecurityListeners();
+            init3D();
+            animate();
+            console.log("Spelet rullas nu i skarpt läge!");
+        });
+
+        window.addEventListener('resize', () => {
+            if (camera && renderer && hudCanvas) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                hudCanvas.width = window.innerWidth;
+                hudCanvas.height = window.innerHeight;
+            }
+        });
+
+        window.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
+        window.addEventListener('keyup', e => {
+            keys[e.key.toLowerCase()] = false;
+            if (e.key.toLowerCase() === 'r') reload();
+        });
+        window.addEventListener('mousemove', e => {
+    if (controlType !== 'gamepad') { // Låt kontrollen ha total kontroll när den används
+        mousePx.x = e.clientX;
+        mousePx.y = e.clientY;
+    }
+});
+        window.addEventListener('mousedown', e => {
+            if (gameState !== 'PLAYING') return;
+            if (e.button === 0) firePlayerLaser();
+            if (e.button === 2) firePlayerRocket();
+        });
+
+    </script>
+</body>
+</html>
