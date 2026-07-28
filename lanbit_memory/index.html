@@ -279,7 +279,7 @@
 
     <input type="text" id="player-name" placeholder="SKRIV DITT NAMN..."> <button onclick="toggleInstructions(true)" style="background: #00ccff; color: white; cursor: pointer; width: 80%; margin-bottom: 20px;">
     📖 LÄS SPELINSTRUKTIONER
-</button> <button class="open-settings-btn" onclick="openMediaPopup()">🎥 INSTÄLLNINGAR</button> <button class="open-settings-btn" onclick="window.location='index2.html'">ENGLISH VERSION</button>
+</button> <button class="open-settings-btn" onclick="openMediaPopup()">🎥 INSTÄLLNINGAR</button> <button class="open-settings-btn" onclick="window.location='index2.html'">IN ENGLISH</button> <button class="open-settings-btn" onclick="window.location='index3.html'">SUOMEKSI</button>
 <div id="media-modal-overlay" class="modal-overlay">
     <div class="setup-box popup-content">
         <button class="close-popup" onclick="closeMediaPopup()">X</button>
@@ -566,7 +566,7 @@ async function confirmAndStart() {
 
 <script>
 
-    const ALL_IMAGES = ['360con.jfif', 'a.jfif','ac.jfif', 'bskal.jfif', 'and.jfif', 'ds.jfif', 'lurar.jfif', 'hdd.jfif', 'mk64.jfif','fia.jfif', 'ic3.jpg','ir.jpg','x2og.jpg', 'x2.jpg','sopbil.jfif','ksb.jfif', 'bandspelare.jfif', 'xbd.jfif','clock.jfif', 'vcr.jfif','crt2.jfif', 'crt3.jfif','tv.jfif', 'cd.jfif','cds.jfif','radio.jfif','gccrt.jfif', 'ps3.jfif', 'chess.jfif', 'yatzy.jfif', 'bse.jfif', 'monopol.jfif',  'cr.jfif', 'cr2.jfif', 'aaa.jfif', 'aa.jfif', '9v.jfif', 'dc.jfif', 'd10.jpg', 'gm.jpg', 'star.jpg', 'box.jpg', 'm.jpg', 'nb.jpg',  'ttr.jfif', 'br.jfif', 'ff.jpg', 'ps2crt.jfif', 'bamse.png', 'boo.jfif',  'kp.jfif',  'ck.jfif', 'vargen.jfif', 'mikro.jfif', 'bilar.jfif', 'pizzakartong.jfif',  'hb.jfif', 'nc.jfif', 'vk.jfif', 'gb.jfif', 'gd.jfif', 'kd.jfif', 'creeper2.jfif', '360conw.jfif', 'mario.jfif', 'yoshi.jfif', '360crt.jpg', '360.jfif', 'n64.jfif', 'crash.jpg', 'creeper.jfif', 'crt.jfif', 'crtm.jfif', 'dh.jfif', 'dh2.jfif', 'dhg.jfif', 'eluttag.jfif', 'fst.jfif', 'gb c.jfif', 'gc.jpg', 'gpc.jfif', 'gta v.jpg', 'hs.jfif', 'lb c.jfif', 'mc.jpg', 'mch.jfif', 'mus.jfif', 'mushroom.jfif', 'nes.jfif', 'pk.jfif', 'ps1.jfif', 'ps2.jfif', 'ps5c.jfif', 'ratt.jfif', 'rb.jfif', 'bus.jfif', 'rbr.jfif', 's2.jfif', 'shd.jfif', 'xbc.jfif', 'sonic.jfif', 'tgtbord.jfif', 'varmkorv.jfif', 'wii.jfif', 'x360.jpg', 'sonic.jpg'];
+    const ALL_IMAGES = ['360con.jfif', 'bobil.jfif', 'husvagn.jfif', 'stuga.jfif', 'tvplatt.jfif', 'kaktus.jfif', 'bilstereo.jfif',  'a.jfif','ac.jfif', 'bskal.jfif', 'and.jfif', 'ds.jfif', 'lurar.jfif', 'hdd.jfif', 'mk64.jfif','fia.jfif', 'ic3.jpg','ir.jpg','x2og.jpg', 'x2.jpg','sopbil.jfif','ksb.jfif', 'bandspelare.jfif', 'xbd.jfif','clock.jfif', 'vcr.jfif','crt2.jfif', 'crt3.jfif','tv.jfif', 'cd.jfif','cds.jfif','radio.jfif','gccrt.jfif', 'ps3.jfif', 'chess.jfif', 'yatzy.jfif', 'bse.jfif', 'monopol.jfif',  'cr.jfif', 'cr2.jfif', 'aaa.jfif', 'aa.jfif', '9v.jfif', 'dc.jfif', 'd10.jpg', 'gm.jpg', 'star.jpg', 'box.jpg', 'm.jpg', 'nb.jpg',  'ttr.jfif', 'br.jfif', 'ff.jpg', 'ps2crt.jfif', 'bamse.png', 'boo.jfif',  'kp.jfif',  'ck.jfif', 'vargen.jfif', 'mikro.jfif', 'bilar.jfif', 'pizzakartong.jfif',  'hb.jfif', 'nc.jfif', 'vk.jfif', 'gb.jfif', 'gd.jfif', 'kd.jfif', 'creeper2.jfif', '360conw.jfif', 'mario.jfif', 'yoshi.jfif', '360crt.jpg', '360.jfif', 'n64.jfif', 'crash.jpg', 'creeper.jfif', 'crt.jfif', 'crtm.jfif', 'dh.jfif', 'dh2.jfif', 'dhg.jfif', 'eluttag.jfif', 'fst.jfif', 'gb c.jfif', 'gc.jpg', 'gpc.jfif', 'gta v.jpg', 'hs.jfif', 'lb c.jfif', 'mc.jpg', 'mch.jfif', 'mus.jfif', 'mushroom.jfif', 'nes.jfif', 'pk.jfif', 'ps1.jfif', 'ps2.jfif', 'ps5c.jfif', 'ratt.jfif', 'rb.jfif', 'bus.jfif', 'rbr.jfif', 's2.jfif', 'shd.jfif', 'xbc.jfif', 'sonic.jfif', 'tgtbord.jfif', 'varmkorv.jfif', 'wii.jfif', 'x360.jpg', 'sonic.jpg'];
     let timeLeft, timeMilliseconds, moveCount, timerInterval, flippedCards, matchedPairs, isProcessing, totalPairsNeeded, selectedMode, currentPlayerName;
 
 /* --- LEADERBOARD LOGIK --- */
@@ -1295,6 +1295,7 @@ function kamekPurpleLockdown() {
 const KAMEK_TRACKS = [
 '../The Boss - Base Defense/music/gangnam_style.mp3', // FLYTTAD HÄRÅT! Den ultimata YouTube-hiten!
                 '../The Boss - Base Defense/music/billie_jean.mp3', 
+		'../The Boss - Base Defense/music/bring_me_to_life.mp3', 
                 '../The Boss - Base Defense/music/levitating.mp3', 
                 '../The Boss - Base Defense/music/blinding_lights.mp3', 
                 '../The Boss - Base Defense/music/golden.mp3', 

@@ -57,6 +57,15 @@ const multiLangData = {
         "KONTOR": ["SKRIVEBORD", "KONTORSTOL", "HULLMASKIN", "SKRIVER", "TASTATUR", "DATAMUS", "ARKIVSKAP", "PENN", "BLOKK", "KAFFEMASKIN", "WHITEBOARD", "BINDERS", "SKJERM", "DOKKINGSTASJON", "PAPIRKURV"],
         "MATRETTER": ["PANNEKAKER", "LASAGNE", "HAMBURGER", "TACOS", "PIZZA", "SUSHI", "KJØTTBOLLER", "PASTA", "KEBAB", "GRØT"],
         "KJØRETØY": ["HELIKOPTER", "UBÅT", "TRIKK", "TRAKTOR", "MOTORSYKKEL", "LASTEBIL", "MOPED", "SYKKEL", "AMBULANSE", "TOG"]
+    }, fi: {
+        "LAN-RUOKA": ["ENERGIAJUOMA", "HALVAPIZZA", "NUDELIT", "LIMU", "SIPSIT", "PIKARUOKA", "KAHVI", "KEBAB", "PURILAINEN", "MAKKARA"],
+        "PC-KOMPONENTIT": ["NÄYTÖNOHJAIN", "EMOLEVY", "PROSESSORI", "VIRTALÄHDE", "KOTELO", "JÄÄHDYTYS", "MUISTIKAPULA", "KOVALEVY", "ÄÄNIKORTTI", "TUULETIN"],
+        "PELISLANGI": ["NOOBIT", "CLUTCH", "CAMPPAUS", "HEADSHOT", "SMURFFAUS", "FRÄGI", "SPAWNI", "SPEEDRUN", "LAGI", "CARRY"],
+        "RETROPELIT": ["PACMAN", "TETRIS", "PONG", "DONKEYKONG", "ASTEROIDS", "MEGAMAN", "FROGGER", "ZELDA", "METROID", "SPACEINVADERS"],
+        "VERKKO": ["REITITIN", "KYTKIN", "IPOSOITE", "PROTOKOLLA", "PALOMUURI", "VIIVE", "KAISTANLEVEYS", "ETHERNET", "PINGI", "PORTTI"],
+        "OHJELMOINTI": ["MUUTTUJA", "FUNKTIO", "SILMUKKA", "REKURSIO", "KÄÄNTÄJÄ", "SYNTAKSI", "DEBUGGAUS", "ALGORITMI", "TAULUKKO", "MERKKIJONO"],
+        "RUOKALAJIT": ["OHUKAISET", "LASAGNE", "HAMPURILAINEN", "TACOT", "PIZZA", "SUSHI", "LIHAPULLAT", "PASTA", "PIHVI", "SALAATTI"],
+        "AJONEUVOT": ["HELIKOPTERI", "SUKLARI", "RAITIOVAUNU", "TRAKTORI", "MOOTTORIPYÖRÄ", "REKKA", "MOPO", "POLKUPYÖRÄ", "AMBULANSSI", "JUNA"]
     },
     en: {
         "LAN-FOOD": ["ENERGYDRINK", "CHEAPPIZZA", "BURGERS", "NOODLES", "SODA", "CHIPS", "FASTFOOD", "COFFEE", "HOTDOG", "SNACKS"],
@@ -78,6 +87,7 @@ const badWordsByLang = {
     sv: ["fan", "jävla", "skit", "helvete", "fuck", "shit", "idiot"],
     da: ["helvede", "lort", "bitch", "fuck", "shit", "idiot", "røvhul"],
     no: ["faen", "jævla", "skit", "helvete", "fuck", "shit", "idiot"],
+fi: ["vittu", "saatana", "perkele", "paska", "helvetisti", "kusi", "vitun", "paskiainen"],
     en: ["fuck", "shit", "bitch", "asshole", "dick", "bastard", "cunt"]
 };
 
@@ -171,6 +181,36 @@ const TRANSLATIONS = {
         lock_toxic: "TOXIC_OPERATOR", lock_toxic_msg: "Banning er ikke tillatt i terminalen.",
         lock_header: "LÅST AV KAMEK", cam_status_on: "📸 KAMERA: PÅ", cam_status_off: "📸 KAMERA: AV", mic_status_on: "🎤 MIKROFON: PÅ", mic_status_off: "🎤 MIKROFON: AV",
         sub_verification: "--- IDENTITETSVERIFISERING KREVES ---"
+    },
+fi: {
+        title: "STATION 24: HIRSIPUU", alias: "Nimimerkki...", guest: "Vieras",
+        start: "KÄYNNISTÄ PROTOKOLLA", how: "❓ KUINKA PELATAAN?", media: "🎥 MEDIA-ASETUKSET",
+        lb_title: "PISTETAULUKKO (STREAKS)", lb_empty: "Ei vielä pisteitä...",
+        clock: "🕒 AIKA:", streak: "🔥 STREAK:", category: "AIHE:", cam_off: "KAMERA POIS", mic_live: "MIKKI PÄÄLLÄ",
+        modal_title: "TURVALLISUUSTARKASTUS", modal_desc: "Aktivoi laitteisto turnausta varten:", modal_confirm: "VAHVISTA ASETUKSET",
+        info_title: "PROTOKOLLAN OHJEET", info_profile: "📝 AISTIPROFIILI:", info_profile_desc: "Minimaalinen kuormitus. Keskity tekstiin ja logiikkaan.",
+        info_rules_title: "🎮 PELISÄÄNNÖT", info_rules_desc: "Tehtäväsi on pelastaa miehistö arvaamalla oikea sana. Sinulla on 6 yritystä ennen kuin ukko hirtetään ja putkesi nollataan.",
+        info_warn_title: "⚠️ AISTIVAROITUS (SENSORY WARNING)", info_warn_desc: "Peli sisältää kovia ääniä (torvia, pasuunoita ja naurua) sekä vilkkuvia efektejä. Laske äänenvoimakkuutta ennen aloittamista.",
+        info_cheat_title: "🛡️ KAMEK ANTI-CHEAT",
+        info_cheat_desc: "<li><strong>EI KOSKETUSLEVYÄ:</strong> Oikea hiiri vaaditaan.</li><li><strong>VÄLILEHTIVAHTI:</strong> Välilehden vaihtaminen tulkitaan guuglaamiseksi.</li><li><strong>EI KOODIN TARKASTUSTA:</strong> F12 ja hiiren oikea painike lukitsevat päätteen.</li>",
+        info_tournament_title: "🏆 TURNAUS JA PUTKI", info_tournament_desc: "Jokainen ratkaistu sana kasvattaa putkeasi. Putkesi tallennetaan pistetaulukkoon vain, jos kuolet rehellisesti.",
+        info_close: "YMMÄRRÄN", next_btn: "JATKA ➔", playing: "SOI: ", playing_none: "SOI: EI MITÄÄN",
+        win_msg: "MIEHISTÖ PELASTETTU!", lose_msg: "TEHTÄVÄ EPÄONNISTUI!",
+        warn_valid: "VAIN KIRJAIMET A-Ö OVAT SALLITTUJA!", warn_used: "KIRJAIN '#X' ON JO KÄYTETTY!",
+        lock_devtools: "DEVTOOLS_INTRUSION", lock_devtools_msg: "Yritätkö tarkastella koodia? Et ole sen arvoinen!",
+        lock_rightclick: "RIGHT_CLICK_PROHIBITED", lock_rightclick_msg: "Oikea klikkaus? Yritätkö urkkia salaisuuksiani? Pelaa rehellisesti!",
+        lock_esc: "PAUSE_ATTEMPT_DETECTED", lock_esc_msg: "Tauko? Oikea operaattori ei lepää koskaan! Taukonäppäintä ei ole!",
+        lock_paste: "UNAUTHORIZED_PASTE", lock_paste_msg: "Onko kirjoittaminen liian vaikeaa? Käytä sormiasi, älä leikepöytää!",
+        lock_macro: "MACRO_DETECTION", lock_macro_msg: "Ihmissormet eivät ole noin nopeita... Huijari!",
+        lock_afk: "OPERATOR_IDLE", lock_afk_msg: "Haloo? Nukahditko? Minulla ei ole aikaa laiskoille operaattoreille!",
+        lock_trackpad: "TRACKPAD_DETECTION", lock_trackpad_msg: "LOPETA LÄPPÄRIN SILITTELY! Kamek vaatii oikean hiiren.",
+        lock_tab: "TAB_SWITCH", lock_tab_msg: "Yritit guuglata vastauksen! Huijari!",
+        lock_power: "POWER_FAILURE", lock_power_msg: "Hae laturi! Päätteesi kuolee, ja kärsivällisyyteni sen mukana!",
+        lock_ram: "MEMORY_OVERFLOW", lock_ram_msg: "RAM-muistisi on vitsi! Järjestelmä tulvii yli.",
+        lock_storage: "STORAGE_EXHAUSTED", lock_storage_msg: "Puhdista levysi! Ei tilaa pisteille = ei peliä!",
+        lock_toxic: "TOXIC_OPERATOR", lock_toxic_msg: "Kiroilu ei ole sallittua päätteessä.",
+        lock_header: "KAMEKIN LUKITSEMA", cam_status_on: "📸 KAMERA: PÄÄLLÄ", cam_status_off: "📸 KAMERA: POIS", mic_status_on: "🎤 MIKROFONI: PÄÄLLÄ", mic_status_off: "🎤 MIKROFONI: POIS",
+        sub_verification: "--- TAHINNASTAVARMISTUS VAADITAAN ---"
     },
     en: {
         title: "STATION 24: HANGMAN", alias: "Alias...", guest: "Guest",
@@ -536,7 +576,7 @@ function startEar() {
     if(!Speech) return;
     const rec = new Speech(); rec.continuous = true; 
     
-    rec.lang = currentLang === 'sv' ? 'sv-SE' : currentLang === 'da' ? 'da-DK' : currentLang === 'no' ? 'no-NO' : 'en-US';
+    rec.lang = currentLang === 'sv' ? 'sv-SE' : currentLang === 'da' ? 'da-DK' : currentLang === 'no' ? 'no-NO' : currentLang === 'fi' ? 'fi-FI' : 'en-US';
     
     rec.onresult = (e) => {
         const txt = e.results[e.results.length-1][0].transcript.toLowerCase();

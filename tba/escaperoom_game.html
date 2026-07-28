@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scifi Escaperoom</title>
+    <style>
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff007f;
+            --neon-green: #39ff14;
+        }
+        body {
+            background-color: #0a0a1a;
+            color: #fff;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        #game-container {
+            width: 800px;
+            background: rgba(10, 10, 30, 0.85);
+            border: 4px solid var(--neon-blue);
+            box-shadow: 0 0 20px var(--neon-blue);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        h1 {
+            color: var(--neon-pink);
+            text-shadow: 0 0 10px var(--neon-pink);
+            margin-top: 0;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            border-bottom: 2px dashed var(--neon-blue);
+            padding-bottom: 10px;
+        }
+        .hud-val { color: var(--neon-green); font-weight: bold; }
+        .screen { display: none; }
+        .active { display: block; }
+        
+        /* Knappar */
+        button {
+            background: transparent;
+            color: var(--neon-blue);
+            border: 2px solid var(--neon-blue);
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-family: inherit;
+            text-transform: uppercase;
+            box-shadow: 0 0 5px var(--neon-blue);
+            transition: 0.2s;
+            margin: 10px;
+        }
+        button:hover {
+            background: var(--neon-blue);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-blue);
+        }
+
+        /* Kodlås */
+        .pad-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 60px);
+            gap: 10px;
+            justify-content: center;
+            margin: 20px auto;
+        }
+        .pad-btn { width: 60px; height: 60px; font-size: 1.5rem; }
+        #code-display {
+            width: 200px;
+            height: 40px;
+            background: #000;
+            border: 2px solid var(--neon-pink);
+            margin: 10px auto;
+            font-size: 1.8rem;
+            color: var(--neon-pink);
+            letter-spacing: 5px;
+            line-height: 40px;
+        }
+
+        /* Canvas för skytte/precision */
+        canvas {
+            background: #111;
+            border: 2px solid var(--neon-pink);
+            margin-top: 15px;
+            cursor: crosshair;
+        }
+        .instructions {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <h1>SCIFI ESCAPEROOM</h1>
+        
+        <div class="stats">
+            <div>HÄLSA: <span id="hud-hp" class="hud-val">100</span>%</div>
+            <div>RUM: <span id="hud-room" class="hud-val">1 / 3</span></div>
+        </div>
+
+        <div id="room1" class="screen active">
+            <h2>Nivå 1: Det dränkta rymdcirkustältet</h2>
+            <p>Du är instängd i ett akvarie-cirkustält på en främmande planet. Neon-clownfiskar simmar förbi. För att öppna slussen måste du knäcka det digitala kodlåset.</p>
+            <blockquote>
+                <strong>Logisk ledtråd på väggen:</strong><br>
+                "Antalet tältpinnar är hälften av clownens ballonger. <br>
+                Det första numret är 3. Nästa nummer är dubbelt så stort som det första. <br>
+                Det sista numret är det första plus det andra, minus 4."
+            </blockquote>
+            
+            <div id="code-display">----</div>
+            <div class="pad-grid">
+                <button class="pad-btn" onclick="pressKey(3)">3</button>
+                <button class="pad-btn" onclick="pressKey(4)">4</button>
+                <button class="pad-btn" onclick="pressKey(5)">5</button>
+                <button class="pad-btn" onclick="pressKey(6)">6</button>
+                <button class="pad-btn" onclick="pressKey(7)">7</button>
+                <button class="pad-btn" onclick="pressKey(8)">8</button>
+            </div>
+            <button onclick="checkCode()">KONTROLLERA KOD</button>
+            <button onclick="clearCode()" style="border-color: var(--neon-pink); color: var(--neon-pink);">RENSA</button>
+            <p id="r1-msg" style="color: var(--neon-pink);"></p>
+        </div>
+
+        <div id="room2" class="screen">
+            <h2>Nivå 2: Laser-Clownens attack</h2>
+            <p>Slussen öppnades! Men en cybernetisk rymdclown blockerar vägen. Han skjuter målsökande vattenballonger av plasma!</p>
+            <p class="instructions">Klicka på de flygande rosa plasmakloten innan de når botten för att förstöra dem. Skjut 15 klot för att besegra clownen!</p>
+            <div style="font-weight: bold;">Nedskjutna klot: <span id="score-counter" style="color:var(--neon-green)">0</span> / 15</div>
+            <canvas id="shooterCanvas" width="600" height="300"></canvas>
+            <p id="r2-msg"></p>
+        </div>
+
+        <div id="room3" class="screen">
+            <h2>Nivå 3: Gravitations-dockning</h2>
+            <p>Du har nått flyktkapseln, men undervattensströmmarna och rymdvakuumet krockar! Du måste navigera dockningsnyckeln (grön) exakt i centrum av den roterande cyber-porten (rosa).</p>
+            <p class="instructions">Tryck på space eller klicka på knappen exakt när den gröna indikatorn matchar den rosa zonen i mätaren nedan!</p>
+            <canvas id="precisionCanvas" width="600" height="150"></canvas>
+            <br>
+            <button onclick="triggerDocking()">DOCKA NU!</button>
+            <p id="r3-msg"></p>
+        </div>
+
+        <div id="gameover" class="screen">
+            <h2 style="color: red; text-shadow: 0 0 10px red;">GAME OVER</h2>
+            <p>Hjärnan orkade inte med trycket, eller så träffades du av laser-cirkusens faror.</p>
+            <button onclick="restartGame()">FÖRSÖK IGEN</button>
+        </div>
+
+        <div id="victory" class="screen">
+            <h2 style="color: var(--neon-green); text-shadow: 0 0 10px var(--neon-green);">UPPDRAGET SLUTFÖRT!</h2>
+            <p>Du knäckte koderna, besegrade cyberclownen och dockade med kirurgisk precision. Du har flytt från Scifi Escaperoom!</p>
+            <button onclick="restartGame()">SPELA IGEN</button>
+        </div>
+
+    </div>
+
+    <script>
+        // Spelstatus
+        let hp = 100;
+        let currentRoom = 1;
+        let currentCode = "";
+        const correctCode = "365"; // Lösning: 3, 3*2=6, (3+6)-4=5
+        
+        // Loop-variabler
+        let shooterInterval;
+        let precisionInterval;
+        
+        // DOM-element
+        const hudHp = document.getElementById("hud-hp");
+        const hudRoom = document.getElementById("hud-room");
+
+        function updateHUD() {
+            hudHp.innerText = hp;
+            hudRoom.innerText = currentRoom + " / 3";
+            if (hp <= 0) {
+                gameOver();
+            }
+        }
+
+        function changeScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function damage(amount) {
+            hp -= amount;
+            if(hp < 0) hp = 0;
+            updateHUD();
+        }
+
+        // --- RUM 1 LOGIK (Kodlås) ---
+        function pressKey(num) {
+            if (currentCode.length < 3) {
+                currentCode += num;
+                document.getElementById("code-display").innerText = currentCode.padEnd(3, '-');
+            }
+        }
+        function clearCode() {
+            currentCode = "";
+            document.getElementById("code-display").innerText = "---";
+        }
+        function checkCode() {
+            if (currentCode === correctCode) {
+                document.getElementById("r1-msg").style.color = "var(--neon-green)";
+                document.getElementById("r1-msg").innerText = "KOD GODKÄND! Öppnar sluss...";
+                setTimeout(() => {
+                    currentRoom = 2;
+                    updateHUD();
+                    changeScreen("room2");
+                    startRoom2();
+                }, 1500);
+            } else {
+                document.getElementById("r1-msg").innerText = "FEL KOD! Elchock administrerad (-20 HP)";
+                damage(20);
+                clearCode();
+            }
+        }
+
+        // --- RUM 2 LOGIK (Fiendestrid / Skytte) ---
+        const sCanvas = document.getElementById("shooterCanvas");
+        const ctxS = sCanvas.getContext("2d");
+        let targets = [];
+        let scoreR2 = 0;
+
+        function startRoom2() {
+            targets = [];
+            scoreR2 = 0;
+            document.getElementById("score-counter").innerText = scoreR2;
+            
+            // Spawn-logik
+            shooterInterval = setInterval(() => {
+                targets.push({
+                    x: Math.random() * (sCanvas.width - 40) + 20,
+                    y: 0,
+                    radius: 15,
+                    speed: 2 + Math.random() * 3
+                });
+            }, 800);
+
+            requestAnimationFrame(gameLoopR2);
+        }
+
+        sCanvas.addEventListener('mousedown', function(e) {
+            const rect = sCanvas.getBoundingClientRect();
+            const mouseTwitter = e.clientTwitter - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            for (let i = targets.length - 1; i >= 0; i--) {
+                let t = targets[i];
+                let dist = Math.hypot(mouseTwitter - t.x, mouseY - t.y);
+                if (dist < t.radius + 10) { // Lite förlåtande hitbox
+                    targets.splice(i, 1);
+                    scoreR2++;
+                    document.getElementById("score-counter").innerText = scoreR2;
+                    if (scoreR2 >= 15) {
+                        clearInterval(shooterInterval);
+                        currentRoom = 3;
+                        updateHUD();
+                        changeScreen("room3");
+                        startRoom3();
+                    }
+                    break;
+                }
+            }
+        });
+
+        function gameLoopR2() {
+            if (currentRoom !== 2 || hp <= 0) return;
+            ctxS.clearRect(0, 0, sCanvas.width, sCanvas.height);
+
+            // Rita cyber-clown (bakgrundsdekor)
+            ctxS.fillStyle = "#ff007f";
+            ctxS.font = "16px Courier New";
+            ctxS.fillText("🤡 CYBER-CLOWN [HP: " + (15 - scoreR2) + "]", 220, 30);
+
+            // Uppdatera och rita projektiler
+            for (let i = targets.length - 1; i >= 0; i--) {
+                let t = targets[i];
+                t.y += t.speed;
+
+                ctxS.beginPath();
+                ctxS.arc(t.x, t.y, t.radius, 0, Math.PI * 2);
+                ctxS.fillStyle = "rgba(255, 0, 127, 0.8)";
+                ctxS.strokeStyle = "#fff";
+                ctxS.lineWidth = 2;
+                ctxS.fill();
+                ctxS.stroke();
+
+                // Om den når botten
+                if (t.y > sCanvas.height) {
+                    targets.splice(i, 1);
+                    damage(15);
+                    document.getElementById("r2-msg").innerText = "Du träffades av en plasmaballong! (-15 HP)";
+                    document.getElementById("r2-msg").style.color = "red";
+                }
+            }
+            requestAnimationFrame(gameLoopR2);
+        }
+
+        // --- RUM 3 LOGIK (Extrem Precision) ---
+        const pCanvas = document.getElementById("precisionCanvas");
+        const ctxP = pCanvas.getContext("2d");
+        let indicatorTwitter = 0;
+        let indicatorDir = 1;
+        let pSpeed = 6;
+        let targetZone = { start: 270, end: 330 }; // Mitten av 600px canvas
+
+        function startRoom3() {
+            requestAnimationFrame(gameLoopR3);
+        }
+
+        window.addEventListener('keydown', function(e) {
+            if (e.code === "Space" && currentRoom === 3) {
+                e.preventDefault();
+                triggerDocking();
+            }
+        });
+
+        function gameLoopR3() {
+            if (currentRoom !== 3 || hp <= 0) return;
+            ctxP.clearRect(0, 0, pCanvas.width, pCanvas.height);
+
+            // Rita målzon (Rosa)
+            ctxP.fillStyle = "rgba(255, 0, 127, 0.3)";
+            ctxP.fillRect(targetZone.start, 0, targetZone.end - targetZone.start, pCanvas.height);
+            ctxP.strokeStyle = "#ff007f";
+            ctxP.lineWidth = 3;
+            ctxP.strokeRect(targetZone.start, 0, targetZone.end - targetZone.start, pCanvas.height);
+
+            // Flytta indikator (Grön)
+            indicatorTwitter += pSpeed * indicatorDir;
+            if (indicatorTwitter >= pCanvas.width || indicatorTwitter <= 0) {
+                indicatorDir *= -1;
+            }
+
+            // Rita indikator
+            ctxP.fillStyle = "#39ff14";
+            ctxP.fillRect(indicatorTwitter - 5, 0, 10, pCanvas.height);
+
+            // Texthjälp
+            ctxP.fillStyle = "#fff";
+            ctxP.font = "14px Courier New";
+            ctxP.fillText("MÅLZON", 275, 40);
+
+            requestAnimationFrame(gameLoopR3);
+        }
+
+        function triggerDocking() {
+            if (indicatorTwitter >= targetZone.start && indicatorTwitter <= targetZone.end) {
+                document.getElementById("r3-msg").innerText = "PERFEKT DOCKNING!";
+                setTimeout(() => {
+                    changeScreen("victory");
+                }, 1000);
+            } else {
+                damage(25);
+                document.getElementById("r3-msg").innerText = "MISSDOCKNING! Du krockade med slussväggen (-25 HP)";
+                document.getElementById("r3-msg").style.color = "red";
+                // Gör det lite svårare genom att ändra hastigheten slumpmässigt vid miss
+                pSpeed = 5 + Math.random() * 6;
+            }
+        }
+
+        // --- GAME OVER & RESTART ---
+        function gameOver() {
+            currentRoom = 0;
+            clearInterval(shooterInterval);
+            changeScreen("gameover");
+        }
+
+        function restartGame() {
+            hp = 100;
+            currentRoom = 1;
+            currentCode = "";
+            clearCode();
+            document.getElementById("r1-msg").innerText = "";
+            document.getElementById("r2-msg").innerText = "";
+            document.getElementById("r3-msg").innerText = "";
+            updateHUD();
+            changeScreen("room1");
+        }
+    </script>
+</body>
+</html>

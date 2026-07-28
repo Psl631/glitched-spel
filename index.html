@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Glitcheds webbspels-hubb! // THE BOSS HQ</title>
+    <title id="doc-title">Assemblys webbspels-hubb! // THE BOSS HQ</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --glitched-purple: #120024;
-            --glitched-cyan: #00ffcc;
-            --glitched-dark: #070110;
-            --glitched-accent: #ff00ff;
-            --glitched-warning: #ff0033;
+            --assembly-purple: #120024;
+            --assembly-cyan: #00ffcc;
+            --assembly-dark: #070110;
+            --assembly-accent: #ff00ff;
+            --assembly-warning: #ff0033;
             --monitor-glow: rgba(0, 255, 204, 0.15);
             --bg-black: #05020a;
-            --glitched-blue: #00ccff;
+            --assembly-blue: #00ccff;
         }
 
         body {
-            background-color: var(--glitched-dark);
-            background-image: radial-gradient(circle at 50% 30%, #1a0033 0%, var(--glitched-dark) 70%);
+            background-color: var(--assembly-dark);
+            background-image: radial-gradient(circle at 50% 30%, #1a0033 0%, var(--assembly-dark) 70%);
             color: #ffffff;
             font-family: 'Montserrat', sans-serif;
             margin: 0;
@@ -36,7 +36,7 @@
             width: 95%;
             max-width: 1050px;
             min-height: 85vh; 
-            border: 4px solid var(--glitched-cyan);
+            border: 4px solid var(--assembly-cyan);
             border-radius: 24px;
             background: rgba(12, 1, 24, 0.9);
             position: relative;
@@ -59,12 +59,39 @@
             opacity: 0.7;
         }
 
+        .lang-selector {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 15px;
+            z-index: 20;
+            position: relative;
+        }
+
+        .lang-btn {
+            background: rgba(0, 255, 204, 0.1);
+            border: 1px solid var(--assembly-cyan);
+            color: var(--assembly-cyan);
+            padding: 6px 12px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.7rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .lang-btn:hover, .lang-btn.active {
+            background: var(--assembly-cyan);
+            color: var(--assembly-dark);
+            box-shadow: 0 0 10px var(--assembly-cyan);
+        }
+
         .logo-container {
             text-align: center;
             margin-bottom: 25px;
         }
 
-        .glitched-logo {
+        .assembly-logo {
             max-width: 280px;
             height: auto;
             filter: drop-shadow(0 0 15px rgba(0, 255, 204, 0.5));
@@ -82,7 +109,7 @@
             text-align: center;
             margin: 0 0 10px 0;
             color: #ffffff;
-            text-shadow: 0 0 10px var(--glitched-cyan);
+            text-shadow: 0 0 10px var(--assembly-cyan);
             letter-spacing: -1px;
         }
 
@@ -90,7 +117,7 @@
             text-align: center;
             font-family: 'VT323', monospace;
             font-size: 1.6rem;
-            color: var(--glitched-cyan);
+            color: var(--assembly-cyan);
             margin-bottom: 40px;
             letter-spacing: 2px;
             text-transform: uppercase;
@@ -115,7 +142,7 @@
 
         .game-card:hover {
             background: rgba(0, 255, 204, 0.08);
-            border-color: var(--glitched-cyan);
+            border-color: var(--assembly-cyan);
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 255, 204, 0.1);
         }
@@ -125,7 +152,7 @@
             background: rgba(51, 0, 10, 0.15);
         }
         .game-card.high-intensity:hover {
-            border-color: var(--glitched-warning);
+            border-color: var(--assembly-warning);
             background: rgba(51, 0, 10, 0.3);
             box-shadow: 0 5px 15px rgba(255, 0, 51, 0.15);
         }
@@ -144,13 +171,13 @@
         }
 
         .nav-link:hover {
-            color: var(--glitched-cyan);
-            text-shadow: 0 0 8px var(--glitched-cyan);
+            color: var(--assembly-cyan);
+            text-shadow: 0 0 8px var(--assembly-cyan);
         }
 
         .game-card.high-intensity .nav-link:hover {
-            color: var(--glitched-warning);
-            text-shadow: 0 0 8px var(--glitched-warning);
+            color: var(--assembly-warning);
+            text-shadow: 0 0 8px var(--assembly-warning);
         }
 
         .meta-info {
@@ -170,7 +197,6 @@
         .diff-hard { color: #ff5500; }
         .diff-extreme { color: #ff00ff; animation: extreme-pulse 1s infinite alternate; }
 
-        /* Språktaggar */
         .lang-tag {
             display: inline-block;
             font-family: 'Montserrat', sans-serif;
@@ -184,8 +210,8 @@
         }
         .lang-en {
             background: rgba(0, 204, 255, 0.15);
-            border: 1px solid var(--glitched-blue);
-            color: var(--glitched-blue);
+            border: 1px solid var(--assembly-blue);
+            color: var(--assembly-blue);
         }
         .lang-scan {
             background: rgba(255, 204, 0, 0.15);
@@ -208,7 +234,7 @@
             color: #dcdcdc;
         }
         .card-sensory-warning.severe {
-            border-left-color: var(--glitched-warning);
+            border-left-color: var(--assembly-warning);
             background: rgba(255, 0, 51, 0.1);
             color: #ffcccc;
         }
@@ -253,7 +279,7 @@
         @media (max-width: 768px) {
             .links-grid { grid-template-columns: 1fr; gap: 15px; }
             h1 { font-size: 1.4rem; }
-            .glitched-logo { max-width: 200px; }
+            .assembly-logo { max-width: 200px; }
         }
     </style>
 </head>
@@ -261,22 +287,28 @@
     <div class="scanlines"></div>
     <div class="monitor-frame">
         
+        <div class="lang-selector">
+            <button class="lang-btn" onclick="setLanguage('sv')">SV</button>
+            <button class="lang-btn" onclick="setLanguage('en')">EN</button>
+            <button class="lang-btn" onclick="setLanguage('fi')">FI</button>
+        </div>
+
         <div class="logo-container">
-            <img src="glitched.png" alt="Glitched Logo" class="glitched-logo">
+            <img src="glitched.png" alt="Assembly Logo" class="assembly-logo">
         </div>
 
         <div class="terminal-header" style="text-align: center; margin-bottom: 40px;">
-            <h1 class="terminal-title">Glitcheds webbspels-hubb!</h1>
-            <div class="hub-subtitle" style="font-family: 'Montserrat', sans-serif; font-size: 1.05rem; color: #b3a0c9; line-height: 1.6; max-width: 800px; margin: 15px auto 0 auto; font-weight: normal; text-transform: none; letter-spacing: 0.5px;">
-                Välkommen till Glitcheds officiella arkadkommandocentral på Elmia 2026! Här har vi samlat våra specialutvecklade festivalspel, designade för att sätta dina reflexer, din hårdvarukunskap, din logik och dina snabbskrivningsfingrar på ultimat prov. Välj en modul nedan, dominera highscore-listan och visa mässgolvet vad du går för!
+            <h1 class="terminal-title" data-i18n="mainTitle">Assemblys webbspels-hubb!</h1>
+            <div class="hub-subtitle" data-i18n="hubSubtitle" style="font-family: 'Montserrat', sans-serif; font-size: 1.05rem; color: #b3a0c9; line-height: 1.6; max-width: 800px; margin: 15px auto 0 auto; font-weight: normal; text-transform: none; letter-spacing: 0.5px;">
             </div>
         </div>
 
         <div class="links-grid">
             
+            <!-- QWERTY DEFENSE -->
             <div class="game-card high-intensity" style="
                 grid-column: 1 / -1; 
-                border: 3px solid var(--glitched-accent); 
+                border: 3px solid var(--assembly-accent); 
                 box-shadow: 0 0 25px rgba(255, 0, 255, 0.4), inset 0 0 15px rgba(255, 0, 255, 0.2);
                 background: linear-gradient(135deg, rgba(26, 0, 51, 0.9) 0%, rgba(7, 1, 16, 0.95) 100%);
                 padding: 25px;
@@ -287,7 +319,7 @@
                         <a href="The%20Boss%20-%20Base%20Defense/qwerty_defense.html" class="nav-link" style="font-size: 2.2rem; letter-spacing: 2px;">
                             > QWERTY DEFENSE
                         </a>
-                        <span style="
+                        <span data-i18n="qwertyBadge" style="
                             background: linear-gradient(45deg, #ff00ff, #00ffcc);
                             color: #fff;
                             padding: 5px 12px;
@@ -298,15 +330,14 @@
                             font-weight: bold;
                         ">OFFICIELLT FESTIVALSPEL</span>
                     </div>
-                    <div class="lang-tag lang-en">🌐 English version available</div>
+                    <div class="lang-tag lang-en" data-i18n="langEnAvail">🌐 English version available</div>
                     
-                    <div style="font-family: 'Montserrat', sans-serif; font-size: 1.1rem; color: #fff; margin: 5px 0 15px 0; line-height: 1.6;">
-                        Det här är <b>festivalens officiella webbspel</b> där man kan vinna fina priser om man lyckas hålla maskoten QWERTY vid liv till minst ett visst antal poäng! Skydda QWERTY från elaka virus- och fiendeattacker genom att skjuta på fienderna som invaderar QWERTY!
+                    <div data-i18n="qwertyDesc" style="font-family: 'Montserrat', sans-serif; font-size: 1.1rem; color: #fff; margin: 5px 0 15px 0; line-height: 1.6;">
                     </div>
                     
                     <div style="margin-bottom: 15px; font-family: 'Montserrat', sans-serif;">
-                        <a href="https://glitched.se/sv/" target="_blank" style="
-                            color: var(--glitched-cyan); 
+                        <a href="https://www.assembly.org/" target="_blank" data-i18n="visitAssembly" style="
+                            color: var(--assembly-cyan); 
                             text-decoration: underline; 
                             font-weight: bold; 
                             font-size: 1rem;
@@ -314,152 +345,370 @@
                             align-items: center;
                             gap: 5px;
                         ">
-                            🔗 Besök festivalens hemsida (glitched.se)
+                            🔗 Besök festivalens hemsida (assembly.org)
                         </a>
                     </div>
 
-                    <div class="meta-info" style="font-size: 0.95rem;">Svårighet: <span class="tag-diff diff-extreme" style="padding: 4px 10px;">EXTREM (3D)</span> (men kan justeras) | Åldersrek: 7+ | Prischans: <span style="color: #ffcc00; font-weight: bold;">JA! 🎁</span></div>
+                    <div class="meta-info" style="font-size: 0.95rem;">
+                        <span data-i18n="lblDiff">Svårighet</span>: <span class="tag-diff diff-extreme" data-i18n="diffExtreme" style="padding: 4px 10px;">EXTREM (3D)</span> (<span data-i18n="canAdjust">men kan justeras</span>) | <span data-i18n="lblAge">Åldersrek</span>: 7+ | <span data-i18n="lblPrize">Prischans</span>: <span style="color: #ffcc00; font-weight: bold;" data-i18n="yesUpper">JA! 🎁</span>
+                    </div>
                 </div>
-                <div class="card-sensory-warning severe" style="margin-top: 15px;"><b>🚨 SENSORISK RISK:</b> Fullt stroboskop-inferno, skakande 3D-kamera, intensiva <b>laserstrålar</b> samt dämpade effekter vid giftdimma. Använd [S] på tangentbordet för nödstopp!</div>
+                <div class="card-sensory-warning severe" style="margin-top: 15px;" data-i18n="qwertySensory">
+                </div>
             </div>
 
+            <!-- QUIZ -->
             <div class="game-card">
                 <div>
-                    <a href="lanbit_quiz/index.html" class="nav-link">> GLITCHEDS OFFICIELLA QUIZ</a>
-                    <div class="lang-tag lang-en">🌐 English version available</div>
-                    <div style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
-                        Svara på kluriga frågor och testa dina IT- och gaming-kunskaper i Glitcheds egna quiz!
+                    <a href="lanbit_quiz/index.html" class="nav-link" data-i18n="quizTitle">> ASSEMBLYs OFFICIELLA QUIZ</a>
+                    <div class="lang-tag lang-en" data-i18n="langEnAvail">🌐 English version available</div>
+                    <div data-i18n="quizDesc" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
                     </div>
-                    <div class="meta-info">Svårighet: <span class="tag-diff diff-medium">Medium</span> | Åldersrek: 7+</div>
+                    <div class="meta-info"><span data-i18n="lblDiff">Svårighet</span>: <span class="tag-diff diff-medium" data-i18n="diffMedium">Medium</span> | <span data-i18n="lblAge">Åldersrek</span>: 7+</div>
                 </div>
-                <div class="card-sensory-warning"><b>Sensorisk profil:</b> Texttungt. Inga rörliga ljus, men contains skarpa ljudeffekter med ett ljust "pling" vid rätt svar och ett högt "BZZZZT"-ljud vid fel.</div>
+                <div class="card-sensory-warning" data-i18n="quizSensory">
+                </div>
             </div>
             
+            <!-- HÄNGA GUBBE -->
             <div class="game-card">
                 <div>
-                    <a href="lanbit hänga gubbe/index.html" class="nav-link">> GLITCHEDS HÄNGA GUBBE</a>
-                    <div class="lang-tag lang-scan">🇩🇰 🇳🇴 🇸🇪 Skandinavisk version tillgänglig</div>
-                    <div style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
-                        Det klassiska ordspelet i officiell festival-tappning. Gissa rätt bokstäver innan du blir hängd!
+                    <a href="lanbit hänga gubbe/index.html" class="nav-link" data-i18n="hangmanTitle">> ASSEMBLYs HÄNGA GUBBE</a>
+                    <div class="lang-tag lang-scan" data-i18n="langScanAvail">🇩🇰 🇳🇴 🇸🇪 Skandinavisk version tillgänglig</div>
+                    <div data-i18n="hangmanDesc" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
                     </div>
-                    <div class="meta-info">Svårighet: <span class="tag-diff diff-easy">Lätt</span> | Åldersrek: 7+</div>
+                    <div class="meta-info"><span data-i18n="lblDiff">Svårighet</span>: <span class="tag-diff diff-easy" data-i18n="diffEasy">Lätt</span> | <span data-i18n="lblAge">Åldersrek</span>: 7+</div>
                 </div>
-                <div class="card-sensory-warning"><b>Sensorisk profil:</b> Statiskt UI. Låg visuell och auditorisk stress.</div>
+                <div class="card-sensory-warning" data-i18n="hangmanSensory">
+                </div>
             </div>
             
+            <!-- BASE DEFENSE -->
             <div class="game-card">
                 <div>
-                    <a href="The%20Boss%20-%20Base%20Defense/index.html" class="nav-link">> GLITCHEDS BASE DEFENSE</a>
-                    <div class="lang-tag lang-scan">🇩🇰 🇳🇴 🇸🇪 Skandinavisk version tillgänglig</div>
-                    <div style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
-                        Försvara Glitched-basen mot vågor av fientliga rymdskepp med ditt officiella försvarstorn!
+                    <a href="The%20Boss%20-%20Base%20Defense/index3.html" class="nav-link" data-i18n="baseDefTitle">> ASSEMBLYs BASE DEFENSE</a>
+                    <div class="lang-tag lang-scan" data-i18n="langScanAvail">🇩🇰 🇳🇴 🇸🇪 Skandinavisk version tillgänglig</div>
+                    <div data-i18n="baseDefDesc" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
                     </div>
-                    <div class="meta-info">Svårighet: <span class="tag-diff diff-medium">Medium</span> | Åldersrek: 7+</div>
+                    <div class="meta-info"><span data-i18n="lblDiff">Svårighet</span>: <span class="tag-diff diff-medium" data-i18n="diffMedium">Medium</span> | <span data-i18n="lblAge">Åldersrek</span>: 7+</div>
                 </div>
-                <div class="card-sensory-warning"><b>Sensorisk profil:</b> Innehåller snabba stroboskopeffekter, blinkande ljusblixtar och retropartiklar vid explosioner samt linjära spårskott.</div>
+                <div class="card-sensory-warning" data-i18n="baseDefSensory">
+                </div>
             </div>
 
+            <!-- BASE DEFENSE BOSS -->
             <div class="game-card high-intensity">
                 <div>
-                    <a href="The%20Boss%20-%20Base%20Defense/base_defense_boss2.html" class="nav-link">> GLITCHEDS BASE DEFENSE BOSS</a>
-                    <div style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #ffcccc; margin: 8px 0 16px 0; line-height: 1.5; font-weight: normal;">
-                        Slutstriden i Glitched-basen! Ta dig an den gigantiska moderskepps-bossen i en intensiv uppgörelse.
+                    <a href="The%20Boss%20-%20Base%20Defense/base_defense_boss2.html" class="nav-link" data-i18n="bossTitle">> ASSEMBLYs BASE DEFENSE BOSS</a>
+                    <div data-i18n="bossDesc" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #ffcccc; margin: 8px 0 16px 0; line-height: 1.5; font-weight: normal;">
                     </div>
-                    <div class="meta-info">Svårighet: <span class="tag-diff diff-hard">Svår</span> | Åldersrek: 10+</div>
+                    <div class="meta-info"><span data-i18n="lblDiff">Svårighet</span>: <span class="tag-diff diff-hard" data-i18n="diffHard">Svår</span> | <span data-i18n="lblAge">Åldersrek</span>: 10+</div>
                 </div>
-                <div class="card-sensory-warning severe"><b>🚨 SENSORISK RISK:</b> Innehåller kraftfulla stroboskopeffekter, intensiva <b>lasereffekter</b>, blinkande bosssköldar och ihållande ljusblixtar vid träff.</div>
+                <div class="card-sensory-warning severe" data-i18n="bossSensory">
+                </div>
             </div>
             
+            <!-- MATH MAYHEM -->
             <div class="game-card">
                 <div>
-                    <a href="lanbit_math-mayhem/index2.html" class="nav-link">> GLITCHEDS MATH MAYHEM</a>
-                    <div class="lang-tag lang-en">🌐 English version available</div>
-                    <div style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
-                        Officiell huvudräkning under extrem tidspress! Lös mattetalen innan varningsklockan slår noll. Men se upp för plötsliga alarm som ska snoozas!
+                    <a href="lanbit_math-mayhem/index_sv.html" class="nav-link" data-i18n="mathTitle">> ASSEMBLYs MATH MAYHEM</a>
+                    <div class="lang-tag lang-en" data-i18n="langEnAvail">🌐 English version available</div>
+                    <div data-i18n="mathDesc" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
                     </div>
-                    <div class="meta-info">Svårighet: <span class="tag-diff diff-hard">Svår</span> | Åldersrek: 7+</div>
+                    <div class="meta-info"><span data-i18n="lblDiff">Svårighet</span>: <span class="tag-diff diff-hard" data-i18n="diffHard">Svår</span> | <span data-i18n="lblAge">Åldersrek</span>: 7+</div>
                 </div>
-                <div class="card-sensory-warning"><b>Sensorisk profil:</b> Hög tidspress med pulserande varningsklockor.</div>
+                <div class="card-sensory-warning" data-i18n="mathSensory">
+                </div>
             </div>
             
+            <!-- AIM TRAINER -->
             <div class="game-card">
                 <div>
-                    <a href="lanbit_aimtrainer/index.html" class="nav-link">> GLITCHEDS AIM TRAINER</a>
-                    <div style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 8px 0 16px 0; line-height: 1.5; font-weight: normal;">
-                        Pricka målen så snabbt du kan. Glitcheds officiella uppvärmning för FPS- och e-sportproffs!
+                    <a href="lanbit_aimtrainer/index.html" class="nav-link" data-i18n="aimTitle">> ASSEMBLYs AIM TRAINER</a>
+                    <div data-i18n="aimDesc" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 8px 0 16px 0; line-height: 1.5; font-weight: normal;">
                     </div>
-                    <div class="meta-info">Svårighet: <span class="tag-diff diff-medium">Medium</span> | Åldersrek: 7+</div>
+                    <div class="meta-info"><span data-i18n="lblDiff">Svårighet</span>: <span class="tag-diff diff-medium" data-i18n="diffMedium">Medium</span> | <span data-i18n="lblAge">Åldersrek</span>: 7+</div>
                 </div>
-                <div class="card-sensory-warning"><b>Sensorisk profil:</b> Snabba målvandringar och rörliga mikromönster.</div>
+                <div class="card-sensory-warning" data-i18n="aimSensory">
+                </div>
             </div>
             
+            <!-- CYBER-SANITIZER -->
             <div class="game-card">
                 <div>
-                    <a href="lanbit_antivirus/index2.html" class="nav-link">> GLITCHEDS CYBER-SANITIZER</a>
-                    <div style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 8px 0 16px 0; line-height: 1.5; font-weight: normal;">
-                        Fånga snälla filer och rensa bort virus i ett flytande, snabbt samlarspel signerat Glitched.
+                    <a href="lanbit_antivirus/index2.html" class="nav-link" data-i18n="cyberTitle">> ASSEMBLYs CYBER-SANITIZER</a>
+                    <div data-i18n="cyberDesc" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 8px 0 16px 0; line-height: 1.5; font-weight: normal;">
                     </div>
-                    <div class="meta-info">Svårighet: <span class="tag-diff diff-easy">Lätt</span> | Åldersrek: 7+</div>
+                    <div class="meta-info"><span data-i18n="lblDiff">Svårighet</span>: <span class="tag-diff diff-easy" data-i18n="diffEasy">Lätt</span> | <span data-i18n="lblAge">Åldersrek</span>: 7+</div>
                 </div>
-                <div class="card-sensory-warning"><b>Sensorisk profil:</b> Glidande rörelsemönster med mjuka färgövergångar.</div>
+                <div class="card-sensory-warning" data-i18n="cyberSensory">
+                </div>
             </div>
             
+            <!-- REAKTIONSSPEL -->
             <div class="game-card">
                 <div>
-                    <a href="lanbit_reaktionsspel/index2.html" class="nav-link">> GLITCHEDS REAKTIONSSPEL</a>
-                    <div class="lang-tag lang-scan">🇩🇰 🇳🇴 🇸🇪 Skandinavisk version tillgänglig</div>
-                    <div style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
-                        Håll musen redo! Officiellt reflextest där du klickar så fort skärmen växlar färg.
+                    <a href="lanbit_reaktionsspel/index2.html" class="nav-link" data-i18n="reactionTitle">> ASSEMBLYs REAKTIONSSPEL</a>
+                    <div class="lang-tag lang-scan" data-i18n="langScanAvail">🇩🇰 🇳🇴 🇸🇪 Skandinavisk version tillgänglig</div>
+                    <div data-i18n="reactionDesc" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
                     </div>
-                    <div class="meta-info">Svårighet: <span class="tag-diff diff-medium">Medium</span> | Åldersrek: 7+</div>
+                    <div class="meta-info"><span data-i18n="lblDiff">Svårighet</span>: <span class="tag-diff diff-medium" data-i18n="diffMedium">Medium</span> | <span data-i18n="lblAge">Åldersrek</span>: 7+</div>
                 </div>
-                <div class="card-sensory-warning"><b>Sensorisk profil:</b> Plötsliga, skarpa färgskiften (ex. rött till grönt) över hela skärmytan.</div>
+                <div class="card-sensory-warning" data-i18n="reactionSensory">
+                </div>
             </div>
             
+            <!-- KEYBOARD WARRIOR -->
             <div class="game-card">
                 <div>
-                    <a href="keyboard warrior/index_II.html" class="nav-link">> GLITCHEDS KEYBOARD WARRIOR</a>
-                    <div style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 8px 0 16px 0; line-height: 1.5; font-weight: normal;">
-                        Skriv eller dö! Hammer-knappa in Glitched-orden på tangentbordet innan de faller i botten.
+                    <a href="keyboard warrior/index_II.html" class="nav-link" data-i18n="kwTitle">> ASSEMBLYs KEYBOARD WARRIOR</a>
+                    <div data-i18n="kwDesc" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 8px 0 16px 0; line-height: 1.5; font-weight: normal;">
                     </div>
-                    <div class="meta-info">Svårighet: <span class="tag-diff diff-hard">Svår</span> | Åldersrek: 10+</div>
+                    <div class="meta-info"><span data-i18n="lblDiff">Svårighet</span>: <span class="tag-diff diff-hard" data-i18n="diffHard">Svår</span> | <span data-i18n="lblAge">Åldersrek</span>: 10+</div>
                 </div>
-                <div class="card-sensory-warning"><b>Sensorisk profil:</b> Mycket hög fysisk klickfrekvens, text som rör sig snabbt nedåt.</div>
+                <div class="card-sensory-warning" data-i18n="kwSensory">
+                </div>
             </div>
             
+            <!-- MEMORY -->
             <div class="game-card">
                 <div>
-                    <a href="lanbit_memory/index.html" class="nav-link">> GLITCHEDS MEMORY</a>
-                    <div class="lang-tag lang-en">🌐 English version available</div>
-                    <div style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
-                        Hitta matchande festival-par och testa ditt fotografiska minne i lugn och ro.
+                    <a href="lanbit_memory/index.html" class="nav-link" data-i18n="memoryTitle">> ASSEMBLYs MEMORY</a>
+                    <div class="lang-tag lang-en" data-i18n="langEnAvail">🌐 English version available</div>
+                    <div data-i18n="memoryDesc" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
                     </div>
-                    <div class="meta-info">Svårighet: <span class="tag-diff diff-easy">Lätt</span> | Åldersrek: 7+</div>
+                    <div class="meta-info"><span data-i18n="lblDiff">Svårighet</span>: <span class="tag-diff diff-easy" data-i18n="diffEasy">Lätt</span> | <span data-i18n="lblAge">Åldersrek</span>: 7+</div>
                 </div>
-                <div class="card-sensory-warning"><b>Sensorisk profil:</b> Lugnt gränssnitt med repeterande bildmönster.</div>
+                <div class="card-sensory-warning" data-i18n="memorySensory">
+                </div>
             </div>
             
+            <!-- SPAM-KLICKER -->
             <div class="game-card">
                 <div>
-                    <a href="lanbit_spamklicker/index.html" class="nav-link">> GLITCHEDS SPAM-KLICKER</a>
-                    <div style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 8px 0 16px 0; line-height: 1.5; font-weight: normal;">
-                        Ren klick-hastighet! Hur många gånger hinner du spamma Glitched-knappen innan tiden tar slut?
+                    <a href="lanbit_spamklicker/index.html" class="nav-link" data-i18n="spamTitle">> ASSEMBLYs SPAM-KLICKER</a>
+                    <div data-i18n="spamDesc" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 8px 0 16px 0; line-height: 1.5; font-weight: normal;">
                     </div>
-                    <div class="meta-info">Svårighet: <span class="tag-diff diff-medium">Medium</span> | Åldersrek: 10+</div>
+                    <div class="meta-info"><span data-i18n="lblDiff">Svårighet</span>: <span class="tag-diff diff-medium" data-i18n="diffMedium">Medium</span> | <span data-i18n="lblAge">Åldersrek</span>: 10+</div>
                 </div>
-                <div class="card-sensory-warning"><b>Sensorisk profil:</b> Snabba talförändringar och repetitiva, mekaniska klickljud.</div>
+                <div class="card-sensory-warning" data-i18n="spamSensory">
+                </div>
             </div>
         </div>
 
         <div class="sensor-warning-box">
-            <h3>⚠️ OVERALL SENSORISK VARNING &amp; INFORMATION</h3>
-            <p>Vissa av webbläsarspelen i denna terminal (särskilt Qwerty Defense och Base Defense Boss) innehåller snabba 3D-rörelser, intensiva ljusfrekvenser, lasereffekter och stroboskopeffekter. Om du upplever obehag, visuell stress eller sensorisk överbelastning, tryck på [S] på tangentbordet för akut nödstopp, eller kontakta Glitched Crew i montern för assistans.</p>
+            <h3 data-i18n="overallWarnTitle">⚠️ OVERALL SENSORISK VARNING &amp; INFORMATION</h3>
+            <p data-i18n="overallWarnText"></p>
         </div>
 
         <div class="footer">
-            SYSTEM STATUS: ONLINE | OPERATOR: PSL631 | VENUE: ELMIA HALL D<br>
-            <a href="https://docs.google.com/document/d/1oMtMZWXSW8DhpPGlAClCrqfEbuWaSSk7CrwN6R1p5cQ/edit?usp=sharing" target="_blank">Turneringsinformation</a>
+            SYSTEM STATUS: ONLINE | OPERATOR: PSL631 | VENUE: MESSUKESKUS HALL 6<br>
+            <a href="https://docs.google.com/document/d/1BbmSSWbVqmaiJwH5_fYP_SVQXu5zeGI94bjoaPfJ_jo/edit?usp=sharing" target="_blank" data-i18n="tourneyInfo">Turneringsinformation</a>
         </div>
     </div> 
+
+    <script>
+        const translations = {
+            sv: {
+                docTitle: "Assemblys webbspels-hubb! // THE BOSS HQ",
+                mainTitle: "Assemblys webbspels-hubb!",
+                hubSubtitle: "Välkommen till Assemblys officiella arkadkommandocentral på Messukeskus 2026! Här har vi samlat våra specialutvecklade festivalspel, designade för att sätta dina reflexer, din hårdvarukunskap, din logik och dina snabbskrivningsfingrar på ultimat prov. Välj en modul nedan, dominera highscore-listan och visa mässgolvet vad du går för!",
+                qwertyBadge: "OFFICIELLT FESTIVALSPEL",
+                langEnAvail: "🌐 English version available",
+                langScanAvail: "🇩🇰 🇳🇴 🇸🇪 Skandinavisk version tillgänglig",
+                qwertyDesc: "Det här är <b>festivalens officiella webbspel</b> där man kan vinna fina priser om man lyckas hålla maskoten QWERTY vid liv till minst ett visst antal poäng! Skydda QWERTY från elaka virus- och fiendeattacker genom att skjuta på fienderna som invaderar QWERTY!",
+                visitAssembly: "🔗 Besök festivalens hemsida (assembly.org)",
+                lblDiff: "Svårighet",
+                lblAge: "Åldersrek",
+                lblPrize: "Prischans",
+                canAdjust: "men kan justeras",
+                yesUpper: "JA! 🎁",
+                diffEasy: "Lätt",
+                diffMedium: "Medium",
+                diffHard: "Svår",
+                diffExtreme: "EXTREM (3D)",
+                qwertySensory: "<b>🚨 SENSORISK RISK:</b> Fullt stroboskop-inferno, skakande 3D-kamera, intensiva <b>laserstrålar</b> samt dämpade effekter vid giftdimma. Använd [S] på tangentbordet för nödstopp!",
+                quizTitle: "> ASSEMBLYs OFFICIELLA QUIZ",
+                quizDesc: "Svara på kluriga frågor och testa dina IT- och gaming-kunskaper i Assemblys egna quiz!",
+                quizSensory: "<b>Sensorisk profil:</b> Texttungt. Inga rörliga ljus, men innehåller skarpa ljudeffekter med ett ljust \"pling\" vid rätt svar och ett högt \"BZZZZT\"-ljud vid fel.",
+                hangmanTitle: "> ASSEMBLYs HÄNGA GUBBE",
+                hangmanDesc: "Det klassiska ordspelet i officiell festival-tappning. Gissa rätt bokstäver innan du blir hängd!",
+                hangmanSensory: "<b>Sensorisk profil:</b> Statiskt UI. Låg visual och auditorisk stress.",
+                baseDefTitle: "> ASSEMBLYs BASE DEFENSE",
+                baseDefDesc: "Försvara Assembly-basen mot vågor av fientliga rymdskepp med ditt officiella försvarstorn!",
+                baseDefSensory: "<b>Sensorisk profil:</b> Innehåller snabba stroboskopeffekter, blinkande ljusblixtar och retropartiklar vid explosioner samt linjära spårskott.",
+                bossTitle: "> ASSEMBLYs BASE DEFENSE BOSS",
+                bossDesc: "Slutstriden i Assembly-basen! Ta dig an den gigantiska moderskepps-bossen i en intensiv uppgörelse.",
+                bossSensory: "<b>🚨 SENSORISK RISK:</b> Innehåller kraftfulla stroboskopeffekter, intensiva <b>lasereffekter</b>, blinkande bosssköldar och ihållande ljusblixtar vid träff.",
+                mathTitle: "> ASSEMBLYs MATH MAYHEM",
+                mathDesc: "Officiell huvudräkning under extrem tidspress! Lös mattetalen innan varningsklockan slår noll. Men se upp för plötsliga alarm som ska snoozas!",
+                mathSensory: "<b>Sensorisk profil:</b> Hög tidspress med pulserande varningsklockor.",
+                aimTitle: "> ASSEMBLYs AIM TRAINER",
+                aimDesc: "Pricka målen så snabbt du kan. Assemblys officiella uppvärmning för FPS- och e-sportproffs!",
+                aimSensory: "<b>Sensorisk profil:</b> Snabba målvandringar och rörliga mikromönster.",
+                cyberTitle: "> ASSEMBLYs CYBER-SANITIZER",
+                cyberDesc: "Fånga snälla filer och rensa bort virus i ett flytande, snabbt samlarspel signerat Assembly.",
+                cyberSensory: "<b>Sensorisk profil:</b> Glidande rörelsemönster med mjuka färgövergångar.",
+                reactionTitle: "> ASSEMBLYs REAKTIONSSPEL",
+                reactionDesc: "Håll musen redo! Officiellt reflextest där du klickar så fort skärmen växlar färg.",
+                reactionSensory: "<b>Sensorisk profil:</b> Plötsliga, skarpa färgskiften (ex. rött till grönt) över hela skärmytan.",
+                kwTitle: "> ASSEMBLYs KEYBOARD WARRIOR",
+                kwDesc: "Skriv eller dö! Hammer-knappa in Assembly-orden på tangentbordet innan de faller i botten.",
+                kwSensory: "<b>Sensorisk profil:</b> Mycket hög fysisk klickfrekvens, text som rör sig snabbt nedåt.",
+                memoryTitle: "> ASSEMBLYs MEMORY",
+                memoryDesc: "Hitta matchande festival-par och testa ditt fotografiska minne i lugn och ro.",
+                memorySensory: "<b>Sensorisk profil:</b> Lugnt gränssnitt med repeterande bildmönster.",
+                spamTitle: "> ASSEMBLYs SPAM-KLICKER",
+                spamDesc: "Ren klick-hastighet! Hur många gånger hinner du spamma Assembly-knappen innan tiden tar slut?",
+                spamSensory: "<b>Sensorisk profil:</b> Snabba talförändringar och repetitiva, mekaniska klickljud.",
+                overallWarnTitle: "⚠️ OVERALL SENSORISK VARNING & INFORMATION",
+                overallWarnText: "Vissa av webbläsarspelen i denna terminal (särskilt Qwerty Defense och Base Defense Boss) innehåller snabba 3D-rörelser, intensiva ljusfrekvenser, lasereffekter och stroboskopeffekter. Om du upplever obehag, visuell stress eller sensorisk överbelastning, tryck på [S] på tangentbordet för akut nödstopp, eller kontakta Assembly Crew i montern för assistans.",
+                tourneyInfo: "Turneringsinformation"
+            },
+            en: {
+                docTitle: "Assembly Web Games Hub! // THE BOSS HQ",
+                mainTitle: "Assembly Web Games Hub!",
+                hubSubtitle: "Welcome to Assembly's official arcade command center at Messukeskus 2026! Here we have gathered our custom festival games, designed to put your reflexes, hardware knowledge, logic, and speed-typing fingers to the ultimate test. Select a module below, dominate the high score leaderboard, and show the expo floor what you've got!",
+                qwertyBadge: "OFFICIAL FESTIVAL GAME",
+                langEnAvail: "🌐 English version available",
+                langScanAvail: "🇩🇰 🇳🇴 🇸🇪 Scandinavian version available",
+                qwertyDesc: "This is the <b>official festival game</b> where you can win great prizes if you manage to keep the mascot QWERTY alive to reach a target score! Protect QWERTY from malicious virus and enemy attacks by shooting down invaders!",
+                visitAssembly: "🔗 Visit festival website (assembly.org)",
+                lblDiff: "Difficulty",
+                lblAge: "Age Rec",
+                lblPrize: "Prizes",
+                canAdjust: "adjustable",
+                yesUpper: "YES! 🎁",
+                diffEasy: "Easy",
+                diffMedium: "Medium",
+                diffHard: "Hard",
+                diffExtreme: "EXTREME (3D)",
+                qwertySensory: "<b>🚨 SENSORY WARNING:</b> Full strobe inferno, shaking 3D camera, intense <b>laser beams</b>, and poison fog effects. Press [S] on your keyboard for emergency stop!",
+                quizTitle: "> ASSEMBLY'S OFFICIAL QUIZ",
+                quizDesc: "Answer tricky questions and test your IT and gaming knowledge in Assembly's official quiz!",
+                quizSensory: "<b>Sensory Profile:</b> Text-heavy. No moving lights, but features sharp sound effects with a bright 'ding' for correct answers and a loud 'BZZZZT' for errors.",
+                hangmanTitle: "> ASSEMBLY'S HANGMAN",
+                hangmanDesc: "The classic word game in official festival style. Guess the correct letters before you're hanged!",
+                hangmanSensory: "<b>Sensory Profile:</b> Static UI. Low visual and auditory stress.",
+                baseDefTitle: "> ASSEMBLY'S BASE DEFENSE",
+                baseDefDesc: "Defend the Assembly base against waves of hostile starships with your official defense turret!",
+                baseDefSensory: "<b>Sensory Profile:</b> Features fast strobe effects, flashing muzzle flashes, retro particle explosions, and tracer fire.",
+                bossTitle: "> ASSEMBLY'S BASE DEFENSE BOSS",
+                bossDesc: "The final battle at the Assembly base! Take on the gigantic mothership boss in an intense showdown.",
+                bossSensory: "<b>🚨 SENSORY WARNING:</b> Contains powerful strobe effects, intense <b>laser visuals</b>, flashing boss shields, and persistent impact flashes.",
+                mathTitle: "> ASSEMBLY'S MATH MAYHEM",
+                mathDesc: "Official mental math under extreme time pressure! Solve equations before the alarm reaches zero. Watch out for sudden alarms to snooze!",
+                mathSensory: "<b>Sensory Profile:</b> High time pressure with pulsing warning alarms.",
+                aimTitle: "> ASSEMBLY'S AIM TRAINER",
+                aimDesc: "Hit the targets as fast as you can. Assembly's official warm-up for FPS and esports pros!",
+                aimSensory: "<b>Sensory Profile:</b> Fast target motion and moving micro-patterns.",
+                cyberTitle: "> ASSEMBLY'S CYBER-SANITIZER",
+                cyberDesc: "Catch clean files and purge viruses in a smooth, fast collection game created by Assembly.",
+                cyberSensory: "<b>Sensory Profile:</b> Smooth movement patterns with soft color transitions.",
+                reactionTitle: "> ASSEMBLY'S REACTION GAME",
+                reactionDesc: "Keep your mouse ready! Official reflex test where you click as soon as the screen changes color.",
+                reactionSensory: "<b>Sensory Profile:</b> Sudden, sharp color shifts (e.g. red to green) across the entire screen.",
+                kwTitle: "> ASSEMBLY'S KEYBOARD WARRIOR",
+                kwDesc: "Type or die! Hammer out Assembly words on your keyboard before they hit the bottom.",
+                kwSensory: "<b>Sensory Profile:</b> Very high physical clicking frequency, fast downward scrolling text.",
+                memoryTitle: "> ASSEMBLY'S MEMORY",
+                memoryDesc: "Match festival pairs and test your photographic memory at your own pace.",
+                memorySensory: "<b>Sensory Profile:</b> Calm interface with repeating image patterns.",
+                spamTitle: "> ASSEMBLY'S SPAM CLICKER",
+                spamDesc: "Pure clicking speed! How many times can you spam the Assembly button before time runs out?",
+                spamSensory: "<b>Sensory Profile:</b> Fast digit changes and repetitive mechanical click sounds.",
+                overallWarnTitle: "⚠️ OVERALL SENSORY WARNING & INFORMATION",
+                overallWarnText: "Some browser games in this terminal (especially Qwerty Defense and Base Defense Boss) contain fast 3D movements, intense light frequencies, laser effects, and strobe lighting. If you experience discomfort, visual strain, or sensory overload, press [S] on your keyboard for emergency stop, or contact Assembly Crew at the booth for assistance.",
+                tourneyInfo: "Tournament Information"
+            },
+            fi: {
+                docTitle: "Assembly verkkopelikeskus! // THE BOSS HQ",
+                mainTitle: "Assemblyn verkkopelikeskus!",
+                hubSubtitle: "Tervetuloa Assemblyn viralliseen arkadikomentokeskukseen Messukeskuksessa 2026! Tänne olemme koonneet erikoiskehitetyt festivaalipelimme, jotka laittavat reaktiosi, laitteistotietoutesi, logiikkasi ja kirjoitusnopeutesi äärimmäiseen testiin. Valitse moduuli alta, hallitse hi-score-listaa ja näytä messulattialle taitosi!",
+                qwertyBadge: "VIRALLINEN FESTIVAALIPELI",
+                langEnAvail: "🌐 Englanninkielinen versio saatavilla",
+                langScanAvail: "🇩🇰 🇳🇴 🇸🇪 Skandinaavinen versio saatavilla",
+                qwertyDesc: "Tämä on <b>festivaalin virallinen verkkopeli</b>, jossa voit voittaa hienoja palkintoja pitämällä QWERTY-maskotin hengissä tiettyyn pistemäärään asti! Suojele QWERTYä viruksilta ja vihollishyökkäyksiltä ampumalla tunkeutujat!",
+                visitAssembly: "🔗 Vieraile festivaalin kotisivuilla (assembly.org)",
+                lblDiff: "Vaikeustaso",
+                lblAge: "Ikäsuositus",
+                lblPrize: "Palkinnot",
+                canAdjust: "säädettävissä",
+                yesUpper: "KYLLÄ! 🎁",
+                diffEasy: "Helppo",
+                diffMedium: "Keskivaikea",
+                diffHard: "Vaikea",
+                diffExtreme: "ÄÄRIMMÄINEN (3D)",
+                qwertySensory: "<b>🚨 AISTIVAROITUS:</b> Täysi vilkkuvalo-inferno, tärisevä 3D-kamera, voimakkaat <b>lasersäteet</b> sekä myrkkysumuefektit. Paina näppäimistön [S]-näppäintä hätäpysäytykseen!",
+                quizTitle: "> ASSEMBLYn VIRALLINEN TIETOKILPAILU",
+                quizDesc: "Vastaa kiperiin kysymyksiin ja testaa IT- sekä peli tietämyksesi Assemblyn omassa tietokilpailussa!",
+                quizSensory: "<b>Aistiprofiili:</b> Tekstipainotteinen. Ei liikkuvia valoja, mutta sisältää teräviä äänitehosteita (oikeasta vastauksesta kirkas merkkiääni, väärästä kova 'BZZZZT').",
+                hangmanTitle: "> ASSEMBLYn HIRSIPUU",
+                hangmanDesc: "Klassinen sanapeli virallisessa festivaaliasussa. Arvaa oikeat kirjaimet ennen kuin joudut hirtetyksi!",
+                hangmanSensory: "<b>Aistiprofiili:</b> Staattinen käyttöliittymä. Matala visuaalinen ja auditiivinen rasitus.",
+                baseDefTitle: "> ASSEMBLYn BASE DEFENSE",
+                baseDefDesc: "Puolusta Assembly-tukikohtaa vihollisen avaruusaluksilta virallisella puolustustornillasi!",
+                baseDefSensory: "<b>Aistiprofiili:</b> Sisältää nopeita strobo-efektejä, vilkkuvia valovälähdyksiä ja räjähdyspartikkeleita.",
+                bossTitle: "> ASSEMBLYn BASE DEFENSE BOSS",
+                bossDesc: "Lopputaistelu Assembly-tukikohdassa! Ota mittaa jättimäisestä emoaluspomosta intensiivisessä taistelussa.",
+                bossSensory: "<b>🚨 AISTIVAROITUS:</b> Sisältää voimakkaita strobo-efektejä, intensiivisiä <b>laserefektejä</b>, vilkkuvia pomosuojia ja toistuvia valovälähdyksiä.",
+                mathTitle: "> ASSEMBLYn MATH MAYHEM",
+                mathDesc: "Virallinen päässälasku äärimmäisessä aikapaineessa! Ratkaise laskutoimitukset ennen kuin hälytyskello lyö nollaa. Varo äkillisiä hälytyksiä!",
+                mathSensory: "<b>Aistiprofiili:</b> Korkea aikapaine ja sykkivät varoituskellot.",
+                aimTitle: "> ASSEMBLYn AIM TRAINER",
+                aimDesc: "Osu kohteisiin niin nopeasti kuin pystyt. Assemblyn virallinen lämmittely FPS- ja e-urheiluammattilaisille!",
+                aimSensory: "<b>Aistiprofiili:</b> Nopeasti liikkuvia kohteita ja mikrokuvioita.",
+                cyberTitle: "> ASSEMBLYn CYBER-SANITIZER",
+                cyberDesc: "Kerää turvallisia tiedostoja ja puhdista virukset sujuvassa keräilypelissä.",
+                cyberSensory: "<b>Aistiprofiili:</b> Pehmeät liikemallit ja värisiirtymät.",
+                reactionTitle: "> ASSEMBLYn REAKTIOPELI",
+                reactionDesc: "Pidä hiiri valmiina! Virallinen reaktiotesti, jossa klikkaat heti kun näytön väri vaihtuu.",
+                reactionSensory: "<b>Aistiprofiili:</b> Äkillisiä, teräviä värimuutoksia koko näytön alueella.",
+                kwTitle: "> ASSEMBLYn KEYBOARD WARRIOR",
+                kwDesc: "Kirjoita tai häviä! Naputa Assembly-sanat näppäimistöllä ennen kuin ne putoavat pohjaan.",
+                kwSensory: "<b>Aistiprofiili:</b> Erittäin korkea naputtelutahti, nopeasti alaspäin liikuva teksti.",
+                memoryTitle: "> ASSEMBLYn MEMORY",
+                memoryDesc: "Etsi parit ja testaa valokuvamuistiasi rauhallisessa muistipelissä.",
+                memorySensory: "<b>Aistiprofiili:</b> Rauhallinen käyttöliittymä ja toistuvat kuvakuvioinnit.",
+                spamTitle: "> ASSEMBLYn SPÄMMIKLIKKERI",
+                spamDesc: "Puhdasta klikkausnopeutta! Kuinka monta kertaa ehdit spämmätä Assembly-painiketta ennen ajan päättymistä?",
+                spamSensory: "<b>Aistiprofiili:</b> Nopeasti muuttuvat numerot ja toistuvat mekaaniset klikkausäänet.",
+                overallWarnTitle: "⚠️ YLEINEN AISTIVAROITUS JA TIEDOTE",
+                overallWarnText: "Jotkin tämän päätteen verkkoselainpeleistä (erityisesti Qwerty Defense ja Base Defense Boss) sisältävät nopeaa 3D-liikettä, voimakkaita valotaajuuksia, laserefektejä ja vilkkuvaloa. Jos koet epämukavuutta, visuaalista rasitusta tai aistiylikuormitusta, paina näppäimistön [S]-näppäintä hätäpysäytykseen tai ota yhteyttä Assembly Crewiin osastolla.",
+                tourneyInfo: "Turnaustiedot"
+            }
+        };
+
+        function getInitialLanguage() {
+            const browserLang = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+            if (browserLang.startsWith('sv')) return 'sv';
+            if (browserLang.startsWith('fi')) return 'fi';
+            return 'en';
+        }
+
+        function setLanguage(lang) {
+            if (!translations[lang]) lang = 'en';
+            
+            document.documentElement.lang = lang;
+            
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.innerText.toLowerCase() === lang);
+            });
+
+            document.getElementById('doc-title').innerText = translations[lang].docTitle;
+
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.innerHTML = translations[lang][key];
+                }
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            setLanguage(getInitialLanguage());
+        });
+    </script>
 </body>
 </html>
