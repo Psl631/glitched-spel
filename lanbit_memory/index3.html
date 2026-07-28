@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <title>Station 24 - Assembly Muistipeli</title>
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
+<script>
+// --- SPELVARIABLER & BILDER ---
+// --- 1. KAMEK ELITE LAITTEISTO- JA SELAINESTO (LOKI) ---
+(function() {
+    var ua = navigator.userAgent.toLowerCase();
+    var reason = "";
+    var mockery = "";
+
+    // SELAINTESTIT
+    var isIE = !!document.documentMode || ua.indexOf("msie") > -1 || ua.indexOf("trident") > -1;
+    var isOldEdge = ua.indexOf("edge/") > -1;
+    var isSafari = ua.indexOf("safari") > -1 && ua.indexOf("chrome") === -1;
+    var isOldSafari = false;
+
+    if (isSafari) {
+        var safariVerMatch = ua.match(/version\/(\d+)/);
+        if (safariVerMatch && parseInt(safariVerMatch[1]) < 16) isOldSafari = true;
+    }
+
+    if (isIE) {
+        reason = "INTERNET_EXPLORER_HAUTARAUSKO";
+        mockery = "Internet Explorer on kuollut ja kuopattu! Vaihda nykyaikaiseen selaimeen. PSL631 kuulee 56k-modeemisi huudon painajaisissaan.";
+    } else if (isOldEdge) {
+        reason = "VANHA_EDGE_ROSKISSA";
+        mockery = "Käytätkö vanhaa Edgeä? Tämä selain kuoli nopeammin kuin Goomba saappaan alla! Asenna Chromium-selain ennen kuin Kamek muuttaa tietokoneesi tuhkakupiksi.";
+    } else if (isOldSafari) {
+        reason = "KIVIKAUDEN_SAFARI";
+        mockery = "Safari-versiosi on niin vanha, että se luulee Steve Jobsin elävän vielä. Päivitä laitteesi tai pääsysi estetään!";
+    }
+
+    // LAITTEISTOTESTIT
+    var isMobile = /iphone|ipod|android|blackberry|iemobile/i.test(ua);
+    var isTablet = /ipad|playbook|silk/i.test(ua) || (navigator.maxTouchPoints > 0 && ua.indexOf("macintosh") > -1);
+    var isVR = /oculus|quest|pico|vive/i.test(ua);
+    var isWatch = /watch|wearable/i.test(ua);
+    var isSmartHome = /tizen|web0s|googletv|appletv|smarttv|hbbtv/i.test(ua);
+
+    if (isVR) {
+        reason = "VR_LASIT_HAVAITTU";
+        mockery = "Ota ne VR-lasit pois päästä! Muistipeliä ei pelata 3D:nä sukellusvarusteissa. Station 24 vaatii tasaisen näytön ja mekaanisen hiiren!";
+    } else if (isWatch) {
+        reason = "MIKRO_LAITE_HAVAITTU";
+        mockery = "Älykello?! Näyttösi on pienempi kuin Kamekin varpaankynsi. Älä edes yritä hyökätä matriisiin rannelaitteella!";
+    } else if (isSmartHome) {
+        reason = "SOHVAPERUNA_ANOMALIA";
+        mockery = "Äly-TV:si ei ole hyväksytty komentokeskus! Virusten torjunta kaukosäätimellä on kuin keiton syömistä haarukalla.";
+    } else if (ua.indexOf("tesla") > -1 || ua.indexOf("carbrowser") > -1) {
+        reason = "LIIKENNEVAARA_HAVAITTU";
+        mockery = "SAMMUTA MOOTTORI! Teslasi näyttö ei ole peliruutu. Pidä kädet ratissa ennen kuin törmäät tietokonejärjestelmään!";
+    } else if (ua.indexOf("playstation") > -1 || ua.indexOf("xbox") > -1 || ua.indexOf("nintendo") > -1) {
+        reason = "KONSOLI_TALONPOIKA";
+        mockery = "Mene takaisin ohjaimesi ja tähtäysavustimesi pariin, senkin konsolitalonpoika! Station 24 vaatii mekaanista tarkkuutta.";
+    } else if (isTablet) {
+        reason = "TAHMAISET_SORMET";
+        mockery = "Lopeta ruudun lääppiminen! Tabletti on lelu. Station 24 Protocol vaatii kunnon pelihiiren!";
+    } else if (isMobile) {
+        reason = "MOBIILITERMINAALI";
+        mockery = "Näyttösi on liian pieni tälle älytasolle. Station 24 ei ole mikään Goomboiden mobiilipeli!";
+    }
+
+    // KÄYTTÖJÄRJESTELMÄTESTIT
+    var isWindows = ua.indexOf("windows nt") > -1;
+    var isMac = ua.indexOf("mac os x") > -1 && !isTablet;
+    var isChromeOS = ua.indexOf("cros") > -1;
+
+    if (isChromeOS) {
+        reason = "CHROME_OS_HYLÄTTY";
+        mockery = "Chromebook? Se on kuin yrittäisi voittaa Formula 1 -kisan polkuautolla. Kamek hyväksyy vain oikeat käyttöjärjestelmät!";
+    } else if (isWindows) {
+        var winVer = parseFloat(ua.split("windows nt ")[1]);
+        if (winVer < 10.0) {
+            reason = "WINDOWS_FOSSIILI";
+            mockery = "Windows " + (winVer < 6.2 ? "7" : "8") + "? Tietokoneesi kuuluu museoon eikä Station 24 -järjestelmään!";
+        }
+    } else if (isMac) {
+        var macVerMatch = ua.match(/mac os x (\d+)[_.](\d+)/);
+        if (macVerMatch) {
+            var major = parseInt(macVerMatch[1]);
+            if (major < 15) {
+                reason = "MÄTÄ_OMENA";
+                mockery = "macOS " + major + "? Sequoia (15.0) on vähimmäisvaatimus näille algoritmeille. Päivitä tai poistu!";
+            }
+        }
+    }
+
+    if (reason !== "") {
+        document.documentElement.innerHTML = ""; 
+        window.onload = function() {
+            var h = '<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#1a0000;color:#fff;z-index:9999999;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:40px;font-family:Arial, sans-serif;border:15px double #ff0000;box-sizing:border-box;">';
+            h += '<img src="kamek.jfif" style="width:180px;border-radius:30px;border:5px solid #ffcc00;margin-bottom:20px;filter:drop-shadow(0 0 15px #ff0000);">';
+            h += '<h1 style="font-size:42px;color:#ff0000;margin:10px 0;font-weight:900;">[ PÄÄSY EVÄTTY ]</h1>';
+            h += '<div style="background:rgba(0,0,0,0.4);padding:40px;border-radius:30px;max-width:800px;border:2px solid #ffcc00;">';
+            h += '<p style="font-size:26px;color:#ffcc00;margin-bottom:20px;font-weight:bold;">Kamek pilkkaa laitteistoasi:</p>';
+            h += '<p style="font-size:32px;line-height:1.4;font-style:italic;">"' + mockery + '"</p>';
+            h += '</div>';
+            h += '<p style="margin-top:50px;opacity:0.5;font-family:monospace;">SYSTEM_ERROR: ' + reason + '</p></div>';
+            document.body.innerHTML = h;
+            if (window.stop) window.stop();
+        };
+        throw new Error("Lockdown: System integrity check failed.");
+    }
+})();
+
+</script>
+    <style>
+        html, body {
+            margin: 0; padding: 0; min-height: 100vh;
+            background-image: url('lanbit_bg.jfif'); background-size: cover;
+            background-position: center; background-attachment: fixed;
+            font-family: 'Luckiest Guy', cursive; color: white;
+            display: flex; flex-direction: column; align-items: center;
+            overflow-y: auto; transition: background-color 0.1s;
+        }
+
+        #start-screen, #end-screen {
+            background: rgba(0, 0, 0, 0.9); padding: 30px; border-radius: 30px;
+            margin: 30px auto; text-align: center; border: 8px solid #ffcc00;
+            max-width: 700px; z-index: 200;
+        }
+
+        #end-screen { display: none; position: fixed; top: 15%; }
+
+        .guide-box {
+            background: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 15px;
+            margin: 15px 0; text-align: left; font-size: 16px; line-height: 1.4;
+        }
+
+        .guide-box h2 { color: #ffcc00; margin-top: 0; text-align: center; font-size: 28px; }
+        .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .casual-info { border-left: 5px solid #00ff00; padding-left: 10px; }
+        .classic-info { border-left: 5px solid #ff3300; padding-left: 10px; }
+        
+        .how-to-play {
+            margin-top: 15px; border-top: 2px solid rgba(255,255,255,0.2); padding-top: 10px;
+        }
+
+#toast-container {
+    position: fixed; bottom: 20px; right: 20px; z-index: 9999;
+}
+
+.toast {
+    background: rgba(0, 0, 0, 0.85); color: white; padding: 15px 25px;
+    border-radius: 10px; margin-top: 10px; border-left: 5px solid #ffcc00;
+    font-family: 'Luckiest Guy', cursive; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    animation: slideIn 0.5s, fadeOut 0.5s 4.5s forwards;
+}
+
+@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+        input, select, button {
+            font-family: 'Luckiest Guy', cursive; font-size: 22px;
+            margin: 10px; padding: 10px; border-radius: 10px; border: none;
+        }
+
+        .btn-casual { background-color: #00ff00; color: black; cursor: pointer; }
+        .btn-classic { background-color: #ff3300; color: white; cursor: pointer; }
+        .btn-restart { background-color: #ffcc00; color: black; cursor: pointer; margin-top: 20px; }
+
+        #game-container { display: none; width: 95%; max-width: 1100px; margin: 20px auto; text-align: center; }
+        #game-board {
+            display: grid; gap: 15px; justify-content: center;
+            background: rgba(0, 0, 0, 0.5); padding: 25px;
+            border: 10px solid #333; border-radius: 20px; transition: all 0.2s;
+        }
+
+        .card {
+            width: 100px; height: 100px; background-image: url('lanbit.jpg');
+            background-size: contain; background-repeat: no-repeat; background-position: center;
+            background-color: #1a1a1a; cursor: pointer; border: 3px solid #fff;
+            border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden;
+        }
+
+        .card img { width: 100%; height: 100%; object-fit: contain; display: none; pointer-events: none; }
+        .card.flipped { background-image: none; background-color: #444; }
+        .card.flipped img { display: block; }
+
+        .frame-correct { border-color: #00ff00 !important; }
+        .frame-wrong { border-color: #ff0000 !important; }
+        .frame-warning { border-color: #ffff00 !important; }
+        .frame-danger { border-color: #ff0000 !important; }
+        #countdown { font-size: 180px; color: #ffcc00; position: fixed; top: 30%; z-index: 100; display: none; }
+
+        .btn-toggle {
+            font-family: 'Luckiest Guy', cursive; font-size: 18px; padding: 15px 25px;
+            border: 3px solid #333; border-radius: 12px; cursor: pointer; min-width: 180px; transition: all 0.2s; color: white;
+        }
+        .btn-off { background: #440000; border-color: #ff0000; }
+        .btn-on { background: #004400; border-color: #00ff00; }
+        .btn-start-game { width: 100%; background: #ffcc00; color: black; font-size: 28px; padding: 20px; border: none; border-radius: 15px; cursor: pointer; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px); z-index: 20000; justify-content: center; align-items: center; }
+        .popup-content { position: relative; width: 90%; max-width: 500px; }
+        .close-popup { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #ffcc00; font-size: 24px; cursor: pointer; }
+        .toggle-container { display: flex; flex-direction: column; gap: 15px; margin: 25px 0; }
+        .open-settings-btn { padding: 10px 20px; font-family: 'Luckiest Guy'; background: #1a0033; color: #ffcc00; border: 2px solid #8200ff; cursor: pointer; border-radius: 10px; }
+    </style>
+</head>
+<body>
+<div id="start-screen">
+    <h1>STATION 24 - MUISTIPELI 🇫🇮</h1>
+
+    <!-- SPRÅKNAVERING MELLAN FILER -->
+    <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 15px;">
+        <button onclick="window.location='index.html'" style="font-size: 14px; padding: 6px 15px; background: #222; color: #fff; border: 2px solid #ffcc00; cursor: pointer;">🇸🇪 SVENSKA</button>
+        <button onclick="window.location='index2.html'" style="font-size: 14px; padding: 6px 15px; background: #222; color: #fff; border: 2px solid #ffcc00; cursor: pointer;">🇬🇧 ENGLISH</button>
+        <button onclick="window.location='index3.html'" style="font-size: 14px; padding: 6px 15px; background: #ffcc00; color: #000; border: 2px solid #ffcc00; cursor: pointer;">🇫🇮 SUOMI</button>
+    </div>
+    
+    <div class="guide-box">
+        <h2>SÄÄNNÖT JA TILAT</h2>
+        <div class="mode-grid">
+            <div class="casual-info">
+                <strong style="color:#00ff00">CASUAL</strong><br>
+                • mm.ss.cc (Laskee ylöspäin)[cite: 2]<br>
+                • Kamek on tavallinen PARI[cite: 2]<br>
+                • Ei aikapainetta - harjoittelua varten!<br>
+                • Voita kultakolikoita!
+            </div>
+            <div class="classic-info">
+                <strong style="color:#ff3300">CLASSIC</strong><br>
+                • Ajastin (Laskee alaspäin)[cite: 2]<br>
+                • Ansat: Kamek, Bowser & NUKE[cite: 3]<br>
+                • Voita tähtipalkinto!
+            </div>
+        </div>
+        <div class="how-to-play">
+            <strong style="color:#ffcc00">VAROITUS:</strong> Ekstreemi-tilassa voit löytää <strong>NUKEN</strong>. Se nollaa siirtosi ja vie 20 sekuntia aikaa![cite: 3]
+        </div>
+    </div>
+
+    <input type="text" id="player-name" placeholder="KIRJOITA NIMESI..."> 
+    
+    <button onclick="toggleInstructions(true)" style="background: #00ccff; color: white; cursor: pointer; width: 80%; margin-bottom: 10px;">
+        📖 LUE PELIOHJEET
+    </button> 
+    <button class="open-settings-btn" onclick="openMediaPopup()">🎥 ASETUKSET</button>
+
+    <br>
+    <select id="difficulty">
+        <option value="16">HELPPO (16 KORTTIA)</option>
+        <option value="24">KESKITASO (24 KORTTIA)</option>
+        <option value="32">VAIKEA (32 KORTTIA + KAMEK)</option>
+        <option value="48">HARDCORE (48 KORTTIA + KAIKKI)</option>
+        <option value="64">EKSTREEMI (64 KORTTIA + NUKE)</option>
+    </select>
+    <br>
+    <button class="btn-casual" onclick="prepareGame('casual')">ALOITA CASUAL</button>
+    <button class="btn-classic" onclick="prepareGame('classic')">ALOITA CLASSIC</button>
+
+    <div id="leaderboard-container" style="margin-top: 20px; border-top: 2px solid #ffcc00; padding-top: 10px;">
+        <h3>🏆 TULOSTAULUKKO (CASUAL)</h3>
+        <table id="leaderboard-table" style="width: 100%; font-size: 18px; border-collapse: collapse;">
+            <thead>
+                <tr style="color: #ffcc00;">
+                    <th>SIJA</th>
+                    <th>NIMI</th>
+                    <th>AIKA</th>
+                    <th>SIIRROT</th>
+                </tr>
+            </thead>
+            <tbody id="leaderboard-body"></tbody>
+        </table>
+        <button onclick="clearLeaderboard()" style="font-size: 12px; background: red; color: white; margin-top: 10px;">TYHJENNÄ TAULUKKO</button>
+    </div>
+</div>
+
+<!-- MEDIA POPUP -->
+<div id="media-modal-overlay" class="modal-overlay">
+    <div class="setup-box popup-content">
+        <button class="close-popup" onclick="closeMediaPopup()">X</button>
+        <h1>MEDIA-OHJAUS</h1>
+        <p>Aktivoi laitteistot turnausta varten:</p>
+        <div class="toggle-container">
+            <button id="toggle-cam" class="btn-toggle btn-off" onclick="toggleMediaState('cam')">
+                📸 KAMERA: <span id="status-cam">POIS</span>
+            </button>
+            <button id="toggle-mic" class="btn-toggle btn-off" onclick="toggleMediaState('mic')">
+                🎤 MIKROFONI: <span id="status-mic">POIS</span>
+            </button>
+        </div>
+        <button class="btn-start-game" onclick="confirmAndStart()">TALLENNA JA AKTIVOI</button>
+    </div>
+</div>
+
+<!-- INSTRUKTIOT POPUP -->
+<div id="instructions-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:1000; overflow-y:auto;">
+    <div style="background:#ffffff; border: 8px solid #ffcc00; width: 95%; max-width: 800px; margin: 20px auto; padding: 25px; border-radius: 15px; color: #333; font-family: Arial, sans-serif; line-height: 1.5;">
+        <span onclick="toggleInstructions(false)" style="float:right; font-size:45px; cursor:pointer; color:#8b0000; font-weight:bold;">&times;</span>
+        <h2 style="color:#000; text-align:center; font-size: 28px; border-bottom: 4px solid #ffcc00; padding-bottom: 10px; margin-top: 0;">KUINKA PELATAAN ASSEMBLY MUISTIPELIÄ?</h2>
+        
+        <div style="font-size: 16px;">
+            <section style="background: #f0f8ff; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #007bff;">
+                <h3 style="margin-top: 0; color: #007bff;">🎮 NÄIN SE TOIMII</h3>
+                <p><strong>1. Kirjoita nimesi:</strong> Rekisteröi nimimerkkisi tulostaulukkoa varten.</p>
+                <p><strong>2. Käännä kortteja:</strong> Napsauta korttia nähdäksesi sen kuvan.</p>
+                <p><strong>3. Etsi parit:</strong> Jos kuvat ovat samat, ne jäävät näkyviin. Jos ne ovat erilaiset, ne kääntyvät takaisin sekunnin kuluttua.</p>
+            </section>
+        </div>
+        
+        <button onclick="toggleInstructions(false)" style="background:#28a745; color:white; width:100%; margin-top: 20px; padding: 15px; font-size: 20px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer;">YMMÄRRÄN, ALOITA PELI!</button>
+    </div>
+</div>
+
+<div id="end-screen">
+    <h1 id="end-title"></h1>
+    <p id="end-message" style="font-size: 24px;"></p>
+    <button class="btn-restart" onclick="location.reload()">VALIKKO</button>
+</div>
+
+<div id="countdown"></div>
+
+<div id="game-container">
+    <div id="stats-text" style="font-size: 28px; margin-bottom: 15px;">
+        PELAAJA: <span id="display-name"></span> | 
+        SIIRROT: <span id="display-moves">0</span> | 
+        AIKA: <span id="timer">00.00.00</span>
+    </div>
+    <div id="game-board"></div>
+</div>
+<!-- AUDIO INTERFACE / JUKEBOX -->
+<div id="audio-interface" style="position: fixed; bottom: 20px; right: 20px; z-index: 99999; cursor: pointer; user-select: none;">
+    <div id="boombox-container" style="position: relative; width: 80px; height: 80px;">
+        <img src="bandspelare.jfif" id="boombox-img" alt="Musiikki" style="width: 100%; height: 100%; border-radius: 12px; border: 3px solid #ffcc00; box-shadow: 0 0 20px rgba(0,0,0,0.8); opacity: 0.5; transform: scale(0.9); transition: all 0.3s;">
+        
+        <!-- KRYSS NÄR MUSIKEN ÄR AV -->
+        <div id="status-cross" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); border-radius: 12px;">
+            <span style="color: #ff0000; font-size: 60px; font-weight: bold; text-shadow: 2px 2px 4px #000;">✕</span>
+        </div>
+    </div>
+    
+    <!-- LÅTINFO POPUP -->
+    <div id="track-info" style="position: absolute; bottom: 90px; right: 0; background: rgba(0,0,0,0.9); color: #ffcc00; padding: 8px 12px; border-radius: 8px; font-size: 11px; font-family: 'Luckiest Guy', cursive, sans-serif; letter-spacing: 1px; white-space: nowrap; display: none; border: 1px solid #ffcc00; pointer-events: none;">
+        SOITTAA: EI MITÄÄN
+    </div>
+</div>
+<script>
+// --- 2. PELIN KUVAT JA MUUTTUJAT ---
+const ALL_IMAGES = [
+    '360con.jfif', 'bobil.jfif', 'husvagn.jfif', 'stuga.jfif', 'tvplatt.jfif', 'kaktus.jfif', 'bilstereo.jfif', 'a.jfif', 'ac.jfif', 
+    'bskal.jfif', 'and.jfif', 'ds.jfif', 'lurar.jfif', 'hdd.jfif', 'mk64.jfif', 'fia.jfif', 'ic3.jpg', 'ir.jpg', 'x2og.jpg', 'x2.jpg', 
+    'sopbil.jfif', 'ksb.jfif', 'bandspelare.jfif', 'xbd.jfif', 'clock.jfif', 'vcr.jfif', 'crt2.jfif', 'crt3.jfif', 'tv.jfif', 'cd.jfif', 
+    'cds.jfif', 'radio.jfif', 'gccrt.jfif', 'ps3.jfif', 'chess.jfif', 'yatzy.jfif', 'bse.jfif', 'monopol.jfif', 'cr.jfif', 'cr2.jfif', 
+    'aaa.jfif', 'aa.jfif', '9v.jfif', 'dc.jfif', 'd10.jpg', 'gm.jpg', 'star.jpg', 'box.jpg', 'm.jpg', 'nb.jpg', 'ttr.jfif', 'br.jfif', 
+    'ff.jpg', 'ps2crt.jfif', 'bamse.png', 'boo.jfif', 'kp.jfif', 'ck.jfif', 'vargen.jfif', 'mikro.jfif', 'bilar.jfif', 'pizzakartong.jfif', 
+    'hb.jfif', 'nc.jfif', 'vk.jfif', 'gb.jfif', 'gd.jfif', 'kd.jfif', 'creeper2.jfif', '360conw.jfif', 'mario.jfif', 'yoshi.jfif', 
+    '360crt.jpg', '360.jfif', 'n64.jfif', 'crash.jpg', 'creeper.jfif', 'crt.jfif', 'crtm.jfif', 'dh.jfif', 'dh2.jfif', 'dhg.jfif', 
+    'eluttag.jfif', 'fst.jfif', 'gb c.jfif', 'gc.jpg', 'gpc.jfif', 'gta v.jpg', 'hs.jfif', 'lb c.jfif', 'mc.jpg', 'mch.jfif', 'mus.jfif', 
+    'mushroom.jfif', 'nes.jfif', 'pk.jfif', 'ps1.jfif', 'ps2.jfif', 'ps5c.jfif', 'ratt.jfif', 'rb.jfif', 'bus.jfif', 'rbr.jfif', 
+    's2.jfif', 'shd.jfif', 'xbc.jfif', 'sonic.jfif', 'tgtbord.jfif', 'varmkorv.jfif', 'wii.jfif', 'x360.jpg', 'sonic.jpg'
+];
+
+let timeLeft, timeMilliseconds, moveCount, timerInterval, flippedCards, matchedPairs, isProcessing, totalPairsNeeded, selectedMode, currentPlayerName;
+let configCam = false, configMic = false;
+let kamekStrikes = 0;
+const kamekForbiddenFi = ["vittu", "saatana", "perkele", "paska", "vitun", "kusi", "helvetti", "paskapää", "huora", "vittua"];
+
+// --- 3. TULOSTAULUKKO (CASUAL) ---
+window.onload = function() {
+    displayLeaderboard();
+};
+
+function displayLeaderboard() {
+    const scores = JSON.parse(localStorage.getItem('casualScores_fi')) || [];
+    const tbody = document.getElementById('leaderboard-body');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+    scores.forEach((score, index) => {
+        const row = tbody.insertRow();
+        row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${score.name}</td>
+            <td>${formatCasualTime(score.time)}</td>
+            <td>${score.moves}</td>
+        `;
+    });
+}
+
+function saveCasualScore(name, time, moves) {
+    let scores = JSON.parse(localStorage.getItem('casualScores_fi')) || [];
+    scores.push({ name: name, time: time, moves: moves });
+    scores.sort((a, b) => a.time - b.time || a.moves - b.moves);
+    scores = scores.slice(0, 5);
+    localStorage.setItem('casualScores_fi', JSON.stringify(scores));
+    displayLeaderboard();
+}
+
+function clearLeaderboard() {
+    if(confirm("Haluatko varmasti tyhjentää tulostaulukon?")) {
+        localStorage.removeItem('casualScores_fi');
+        displayLeaderboard();
+    }
+}
+
+// --- 4. TOAST-ILMOITUKSET ---
+function showToast(message, color = "#ffcc00") {
+    const container = document.getElementById('toast-container') || createToastContainer();
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.style.borderLeft = `8px solid ${color}`;
+    toast.innerText = message;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 5000);
+}
+
+function createToastContainer() {
+    const div = document.createElement('div');
+    div.id = 'toast-container';
+    document.body.appendChild(div);
+    return div;
+}
+
+window.addEventListener('offline', () => showToast("⚠️ INTERNET-YHTEYS KATKENNUT!", "#ff0000"));
+window.addEventListener('online', () => showToast("✅ YHTEYS PALAUTETTU.", "#00ff00"));
+
+// --- 5. KAMEK LUKITUSTOIMINTO ---
+function triggerKamekLock(reason) {
+    isProcessing = true;
+    if (timerInterval) clearInterval(timerInterval);
+    playAudio('kamek.mp3'); 
+
+    const lockOverlay = document.createElement('div');
+    lockOverlay.id = 'kamek-lock';
+    lockOverlay.style = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: #4b0082; z-index: 10000; 
+        display: flex; flex-direction: column; align-items: center; 
+        justify-content: flex-start; padding: 40px 20px;
+        text-align: center; font-family: 'Luckiest Guy', cursive; color: #ffcc00;
+        overflow-y: auto; box-sizing: border-box;
+    `;
+    
+    lockOverlay.innerHTML = `
+        <div style="background: #6a0dad; padding: 20px; border: 5px solid #ffcc00; border-radius: 50%; display: inline-block;">
+            <img src="kamek.jfif" alt="Kamek" style="width: 250px; height: 250px; object-fit: contain;">
+        </div>
+        <h1 style="font-size: clamp(40px, 8vw, 60px); margin-top: 20px;">HIII-HEEE-HEEE!</h1>
+        <p style="font-size: 30px; color: white; max-width: 800px;">YRITITKÖ HUOHTAA, ${currentPlayerName ? currentPlayerName.toUpperCase() : 'HUOHTAJA'}?</p>
+        <p style="font-size: 24px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; max-width: 600px;">${reason}</p>
+        <button onclick="location.reload()" style="background: #ffcc00; color: black; padding: 20px 40px; margin: 30px 0; border-radius: 15px; cursor: pointer; font-size: 24px; border: none; font-family: 'Luckiest Guy', cursive;">ANTEEKSI KAMEK...</button>
+    `;
+    
+    document.body.style.overflow = 'hidden'; 
+    document.body.appendChild(lockOverlay);
+}
+
+// --- 6. TÄYSI SUOJAUS & ANTI-CHEAT ---
+
+// KOSKETUSLEVYN (TRACKPAD) KIELTO
+window.addEventListener('wheel', (e) => {
+    if (timerInterval && (!Number.isInteger(e.deltaY) || (Math.abs(e.deltaY) > 0 && Math.abs(e.deltaY) < 20))) {
+        triggerKamekLock("Lopeta läppärin kosketuslevyn silittely! Käytä oikeaa pelihiirtä Station 24 -protokollassa. Kamek hyväksyy vain mekaanista tarkkuutta!");
+    }
+}, { passive: false });
+
+// OIKEA KLIKKAUS & F12
+document.addEventListener('contextmenu', e => {
+    e.preventDefault();
+    triggerKamekLock("OIKEA KLIKKAUS ON KIELLETTY STATION 24:SSÄ!");
+});
+
+document.addEventListener('keydown', e => {
+    if (e.key === "F12" || (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J" || e.key === "C")) || (e.ctrlKey && e.key === "U")) {
+        e.preventDefault();
+        triggerKamekLock("ÄLÄ YRITÄ KURKISTAA KOODIN TAAKSE!");
+    }
+});
+
+// FOKUKSEN MENETYS (BLUR - 5 SEKUNNAN AIKAPOMMI)
+let blurTimeout;
+window.addEventListener('blur', () => {
+    showToast("🔍 PELI MENETTI FOKUKSEN! PALAA 5 SEKUNNIN KULUESSA...", "#ffcc00");
+    blurTimeout = setTimeout(() => {
+        triggerKamekLock("OLIT POISSA LIIAN KAUAN! YRITITKÖ ETSIÄ VASTAUKSIA GOOGLESTA?");
+    }, 5000);
+});
+
+window.addEventListener('focus', () => {
+    if (blurTimeout) {
+        clearTimeout(blurTimeout);
+        showToast("✅ FOKUS PALAUTETTU. PELI JATKUU.", "#00ff00");
+    }
+});
+
+// AUTOCLICKER-SUOJAUS
+let clickCount = 0;
+document.addEventListener('click', () => {
+    clickCount++;
+    setTimeout(() => clickCount--, 1000);
+    if (clickCount > 5 && clickCount <= 15) {
+        showToast("☝️ OTA RAUHALLISESTI! AUTOCLICKER ON KIELLETTY.", "#ff0000");
+    } else if (clickCount > 15) {
+        triggerKamekLock("AUTOCLICKER HAVAITTU!");
+        clickCount = 0;
+    }
+});
+
+// AIKAMANIPULAATIO (SYSTEM CLOCK HACK)
+let lastTick = Date.now();
+setInterval(() => {
+    const now = Date.now();
+    if (Math.abs(now - lastTick - 1000) > 2000) {
+        triggerKamekLock("YRITITKÖ JUURI MANIPULOIDA AIKAA?");
+    }
+    lastTick = now;
+}, 1000);
+
+// INAKTIIVISUUSVAHTI (IDLE TIMERS: 30s varoitus, 60s lukitus)
+let idleTimer, lockTimer;
+function resetIdleTimers() {
+    clearTimeout(idleTimer);
+    clearTimeout(lockTimer);
+    if (!timerInterval) return;
+
+    idleTimer = setTimeout(() => {
+        showToast("💤 HOI? TURNAUS EI ODOTA! TOIMI ENNEN KUIN KAMEK LUKITSEE PELIN.", "#ffaa00");
+    }, 30000);
+
+    lockTimer = setTimeout(() => {
+        triggerKamekLock("KÄYTTÄJÄN AIKAKATKAISU: OLIT INAKTIIVINEN LIIAN KAUAN!");
+    }, 60000);
+}
+
+document.addEventListener('mousedown', resetIdleTimers);
+document.addEventListener('keydown', resetIdleTimers);
+document.addEventListener('mousemove', resetIdleTimers);
+
+// AKUN KRIITTINEN TILA
+if ('getBattery' in navigator) {
+    navigator.getBattery().then(battery => {
+        battery.addEventListener('levelchange', () => {
+            if (battery.level <= 0.1) {
+                triggerKamekLock("🚨 KRIITTINEN AKUN VARAUS! LATAA LAITTEESI VÄLITTÖMÄSTI!");
+            }
+        });
+    });
+}
+
+// --- 7. PELIN LOGIIKKA ---
+function formatCasualTime(ms) {
+    let min = Math.floor(ms / 60000);
+    let sec = Math.floor((ms % 60000) / 1000);
+    let cs = Math.floor((ms % 1000) / 10);
+    return `${String(min).padStart(2,'0')}.${String(sec).padStart(2,'0')}.${String(cs).padStart(2,'0')}`;
+}
+
+function toggleInstructions(show) {
+    const modal = document.getElementById('instructions-modal');
+    if (modal) modal.style.display = show ? 'block' : 'none';
+}
+
+function openMediaPopup() { 
+    const overlay = document.getElementById('media-modal-overlay');
+    if (overlay) overlay.style.display = 'flex'; 
+}
+
+function closeMediaPopup() { 
+    const overlay = document.getElementById('media-modal-overlay');
+    if (overlay) overlay.style.display = 'none'; 
+}
+
+function toggleMediaState(type) {
+    if (type === 'cam') {
+        configCam = !configCam;
+        document.getElementById('status-cam').innerText = configCam ? 'PÄÄLLÄ' : 'POIS';
+        document.getElementById('toggle-cam').className = configCam ? 'btn-toggle btn-on' : 'btn-toggle btn-off';
+    } else {
+        configMic = !configMic;
+        document.getElementById('status-mic').innerText = configMic ? 'PÄÄLLÄ' : 'POIS';
+        document.getElementById('toggle-mic').className = configMic ? 'btn-toggle btn-on' : 'btn-toggle btn-off';
+    }
+}
+
+function confirmAndStart() {
+    if (configMic) setupKamekEar();
+    closeMediaPopup();
+}
+
+function prepareGame(mode) {
+    selectedMode = mode;
+    const nameInput = document.getElementById('player-name');
+    currentPlayerName = nameInput && nameInput.value.trim() !== "" ? nameInput.value.trim() : "Vieras";
+    
+    document.getElementById('start-screen').style.display = 'none';
+    const cd = document.getElementById('countdown');
+    cd.style.display = 'block';
+    let count = 3; 
+    cd.innerText = count;
+    
+    const countInt = setInterval(() => {
+        count--; 
+        cd.innerText = count;
+        if(count === 0) { 
+            clearInterval(countInt); 
+            cd.style.display = 'none'; 
+            initGame(currentPlayerName); 
+        }
+    }, 1000);
+}
+
+function initGame(name) {
+    clearInterval(timerInterval);
+    document.getElementById('display-name').innerText = name.toUpperCase();
+    document.getElementById('game-container').style.display = 'block';
+    moveCount = 0; matchedPairs = 0; flippedCards = []; isProcessing = false;
+    document.getElementById('display-moves').innerText = "0";
+    
+    const diff = parseInt(document.getElementById('difficulty').value);
+    const board = document.getElementById('game-board');
+    board.innerHTML = ''; board.className = '';
+    board.style.gridTemplateColumns = `repeat(${diff >= 32 ? 8 : 4}, 100px)`;
+
+    if (selectedMode === 'classic') {
+        timeLeft = (diff === 16) ? 30 : (diff === 24) ? 45 : (diff === 32) ? 60 : (diff === 48) ? 90 : 120;
+        document.getElementById('timer').innerText = timeLeft;
+        timerInterval = setInterval(() => {
+            timeLeft--; 
+            document.getElementById('timer').innerText = timeLeft;
+            if(timeLeft < 10 && timeLeft > 0) playAudio('tick.mp3');
+            if(timeLeft <= 5) board.className = 'frame-danger';
+            else if(timeLeft <= 10) board.className = 'frame-warning';
+            if(timeLeft <= 0) endGame(false);
+        }, 1000);
+    } else {
+        timeMilliseconds = 0;
+        timerInterval = setInterval(() => {
+            timeMilliseconds += 10;
+            document.getElementById('timer').innerText = formatCasualTime(timeMilliseconds);
+        }, 10);
+    }
+
+    let numPairs = diff / 2; totalPairsNeeded = numPairs;
+    let deck = []; let tempPool = [...ALL_IMAGES];
+    for(let i=0; i<numPairs; i++) {
+        if(tempPool.length === 0) tempPool = [...ALL_IMAGES];
+        let img = tempPool.splice(Math.floor(Math.random()*tempPool.length), 1)[0];
+        deck.push(img, img);
+    }
+
+    if(selectedMode === 'classic') {
+        if(diff >= 32) { deck[deck.length-1] = 'KAMEK'; totalPairsNeeded--; }
+        if(diff >= 48) { deck[deck.length-2] = 'BOWSER'; totalPairsNeeded--; }
+        if(diff === 64) { deck[deck.length-3] = 'KAMEK'; deck[deck.length-4] = 'NUKE'; totalPairsNeeded -= 2; }
+    } else {
+        deck[deck.length-1] = 'KAMEK'; deck[deck.length-2] = 'KAMEK';
+    }
+
+    deck.sort(() => Math.random() - 0.5).forEach(item => {
+        const card = document.createElement('div'); 
+        card.className = 'card'; card.dataset.value = item;
+        const img = document.createElement('img'); 
+        img.src = item === 'KAMEK' ? 'kamek.jfif' : item === 'BOWSER' ? 'bowser.jfif' : item === 'NUKE' ? 'nuke.png' : item;
+        card.appendChild(img); 
+        card.onclick = () => flipCard(card); 
+        board.appendChild(card);
+    });
+
+    resetIdleTimers();
+}
+
+function flipCard(card) {
+    if (isProcessing || card.classList.contains('flipped')) return;
+    card.classList.add('flipped');
+
+    if (selectedMode === 'classic') {
+        if (card.dataset.value === 'KAMEK') {
+            isProcessing = true; playAudio('kamek.mp3'); triggerFlash('purple');
+            setTimeout(shuffleBoard, 1000); return;
+        }
+        if (card.dataset.value === 'BOWSER') {
+            isProcessing = true; playAudio('bowser_roar.mp3'); timeLeft -= 5; triggerFlash('red');
+            setTimeout(() => { card.classList.remove('flipped'); isProcessing = false; }, 1000); return;
+        }
+        if (card.dataset.value === 'NUKE') {
+            isProcessing = true; playAudio('nuke.mp3'); timeLeft -= 20; moveCount = 0;
+            document.getElementById('display-moves').innerText = "0";
+            triggerFlash('yellow');
+            setTimeout(() => { card.classList.remove('flipped'); isProcessing = false; }, 1200); return;
+        }
+    }
+
+    flippedCards.push(card);
+    if (flippedCards.length === 2) {
+        isProcessing = true; 
+        moveCount++; 
+        document.getElementById('display-moves').innerText = moveCount;
+        const [c1, c2] = flippedCards;
+        if (c1.dataset.value === c2.dataset.value) {
+            playAudio(c1.dataset.value === 'KAMEK' ? 'kamek.mp3' : 'pling.mp3');
+            matchedPairs++; flippedCards = []; isProcessing = false;
+            if(selectedMode === 'classic') timeLeft += 5;
+            if (matchedPairs >= totalPairsNeeded) endGame(true);
+        } else {
+            playAudio('boooop.mp3');
+            setTimeout(() => { 
+                c1.classList.remove('flipped'); 
+                c2.classList.remove('flipped'); 
+                flippedCards = []; 
+                isProcessing = false; 
+            }, 1000);
+        }
+    }
+}
+
+function triggerFlash(color) {
+    const old = document.body.style.backgroundColor; 
+    document.body.style.backgroundColor = color;
+    setTimeout(() => document.body.style.backgroundColor = old, 500);
+}
+
+function shuffleBoard() {
+    const board = document.getElementById('game-board');
+    Array.from(board.children).forEach(c => c.classList.remove('flipped'));
+    setTimeout(() => {
+        for (let i = board.children.length; i >= 0; i--) board.appendChild(board.children[Math.random() * i | 0]);
+        flippedCards = []; isProcessing = false;
+    }, 500);
+}
+
+function endGame(won) {
+    clearInterval(timerInterval);
+    const screen = document.getElementById('end-screen'); 
+    screen.style.display = 'block';
+    const pairs = parseInt(document.getElementById('difficulty').value)/2;
+    const eff = moveCount / pairs;
+    
+    if (selectedMode === 'casual') {
+        saveCasualScore(currentPlayerName, timeMilliseconds, moveCount);
+    }
+
+    let res;
+    if (!won && selectedMode === 'classic') {
+        res = {t:"HUONO", s:"mk64_loser.wav", msg:"HÄVISIT PELIN - MENE NUKKUMAAN!"};
+    } else {
+        if (eff < 2.0) res = {t:"PARAS!", s:"yay.mp3", msg:"LEGENDAARISTA! KULTAKOLIKKO ON SINUN!"};
+        else if (eff < 2.5) res = {t:"HYVÄ!", s:"pling.mp3", msg:"IHAN OK, MUTTA PYSTYTKO PAREMPAAN?"};
+        else if (eff < 3.0) res = {t:"KESKITASO", s:"boooop.mp3", msg:"SIINÄKÖ KAIKKI?"};
+        else if (eff < 4.0) res = {t:"HUONO", s:"sad_trombone.mp3", msg:"HUONOMPI KUIN GOOMBA!"};
+        else res = {t:"TÄYSIN HUONO", s:"mk64_loser.wav", msg:"SURKEA ESITYS!"};
+    }
+    
+    playAudio(res.s);
+    document.getElementById('end-title').innerText = res.t;
+    document.getElementById('end-title').style.color = (won || eff < 2.5) ? "#00ff00" : "#ff0000";
+    document.getElementById('end-message').innerHTML = `${res.msg}<br>Aika: ${selectedMode === 'casual' ? formatCasualTime(timeMilliseconds) : timeLeft+'s'}<br>Siirrot: ${moveCount}`;
+}
+
+function playAudio(f) { 
+    new Audio(f).play().catch(()=>{}); 
+}
+
+// --- 8. MIKROFONI & SUOMENKIELINEN KIROILUSUODATIN ---
+function setupKamekEar() {
+    const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!Speech) return;
+    const rec = new Speech();
+    rec.continuous = true; 
+    rec.lang = 'fi-FI';
+    
+    rec.onresult = (e) => {
+        const txt = e.results[e.results.length-1][0].transcript.toLowerCase();
+        if (kamekForbiddenFi.some(w => txt.includes(w))) {
+            kamekStrikes++;
+            if (kamekStrikes < 3) {
+                kamekToast("⚠️ VAROITUS #" + kamekStrikes + ": PESE SUUSI!");
+            } else {
+                kamekPurpleLockdown();
+            }
+        }
+    };
+    rec.start();
+}
+
+function kamekToast(m) {
+    const t = document.createElement('div'); 
+    t.className = 'k-toast';
+    t.innerHTML = m; 
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+}
+
+function kamekPurpleLockdown() {
+    if (window.stop) window.stop();
+    document.body.innerHTML = `
+        <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#1a0033;display:flex;flex-direction:column;justify-content:center;align-items:center;color:white;font-family:Arial;border:15px double #8200ff;box-sizing:border-box;z-index:1000000;">
+            <img src="kamek.jfif" style="width:150px;border:5px solid #ffcc00;border-radius:50%;box-shadow:0 0 30px #8200ff;">
+            <h1 style="font-family:'Luckiest Guy';font-size:50px;color:#ffcc00;margin:20px 0;">KAMEKIN LUKITSEMA 🧙‍♂️</h1>
+            <div style="background:rgba(0,0,0,0.5);padding:30px;border-radius:20px;border:1px dashed #8200ff;">
+                <p style="font-size:35px;font-style:italic;">"Kiroilu ei ole sallittua."</p>
+            </div>
+            <p style="margin-top:40px;color:#8200ff;font-family:monospace;font-weight:bold;">SYSTEM_ERROR: TOXIC_OPERATOR_DETECTED</p>
+            <p style="color:red;font-weight:bold;font-size:24px;">TULOS: 0 PISTETTÄ REKISTERÖITY</p>
+            <button onclick="location.reload()" style="margin-top:20px;padding:10px 30px;font-family:'Luckiest Guy';cursor:pointer;background:#ffcc00;border:none;border-radius:10px;">YRITÄ UUDELLEEN</button>
+        </div>`;
+}
+
+// --- 9. JUKEBOX-MOOTTORI (ASSEMBLY JUKEBOX) ---
+const KAMEK_TRACKS = [
+    '../The Boss - Base Defense/music/gangnam_style.mp3',
+    '../The Boss - Base Defense/music/billie_jean.mp3', 
+    '../The Boss - Base Defense/music/bring_me_to_life.mp3', 
+    '../The Boss - Base Defense/music/levitating.mp3', 
+    '../The Boss - Base Defense/music/blinding_lights.mp3', 
+    '../The Boss - Base Defense/music/golden.mp3', 
+    '../The Boss - Base Defense/music/faded.mp3', 
+    '../The Boss - Base Defense/music/headlights.mp3', 
+    '../The Boss - Base Defense/music/miracle.mp3', 
+    '../The Boss - Base Defense/music/starships.mp3', 
+    '../The Boss - Base Defense/music/despre_tine.mp3',
+    '../The Boss - Base Defense/music/good_feeling.mp3', 
+    '../The Boss - Base Defense/music/wild_ones.mp3', 
+    '../The Boss - Base Defense/music/alone.mp3', 
+    '../The Boss - Base Defense/music/where_have_you_been.mp3', 
+    '../The Boss - Base Defense/music/party_rock_anthem.mp3', 
+    '../The Boss - Base Defense/music/titanium.mp3', 
+    '../The Boss - Base Defense/music/fever_dream.mp3', 
+    '../The Boss - Base Defense/music/axel_f.mp3', 
+    '../The Boss - Base Defense/music/dragostea_del_tei.mp3', 
+    '../The Boss - Base Defense/music/low.mp3', 
+    '../The Boss - Base Defense/music/where_them_girls_at.mp3',
+    '../The Boss - Base Defense/music/tik_tok.mp3', 
+    '../The Boss - Base Defense/music/my_system.mp3',
+    '../The Boss - Base Defense/music/animals.mp3',
+    '../The Boss - Base Defense/music/the_business.mp3', 
+    '../The Boss - Base Defense/music/yeah.mp3', 
+    '../The Boss - Base Defense/music/bad_romance.mp3', 
+    '../The Boss - Base Defense/music/beauty_and_a_beat.mp3', 
+    '../The Boss - Base Defense/music/dont_you_worry_child.mp3', 
+    '../The Boss - Base Defense/music/clarity.mp3', 
+    '../The Boss - Base Defense/music/lean_on.mp3',
+    '../The Boss - Base Defense/music/du_hast.mp3', 
+    '../The Boss - Base Defense/music/the_trooper.mp3', 
+    '../The Boss - Base Defense/music/chop_suey.mp3', 
+    '../The Boss - Base Defense/music/through_the_fire_and_flames.mp3',
+    '../The Boss - Base Defense/music/u_cant_touch_this.mp3', 
+    '../The Boss - Base Defense/music/just_wanna_rock.mp3',
+    '../The Boss - Base Defense/music/rockstar.mp3', 
+    '../The Boss - Base Defense/music/rockstar_dababy.mp3', 
+    '../The Boss - Base Defense/music/montero.mp3', 
+    '../The Boss - Base Defense/music/freestyler.mp3', 
+    '../The Boss - Base Defense/music/lose_yourself.mp3',
+    '../The Boss - Base Defense/music/lucid_dreams.mp3',
+    '../The Boss - Base Defense/music/old_town_road.mp3',
+    '../The Boss - Base Defense/music/gods_plan.mp3',
+    '../The Boss - Base Defense/music/ice_ice_baby.mp3',
+    '../The Boss - Base Defense/music/here_i_go_again_ws.mp3', 
+    '../The Boss - Base Defense/music/thunderstruck.mp3', 
+    '../The Boss - Base Defense/music/the_final_countdown.mp3', 
+    '../The Boss - Base Defense/music/in_the_end.mp3', 
+    '../The Boss - Base Defense/music/danger_zone.mp3', 
+    '../The Boss - Base Defense/music/dragula.mp3', 
+    '../The Boss - Base Defense/music/kickstart_my_heart.mp3', 
+    '../The Boss - Base Defense/music/died_in_your_arms.mp3', 
+    '../The Boss - Base Defense/music/we_built_this_city.mp3', 
+    '../The Boss - Base Defense/music/it_has_begun_starset.mp3',
+    '../The Boss - Base Defense/music/take_on_me.mp3', 
+    '../The Boss - Base Defense/music/sweet_dreams.mp3', 
+    '../The Boss - Base Defense/music/moviestar.mp3', 
+    '../The Boss - Base Defense/music/never_gonna_give_you_up.mp3', 
+    '../The Boss - Base Defense/music/send_me_an_angel.mp3',
+    '../The Boss - Base Defense/music/self_control.mp3',
+    '../The Boss - Base Defense/music/take_a_chance.mp3',  
+    '../The Boss - Base Defense/music/dancing_queen.mp3',  
+    '../The Boss - Base Defense/music/mamma_mia.mp3',  
+    '../The Boss - Base Defense/music/knowing_me_knowing_you.mp3', 
+    '../The Boss - Base Defense/music/the_winner_takes_it_all.mp3',
+    '../The Boss - Base Defense/music/you_spin_me_round.mp3', 
+    '../The Boss - Base Defense/music/ma_baker.mp3', 
+    '../The Boss - Base Defense/music/smalltown_boy.mp3',
+    '../The Boss - Base Defense/music/caramelldansen.mp3', 
+    '../The Boss - Base Defense/music/rosa_helikopter.mp3', 
+    '../The Boss - Base Defense/music/cotton_eye_joe.mp3', 
+    '../The Boss - Base Defense/music/rhythm_is_a_dancer.mp3', 
+    '../The Boss - Base Defense/music/eurodancer.mp3', 
+    '../The Boss - Base Defense/music/no_limit.mp3', 
+    '../The Boss - Base Defense/music/pump_up_the_jam.mp3', 
+    '../The Boss - Base Defense/music/sandstorm.mp3', 
+    '../The Boss - Base Defense/music/boten_anna.mp3', 
+    '../The Boss - Base Defense/music/scooter.mp3', 
+    '../The Boss - Base Defense/music/the_logical_song.mp3', 
+    '../The Boss - Base Defense/music/this_is_the_way.mp3', 
+    '../The Boss - Base Defense/music/what_is_love.mp3', 
+    '../The Boss - Base Defense/music/blue.mp3', 
+    '../The Boss - Base Defense/music/better_off_alone.mp3', 
+    '../The Boss - Base Defense/music/boom_boom_boom.mp3', 
+    '../The Boss - Base Defense/music/everytime_we_touch.mp3', 
+    '../The Boss - Base Defense/music/we_like_to_party.mp3', 
+    '../The Boss - Base Defense/music/be_my_lover.mp3', 
+    '../The Boss - Base Defense/music/infinity_2008.mp3', 
+    '../The Boss - Base Defense/music/children_miles.mp3', 
+    '../The Boss - Base Defense/music/god_is_a_dj.mp3', 
+    '../The Boss - Base Defense/music/ecstasy.mp3', 
+    '../The Boss - Base Defense/music/l_amour_toujours.mp3', 
+    '../The Boss - Base Defense/music/stereo_love.mp3', 
+    '../The Boss - Base Defense/music/mr_saxobeat.mp3'
+];
+
+const jukebox = new Audio();
+jukebox.loop = true;
+jukebox.volume = 0.5;
+
+let musicActive = false;
+
+const uiContainer = document.getElementById('audio-interface');
+const uiImg = document.getElementById('boombox-img');
+const uiCross = document.getElementById('status-cross');
+const uiInfo = document.getElementById('track-info');
+
+function playRandomTrack() {
+    const randomIdx = Math.floor(Math.random() * KAMEK_TRACKS.length);
+    const trackName = KAMEK_TRACKS[randomIdx];
+    jukebox.src = trackName;
+    
+    jukebox.play().then(() => {
+        if (uiInfo) {
+            const cleanName = trackName.split('/').pop().replace('.mp3', '').toUpperCase();
+            uiInfo.innerText = "SOITTAA: " + cleanName;
+            uiInfo.style.display = 'block';
+            setTimeout(() => { uiInfo.style.display = 'none'; }, 3000);
+        }
+    }).catch(err => console.log("Vuorovaikutus vaaditaan musiikin toistamiseen"));
+}
+
+function toggleMusic() {
+    musicActive = !musicActive;
+    
+    if (musicActive) {
+        if (!jukebox.src) playRandomTrack();
+        else jukebox.play();
+        
+        if (uiImg) {
+            uiImg.style.opacity = "1";
+            uiImg.style.transform = "scale(1.1)";
+        }
+        if (uiCross) uiCross.style.display = "none";
+    } else {
+        jukebox.pause();
+        if (uiImg) {
+            uiImg.style.opacity = "0.5";
+            uiImg.style.transform = "scale(0.9)";
+        }
+        if (uiCross) uiCross.style.display = "flex";
+    }
+}
+
+if (uiContainer) {
+    uiContainer.addEventListener('click', toggleMusic);
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.key.toLowerCase() === 'm') {
+        toggleMusic();
+    }
+});
+</script>
+</body>
+</html>

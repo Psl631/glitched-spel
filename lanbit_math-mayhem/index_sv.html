@@ -615,6 +615,14 @@
             </svg>
             <span>English</span>
         </button>
+<button class="flag-button" onclick="window.setLanguage('fi')" title="Suomi">
+    <svg viewBox="0 0 18 11">
+        <rect width="18" height="11" fill="#fff"/>
+        <rect width="3" height="11" x="5" fill="#003580"/>
+        <rect width="18" height="3" y="4" fill="#003580"/>
+    </svg>
+    <span>Suomi</span>
+</button>
         <button class="flag-button" onclick="window.setLanguage('da')" title="Dansk">
             <svg viewBox="0 0 37 28">
                 <rect width="37" height="28" fill="#c8102e"/>
@@ -976,6 +984,155 @@ const translations = {
         press_sequence: "TRYCK I ORDNING: #SEQ",
         math_clutch: "SNABBRÄKNA: #PROB",
         spell_words: "KAMEK,GOOMBA,KUNGSBACKA,DATORMUS,NÖDSIGNAL,KRAFTKÄLLA,TANGENTBORD,STRÖMBRYTARE,KRYPTERING,MATEMATIK"
+    },
+    fi: {
+        score: "PISTEET",
+        time: "AIKA",
+        player: "PELAAJA",
+        start_game: "ALOITA TURNAUS",
+        how_to_play: "KUINKA PELATAAN?",
+        leaderboard: "PISTETAULUKKO",
+        wake_up: "HERÄÄ!!!",
+        snooze: "TORKKU!",
+        drag_clock: "HEITÄ KELLO POIS!",
+        multi_click: "KLIKKAA #X KERTAA!",
+        dot_chase: "JAHTAA PISTETTÄ (#X)!",
+        spell_word: "TAVAA: ",
+        q_spam: "RÄMPPÄÄ Q #X KERTAA!",
+        hold_key: "PIDÄ '#X' POHJASSA 2 SEK!",
+        rating_super: "SUPER (TÄHTIVOITTO) - LEGENDAARINEN STATUS!",
+        rating_best: "PARAS - Todellinen tukikohdan puolustaja!",
+        rating_good: "HYVÄ - Tsemppiä!",
+        name_placeholder: "NIMESI, SENKIN GOOMBA?",
+        sensor_setup_title: "TURNAUSMODUULIT (VALINNAINEN)",
+        sensor_btn_all: "🎤+📸 AKTIVOI KAIKKI",
+        sensor_btn_mic: "🎤 VAIN MIKKI",
+        medical_warning: "⚠️ LÄÄKETIETEELLINEN VAROITUS: Peli sisältää voimakkaita strobovaloja. Ei suositella henkilöille, joilla on epilepsia.",
+        kamek_warn_desc: "KAMEK LOCKDOWN: Välilehden vaihto tai DevTools lukitsee pelin! Peli jatkuu sekä oikean että väärän vastauksen jälkeen.",
+
+        // System Toasts & Alerts
+        on: "PÄÄLLÄ",
+        off: "POIS",
+        right_click_forbidden: "OIKEA KLIKKAUS KIELLETTY! Pääte lukittu.",
+        escape_locked: "ESCAPE ON ESTETTY LAN-TILASSA!",
+        devtools_forbidden: "DEVTOOLS KIELLETTY! Hakkerointiyritys kirjattu.",
+        lost_focus: "PÄÄTE MENETTI FOKUKSEN! Huijaustauko ei ole sallittu.",
+        tab_switch_detected: "VÄLILEHDEN VAIHTO HAVAITTU! Kamek näkee kaiken.",
+        zoom_attempt: "ZOOMAYS-YRITYS HAVAITTU!",
+        zoom_attempt_mock: "Nyehehe! Yritätkö zoomata salaisuuksiini? Käytä silmälaseja sen sijaan!",
+        trackpad_lockdown: "KOSKETUSLEVY HAVAITTU!",
+        trackpad_lockdown_mock: "Kamekin sensorit havaitsevat pyyhkäisyn! Station 24 vaatii kunnollisen vanhan rulla-hiiren.",
+        double_session: "DUBBEL_SESSION_DETEKTERAD",
+        double_session_mock: "Yritätkö olla kahdessa paikassa yhtä aikaa? Kamek sallii vain YHDEN aktiivisen yhteyden per pääte!",
+        ups_warning: "⚠️ SÄHKÖKATKO! Tietokone toimii akulla/UPS-varavirralla! Kytke laturi välittömästi!",
+        power_status: "⚡ ULKOINEN VIRTA: OK (UPS VARMISTETTU)",
+        power_battery: "🔋 UPS-VARA (VAROITUS: EI ULKOISTA VIRTAA!)",
+        camera_off_label: "KAMERA POIS PÄÄLTÄ",
+        integrity: "🛡️ EHEYS",
+        wall_integrity_label: "SEINÄN EHEYS: ",
+
+        // Diagnostics Screen
+        diag_ram: "Analysoidaan fyysistä muistia (RAM)...",
+        diag_cpu: "Esitään suoritinytimiä (i5/Ryzen 5)...",
+        diag_os: "Tarkistetaan käyttöjärjestelmän turvallisuutta...",
+        diag_disk: "Skannataan vapaata levytilaa HDD:ltä...",
+        diag_ok: "HYVÄKSYTTY!",
+        diag_fail: "EPÄONNISTUI!",
+
+        // Device insults / Lockdowns
+        device_mobile: "MATKAPUHELIN HAVAITTU! 🚫",
+        device_mobile_mock: "Tämä ei ole mobiilipeli! Math Mayhem vaatii raakaa tehoa, ulkoisen virtalähteen ja oikean hiiren! Lopeta näytön lääppiminen.",
+        device_tablet: "TABLETTI HAVAITTU! 👶",
+        device_tablet_mock: "Tabletit on tarkoitettu lastenohjelmien katseluun, ei Math Mayhemin pelaamiseen! Mene katsomaan Pipsa Possua sen sijaan.",
+        device_smarttv: "ÄLY-TV HAVAITTU! 📺",
+        device_smarttv_mock: "Näyttö on suuri, mutta suorittimesi on leivänpaahdin. YouTube sopii sinulle paremmin. Mene katsomaan kissavideoita!",
+        device_console: "KONSOLI HAVAITTU! 🎮",
+        device_console_mock: "Konsolit on tarkoitettu GTA:n pelaamiseen! Math Mayhemia hallitaan tahdonvoimalla, hiirellä ja näppäimistöllä. Myy ohjaimesi.",
+        device_car: "AUTON NÄYTTÖ HAVAITTU! 🚗",
+        device_car_mock: "Liikennevaara! Yritätkö laskea matematiikkaa Teslan näytöllä moottoritiellä?! Pidä katse tiessä ennen kuin Kamek kolaroi autopilotit!",
+        device_refrigerator: "ÄLYJÄÄKAAPPI HAVAITTU! 🧊",
+        device_refrigerator_mock: "Mitä ihmettä?! Yritätkö pelata arkadepeliä jääkaappisi ovessa? Mene sulkemaan maitotölkki sen sijaan!",
+        device_smartwatch: "ÄLYKELLO HAVAITTU! ⌚",
+        device_smartwatch_mock: "Näyttö on pienempi kuin kolikko! Miten meinasit laskea tässä? Hanki mikroskooppi.",
+        device_smarthome: "ÄLYKODIN NÄYTTÖ HAVAITTU! 🏠",
+        device_smarthome_mock: "Miten tämä on edes mahdollista? Laskea matematiikkaa älytermostaatista tai ovikellosta? Kamek kuolee nauruun!",
+        device_unknown: "TUNTEMATON LAITE HAVAITTU! 👽",
+        device_unknown_mock: "Mitä avaruusteknologiaa tämä on? Station 24 -protokolla ei tue laitettasi!",
+        device_hw_ram_fail: "LIJAN VÄHÄN RAM-MUISTIA HAVAITTU!",
+        device_hw_ram_fail_mock: "Math Mayhem vaatii vähintään 4Gt RAM-muistia, jotta emolevy ei sula. Kamek pilkkaa säälittävää läppäriäsi! Hanki kunnon kone.",
+        device_hw_cpu_cores_fail: "PROSESSORIYTIMIÄ PUUTTUU!",
+        device_hw_cpu_cores_fail_mock: "Vähintään 4 prosessoriydintä vaaditaan. Kamek pilkkaa polkupyöräkäyttöistä suoritintasi!",
+        device_hw_storage_fail: "LEVYTILAA KRIITTISESTI JÄLJELLÄ!",
+        device_hw_storage_fail_mock: "Kriittinen vapaan tilan raja! Math Mayhem vaatii vähintään 4Gt vapaata levytilaa kryptattujen koodien tallentamiseen.",
+
+        // Runtime Lockdowns translated keys
+        KRITISKT_LÅGT_BATTERI: "KRIITTISEN ALHAINEN AKKU",
+        KRITISKT_LÅGT_BATTERI_mock: "Vähintään 20% lataus vaaditaan pelaamiseen! Hae laturi, senkin Goomba!",
+        TIDS_MANIPULERING_DETEKTERAD: "AJAN MANIPULOINTI HAVAITTU",
+        TIDS_MANIPULERING_DETEKTERAD_mock: "Yritätkö hidastaa aikaa, pikku aikavelho? Nyehehehe! Station 24:ssä pätevät vain aika-avaruuden lait. Pääte lukittu!",
+        ROBOT_OPERATÖR_DETEKTERAD: "ROBOTTIOPERAATTORI HAVAITTU",
+        ROBOT_OPERATÖR_DETEKTERAD_mock: "Roboteilla ei ole pääsyä Station 24:ään! Kamek hyväksyy vain orgaaniset aivot (olivatpa ne kuinka heikot tahansa). Järjestelmä suljettu.",
+        HÖGERKLICK_DETEKTERAT: "OIKEA KLIKKAUS HAVAITTU",
+        HÖGERKLICK_DETEKTERAT_mock: "YRITÄTKÖ KURKISTAA VERHON TAAKSE? 🕵️ \n\nKamek näkee ahneet sormesi oikealla painikkeella: 'NYEHEHEHE!' \nEi koodin tarkastelua Station 24:ssä!",
+        FLIKBYTE_ELLER_FOKUSFÖRLUST: "VÄLILEHDEN VAIHTO TAI FOKUKSEN MENETYS",
+        FLIKBYTE_ELLER_FOKUSFÖRLUST_mock: "Yritit poistua ikkunasta! Google ei voi auttaa sinua täällä.",
+        PROCESSOR_FÖR_SVAG: "PROSESSORI ON LIIAN HEIKKO",
+        PROCESSOR_FÖR_SVAG_mock: "Suorittimesi on liian heikko! Station 24 vaatii vähintään kaksiytimisen CPU:n matemaattisten algoritmien suorittamiseen.",
+        OFFLINE_VID_START: "OFFLINE ALOITETTAESSA",
+        OFFLINE_VID_START_mock: "Pelaamiseen vaaditaan internetyhteys! Et voi tunkeutua Station 24:ään ilman aktiivista linkkiä.",
+        GRAFIK_INKOMPATIBEL: "GRAFIIKKAMOOTTORI YHTEENSOPIMATON",
+        GRAFIK_INKOMPATIBEL_mock: "Päätteestäsi puuttuu WebGL-tuki (laitekiihdytys). Kamek kieltäytyy ajamasta Math Mayhemia kivikauden näytönohjaimella!",
+        GPU_ERROR: "KRIITTINEN GRAFIIKKAVIRHE",
+        GPU_ERROR_mock: "Kriittinen virhe grafiikkamoottorissa. Pääte lukittu näytön suojaamiseksi.",
+        ZOOM_FÖRSÖK_mock: "Nyehehe! Yritätkö zoomata salaisuuksiini? Käytä silmälaseja sen sijaan!",
+        STYRPLATTA_DETEKTERAD_mock: "Kamekin sensorit havaitsevat pyyhkäisyn! Station 24 vaatii kunnollisen vanhan rulla-hiiren.",
+        DUBBEL_SESSION_DETEKTERAD_mock: "Yritätkö olla kahdessa paikassa yhtä aikaa? Kamek sallii vain YHDEN aktiivisen yhteyden per pääte!",
+
+        // Voice controls
+        voice_cmd_snooze: ["snooze", "hiljaa", "seis", "stop", "lopeta"],
+        voice_cmd_radio: ["radio pois", "radio päälle", "mykkä", "mute"],
+        voice_cmd_strobe: ["pysäytä strobe", "strobe pois"],
+        voice_cmd_emergency: ["hätä", "apu", "apua", "emergency", "help"],
+        kamek_loud_mock: "🧙‍♂️ KAMEK: 'Lopeta huutaminen! Äänesi sattuu korviini! NYEHEHEHE!'",
+        toxic_warning: "⚠️ VAROITUS #X/3: Vahdi kieltäsi! Kamek valvoo turnausta!",
+        toxic_lockdown_title: "KATASTROFAALINEN TOKSISUUS HAVAITTU",
+        toxic_lockdown_desc: '"Kiroilu ei ole sallittua turnauksen aikana. Pääte on lukittu." <br><br><span style="color:#ffcc00;">UUDELLEENKÄYNNISTYS <span id="countdown">10</span> SEKUNNISSA...</span>',
+        retry_btn: "YRITÄ UUDELLEEN",
+        toxic_lockdown: "JÄRJESTELMÄ LUKITTU! - TOKSISUUS HAVAITTU",
+
+        // Toasts
+        lang_changed: "🌐 KIELI: SUOMI HAVAITTU!",
+        good_luck: "ONNEA PELIIN, {name}!",
+        radio_off: "🔈 RADIO: POIS",
+        radio_on: "🔊 EURODANCE: PÄÄLLÄ!",
+        now_playing: "🎵 NYT SOI: ",
+        gamepad_unsupported: "⚠️ Peliohjainta ei tueta täysin.",
+        gamepad_connected: "🎮 Peliohjain yhdistetty!",
+        offline_mode: "📶 Offline - paikallinen LAN-tila varmistettu",
+        online_mode: "✅ Online - yhdistetty Station 24:ään",
+        sensors_activated: "✅ SENSORIT AKTIVOITU",
+        sensors_denied: "❌ SENSORIN PÄÄSY EVÄTTY",
+        alarm_snoozed: "HÄLYTYS TORKUTETTU!",
+        lb_back: "TAKASI",
+        end_menu: "VALIKKO",
+
+        // Manual detaljer
+        inst_close_text: "SULJE [X]",
+        inst_title_welcome: "TERVETULOA OPERAATTORI. LUE HUOLELLISESTI - JÄRJESTELMÄSI RIIPPUU SIITÄ.",
+        inst_basics_1: "Vastaa matikkatehtäviin niin nopeasti kuin pystyt kasvattaaksesi pisteitäsi ja aikaasi.",
+        inst_basics_2: "Varo äkillisiä Kamek-hälytyksiä, jotka häiritsevät keskittymistäsi ja vaativat välittömiä toimia!",
+        inst_math_1: "Oikea vastaus antaa +150 pistettä ja +2 sekuntia aikaa.",
+        inst_math_2: "Väärä vastaus vähentää 5 sekuntia ja herättää Kamekin raivon.",
+        inst_lock_1: "Kehittäjätyökalut (F12, tarkastele elementtiä) sulkevat päätteen välittömästi.",
+        inst_lock_2: "Välilehden tai ikkunan vaihtaminen turnauksen aikana tulkitaan huijaukseksi ja johtaa hylkäykseen.",
+        inst_hw_1: "Älypuhelimet, iPadit ja konsolit estetään välittömästi Kamek-protokollan toimesta.",
+        inst_hw_2: "Tietokoneilta, joissa ei ole tarpeeksi RAM-muistia (vähintään 4 Gt) tai joissa on hidas prosessori, evätään pääsy.",
+
+        // Kamek's insults and alarms
+        han_list: "ETKÖ OSAA EDES LASKEA?|KAMEK NAURAA TYPERYYDELLESI!|ISOÄITINI ON NOPEAMPI KUIN SINÄ!|HUONOMPI KUIN GOOMBA!|OLETKO KOULUTETTU ETANA?",
+        press_sequence: "PAINA JÄRJESTYKSESSÄ: #SEQ",
+        math_clutch: "NOPEA LASKU: #PROB",
+        spell_words: "KAMEK,GOOMBA,NÄPPÄIN,TIETOKONE,HÄTÄMERKKI,VIRTALÄHDE,KRYPTO,MATEMATIIKKA,HELSINKI,AKKU"
     },
     en: {
         score: "SCORE",

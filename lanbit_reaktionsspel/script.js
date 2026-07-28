@@ -40,6 +40,41 @@ const translations = {
         err_battery: "Hämta laddaren! Terminalen dör.",
         err_ram: "Din RAM-kapacitet är ett skämt!"
     },
+fi: {
+        sub_header: "--- AISTI-HERMO-VARMINNUS ---",
+        placeholder: "Nimimerkki (Jätä tyhjäksi Vieraalle)...",
+        btn_how: "❓ KUINKA PELATAAN?",
+        btn_start: "KÄYNNISTÄ PROTOKOLLA",
+        leaderboard_title: "PISTETAULUKKO (MS)",
+        loading: "Ladataan sijoituksia...",
+        best: "⏱️ PARAS:",
+        operator: "👤 OPERAATTORI:",
+        wait_signal: "ODOTA MERKKIÄ...",
+        now: "NYT!",
+        focus: "KESKITY...",
+        play_again: "PELAA UUDELLEEN",
+        back: "TAKASI",
+        modal_title: "TOIMITUSKOHTAISET OHJEET",
+        rule_1: "<strong>1.</strong> Klikkaa näyttöä, kun se muuttuu vihreäksi.",
+        rule_2: "<strong>2.</strong> Varaslähtö johtaa välittömään <strong>DNF</strong>-hylkäykseen.",
+        rule_3: "<strong>⚠️ VAROITUS:</strong> Sisältää vilkkuvia valoja ja äkillisiä ääniä.",
+        rule_4: "<strong>🔒 KAMEK:</strong> Ei kosketuslevyjä, ei huijausta, ei välilehden vaihtoa.",
+        btn_understand: "YMMÄRRÄN",
+        dnf: "🚫 VARASLÄHTÖ!",
+        lock_title: "KAMEKIN LUKITSEMA",
+        rating_star: "⭐ TÄHTIVOITTO! ⭐",
+        rating_gold: "🪙 KULTA-KOLIKKO! (HYVÄ)",
+        rating_avg: "🥈 KESKIVERTO",
+        rating_bad: "🥉 HUONO",
+        rating_useless: "🐢 SURKEA (KAMEK NAURAA)",
+        err_devtools: "Yritätkö tarkastella koodia? Et ole sen arvoinen!",
+        err_right_click: "Oikea klikkaus? Yritätkö urkkia salaisuuksiani? Station 24:ssä pelataan rehellisesti! Nyehehehe!",
+        err_pause: "Tauko? Oikea operaattori ei lepää koskaan! Päätteessäni ei ole taukonäppäintä, vain seurauksia!",
+        err_trackpad: "LOPETA LÄPPÄRIN SILITTELY! Kamek vaatii oikean hiiren.",
+        err_tab: "Ei pakotietä! Yritit huijata poistumalla päätteestä.",
+        err_battery: "Hae laturi! Pääte kuolee.",
+        err_ram: "RAM-kapasiteettisi on vitsi!"
+    },
     en: {
         sub_header: "--- SENSORY NERVE VERIFICATION ---",
         placeholder: "Alias (Leave empty for Guest)...",
@@ -262,7 +297,7 @@ function closeInfo() { document.getElementById('info-modal').style.display = 'no
 
 function beginProtocol() {
     let name = document.getElementById('playerName').value.trim();
-    currentPlayer = name === "" ? (currentLang === 'en' ? "Guest" : "Gäst") : name;
+    currentPlayer = name === "" ? (currentLang === 'en' ? "Guest" : currentLang === 'fi' ? "Vieras" : "Gäst") : name;
     
     document.getElementById('start-screen').style.display = 'none';
     document.getElementById('game-container').style.display = 'flex';

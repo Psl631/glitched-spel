@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assemblyn verkkopelihubissa! // THE BOSS HQ</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="flashplayer.png">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <noscript>
+        <div style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;color:red;z-index:9999999;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-family:'Press Start 2P';padding:20px;">
+            <h1>[ JÄRJESTELMÄVIRHE ]</h1>
+            <p>JavaScriptin on oltava päällä suorittaaksesi Glitched-hubia.</p>
+        </div>
+    </noscript>
+
+    <script>
+    (function() {
+        var ua = navigator.userAgent;
+        var blocked = false;
+        var title = "[ PÄÄTEVIRHE ]";
+        var message = "";
+        var subMessage = "";
+        var errorCode = "HARDWARE_INCOMPATIBLE_V4.1";
+
+        // --- 1. TUNNISTUS ---
+        var isIE = /*@cc_on!@*/false || !!document.documentMode;
+        var isAncient = false;
+        try { eval("var t = function() { let x = 1; };"); } catch (e) { isAncient = true; }
+
+        var isMobile = /iPhone|Android|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+        var isTablet = /iPad|PlayBook|Silk/i.test(ua) || (navigator.maxTouchPoints > 0 && /Macintosh/.test(ua));
+        var isConsole = /PlayStation|Nintendo|Xbox/i.test(ua);
+        var isTV = /SmartTV|Tizen|Web0S|Roku|AppleTV|DLNA|LGBrowser/i.test(ua);
+        var isCar = /Tesla|CarBrowser/i.test(ua);
+
+        // --- 2. LAITEVAATIMUKSET ---
+        if (isIE || isAncient) {
+            blocked = true;
+            title = "[ JÄRJESTELMÄARKEOLOGIA ]";
+            message = "Selainympäristösi on muinaismuisto.";
+            subMessage = "Glitched Protocol vaatii kauniin ja modernin päätteen. Päivitä tietokoneesi tai käytä tältä vuosikymmeneltä olevaa laitetta.";
+            errorCode = "UPGRADE_REQUIRED_NOW";
+        } 
+        else if (isCar) {
+            blocked = true;
+            title = "[ AJONEUVOPÄÄTE HYLÄTTY ]";
+            message = "Yritätkö hakkeroida peliä kuljettajan paikalta?";
+            subMessage = "Pysäköi auto ja yhdistä oikealla pöytätietokoneella (Windows/Mac/Linux). Emme tue pyörillä kulkevaa laitteistoa.";
+            errorCode = "DRIVE_BY_ACCESS_DENIED";
+        }
+        else if (isTV) {
+            blocked = true;
+            title = "[ MEDIABOKSI-VAROITUS ]";
+            message = "Televisio on elokuvien katseluun, ei vakavaan pelaamiseen.";
+            subMessage = "Operaattori PSL631 vaatii työaseman hiirellä ja näppäimistöllä. Sohva ei ole hyväksytty komentokeskus.";
+            errorCode = "TV_NOT_A_COMPUTER";
+        }
+        else if (isConsole) {
+            blocked = true;
+            title = "[ KONSOLIRAJOITUS ]";
+            message = "Jätä lelusi ja hae oikea tietokone.";
+            subMessage = "Glitched-hubi toimii parhaiten pöytäkoneella. Windows, Mac tai Linux on vaatimus turnauksen lataamiseksi.";
+            errorCode = "CONSOLE_HARDWARE_WEAK";
+        }
+        else if (isMobile) {
+            blocked = true;
+            title = "[ TASKULELU TUNNISTETTU ]";
+            message = "Näyttösi on liian pieni tälle älykkyystasolle.";
+            subMessage = "Tämä ei ole mobiilipeli. Yhdistä PC-, Mac- tai Linux-päätteellä osallistuaksesi turnaukseen.";
+            errorCode = "DESKTOP_ONLY_SECTOR";
+        }
+        else if (isTablet) {
+            blocked = true;
+            title = "[ KOSKETUSNÄYTTÖKIELTO ]";
+            message = "Tahmaiset sormet lasilla eivät ole ammattimaista.";
+            subMessage = "Tabletti ei ole tietokone. Operaattori PSL631 vaatii fyysiset näppäimet ja aitoa suoritintehoa. Vaihda kannettavaan tai pöytäkoneeseen.";
+            errorCode = "TABLET_ACCESS_REJECTED";
+        }
+
+        if (blocked) {
+            document.write(`
+                <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; color:#ff0000; z-index:99999999; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:'Press Start 2P', cursive; text-align:center; padding:30px; border:15px solid #ff0000; box-sizing:border-box;">
+                    <div style="border: 4px solid #ff0000; padding: 30px; background: rgba(30,0,0,0.8); box-shadow: 0 0 50px #ff0000; max-width:850px;">
+                        <h1 style="font-size:1.8rem; margin-bottom:30px; text-shadow: 5px 5px #550000;">${title}</h1>
+                        <p style="color:#fff; font-family:'VT323'; font-size:2.4rem; margin-bottom:20px; line-height:1.2;">${message}</p>
+                        <p style="color:yellow; font-family:'VT323'; font-size:1.6rem; margin-bottom:30px; border-top:1px dashed #ff0000; padding-top:20px;">${subMessage}</p>
+                        <div style="font-family:'VT323'; font-size:1.1rem; color:#666; letter-spacing:1px;">
+                            JÄRJESTELMÄVAATIMUKSET: PC / MAC / LINUX<br>
+                            PÄÄSYTILA: LOPETETTU<br>
+                            VIRHEKOODI: ${errorCode}
+                        </div>
+                    </div>
+                </div>
+            `);
+            window.stop();
+        }
+    })();
+</script>
+<!-- SPRÅKVÄXLARE MED VEKTORFLAGGOR -->
+<div class="lang-selector">
+    <!-- Sverige -->
+    <a href="index.html" title="På svenska" aria-label="Svenska">
+        <svg class="flag-icon" viewBox="0 0 16 10">
+            <rect width="16" height="10" fill="#006aa7"/>
+            <rect x="5" width="2" height="10" fill="#fecc00"/>
+            <rect y="4" width="16" height="2" fill="#fecc00"/>
+        </svg>
+    </a>
+
+    <!-- Storbritannien (Engelska) -->
+    <a href="eng/index.html" title="In English" aria-label="English">
+        <svg class="flag-icon" viewBox="0 0 60 30">
+            <clipPath id="s"><path d="M0,0 v30 h60 v-30 z"/></clipPath>
+            <clipPath id="t"><path d="M30,15 m-60,0 h120 v15 h-120 z v-30 h120 v15 h-120 z"/></clipPath>
+            <g clip-path="url(#s)">
+                <path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/>
+                <path d="M0,0 L60,30 M60,0 L0,30" stroke="#012169" stroke-width="4" clip-path="url(#t)"/>
+                <path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" stroke-width="2" clip-path="url(#t)"/>
+                <path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/>
+                <path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/>
+            </g>
+        </svg>
+    </a>
+
+    <!-- Finland -->
+    <a href="index_fi.html" title="Suomeksi" aria-label="Suomi">
+        <svg class="flag-icon" viewBox="0 0 18 11">
+            <rect width="18" height="11" fill="#fff"/>
+            <rect x="5" width="3" height="11" fill="#002f6c"/>
+            <rect y="4" width="18" height="3" fill="#002f6c"/>
+        </svg>
+    </a>
+</div>
+<style>
+.lang-selector {
+    position: fixed;
+    top: 15px;
+    left: 20px; /* Flyttad till vänster */
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(0, 0, 0, 0.85);
+    padding: 8px 12px;
+    border: 2px solid #00ffff;
+    border-radius: 8px;
+    box-shadow: 0 0 12px rgba(0, 255, 255, 0.4);
+}
+
+.lang-selector a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.flag-icon {
+    width: 28px;
+    height: 18px;
+    border-radius: 2px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
+}
+
+/* Hover-effekt med neonglöd */
+.lang-selector a:hover {
+    transform: scale(1.2);
+    filter: drop-shadow(0 0 6px #00ff00);
+}
+
+/* Valfritt: Markera aktiv sida/språk */
+.lang-selector a.active .flag-icon {
+    outline: 2px solid #ffcc00;
+    outline-offset: 2px;
+}
+</style>
+
+    <div class="main-container">
+        <div class="monitor-frame">
+            <div class="screen-content">
+                <div class="scanlines"></div>
+                <div id="beep-overlay"></div>
+
+                <div id="game-window">
+                    
+                    <div id="instructions-screen" class="screen hidden">
+                        <h2 style="color: #00ff00; font-family: 'Press Start 2P'; font-size: 1.1rem; margin-bottom: 15px; text-shadow: 3px 3px #000;">GLITCHED QUIZ-PROTOKOLLA &amp; SÄÄNNÖT</h2>
+
+<div style="text-align: left; font-family: 'VT323'; font-size: 1.25rem; line-height: 1.4; padding: 25px; color: #fff; background: rgba(0,20,0,0.95); border: 2px solid var(--terminal-green); margin-bottom: 20px; overflow-y: auto; max-height: 380px; width: 95%; box-shadow: inset 0 0 20px rgba(0,255,0,0.2);">
+    
+    <div style="border: 2px solid #ff0000; padding: 15px; margin-bottom: 20px; background: rgba(50,0,0,0.4);">
+        <h3 style="color: #ff0000; margin: 0 0 10px 0; font-family: 'Press Start 2P'; font-size: 0.7rem;">⚠️ AISTIVAROITUS</h3>
+        <p style="margin: 0; font-size: 1.1rem;">
+            Tämä virallinen Glitched-tietovisa sisältää <strong>teräviä äänitehosteita</strong> väärin vastattaessa sekä aikapainetta. Ääniherkkien käyttäjien tulee säätää äänenvoimakkuutta alareunasta ennen käynnistystä.
+        </p>
+    </div>
+
+    <h3 style="color: yellow; margin: 0 0 10px 0; border-bottom: 1px solid yellow;">1. VALITSE KOMENTOTILA</h3>
+    <p>Ennen järjestelmän käynnistystä sinun on valittava vaikeustaso:</p>
+    <ul style="padding-left: 20px; margin-bottom: 20px;">
+        <li><strong>[ TURNAUS ]</strong>: Puhdas harjoitustila. Sinulla on <strong>äärettömästi energiaa (elämiä)</strong> eikä Kamek voi lukita sinua ulos väärien vastausten vuoksi.</li>
+        <li><strong>[ KLASSINEN ]</strong>: Virallinen messutesti. Aloitat <strong>3 elämällä</strong>. Jokainen väärä vastaus vahingoittaa järjestelmää ja vie elämän, kunnes lukutut kokonaan ulos!</li>
+    </ul>
+
+    <h3 style="color: yellow; margin: 20px 0 10px 0; border-bottom: 1px solid yellow;">2. JÄRJESTELMÄAVUSTIN (OLKAPÄÄT/OLJENKORRET)</h3>
+    <p>Käytössäsi on neljä tehokasta työkalua. Jokaista työkalua voi käyttää vain <strong>kerran</strong> pelisession aikana:</p>
+    <ul style="padding-left: 20px; margin-bottom: 20px;">
+        <li><strong>50/50</strong>: Hakพัน käyttöliittymän ja poistaa puolet vääristä vaihtoehdoista.</li>
+        <li><strong>VAIHDA KYSYMYS</strong>: Hakee täysin uuden Glitched-tietopaketin palvelimelta.</li>
+        <li><strong>ANALYYSI</strong>: PSL631 purkaa oikean vastauksen ensimmäisen kirjaimen puolestasi.</li>
+        <li><strong>UUDELLEENKÄYNNISTYS (REBOOT)</strong>: Käynnistää elämämoduulin uudelleen ja antaa <strong>+1 elämän</strong> (Vain Klassisessa tilassa).</li>
+        <li><strong style="color: #ff00ff;">Huom:</strong> Jos aktivoit yksittäisenkin oljenkorren, hylätään sinut välittömästi eeppisestä Tähtivoitosta.</li>
+    </ul>
+
+    <h3 style="color: #00ffff; margin: 20px 0 10px 0; border-bottom: 1px solid #00ffff;">3. PALKINNOT &amp; PALKINNOT (GLITCHED LOOT)</h3>
+    <p>Operaattori PSL631 on ohjelmoinut seuraavat voittoparametrit messualueelle:</p>
+    <ul style="padding-left: 20px; margin-bottom: 20px;">
+        <li><strong style="color: gold;">[ KULTAKOLIKKO ]</strong>: Myönnetään kaikille operaattoreille, jotka selviävät koko <strong>Klassisen tilan</strong> läpi.</li>
+        <li><strong style="color: #00ff00;">[ TURNAUSVOITTO ]</strong>: Myönnetään esports-operaattorille, joka kerää **eniten pisteitä** messuprotokollassa festivalin päättyessä.</li>
+        <li><strong style="color: #ff00ff;">[ TÄHTIVOITTO ]</strong>: Kunnianosoitus vailla vertaa! Vaatii **30/30 oikein** ilman yhdenkään oljenkorren käyttöä ottelun aikana.</li>
+    </ul>
+
+    <h3 style="color: #ff0000; margin: 20px 0 10px 0; border-bottom: 1px solid #ff0000;">4. ANTI-CHEAT MESSUSUOJA (KAMEK LOCKDOWN)</h3>
+    <p>Turvallisuusarkkitehtuuri Kamek valvoo päätettäsi reaaliajassa Elmian aikana:</p>
+    <ul style="padding-left: 20px;">
+        <li><strong>Fokuksen menetys</strong>: Jos vaihdat välilehteä, avaat uuden ikkunan tai yrität googlettaa vastauksia, Kamek lukitsee päätteen välittömästi.</li>
+        <li><strong>Luvaton syöte</strong>: Oikean painikkeen käyttö, Ctrl+C/Ctrl+V tai kehittäjätyökalut (F12) johtavat välittömästi punaiseen näyttöön.</li>
+        <li><strong>Seuraus</strong>: Sessiosi päätetään välittömästi ja sinut rekisteröidään 0 pisteellä.</li>
+    </ul>
+</div>
+
+<button class="menu-btn" onclick="hideInstructions()" style="width: 300px;">VAHVISTA PROTOKOLLA 🚀</button>
+                    </div>
+
+                    <div id="start-screen" class="screen">
+                        <div class="logo-container" style="text-align: center; margin-bottom: 15px;">
+                            <img src="glitched.png" alt="Glitched Logo" style="max-width: 220px; filter: drop-shadow(0 0 10px var(--glitched-cyan));">
+                        </div>
+                        <h1 class="glitch" data-text="ASSEMBLY HQ" style="font-family: 'Press Start 2P'; font-size: 1.8rem; margin-bottom: 10px;">ASSEMBLY HQ</h1>
+                        
+                        <div class="main-menu-container">
+                            <div id="rules-box">
+                                <h3 id="rules-title">--- KÄYTTÖSÄÄNNÖT ---</h3>
+                                <ul id="rules-list" style="font-family: 'Montserrat', sans-serif; font-size: 0.85rem; text-align: left; padding-left: 15px;">
+    <li>[!] EI GOOGLEA - Estämme sinut välittömästi välilehden vaihdosta turnauksen aikana.</li>
+    <li>[!] KAMEK NÄKEE KAIKEN - Kiroilua osaston mikrofoniin ei suvaita.</li>
+    <li>[!] ASSEMBLY 2026 - Virallinen pisteraportointi palvelimelle tapahtuu livenä.</li>
+</ul>
+                            </div>
+
+                            <div id="mode-selection" style="margin: 15px 0; display: flex; gap: 10px; justify-content: center;">
+                                <button onclick="setMode('tournament')" class="mode-btn" id="btn-tournament">
+                                    [ TURNAUS ]<br><small>Rajatun elämät | 3 Oljenkortta</small>
+                                </button>
+                                <button onclick="setMode('classic')" class="mode-btn" id="btn-classic">
+                                    [ KLASSINEN ]<br><small>3 Elämää | 4 Oljenkortta</small>
+                                </button>
+                            </div>
+
+                            <div class="start-controls">
+                                <label id="label-gamer-tag">SYÖTÄ GAMER-TAG:</label>
+                                <input type="text" id="player-name" placeholder="Kirjoita messunimesi..." maxlength="15">
+                                <button id="start-button" class="menu-btn" onclick="startQuiz()">KÄYNNISTÄ PROTOKOLLA [ ALOITA ]</button>
+                                <button id="how-to-play-btn" class="menu-btn" onclick="showInstructions()" style="margin-top: 10px; background: #222; border-color: #555; font-size: 0.7rem;">[ KUINKA PELATAAN? ]</button> 
+                                <button class="open-settings-btn" onclick="openMediaPopup()" style="margin-top: 10px;">🎥 ASETUKSET</button>
+                            </div>
+                        </div>
+                        
+<div id="media-modal-overlay" class="modal-overlay">
+    <div class="setup-box popup-content">
+        <button class="close-popup" onclick="closeMediaPopup()">X</button>
+        
+        <h1>MEDIA-ASETUKSET</h1>
+        <p>Aktivoi laitteisto messujen ääniohjausta ja huijauksenestoa varten:</p>
+        
+        <div class="toggle-container">
+            <button id="toggle-cam" class="btn-toggle btn-off" onclick="toggleMediaState('cam')">
+                📸 HUIJAUSNESTO KAMERA: <span id="status-cam">POIS</span>
+            </button>
+
+            <button id="toggle-mic" class="btn-toggle btn-off" onclick="toggleMediaState('mic')">
+                🎤 MIKROFONI (VAHVISTIN): <span id="status-mic">POIS</span>
+            </button>
+        </div>
+
+        <button class="btn-start-game" onclick="confirmAndStart()">TALLENNA JA OTA KÄYTTÖÖN</button>
+    </div>
+</div>
+
+<style>
+.btn-toggle {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    padding: 15px 25px;
+    border: 3px solid #333;
+    border-radius: 12px;
+    cursor: pointer;
+    min-width: 180px;
+    transition: all 0.2s;
+    color: white;
+}
+.btn-off { background: #440000; border-color: #ff0000; box-shadow: 0 0 10px rgba(255, 0, 0, 0.2); }
+.btn-on { background: #004400; border-color: #00ff00; box-shadow: 0 0 20px rgba(0, 255, 0, 0.4); transform: translateY(-2px); }
+.btn-start-game { width: 100%; background: #ffcc00; color: black; font-family: 'Montserrat', sans-serif; font-weight: bold; font-size: 22px; padding: 20px; border: none; border-radius: 15px; cursor: pointer; border-bottom: 5px solid #b89500; text-transform: uppercase; }
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px); z-index: 20000; justify-content: center; align-items: center; }
+.popup-content { position: relative; width: 90%; max-width: 500px; animation: popupAnimation 0.3s ease-out; background: #0d011a; border: 2px solid var(--glitched-cyan); padding: 30px; border-radius: 12px; text-align: center; color: white; }
+@keyframes popupAnimation { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.close-popup { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #ffcc00; font-size: 24px; cursor: pointer; font-weight: bold; }
+.toggle-container { display: flex; flex-direction: column; gap: 15px; margin: 25px 0; }
+.open-settings-btn { padding: 10px 20px; font-family: 'Montserrat', sans-serif; font-weight: bold; background: #1a0033; color: #ffcc00; border: 2px solid #8200ff; cursor: pointer; border-radius: 10px; }
+.btn-start-game:hover { background: #ffe066; }
+.btn-start-game:active { transform: translateY(3px); border-bottom: none; }
+</style>
+
+<script>
+var configCam = false;
+var configMic = false;
+
+function toggleMediaState(type) {
+    if (type === 'cam') {
+        configCam = !configCam;
+        var btn = document.getElementById('toggle-cam');
+        var status = document.getElementById('status-cam');
+        btn.className = configCam ? 'btn-toggle btn-on' : 'btn-toggle btn-off';
+        status.innerText = configCam ? 'PÄÄLLÄ' : 'POIS';
+    } else {
+        configMic = !configMic;
+        var btn = document.getElementById('toggle-mic');
+        var status = document.getElementById('status-mic');
+        btn.className = configMic ? 'btn-toggle btn-on' : 'btn-toggle btn-off';
+        status.innerText = configMic ? 'PÄÄLLÄ' : 'POIS';
+    }
+}
+
+function openMediaPopup() { document.getElementById('media-modal-overlay').style.display = 'flex'; }
+function closeMediaPopup() { document.getElementById('media-modal-overlay').style.display = 'none'; }
+
+async function confirmAndStart() {
+    if (!configCam && !configMic) {
+        if (!confirm("Messulaitteistoa ei ole valittu äänianalyysia tai huijausuodatinta varten. Jatketaanko silti?")) return;
+    }
+    initKamekMedia(configCam, configMic);
+    closeMediaPopup();
+}
+</script>
+                    </div>
+
+                    <div id="loading-container" class="screen hidden">
+                        <div class="loading-content">
+                            <div class="spinner"></div>
+                            <div class="loading-text">PURTAAN TIETOPAKETTIA...</div>
+                        </div>
+                    </div>
+
+                    <div id="quiz-screen" class="screen hidden">
+                        <div id="progress" style="color: var(--terminal-green); font-family: 'VT323'; font-size: 1.4rem; margin-bottom: 10px;">
+    TILA: ASSEMBLY KYSYMYSMATRIISI 1/30
+</div>
+
+                        <div class="quiz-header" style="width: 100%; display: flex; flex-direction: column; align-items: center; margin-bottom: 10px;">
+                            <div id="lives-container" style="display: flex; gap: 5px; margin-bottom: 5px;"></div>
+                            <div id="question-category" style="color: yellow; font-family: 'VT323'; font-size: 1.2rem; text-transform: uppercase;">
+                                [ FESTIVAALI-OSIO ]
+                            </div>
+                        </div>
+
+                        <h2 id="question-text" class="question" style="margin: 15px 0; min-height: 60px; color: #fff; font-family: 'VT323'; font-size: 1.8rem; text-align: center;"></h2>
+                        
+                        <div id="options-grid" class="options-grid"></div>
+
+                        <div class="lifelines" style="margin-top: 20px;">
+                            <button id="fifty-fifty-btn" class="lifeline-btn" onclick="useFiftyFifty()">50/50</button>
+                            <button id="skip-btn" class="lifeline-btn" onclick="useSkipQuestion()">VAIHDA KYSYMYS</button>
+                            <button id="analysis-btn" class="lifeline-btn" onclick="useAnalysis()">ANALYYSI</button>
+                            <button id="reboot-btn" class="lifeline-btn" onclick="useReboot()">REBOOT</button>
+                        </div>
+
+                        <div id="feedback" style="min-height: 25px; margin-top: 10px; font-family: 'Press Start 2P'; font-size: 0.7rem;"></div>
+                    </div>
+
+                    <div id="result-screen" class="screen hidden"></div>
+                    <div id="kamek-screen" class="screen hidden"></div>
+
+                </div> 
+            </div> 
+        </div> 
+    </div> 
+
+    <script src="script_fi.js"></script>
+    
+<div id="kamek-media-bridge">
+    <div id="kamek-cam-widget">
+        <div id="kamek-rec-dot">● REC</div>
+        <video id="kamek-video" autoplay playsinline muted></video>
+        <div id="kamek-cam-off">
+            <img src="kamek.jfif" onerror="this.src='https://via.placeholder.com/60?text=KAMEK'">
+            <p>ANTI-CHEAT EYE AKTIIVINEN</p>
+        </div>
+    </div>
+
+    <div id="kamek-mic-widget">
+        <div class="kamek-bars">
+            <div class="k-bar"></div><div class="k-bar"></div>
+            <div class="k-bar"></div><div class="k-bar"></div>
+        </div>
+        <span>AUDIO LIVE</span>
+    </div>
+</div>
+
+<style>
+    #kamek-cam-widget { position: fixed; bottom: 20px; left: 20px; width: 200px; height: 140px; background: #000; border: 3px solid #8200ff; border-radius: 12px; overflow: hidden; z-index: 9999; box-shadow: 0 0 15px rgba(130,0,255,0.4); }
+    #kamek-video { width: 100%; height: 100%; object-fit: cover; display: none; }
+    #kamek-cam-off { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #1a0033; color: #ffcc00; }
+    #kamek-cam-off img { width: 50px; height: 50px; border-radius: 50%; border: 1px solid #ffcc00; margin-bottom: 5px; opacity: 0.6; }
+    #kamek-cam-off p { margin: 0; font-family: 'VT323', monospace; font-size: 14px; }
+    #kamek-rec-dot { position: absolute; top: 8px; left: 8px; color: red; font-family: Arial; font-weight: bold; font-size: 12px; display: none; animation: k-blink 1s infinite; }
+    @keyframes k-blink { 50% { opacity: 0; } }
+    #kamek-mic-widget { position: fixed; bottom: 20px; right: 20px; width: 80px; height: 80px; background: rgba(26,0,51,0.9); border: 2px solid #00ccff; border-radius: 50%; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
+    .kamek-bars { display: flex; align-items: flex-end; height: 25px; gap: 3px; }
+    .k-bar { width: 4px; background: #00ccff; height: 5px; border-radius: 2px; transition: height 0.05s; }
+    #kamek-mic-widget span { font-size: 9px; color: #00ccff; margin-top: 4px; font-family: sans-serif; }
+    .k-toast { position: fixed; top: 20px; right: 20px; background: #1a0033; color: #ffcc00; border: 2px solid #ffcc00; padding: 15px; border-radius: 10px; font-family: 'Montserrat', sans-serif; font-weight: bold; z-index: 10000; animation: k-slide 0.3s ease-out; }
+    @keyframes k-slide { from { transform: translateX(100%); } to { transform: translateX(0); } }
+</style>
+
+<script>
+var kamekStrikes = 0;
+// Suomenkieliset kielletyt sanat
+var kamekForbidden = ["vittu", "perkele", "paska", "helvetti", "saatana", "kusi", "idiootti", "fuck", "shit"];
+
+async function initKamekMedia(useCam, useMic) {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: useCam, audio: useMic });
+        if (useCam) {
+            const v = document.getElementById('kamek-video');
+            v.srcObject = stream;
+            v.style.display = 'block';
+            document.getElementById('kamek-cam-off').style.display = 'none';
+            document.getElementById('kamek-rec-dot').style.display = 'block';
+        }
+        if (useMic) {
+            document.getElementById('kamek-mic-widget').style.display = 'flex';
+            setupKamekVisualizer(stream);
+            setupKamekEar();
+        }
+        kamekToast("✅ ASSEMBLY MEDIA STREAM: PÄÄLLÄ");
+    } catch (e) {
+        kamekToast("❌ VIRTA-VIRHE: TARKISTA MESSUTIETOKONEEN LAITTEISTO");
+    }
+}
+
+function setupKamekVisualizer(stream) {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const src = ctx.createMediaStreamSource(stream);
+    const ana = ctx.createAnalyser();
+    ana.fftSize = 32;
+    src.connect(ana);
+    const data = new Uint8Array(ana.frequencyBinCount);
+    const bars = document.querySelectorAll('.k-bar');
+
+    function draw() {
+        ana.getByteFrequencyData(data);
+        bars.forEach((b, i) => {
+            let h = Math.max(4, (data[i]/255)*25);
+            b.style.height = h + "px";
+            b.style.background = data[i] > 200 ? "red" : "#00ccff";
+        });
+        requestAnimationFrame(draw);
+    }
+    draw();
+}
+
+function setupKamekEar() {
+    const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!Speech) return;
+    const rec = new Speech();
+    rec.continuous = true; rec.lang = 'fi-FI';
+    rec.onresult = (e) => {
+        const txt = e.results[e.results.length-1][0].transcript.toLowerCase();
+        if (kamekForbidden.some(w => txt.includes(w))) {
+            kamekStrikes++;
+            if (kamekStrikes < 3) kamekToast("⚠️ VAROITUS #" + kamekStrikes +">: SIISTI KIELTÄSI OSASTOLLA!");
+            else kamekPurpleLockdown();
+        }
+    };
+    rec.start();
+}
+
+function kamekToast(m) {
+    const t = document.createElement('div'); t.className = 'k-toast';
+    t.innerHTML = m; document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+}
+
+function kamekPurpleLockdown() {
+    if (window.stop) window.stop();
+    document.body.innerHTML = `
+        <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#1a0033;display:flex;flex-direction:column;justify-content:center;align-items:center;color:white;font-family:Arial;border:15px double #8200ff;box-sizing:border-box;z-index:1000000;">
+            <img src="kamek.jfif" style="width:150px;border:5px solid #ffcc00;border-radius:50%;box-shadow:0 0 30px #8200ff;">
+            <h1 style="font-family:'Montserrat', sans-serif;font-weight:bold;font-size:42px;color:#ffcc00;margin:20px 0;">KAMEK SENSORIN LUKITSEMA</h1>
+            <div style="background:rgba(0,0,0,0.5);padding:30px;border-radius:20px;border:1px dashed #8200ff;font-family:'Montserrat';">
+                <p style="font-size:28px;font-style:italic;">"Sopimaton kielenkäyttö tai toksinen käyttäytyminen osastolla on kiellettyä."</p>
+            </div>
+            <p style="margin-top:40px;color:#8200ff;font-family:monospace;font-weight:bold;">SYSTEM_ERROR: MESSUSÄÄNTÖJÄ_RIKKOTU</p>
+            <p style="color:red;font-weight:bold;font-size:24px;font-family:'Montserrat';">TULOS: HYLÄTTY (0 PISTETTÄ)</p>
+            <button onclick="location.reload()" style="margin-top:20px;padding:10px 30px;font-family:'Montserrat';font-weight:bold;cursor:pointer;background:#ffcc00;border:none;border-radius:10px;">RESET TERMINAL</button>
+        </div>`;
+}
+</script>
+
+<div id="audio-interface" style="position: fixed; bottom: 20px; right: 20px; z-index: 99999; cursor: pointer; user-select: none;">
+    <div id="boombox-container" style="position: relative; width: 80px; height: 80px;">
+        <img src="bandspelare.jfif" id="boombox-img" alt="Musiikki" style="width: 100%; height: 100%; border-radius: 12px; border: 3px solid #ffcc00; box-shadow: 0 0 20px rgba(0,0,0,0.8); opacity: 0.5; transform: scale(0.9); transition: all 0.3s;">
+        <div id="status-cross" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); border-radius: 12px;">
+            <span style="color: #ff0000; font-size: 60px; font-weight: bold; text-shadow: 2px 2px 4px #000;">✕</span>
+        </div>
+    </div>
+    <div id="track-info" style="position: absolute; bottom: 90px; right: 0; background: rgba(0,0,0,0.8); color: #ffcc00; padding: 5px 10px; border-radius: 5px; font-size: 12px; font-family: monospace; white-space: nowrap; display: none;">
+        ASSEMBLY SOUNDTRACK: EI MITÄÄN
+    </div>
+</div>
+
+<script>
+// --- ASETUKSET ---
+const KAMEK_TRACKS = [
+    '../The Boss - Base Defense/music/gangnam_style.mp3',
+    '../The Boss - Base Defense/music/billie_jean.mp3', 
+    '../The Boss - Base Defense/music/levitating.mp3', 
+    '../The Boss - Base Defense/music/blinding_lights.mp3', 
+    '../The Boss - Base Defense/music/golden.mp3', 
+    '../The Boss - Base Defense/music/faded.mp3', 
+    '../The Boss - Base Defense/music/headlights.mp3', 
+    '../The Boss - Base Defense/music/miracle.mp3', 
+    '../The Boss - Base Defense/music/starships.mp3', 
+    '../The Boss - Base Defense/music/despre_tine.mp3',
+    '../The Boss - Base Defense/music/good_feeling.mp3', 
+    '../The Boss - Base Defense/music/wild_ones.mp3', 
+    '../The Boss - Base Defense/music/alone.mp3', 
+    '../The Boss - Base Defense/music/where_have_you_been.mp3', 
+    '../The Boss - Base Defense/music/party_rock_anthem.mp3', 
+    '../The Boss - Base Defense/music/titanium.mp3', 
+    '../The Boss - Base Defense/music/fever_dream.mp3', 
+    '../The Boss - Base Defense/music/axel_f.mp3', 
+    '../The Boss - Base Defense/music/dragostea_del_tei.mp3', 
+    '../The Boss - Base Defense/music/alone_ii.mp3', 
+    '../The Boss - Base Defense/music/alone_iii.mp3', 
+    '../The Boss - Base Defense/music/diamond_heart.mp3', 
+    '../The Boss - Base Defense/music/on_the_floor.mp3', 
+    '../The Boss - Base Defense/music/low.mp3', 
+    '../The Boss - Base Defense/music/where_them_girls_at.mp3',
+    '../The Boss - Base Defense/music/tik_tok.mp3', 
+    '../The Boss - Base Defense/music/my_system.mp3',
+    '../The Boss - Base Defense/music/animals.mp3',
+    '../The Boss - Base Defense/music/the_business.mp3', 
+    '../The Boss - Base Defense/music/yeah.mp3', 
+    '../The Boss - Base Defense/music/bad_romance.mp3', 
+    '../The Boss - Base Defense/music/beauty_and_a_beat.mp3', 
+    '../The Boss - Base Defense/music/dont_you_worry_child.mp3', 
+    '../The Boss - Base Defense/music/clarity.mp3', 
+    '../The Boss - Base Defense/music/lean_on.mp3',
+    '../The Boss - Base Defense/music/du_hast.mp3', 
+    '../The Boss - Base Defense/music/the_trooper.mp3', 
+    '../The Boss - Base Defense/music/chop_suey.mp3', 
+    '../The Boss - Base Defense/music/through_the_fire_and_flames.mp3',
+    '../The Boss - Base Defense/music/u_cant_touch_this.mp3', 
+    '../The Boss - Base Defense/music/just_wanna_rock.mp3',
+    '../The Boss - Base Defense/music/rockstar.mp3', 
+    '../The Boss - Base Defense/music/rockstar_dababy.mp3', 
+    '../The Boss - Base Defense/music/montero.mp3', 
+    '../The Boss - Base Defense/music/freestyler.mp3', 
+    '../The Boss - Base Defense/music/lose_yourself.mp3',
+    '../The Boss - Base Defense/music/lucid_dreams.mp3',
+    '../The Boss - Base Defense/music/old_town_road.mp3',
+    '../The Boss - Base Defense/music/gods_plan.mp3',
+    '../The Boss - Base Defense/music/ice_ice_baby.mp3',
+    '../The Boss - Base Defense/music/here_i_go_again_ws.mp3', 
+    '../The Boss - Base Defense/music/thunderstruck.mp3', 
+    '../The Boss - Base Defense/music/the_final_countdown.mp3', 
+    '../The Boss - Base Defense/music/in_the_end.mp3', 
+    '../The Boss - Base Defense/music/danger_zone.mp3', 
+    '../The Boss - Base Defense/music/dragula.mp3', 
+    '../The Boss - Base Defense/music/kickstart_my_heart.mp3', 
+    '../The Boss - Base Defense/music/died_in_your_arms.mp3', 
+    '../The Boss - Base Defense/music/we_built_this_city.mp3', 
+    '../The Boss - Base Defense/music/it_has_begun_starset.mp3',
+    '../The Boss - Base Defense/music/take_on_me.mp3', 
+    '../The Boss - Base Defense/music/sweet_dreams.mp3', 
+    '../The Boss - Base Defense/music/moviestar.mp3', 
+    '../The Boss - Base Defense/music/never_gonna_give_you_up.mp3', 
+    '../The Boss - Base Defense/music/send_me_an_angel.mp3',
+    '../The Boss - Base Defense/music/self_control.mp3',
+    '../The Boss - Base Defense/music/take_a_chance.mp3',  
+    '../The Boss - Base Defense/music/dancing_queen.mp3',  
+    '../The Boss - Base Defense/music/mamma_mia.mp3',  
+    '../The Boss - Base Defense/music/knowing_me_knowing_you.mp3', 
+    '../The Boss - Base Defense/music/the_winner_takes_it_all.mp3',
+    '../The Boss - Base Defense/music/you_spin_me_round.mp3', 
+    '../The Boss - Base Defense/music/ma_baker.mp3', 
+    '../The Boss - Base Defense/music/smalltown_boy.mp3',
+    '../The Boss - Base Defense/music/bowsers_galaxy.mp3', 'music/gerudo_valley.mp3', 'music/gusty_garden.mp3', 
+    '../The Boss - Base Defense/music/coconut_mall.mp3', 'music/pokemon_main.mp3', 'music/mario64_slider.mp3', 
+    '../The Boss - Base Defense/music/mk64_rr.mp3', 'music/mk64_raceway.mp3', 'music/my_system.mp3',
+    '../The Boss - Base Defense/music/axel_f.mp3', 
+    '../The Boss - Base Defense/music/caramelldansen.mp3', 
+    '../The Boss - Base Defense/music/dragostea_del_tei.mp3', 
+    '../The Boss - Base Defense/music/despre_tine.mp3',
+    '../The Boss - Base Defense/music/gangnam_style.mp3',
+    '../The Boss - Base Defense/music/rosa_helikopter.mp3', 
+    '../The Boss - Base Defense/music/cotton_eye_joe.mp3', 
+    '../The Boss - Base Defense/music/rhythm_is_a_dancer.mp3', 
+    '../The Boss - Base Defense/music/never_going_home_tonight.mp3', 
+    '../The Boss - Base Defense/music/eurodancer.mp3', 
+    '../The Boss - Base Defense/music/axel_f.mp3', 
+    '../The Boss - Base Defense/music/despre_tine.mp3',
+    '../The Boss - Base Defense/music/dragostea_del_tei.mp3', 
+    '../The Boss - Base Defense/music/miracle.mp3', 
+    '../The Boss - Base Defense/music/here_i_go_again.mp3', 
+    '../The Boss - Base Defense/music/no_limit.mp3', 
+    '../The Boss - Base Defense/music/pump_up_the_jam.mp3', 
+    '../The Boss - Base Defense/music/sandstorm.mp3', 
+    '../The Boss - Base Defense/music/boten_anna.mp3', 
+    '../The Boss - Base Defense/music/scooter.mp3', 
+    '../The Boss - Base Defense/music/caramelldansen.mp3',
+    '../The Boss - Base Defense/music/rosa_helikopter.mp3',  
+    '../The Boss - Base Defense/music/the_logical_song.mp3', 
+    '../The Boss - Base Defense/music/this_is_the_way.mp3', 
+    '../The Boss - Base Defense/music/my_system.mp3',
+    '../The Boss - Base Defense/music/what_is_love.mp3', 
+    '../The Boss - Base Defense/music/blue.mp3', 
+    '../The Boss - Base Defense/music/strong_enough.mp3', 
+    '../The Boss - Base Defense/music/set_the_world_on_fire.mp3', 
+    '../The Boss - Base Defense/music/better_off_alone.mp3', 
+    '../The Boss - Base Defense/music/boom_boom_boom.mp3', 
+    '../The Boss - Base Defense/music/everytime_we_touch.mp3', 
+    '../The Boss - Base Defense/music/we_like_to_party.mp3', 
+    '../The Boss - Base Defense/music/when_we_were_young.mp3', 
+    '../The Boss - Base Defense/music/be_my_lover.mp3', 
+    '../The Boss - Base Defense/music/infinity_2008.mp3', 
+    '../The Boss - Base Defense/music/children_miles.mp3', 
+    '../The Boss - Base Defense/music/god_is_a_dj.mp3', 
+    '../The Boss - Base Defense/music/sound_of_silence_remix.mp3',
+    '../The Boss - Base Defense/music/ecstasy.mp3', 
+    '../The Boss - Base Defense/music/l_amour_toujours.mp3', 
+    '../The Boss - Base Defense/music/stereo_love.mp3', 
+    '../The Boss - Base Defense/music/mr_saxobeat.mp3',
+    '../The Boss - Base Defense/music/raggen_går.mp3', 
+    '../The Boss - Base Defense/music/rid_mig_som_en_dalahäst.mp3',
+    '../The Boss - Base Defense/music/bubbel_pa_balkongen.mp3', 
+    '../The Boss - Base Defense/music/weed_i_raggarbil.mp3', 
+    '../The Boss - Base Defense/music/rödvin_rose.mp3', 
+    '../The Boss - Base Defense/music/elov_beny.mp3',
+    '../The Boss - Base Defense/music/trucker_motherfucker.mp3', 
+    '../The Boss - Base Defense/music/rom_cola.mp3', 
+    '../The Boss - Base Defense/music/kan_inte_gå.mp3',
+    '../The Boss - Base Defense/music/caramelldansen.mp3',
+    '../The Boss - Base Defense/music/rosa_helikopter.mp3', 
+    '../The Boss - Base Defense/music/forsta_gången_i_en_epa.mp3',
+    '../The Boss - Base Defense/music/ikvall_igen.mp3',
+    '../The Boss - Base Defense/music/30kmh.mp3',
+    '../The Boss - Base Defense/music/banan_melon_kiwi_citron.mp3', 
+    '../The Boss - Base Defense/music/valhalla.mp3', 
+    '../The Boss - Base Defense/music/trakten_epan.mp3',
+    '../The Boss - Base Defense/music/inget_stoppar_oss_nu.mp3', 
+    '../The Boss - Base Defense/music/guld_och_grona_skogar.mp3', 
+    '../The Boss - Base Defense/music/leende_guldbruna_ogon.mp3', 
+    '../The Boss - Base Defense/music/diggiloo_diggiley.mp3',
+    '../The Boss - Base Defense/music/varlden_utanfor.mp3',
+    '../The Boss - Base Defense/music/lyssna_till_ditt_hjarta.mp3',
+    '../The Boss - Base Defense/music/eloise.mp3'
+];
+
+const jukebox = new Audio();
+jukebox.loop = true;
+jukebox.volume = 0.5;
+
+let musicActive = false;
+
+const uiContainer = document.getElementById('audio-interface');
+const uiImg = document.getElementById('boombox-img');
+const uiCross = document.getElementById('status-cross');
+const uiInfo = document.getElementById('track-info');
+
+function playRandomTrack() {
+    const randomIdx = Math.floor(Math.random() * KAMEK_TRACKS.length);
+    const trackName = KAMEK_TRACKS[randomIdx];
+    jukebox.src = trackName;
+    
+    jukebox.play().then(() => {
+        uiInfo.innerText = "SOITTAA: " + trackName.replace('.mp3', '').toUpperCase();
+        uiInfo.style.display = 'block';
+        setTimeout(() => { uiInfo.style.display = 'none'; }, 3000);
+    }).catch(err => console.log("Vuorovaikutus vaaditaan"));
+}
+
+function toggleMusic() {
+    musicActive = !musicActive;
+    
+    if (musicActive) {
+        if (!jukebox.src) playRandomTrack();
+        else jukebox.play();
+        
+        uiImg.style.opacity = "1";
+        uiImg.style.transform = "scale(1.1)";
+        uiCross.style.display = "none";
+    } else {
+        jukebox.pause();
+        uiImg.style.opacity = "0.5";
+        uiImg.style.transform = "scale(0.9)";
+        uiCross.style.display = "flex";
+    }
+}
+
+uiContainer.addEventListener('click', toggleMusic);
+
+document.addEventListener('keydown', (e) => {
+    if (e.key.toLowerCase() === 'm') {
+        toggleMusic();
+    }
+});
+</script>
+<style>
+/* --- UNIVERSAL JUKEBOX STYLING --- */
+#audio-interface {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 99999;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.3s ease;
+}
+
+#boombox-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+#boombox-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    border: 3px solid #ffcc00;
+    box-shadow: 0 0 20px rgba(0,0,0,0.8);
+    opacity: 0.5;
+    transform: scale(0.9);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+#audio-interface.active #boombox-img {
+    opacity: 1;
+    transform: scale(1.1);
+    box-shadow: 0 0 30px rgba(255, 204, 0, 0.4);
+}
+
+#status-cross {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.4);
+    border-radius: 12px;
+    pointer-events: none;
+}
+
+#status-cross span {
+    color: #ff0000;
+    font-size: 60px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px #000;
+}
+
+#track-info {
+    position: absolute;
+    bottom: 90px;
+    right: 0;
+    background: rgba(0,0,0,0.9);
+    color: #ffcc00;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-family: 'Luckiest Guy', cursive, sans-serif;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    display: none;
+    border: 1px solid #ffcc00;
+    pointer-events: none;
+}
+</style>
+</body>
+</html>

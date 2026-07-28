@@ -863,6 +863,11 @@
                         safari: "ROTTEN APPLE! 🍎<br>Your old Safari browser is not supported by Station 24. Update your fruit basket!",
                         other: "YOUR BROWSER IS NOT SUPPORTED! 🚫<br>Upgrade your retro terminal to a modern browser!"
                     },
+fi: {
+    ie: "INTERNET EXPLORER ON KUOLLUT! 🪦<br>Kamek sanoo: 'Lopeta digitaalisessa museossa pelaaminen!'",
+    safari: "MÄTÄ OMENA! 🍎<br>Vanhaa Safari-selaintasi ei tueta Station 24:ssä. Päivitä hedelmäkorisi!",
+    other: "SELAINTASI EI TUETA! 🚫<br>Päivitä retroterminaalisi nykyaikaiseen selaimeen!"
+},
                     da: {
                         ie: "INTERNET EXPLORER ER GÅET I GRAVEN! 🪦<br>Kamek siger: 'Stop med at spille på et digitalt museum!'",
                         safari: "RÅDDENT ÆBLE! 🍎<br>Din gamle Safari-browser understøttes ikke af Station 24. Opdater din frugtkurv!",
@@ -959,6 +964,15 @@
                 </svg>
                 <span>English</span>
             </button>
+<button class="flag-button" onclick="window.setLanguage('fi')" title="Suomi">
+    <!-- Finland Flagga SVG -->
+    <svg viewBox="0 0 18 11">
+        <rect width="18" height="11" fill="#fff"/>
+        <rect width="3" height="11" x="5" fill="#003580"/>
+        <rect width="18" height="3" y="4" fill="#003580"/>
+    </svg>
+    <span>Suomi</span>
+</button>
             <button class="flag-button" onclick="window.setLanguage('da')" title="Dansk">
                 <!-- Danmark Flagga SVG -->
                 <svg viewBox="0 0 37 28">
@@ -1548,6 +1562,142 @@
                 sfx_vol_label: "Sound Effects (SFX)",
                 music_vol_label: "Music Volume"
             },
+fi: {
+    score: "PISTEET",
+    mag: "LIPAS",
+    wave: "AALTO",
+    player_name: "SYÖTÄ NIMESI:",
+    placeholder_name: "Nimesi...",
+    medical_warning: "⚠️ LÄÄKETIETEELLINEN VAROITUS: Peli sisältää voimakkaita stroboskooppivaloja. Ei suositella epilepsiasta kärsiville.",
+    start_game: "ALOITA PELI",
+    instructions: "OHJEET",
+    settings: "ASETUKSET",
+    media_control: "MEDIAN HALLINTA",
+    activate_hardware: "Aktivoi anturit turnausta varten:",
+    camera: "KAMERA",
+    microphone: "MIKROFONI",
+    save_activate: "TALLENNA JA AKTIVOI",
+    top_defenders: "🏆 PARHAAT PUOLUSTAJAT",
+    rank: "SIJA",
+    name: "NIMI",
+    score_col: "PISTEET",
+    on: "PÄÄLLÄ",
+    off: "POIS",
+    no_media_confirm: "Haluatko jatkaa ilman kameraa ja mikrofonia?",
+    right_click_forbidden: "OIKEA PAINIKE KIELLETTY! Terminaali lukittu.",
+    escape_locked: "ESCAPE ON ESTETTY LAN-TILASSA!",
+    devtools_forbidden: "KEHITTÄJÄTYÖKALUT KIELLETTY! Hakkerointiyritys tallennettu.",
+    lost_focus: "TERMINAALI MENETTI FOKUKSEN! Huijaustaukoja ei sallita.",
+    tab_switch_detected: "VALILEHDEN VAIHTO HAVAITTU! Kamek näkee kaiken.",
+    turbo_detected: "TURBOKLIKKAUS HAVAITTU! Huijarit hylätään.",
+    macro_detected: "MAKROKLIKKAUS HAVAITTU! Järjestelmä lukittu.",
+    aimbotuser: "AIMBOT HAVAITTU! Terminaali lukittu.",
+    ups_warning: "⚠️ SÄHKÖKATKO! Tietokone toimii varavirralla (UPS)! Kytke laturi välittömästi!",
+    power_status: "⚡ ULKOINEN VIRTA: OK (UPS VALMIUDESSA)",
+    power_battery: "🔋 UPS-VARAVIRTA (VAROITUS: EI ULKOISTA VIRTAA!)",
+    
+    camera_off_label: "KAMERA POIS PÄÄLTÄ",
+    integrity: "🛡️ KUNTO",
+    wall_ok: "TILA: ERINOMAINEN (OK)",
+    wall_damaged: "TILA: VAURIOITUNUT",
+    wall_critical: "TILA: KRIITTINEN",
+    wall_destroyed: "TILA: TUHOUTUNUT!",
+    wall_integrity_label: "SEINÄN KUNTO: ",
+
+    inst_title: "KÄYTTÖOHJE",
+    medical_warning_modal: "⚠️ LÄÄKETIETEELLINEN VAROITUS: Peli sisältää voimakkaita stroboskooppivaloja, tärinätehosteita ja äkillisiä ääniä. Ei suositella epilepsiasta kärsiville.",
+    sensory_profile_title: "🧠 AISTIPROFIILI",
+    sensory_syn: "<strong>NÄKÖ:</strong> Purppuroita/valkoisia välähdyksiä ammuttaessa. Paina <strong>[S]</strong> hätäpysäytykseen.",
+    sensory_horsel: "<strong>KUULO:</strong> Napsauta nauhuria tai paina <strong>[M]</strong> hiljentääksesi.",
+    sensory_kansel: "<strong>TUNTOPALAUTE:</strong> Peliohjaimet tärisevät räjähdyksissä.",
+    combat_controls_title: "🎮 TAISTELUOHJAIMET",
+    combat_left_html: "<strong>NÄPPÄIMISTÖ:</strong><br>• Hiiri: AMMU<br>• [R]: Lataa<br>• [E]: Hätälaatikko<br>• [S]: Pysäytä vilkkvalo",
+    combat_right_html: "<strong>PELIOHJAIN:</strong><br>• [RT/R2]: Ammu<br>• [X/A]: Lataa<br>• [B/Y]: Pysäytä vilkkuvalo",
+    kamek_cheat_title: "🧙‍♂️ KAMEK HUIJAESTO JA VAROITUS",
+    kamek_cheat_desc_html: "Turboklikkaukset, kosketuslevyt ja huijausskriptit havaitaan automaattisesti. Epäiltäessä kone lukitaan.<br><strong style='color: #ff4444;'>☢️ KIELLETTY KOHDE:</strong> ÄLÄ KOSKAAN ammu radioaktiivisia merkkejä (Nuket). Osuma = Välitön <strong>GAME OVER</strong>.",
+    repair_system_title: "🛡️ KORJAUSJÄRJESTELMÄ",
+    repair_system_desc_html: "• Seinäsi alkaa <strong>100 HP</strong>:sta.<br>• Ammu sydämiä korjataksesi seinää <strong>+25 HP</strong>.<br>• 0 HP = Täydellinen romahdus ja peli päättyy.",
+    powerups_title: "💎 ERITYISCYBER-BONUKSET",
+    power_heart: "❤️ Sydän: +25 HP",
+    power_clock: "🕒 Kello: Hidastus",
+    power_star: "⭐ Tähti: Kuolematon",
+    power_gold: "💰 Kulta: 2X Pisteet",
+    confirm_btn: "VAHVISTA SÄÄNNÖT JA ALOITA!",
+
+    trackpad_lockdown: "LOPETA KANNETTAVASI SILITYS! 🚫\n\nKamek nauraa kömpelölle kosketuslevyllesi: 'NYEHEHEHE!'\nSormesi eivät sovellu Station 24 -protokollaan.\n\n⚠️ SUOSITUS: Kytke oikea HIIRI tarkkuutta varten!",
+    thermal_throttle: "LÄMPÖTILAVAROITUS: \n Tietokoneesi sulaa paineen alla! Pelaa vakaalla laitteistolla, jossa on ulkoinen virtalähde!",
+    pause_lockdown: "KAMEK EI PIDÄ TAOISTA!",
+    ups_active_playing: "⚠️ ULKOINEN VIRTA KATKENNUT! UPS AKTIVOITU. KYTKE LATURI!",
+    toxic_warning: "⚠️ VAROITUS #X: SIISTI KIELESI!",
+    toxic_lockdown_title: "KAMEKIN LUKITSEMA",
+    toxic_lockdown_desc: '"Kiroilu ei ole sallittua turnauksen aikana."',
+    retry_btn: "YRITÄ UUDELLEEN",
+    nuke_explosion: "☢️ YDINPOMMI RÄJÄHTI! \n Kamek nauraa tuhkallesi: 'NYEHEHEHE!'",
+    cheat_detected: "HUIJAUS HAVAITTU!",
+
+    mock_legendary: "SUPER (TÄHTIVOITTO) - LEGENDARAALINEN TILA!",
+    mock_0: "SURKEA - Olitko edes valveilla?",
+    mock_1: "HUONO - Goombat nauravat sinulle.",
+    mock_2: "KESKINKERTAINEN - Ihan ok, mutta ei enempää.",
+    mock_3: "HYVÄ - Nyt alkaa näyttää joltain!",
+    mock_4: "PARAS - Bdefinition todellinen puolustaja!",
+    mock_5: "SUPER (TÄHTIVOITTO) - OLET PYSÄYTTÄMÄTÖN!",
+
+    lang_changed: "🌐 KIELI: SUOMI HAVAITTU!",
+    good_luck: "ONNEA MATKAAN, {name}!",
+    radio_off: "🔈 RADIO: POIS",
+    radio_on: "🔊 EURODANCE: PÄÄLLÄ!",
+    now_playing: "🎵 NYT SOI",
+    gamepad_unsupported: "⚠️ Peliohjainta ei tueta täysin.",
+    gamepad_connected: "🎮 Peliohjain yhdistetty!",
+    offline_mode: "📶 Offline - paikallinen LAN-tila varmistettu",
+    online_mode: "✅ Online - yhdistetty Station 24:ään",
+    ammo_added: "+20 VARA-AMMUSTA!",
+    invincible_on: "🌟 KUOLEMATON! (7 SEK)",
+    invincible_off: "✨ Kuolemattomuus päättyi",
+    double_points_on: "💰 TUPLAPISTEET! (10 SEK)",
+    double_points_off: "💰 Pisteet palautettu",
+    reloading: "🔄 LADATAAN...",
+    reloaded_ready: "✅ VALMIS!",
+    slowmo_on: "🕒 AIKA HIDASTETTU!",
+    wall_repaired: "🧱 SEINÄ KORJATTU (+25 HP)!",
+    emergency_ammo_used: "🚨 HÄTÄAMMONIA KÄYTETTY! ({count} jäljellä)",
+    no_emergency_boxes: "🚫 EI HÄTÄLAATIKOITA JÄLJELLÄ!",
+    gold_transferred: "💰 KULTAKOLIKOT SIIRRETTY! Station 24:n kuningas.",
+    sensors_activated: "✅ ANTURIT AKTIVOITU",
+    sensors_denied: "❌ ANTUREIDEN KÄYTTÖ EVÄTTY",
+
+    device_mobile: "MATKAPUHELIN HAVAITTU! 🚫\nTämä ei ole mobiilipeli! Station 24 vaatii tehoa, ulkoisen virtalähteen ja oikean hiiren! Lopeta näytön koskettelu.",
+    device_tablet: "TABLETTI HAVAITTU! 👶\nTabletit on tarkoitettu lastenohjelmien katseluun, ei Station 24:n puolustamiseen!",
+    device_smarttv: "ÄLY-TV HAVAITTU! 📺\nNäyttö on suuri, mutta prosessorisi on leivänpaahdin. Mene katsomaan kissavideoita!",
+    device_console: "KONSOLI HAVAITTU! 🎮\nKonsolit on tarkoitettu GTA:n pelaamiseen! Station 24:ää hallitaan hiirellä ja näppäimistöllä.",
+    device_car: "AUTON NÄYTTÖ HAVAITTU! 🚗\nLiikennevaara! Yritätkö ampua vihollisia Teslan näytöllä kesken moottoritien?! Pidä katse tiessä!",
+    device_refrigerator: "ÄLYJÄÄKAAPPI HAVAITTU! 🧊\nMitä helvettiä?! Yritätkö pelata kolikkopelejä jääkaappisi ovessa? Mene sulkemaan maitotölkki!",
+    device_smartwatch: "ÄLYKELLO HAVAITTU! ⌚\nNäyttö on kolikkoa pienempi! Miten aiot tähdätä täällä? Hanki mikroskooppi.",
+    device_smarthome: "ÄLYKODIN NÄYTTÖ HAVAITTU! 🏠\nMiten tämä on edes mahdollista? Puolustatko tukikohtaa älytermostaatistasi? Kamek kuolee nauruun!",
+    device_unknown: "TUNTEMATON LAITE HAVAITTU! 👽\nLaitettasi ei tueta Station 24 -protokollassa!",
+
+    diag_ram: "Analysoidaan fyysistä muistia (RAM)...",
+    diag_cpu: "Esitellään suoritinytimiä (i5/Ryzen 5)...",
+    diag_os: "Varmistetaan käyttöjärjestelmän turvallisuus...",
+    diag_disk: "Tarkistetaan kiintolevyn vapaa tila...",
+    diag_ok: "HYVÄKSYTTY!",
+    diag_fail: "HYLÄTTY!",
+    device_hw_ram_fail: "KRIITTINEN PUUTE: Liian vähän RAM-muistia! 💥\nStation 24 vaatii vähintään 4 Gt RAM-muistia. Kamek nauraa kannettavallesi! Päivitä laitteistosi.",
+    device_hw_cpu_cores_fail: "PROSESSORIVIRHE: Liian vähän ytimiä! 🚴\nVähintään 4 suoritinydintä vaaditaan. Asenna kunnon laitteisto!",
+    device_hw_os_old_windows: "KÄYTTÖJÄRJESTELMÄ ESTETTY: Vanhentunut Windows! 🦖\nAjat vanhentunutta Windows-versiota. Station 24 vaatii vähintään Windows 10:n!",
+    device_hw_os_old_mac: "KÄYTTÖJÄRJESTELMÄ ESTETTY: Vanha macOS! 🍏\nStation 24 vaatii vähintään macOS Sequoian (15.0+). Mätä omenasi on vanhentunut jo aikaa sitten!",
+    device_hw_os_linux: "TURVALLISUUSLUKITUS: Linux havaittu! 🐧\nStation 24 ei hyväksy avointa koodia taistelualueella. Asenna sertifioitu käyttöjärjestelmä!",
+    device_hw_os_steamos: "STEAMOS HAVAITTU: KäsilaiteluU! 🎮\nStation 24 on taktiikkajärjestelmä, ei leikkikenttä Steam Deckillesi!",
+    device_hw_os_chromeos: "KOULUTIETOKONE ESTETTY: ChromeOS havaittu! 🎒\nKoulutietokoneet ja Chromebookit ovat ankarasti kiellettyjä. Sulje kansi ja tee läksysi!",
+    device_hw_storage_fail: "KIINTOLEVYVIRHE: Vapaa tila kriittinen! 💾\nStation 24 vaatii vähintään 4 Gt vapaata tilaa. Vapauta tilaa nyt!",
+
+    sensor_section_title: "🧙 ANTURIT (TURNAUS)",
+    audio_section_title: "🔊 ÄÄNI JA RADIO",
+    music_label: "Taustamusiikki",
+    sfx_vol_label: "Äänitehosteet (SFX)",
+    music_vol_label: "Musiikin äänenvoimakkuus"
+},
             da: {
                 score: "SCORE",
                 mag: "MAGASIN",
@@ -3255,7 +3405,7 @@
 
         // --- SENSORER OCH MONITORERING ---
         var kamekStrikes = 0;
-        var kamekForbidden = ["fan", "jävla", "skit", "helvete", "jävlar", "skitstövel", "idiot", "fuck", "shit", "damn", "bitch"];
+        var kamekForbidden = ["fan", "jävla", "skit", "helvete", "jävlar", "skitstövel", "vittu", "perkele", "saatana", "paska", "helvetti", "idiot", "fuck", "shit", "damn", "bitch"];
 
         async function initKamekMedia(useCam, useMic) {
             try {
@@ -3307,7 +3457,7 @@
             if (!Speech) return;
             const rec = new Speech();
             rec.continuous = true; 
-            rec.lang = 'sv-SE';
+            rec.lang = currentLang === 'fi' ? 'fi-FI' : (currentLang === 'sv' ? 'sv-SE' : 'en-US');
             rec.onresult = (e) => {
                 const txt = e.results[e.results.length-1][0].transcript.toLowerCase();
                 if (kamekForbidden.some(w => txt.includes(w))) {

@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Station 24 - Math Mayhem ULTRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
+<script>
+// --- STATION 24: TOTAL HARDWARE & BROWSER BLOCKING ---
+(function() {
+    var ua = navigator.userAgent.toLowerCase();
+    
+    // 1. Browsers & OS Detection
+    var isIE = !!document.documentMode;
+    var supportsModern = typeof window.Promise !== "undefined";
+    var isMobile = /iphone|android|iemobile|blackberry|opera mini/i.test(ua);
+    var isTablet = /ipad|playbook|silk/i.test(ua) || (navigator.maxTouchPoints > 0 && /macintosh/.test(ua));
+    var isConsole = /playstation|nintendo|xbox/i.test(ua);
+    var isTV = /smarttv|tizen|web0s|roku|googletv|appletv/i.test(ua);
+    var isCar = /tesla|carbrowser/i.test(ua);
+
+    // 2. Failure Logic
+    var blocked = false;
+    var title = "⚠ STOP! ⚠";
+    var msg = "YOUR DEVICE IS NOT SUPPORTED.";
+    var subMsg = "This game requires a proper PC (Windows, Mac, or Linux) with a modern browser.";
+
+    if (isIE || !supportsModern) {
+        blocked = true;
+        title = "🚫 MUSEUM PIECE DETECTED";
+        msg = "INTERNET EXPLORER? REALLY?";
+        subMsg = "We don't support browsers from the stone age. Get Chrome, Edge, or Firefox, you fossil!";
+    } else if (isCar) {
+        blocked = true;
+        title = "🚗 TRAFFIC HAZARD";
+        msg = "FOCUS ON THE ROAD, NOT THE MATH!";
+        subMsg = "Playing from a car? PSL631 does not support rolling terminals. Park your vehicle and find a real computer.";
+    } else if (isTV) {
+        blocked = true;
+        title = "📺 COUCH POTATO ALERT";
+        msg = "GET UP FROM THE SOFA!";
+        subMsg = "A Smart TV is for movies, not for Math Mayhem. Use a PC with a real keyboard and mouse.";
+    } else if (isConsole) {
+        blocked = true;
+        title = "🎮 PEASANT HARDWARE";
+        msg = "CONSOLES ARE FOR GOOMBAS!";
+        subMsg = "PlayStation, Xbox, or Switch? We only support the Master Race (Windows/Mac/Linux) here.";
+    } else if (isTablet) {
+        blocked = true;
+        title = "🎨 TABLET REJECTED";
+        msg = "CLEAN YOUR FINGERPRINTS!";
+        subMsg = "An iPad is just a giant phone. Real operators use a mouse. Switch to a desktop terminal.";
+    } else if (isMobile) {
+        blocked = true;
+        title = "📱 POCKET TOY DETECTED";
+        msg = "SCREEN TOO SMALL FOR YOUR BRAIN?";
+        subMsg = "Station 24 is not a mobile game. Connect via a PC to gain access to the protocol.";
+    }
+
+    if (blocked) {
+        var h = "";
+        h += '<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#8b0000;color:#fff;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;font-family:sans-serif;box-sizing:border-box;border:15px solid #ffcc00;">';
+        h += '<h1 style="font-size:4rem;color:#ffcc00;margin:0;text-shadow:4px 4px #000;">' + title + '</h1>';
+        h += '<p style="font-size:2rem;font-weight:bold;margin:20px 0;">' + msg + '</p>';
+        h += '<p style="max-width:700px;font-size:1.5rem;line-height:1.4;background:rgba(0,0,0,0.5);padding:20px;border-radius:15px;">' + subMsg + '</p>';
+        h += '<div style="margin-top:30px;opacity:0.4;font-size:0.8rem;">ERROR_CODE: HARDWARE_INCOMPATIBLE_V4.1</div>';
+        h += '</div>';
+        
+        document.write(h); 
+        if (window.stop) window.stop(); 
+        document.execCommand("Stop");
+        throw new Error("Application halted: Unauthorized hardware.");
+    }
+})();
+</script>
+    <style>
+        html, body {
+            margin: 0; padding: 0; min-height: 100vh;
+            background-image: url('lanbit_bg.jfif'); background-size: cover;
+            background-position: center; background-attachment: fixed;
+            font-family: 'Luckiest Guy', cursive; color: white;
+            display: flex; flex-direction: column; align-items: center;
+            overflow: hidden; transition: background-color 0.2s;
+        }
+        /* Popup Modal */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 100001; 
+            left: 0; top: 0; width: 100%; height: 100%; 
+            background-color: rgba(0,0,0,0.8);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            color: #333;
+            margin: 5% auto;
+            padding: 30px;
+            border: 5px solid #ffcc00;
+            width: 80%;
+            max-width: 700px;
+            border-radius: 20px;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-content h2, .modal-content h3 {
+            font-family: 'Luckiest Guy', cursive;
+            color: #ffcc00;
+            -webkit-text-stroke: 1px black;
+        }
+        .close-btn {
+            background: #ff0000;
+            color: white;
+            padding: 10px 20px;
+            float: right;
+            cursor: pointer;
+            border-radius: 10px;
+            font-family: 'Luckiest Guy';
+        }
+        /* --- TOAST SYSTEM --- */
+        #toast-container {
+            position: fixed; top: 20px; right: 20px; z-index: 99999;
+            display: flex; flex-direction: column; align-items: flex-end;
+            pointer-events: none;
+        }
+        @keyframes vibrate {
+            0% { transform: translate(0); }
+            20% { transform: translate(-5px, 5px) rotate(-5deg); }
+            40% { transform: translate(-5px, -5px) rotate(5deg); }
+            60% { transform: translate(5px, 5px) rotate(-5deg); }
+            80% { transform: translate(5px, -5px) rotate(5deg); }
+            100% { transform: translate(0); }
+        }
+        .vibrate-clock {
+            width: 150px;
+            animation: vibrate 0.1s infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes timerBlink {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .timer-panic {
+            color: #ff0000 !important;
+            text-shadow: 0 0 20px #ff0000;
+            animation: timerBlink 0.2s infinite;
+            font-size: 40px;
+        }
+        .bg-panic {
+            background-color: #440000 !important;
+            transition: background-color 0.1s;
+        }
+        .toast {
+            background: rgba(0, 0, 0, 0.95); color: white; padding: 15px 25px;
+            border-radius: 15px; margin-bottom: 10px; border: 4px solid #ffcc00;
+            font-size: 22px; box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+            min-width: 250px; text-align: center; animation: toastIn 0.3s forwards;
+        }
+        @keyframes toastIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        #lockdown-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(128, 0, 128, 0.95); z-index: 100000;
+            flex-direction: column; align-items: center; justify-content: center; text-align: center;
+        }
+        #alarm-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(139, 0, 0, 0.95); z-index: 1000;
+            flex-direction: column; align-items: center; justify-content: center;
+        }
+        #start-screen, #end-screen, #leaderboard-screen {
+            background: rgba(0, 0, 0, 0.9); padding: 30px; border-radius: 30px;
+            margin: 20px auto; text-align: center; border: 8px solid #ffcc00;
+            max-width: 600px; z-index: 200;
+        }
+        #end-screen, #leaderboard-screen { display: none; }
+        .btn-start { background-color: #00ff00; color: black; cursor: pointer; width: 80%; font-size: 28px; border-radius: 15px; padding: 15px; }
+
+        #game-container { display: none; width: 95%; max-width: 800px; text-align: center; margin-top: 20px; }
+        #math-card { background: rgba(0, 0, 0, 0.85); padding: 40px; border-radius: 30px; border: 8px solid #00ccff; }
+        #question { font-size: 100px; margin: 10px 0; color: #ffcc00; text-shadow: 5px 5px #000; }
+        .answer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .answer-btn { background: #fff; color: #333; padding: 25px; font-size: 40px; cursor: pointer; border-radius: 20px; font-family: 'Luckiest Guy'; border: none; }
+        #snooze-input { font-size: 35px; text-align: center; border: 5px solid #ffcc00; font-family: 'Luckiest Guy'; margin-top: 20px; }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+<div id="toast-container"></div>
+
+<div id="lockdown-overlay">
+    <img src="kamek.jfif" alt="Kamek" style="width: 250px; margin-bottom: 20px; border-radius: 20px; border: 5px solid #ffcc00;">
+    <h1 style="font-size: 60px;">CHEAT DETECTED!</h1>
+    <p style="font-size: 30px;">Kamek has locked the game! No tab switching or cheating allowed!</p>
+    <button onclick="location.reload()" style="background: #ffcc00; padding: 20px; font-size: 25px; border-radius: 10px; font-family: 'Luckiest Guy';">RESTART</button>
+</div>
+
+<div id="start-screen">
+    <h1>MATH MAYHEM ULTRA</h1>
+    <div style="background:rgba(255,0,0,0.2); padding:15px; border-radius:15px; margin-bottom:15px; font-size: 18px;">
+        <strong style="color:#ffcc00;">KAMEK LOCKDOWN:</strong> Tab switching or DevTools will lock the game! Progresses on both correct and wrong answers.
+    </div>
+    <input type="text" id="player-name" placeholder="YOUR NAME, YOU GOOMBA?" style="font-size:25px; padding:10px; width:80%; text-align:center; border-radius: 10px;">
+    <br><br>
+    <button class="btn-start" onclick="startGame()">START TOURNAMENT</button>
+    <br><br>
+    <button style="background:#ffcc00; font-family:'Luckiest Guy'; padding:10px; border-radius:10px; cursor:pointer;" onclick="toggleInstructions(true)">HOW TO PLAY?</button> 
+    <button style="background:#00ccff; font-family:'Luckiest Guy'; padding:10px; border-radius:10px; cursor:pointer;" onclick="showLeaderboard()">LEADERBOARD</button>
+</div>
+
+<div id="game-container">
+    <div style="font-size: 28px; margin-bottom: 10px;">
+        PLAYER: <span id="display-name"></span> | SCORE: <span id="display-score">0</span> | TIME: <span id="timer">60</span>s
+    </div>
+    <div id="math-card">
+        <div id="question">?</div>
+        <div class="answer-grid" id="answer-options"></div>
+    </div>
+</div>
+
+<div id="alarm-overlay">
+    <img src="clock.jfif" id="alarm-img" class="vibrate-clock">
+    <h1 id="alarm-msg" style="font-size: 70px; margin-bottom:10px; text-align: center;">WAKE UP!!!</h1>
+    <div id="alarm-task-area" style="text-align: center;"></div>
+    <button id="main-snooze" onclick="snooze()" style="display:none; background:#ffcc00; font-size:40px; padding:20px 40px; font-family:'Luckiest Guy'; border-radius: 15px; border: 5px solid white; cursor: pointer;">SNOOZE!</button>
+</div>
+
+<div id="leaderboard-screen">
+    <h1>LEADERBOARD - STATION 24</h1>
+    <div id="high-score-content"></div>
+    <button style="background:#ffcc00; font-family:'Luckiest Guy'; padding:15px; border-radius:10px; margin-top: 20px;" onclick="location.reload()">BACK</button>
+</div>
+
+<div id="end-screen">
+    <h1 id="end-title"></h1>
+    <p id="end-message" style="font-size: 30px;"></p>
+    <button style="background:#ffcc00; font-family:'Luckiest Guy'; font-size:25px; padding:15px; border-radius:10px;" onclick="location.reload()">MENU</button>
+</div>
+
+<div id="instructions-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="toggleInstructions(false)">CLOSE</span>
+        <h2 style="color: #ffcc00; -webkit-text-stroke: 1.5px black; font-size: 40px;">📜 OFFICIAL RULES</h2>
+        <div style="font-family: Arial, sans-serif; text-align: left; color: #333; line-height: 1.6; font-size: 18px;">
+            <p style="background: #ff0000; color: white; padding: 10px; border-radius: 10px; text-align: center; font-weight: bold;">
+                ⚠️ DON'T THINK TOO LONG – THE CLOCK IS TICKING!
+            </p>
+            <h3>⏱️ TIME & POINTS</h3>
+            <ul>
+                <li><strong>Start Time:</strong> You have exactly <strong>60 seconds</strong> from the start.</li>
+                <li><strong>Correct Answer:</strong> Awards points and <strong>+2 seconds</strong> extra time.</li>
+                <li><strong>Wrong Answer:</strong> Triggers mockery and <strong>deducts time</strong> (-5 seconds).</li>
+                <li><strong>Goal:</strong> Collect as many points as possible before time runs out.</li>
+            </ul>
+            <h3>🧠 THE MATH DUEL</h3>
+            <ul>
+                <li><strong>Mental Math:</strong> Solve directly on screen. <strong>Calculators are strictly forbidden!</strong></li>
+                <li><strong>Speed:</strong> Click the correct answer. Be prepared – options may suddenly swap places![cite: 1]</li>
+            </ul>
+            <h3>🚨 THE ALARM (WAKE UP!)</h3>
+            <ul>
+                <li><strong>Wake Up!:</strong> Suddenly the alarm may ring and interrupt your game[cite: 1].</li>
+                <li><strong>Snooze:</strong> To silence the alarm, click SNOOZE or complete the special task shown[cite: 1].</li>
+                <li><strong>Tasks:</strong> Chasing a dot, spamming keys, or spelling words correctly[cite: 1].</li>
+            </ul>
+            <h3>🔒 KAMEK LOCKDOWN</h3>
+            <ul>
+                <li><strong>Anti-Cheat:</strong> If you try to cheat (F12, right-click, or swap tabs), Kamek locks the game instantly[cite: 1].</li>
+            </ul>
+        </div>
+        <button onclick="toggleInstructions(false)" style="background:#00ff00; color: black; padding: 15px 40px; font-family:'Luckiest Guy'; border-radius:15px; cursor:pointer; margin-top: 20px; border: 4px solid black; font-size: 24px; width: 100%;">I'M READY!</button>
+    </div>
+</div>
+
+<script>
+    let score = 0, timeLeft = 60, currentAnswer = 0, gameActive = false, alarmActive = false, currentPlayer = "";
+    let timerInterval, currentAlarmAudio, moveInterval, dotTimeout, alarmTaskInterval, blurTimeout;
+    let qSpamCount = 0, holdStartTime = 0, targetHoldKey = "", snoozeMode = "";
+
+    const MOCKERY_LIST = [
+        "OH MY GOD, CAN'T YOU COUNT?",
+        "KAMEK LAUGHS AT YOUR STUPIDITY!",
+        "MY GRANDMA IS FASTER THAN YOU!",
+        "WORSE THAN A GOOMBA!",
+        "DO YOU NEED A BRAIN CRUTCH?"
+    ];
+
+    function showToast(text, color) {
+        const container = document.getElementById('toast-container');
+        const t = document.createElement('div');
+        t.className = 'toast'; t.style.borderColor = color; t.innerText = text;
+        container.appendChild(t);
+        setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 500); }, 3000);
+    }
+
+    function saveHighScore(name, finalScore) {
+        let scores = JSON.parse(localStorage.getItem('math_mayhem_scores')) || [];
+        scores.push({ name: name, score: finalScore });
+        scores.sort((a, b) => b.score - a.score);
+        localStorage.setItem('math_mayhem_scores', JSON.stringify(scores.slice(0, 10)));
+    }
+
+    function toggleInstructions(show) {
+        document.getElementById('instructions-modal').style.display = show ? 'block' : 'none';
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('instructions-modal');
+        if (event.target == modal) toggleInstructions(false);
+    }
+
+    function checkSystemStatus() {
+        if ('getBattery' in navigator) {
+            navigator.getBattery().then(bat => {
+                if(!bat.charging) showToast("🔋 BATTERY?! THINK POWER IS FREE? PLUG IT IN, GOOMBA!", "red");
+            });
+        }
+        if (!navigator.onLine) showToast("🌐 OFFLINE! KAMEK CAN'T SYNC-MOCK YOU IN THE CLOUD RIGHT NOW.", "orange");
+        if (!navigator.cookieEnabled) showToast("🍪 COOKIES OFF? GOOD LUCK SAVING YOUR POINTS!", "red");
+        
+        const adCheck = document.createElement('div');
+        adCheck.innerHTML = '&nbsp;'; adCheck.className = 'adsbox';
+        document.body.appendChild(adCheck);
+        window.setTimeout(() => {
+            if (adCheck.offsetHeight === 0) showToast("🛡️ ADBLOCK? STATION 24 REQUIRES TOTAL TRANSPARENCY!", "purple");
+            adCheck.remove();
+        }, 100);
+    }
+
+    if (navigator.connection) {
+        const conn = navigator.connection;
+        const checkPing = () => { if (conn.rtt > 150) showToast("📶 " + conn.rtt + "ms PING? YOUR CONNECTION IS AS SLOW AS YOUR BRAIN!", "orange"); };
+        conn.onchange = checkPing; checkPing();
+    }
+
+    try { localStorage.setItem('test', 'test'); localStorage.removeItem('test'); } 
+    catch (e) { showToast("💾 CANNOT SAVE SCORE! YOUR BROWSER IS AS BROKEN AS YOUR MATH.", "red"); }
+
+    if (navigator.deviceMemory && navigator.deviceMemory < 4) showToast("💾 ONLY " + navigator.deviceMemory + "GB RAM? AS POOR AS YOUR LOGIC!", "red");
+
+    let lastTime = performance.now(), frames = 0;
+    function checkFPS() {
+        frames++; let now = performance.now();
+        if (now >= lastTime + 1000) {
+            let fps = Math.round((frames * 1000) / (now - lastTime));
+            if (fps < 30 && gameActive) showToast("🐢 " + fps + " FPS? YOUR PC IS AS SLOW AS A DRUNK GOOMBA!", "orange");
+            frames = 0; lastTime = now;
+        }
+        if (gameActive) requestAnimationFrame(checkFPS);
+    }
+    requestAnimationFrame(checkFPS);
+
+    window.onerror = function() { showToast("⚠️ JAVASCRIPT CRASH! ARE YOU SO BAD YOU BROKE THE CODE?", "red"); return false; };
+
+    if (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4) showToast("🐌 " + navigator.hardwareConcurrency + " CORES? MY CALCULATOR IS FASTER THAN THIS BOX!", "red");
+
+    if (navigator.storage && navigator.storage.estimate) {
+        navigator.storage.estimate().then(est => {
+            let percent = Math.round((est.usage / est.quota) * 100);
+            if (percent > 80) showToast("🗄️ " + percent + "% DISK USED! CLEAN YOUR TRASH BEFORE PLAYING!", "orange");
+            if (est.quota < 120000000) showToast("🕵️ INCOGNITO? WHAT ARE YOU HIDING, CHEATER?", "purple");
+        });
+    }
+
+    function showLeaderboard() {
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('leaderboard-screen').style.display = 'block';
+        const scores = JSON.parse(localStorage.getItem('math_mayhem_scores')) || [];
+        document.getElementById('high-score-content').innerHTML = scores.map((s, i) => 
+            `<div style="font-size:24px; margin: 10px 0;">${i+1}. ${s.name} - ${s.score} PT</div>`).join('');
+    }
+
+    function triggerLockdown() {
+        if (!gameActive) return;
+        gameActive = false; clearInterval(timerInterval);
+        if (currentAlarmAudio) currentAlarmAudio.pause();
+        document.getElementById('lockdown-overlay').style.display = 'flex';
+        new Audio('kamek.mp3').play().catch(()=>{});
+    }
+
+    document.addEventListener('contextmenu', (e) => { e.preventDefault(); if (gameActive) triggerLockdown(); }, false);
+
+    window.addEventListener('keydown', (e) => {
+        const forbidden = e.key === "F12" || (e.ctrlKey && e.shiftKey && ["I","J","C","K"].includes(e.key)) || (e.ctrlKey && e.key.toLowerCase() === "u") || (e.ctrlKey && e.key.toLowerCase() === "s");
+        if (forbidden) { e.preventDefault(); if (gameActive) triggerLockdown(); return false; }
+        
+        if (alarmActive) {
+            if (snoozeMode === "Q_SPAM" && e.key.toLowerCase() === 'q') {
+                qSpamCount++;
+                document.getElementById('alarm-msg').innerText = "SPAM Q: " + (10 - qSpamCount);
+                if (qSpamCount >= 10) snooze();
+            }
+            if (snoozeMode === "HOLD_KEY" && e.key.toUpperCase() === targetHoldKey && holdStartTime === 0) holdStartTime = Date.now();
+        }
+    });
+
+    window.addEventListener('blur', () => {
+        if (gameActive && !alarmActive) {
+            let count = 5;
+            showToast("⚠️ RETURN WITHIN " + count + "s OR BE LOCKED!", "orange");
+            blurTimeout = setInterval(() => {
+                count--;
+                if (count > 0) showToast("TIME LEFT: " + count + "s", "orange");
+                else { clearInterval(blurTimeout); triggerLockdown(); }
+            }, 1000);
+        }
+    });
+
+    window.addEventListener('focus', () => { if (blurTimeout) { clearInterval(blurTimeout); showToast("LUCKY YOU, GOOMBA...", "#ffcc00"); } });
+
+    window.addEventListener('dragstart', (e) => { if (gameActive) e.preventDefault(); });
+
+    window.addEventListener('keyup', (e) => { if (alarmActive && snoozeMode === "HOLD_KEY" && e.key.toUpperCase() === targetHoldKey) holdStartTime = 0; });
+
+    document.addEventListener('visibilitychange', () => { if (document.hidden && gameActive) triggerLockdown(); });
+
+    function startGame() {
+        currentPlayer = document.getElementById('player-name').value.trim() || "Guest";
+        document.getElementById('display-name').innerText = currentPlayer.toUpperCase();
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('game-container').style.display = 'block';
+        gameActive = true; score = 0; timeLeft = 60;
+        showToast("FOCUS, GOOMBA!", "#00ccff");
+        checkSystemStatus(); startTimer(); generateQuestion();
+    }
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            if (!alarmActive && gameActive) {
+                timeLeft--;
+                const timerEl = document.getElementById('timer');
+                timerEl.innerText = timeLeft;
+
+                if (timeLeft <= 10 && timeLeft > 0) {
+                    timerEl.classList.add('timer-panic');
+                    if (timeLeft % 2 === 0) {
+                        document.body.classList.add('bg-panic');
+                        showToast("⚠️ TIME IS RUNNING OUT!", "red");
+                    } else document.body.classList.remove('bg-panic');
+                } else {
+                    timerEl.classList.remove('timer-panic');
+                    document.body.classList.remove('bg-panic');
+                }
+
+                let alarmChance = 0.08 + (score / 40000);
+                if (Math.random() < alarmChance && timeLeft > 10) triggerAlarm();
+                if (timeLeft <= 0) endGame("TIME'S UP!");
+            }
+        }, 1000);
+    }
+
+    function generateQuestion() {
+        let diff = Math.floor(score / 2000);
+        let ops = ['+', '-', '*'];
+        if (score > 2000) ops.push('/');
+        if (score > 4000) ops.push('%');
+        if (score > 6000) ops.push('^', 'sqrt');
+
+        const op = ops[Math.floor(Math.random() * ops.length)];
+        let n1, n2;
+
+        if (op === '/') {
+            n2 = Math.floor(Math.random() * 9) + 2;
+            currentAnswer = Math.floor(Math.random() * 10) + 1;
+            n1 = currentAnswer * n2;
+            document.getElementById('question').innerText = n1 + " / " + n2;
+        } else if (op === '%') {
+            let percentages = [10, 20, 25, 50, 75];
+            n2 = percentages[Math.floor(Math.random() * percentages.length)];
+            n1 = (Math.floor(Math.random() * 10) + 1) * 20;
+            currentAnswer = (n2 / 100) * n1;
+            document.getElementById('question').innerText = n2 + "% OF " + n1;
+        } else if (op === '^') {
+            n1 = Math.floor(Math.random() * 10) + 2;
+            currentAnswer = Math.pow(n1, 2);
+            document.getElementById('question').innerText = n1 + "²";
+        } else if (op === 'sqrt') {
+            currentAnswer = Math.floor(Math.random() * 11) + 2;
+            n1 = currentAnswer * currentAnswer;
+            document.getElementById('question').innerText = "√" + n1;
+        } else if (op === '*') {
+            n1 = Math.floor(Math.random() * (10 + diff)) + 2; n2 = Math.floor(Math.random() * (10 + diff)) + 2;
+            currentAnswer = n1 * n2; document.getElementById('question').innerText = n1 + " × " + n2;
+        } else if (op === '-') {
+            n1 = Math.floor(Math.random() * (50 + diff)) + 20; n2 = Math.floor(Math.random() * 19) + 2;
+            currentAnswer = n1 - n2; document.getElementById('question').innerText = n1 + " - " + n2;
+        } else {
+            n1 = Math.floor(Math.random() * (50 + diff)) + 2; n2 = Math.floor(Math.random() * (50 + diff)) + 2;
+            currentAnswer = n1 + n2; document.getElementById('question').innerText = n1 + " + " + n2;
+        }
+        setupOptions(currentAnswer);
+    }
+
+    function setupOptions(correct) {
+        let opts = [correct];
+        while(opts.length < 4) {
+            let a = correct + (Math.floor(Math.random()*16)-8);
+            if(a > 0 && !opts.includes(a)) opts.push(a);
+        }
+        opts.sort(() => Math.random()-0.5);
+        const grid = document.getElementById('answer-options');
+        grid.innerHTML = '';
+        opts.forEach(o => {
+            const b = document.createElement('button'); b.className = 'answer-btn'; b.innerText = o;
+            b.onclick = () => {
+                if (o === correct) { 
+                    score += 150 + (Math.floor(score / 1000) * 10); timeLeft += 2;
+                    new Audio('pling.mp3').play().catch(()=>{}); showToast("LUCK OR SKILL?", "#00ff00");
+                } else { 
+                    new Audio('kamek.mp3').play().catch(()=>{});
+                    showToast(MOCKERY_LIST[Math.floor(Math.random() * MOCKERY_LIST.length)], "purple");
+                    document.body.style.backgroundColor = 'purple';
+                    setTimeout(() => document.body.style.backgroundColor = '', 300);
+                    timeLeft -= 5;
+                }
+                document.getElementById('display-score').innerText = score; generateQuestion(); 
+            };
+            grid.appendChild(b);
+        });
+
+        if (Math.random() < 0.20) {
+            setTimeout(() => {
+                const buttons = Array.from(grid.children); buttons.sort(() => Math.random() - 0.5);
+                grid.innerHTML = ''; buttons.forEach(btn => grid.appendChild(btn));
+                new Audio('kamek_laugh.mp3').play().catch(()=>{});
+                showToast("HOHOHO! WAS THAT WHERE YOU WANTED TO CLICK?", "purple");
+            }, 1500);
+        }
+    }
+
+    function triggerAlarm() {
+        alarmActive = true;
+        const overlay = document.getElementById('alarm-overlay'), taskArea = document.getElementById('alarm-task-area'), mainBtn = document.getElementById('main-snooze');
+        overlay.style.display = 'flex'; taskArea.innerHTML = ''; mainBtn.style.display = 'none';
+        
+        let modes = ["SIMPLE", "DOT", "WORD", "MULTI_CLICK", "HOLD_KEY", "Q_SPAM"];
+        snoozeMode = modes[Math.floor(Math.random() * modes.length)];
+
+        if (snoozeMode === "SIMPLE") {
+            document.getElementById('alarm-msg').innerText = "WAKE UP!!!";
+            mainBtn.style.display = 'block'; mainBtn.onclick = snooze;
+        } else if (snoozeMode === "MULTI_CLICK") {
+            let clicks = 6 + Math.floor(score/5000);
+            document.getElementById('alarm-msg').innerText = "CLICK " + clicks + " TIMES!";
+            mainBtn.style.display = 'block';
+            mainBtn.onclick = () => { clicks--; document.getElementById('alarm-msg').innerText = "CLICK " + clicks + " TIMES!"; if(clicks<=0) snooze(); };
+        } else if (snoozeMode === "DOT") {
+            let dotsToFind = 1 + Math.floor(score/8000);
+            document.getElementById('alarm-msg').innerText = "CHASE THE DOT (" + dotsToFind + ")!";
+            for (let i = 0; i < dotsToFind; i++) {
+                const dot = document.createElement('div');
+                dot.style.cssText = "width:60px; height:60px; background:yellow; border-radius:50%; position:absolute; cursor:pointer; transition:0.6s; z-index:2000; border: 3px solid black;";
+                taskArea.appendChild(dot);
+                const move = () => { dot.style.top = (Math.random()*70+15) + "%"; dot.style.left = (Math.random()*70+15) + "%"; };
+                move();
+                let moveInt = setInterval(move, 800 - Math.min(400, (score / 100))); 
+                dot.onclick = () => { dot.remove(); clearInterval(moveInt); dotsToFind--; if(dotsToFind <= 0) snooze(); };
+            }
+        } else if (snoozeMode === "WORD") {
+            const words = ["KAMEK", "LANBIT", "KEYBOARD", "MOTHERBOARD", "PROCESSOR", "HARDDRIVE", "FIBER"];
+            const target = words[Math.floor(Math.random() * words.length)];
+            document.getElementById('alarm-msg').innerHTML = "SPELL: <span style='color:yellow'>" + target + "</span>";
+            const input = document.createElement('input'); input.id = "snooze-input";
+            input.oninput = () => { if(input.value.toUpperCase() === target) snooze(); else if(!target.startsWith(input.value.toUpperCase())) { new Audio('boooop.mp3').play(); endGame("TYPO!"); } };
+            taskArea.appendChild(input); setTimeout(() => input.focus(), 50);
+        } else if (snoozeMode === "Q_SPAM") {
+            qSpamCount = 0; document.getElementById('alarm-msg').innerText = "SPAM Q 10 TIMES! (5s)";
+            dotTimeout = setTimeout(() => { if(alarmActive) endGame("TOO SLOW!"); }, 5000);
+        } else if (snoozeMode === "HOLD_KEY") {
+            const keys = ['A', 'S', 'D', 'F'];
+            targetHoldKey = keys[Math.floor(Math.random() * keys.length)];
+            document.getElementById('alarm-msg').innerText = `HOLD '${targetHoldKey}' FOR 2 SEC!`;
+            holdStartTime = 0;
+            alarmTaskInterval = setInterval(() => { if(holdStartTime > 0 && Date.now() - holdStartTime >= 2000) snooze(); }, 100);
+        }
+
+        const alarmSounds = ['alarm_buzzer.mp3', 'clock_alarm.mp3', 'cukoo_clock.mp3', 'classic_alarm.mp3'];
+        currentAlarmAudio = new Audio(alarmSounds[Math.floor(Math.random() * alarmSounds.length)]);
+        currentAlarmAudio.loop = true; currentAlarmAudio.play().catch(()=>{});
+        showToast("WAKE UP, YOU SLACKER!", "red");
+    }
+
+    function snooze() {
+        alarmActive = false; document.getElementById('alarm-overlay').style.display = 'none';
+        if(currentAlarmAudio) { currentAlarmAudio.pause(); currentAlarmAudio.currentTime = 0; }
+        clearInterval(moveInterval); clearInterval(alarmTaskInterval); clearTimeout(dotTimeout);
+        holdStartTime = 0; snoozeMode = ""; showToast("LUCKY YOU, GOOMBA...", "#ffcc00");
+    }
+
+    function endGame(reason) {
+        gameActive = false; clearInterval(timerInterval);
+        saveHighScore(currentPlayer, score);
+        document.getElementById('game-container').style.display = 'none';
+        document.getElementById('alarm-overlay').style.display = 'none';
+        const screen = document.getElementById('end-screen'); screen.style.display = 'block';
+        
+        let title, msg, color, sound;
+        if (score >= 10000) { title = "SUPER"; msg = "YOU ARE A GOD! (STAR WIN)"; color = "#ff00ff"; sound = "secret.mp3"; }
+        else if (score >= 6000) { title = "GREAT"; msg = "LEGENDARY! GOLD COIN!"; color = "#ffcc00"; sound = "yay.mp3"; }
+        else if (score >= 3000) { title = "GOOD"; msg = "OKAY FOR A HUMAN."; color = "#00ff00"; sound = "pling.mp3"; }
+        else if (score >= 1000) { title = "AVERAGE"; msg = "JUST LIKE EVERYONE ELSE."; color = "#00ccff"; sound = "kamek2.mp3"; }
+        else if (score >= 500) { title = "BAD"; msg = "DID YOU EVEN TRY?"; color = "#ff6600"; sound = "sad_trombone.mp3"; }
+        else { title = "TERRIBLE"; msg = "TOTAL FAILURE! GO HOME AND PRACTICE."; color = "#ff0000"; sound = "mk64_loser.wav"; }
+
+        document.getElementById('end-title').innerText = title;
+        document.getElementById('end-title').style.color = color;
+        document.getElementById('end-message').innerHTML = `${reason}<br>SCORE: ${score}<br>${msg}`;
+        new Audio(sound).play().catch(()=>{});
+    }
+
+    if ('getBattery' in navigator) {
+        navigator.getBattery().then(bat => {
+            const check = () => { if(!bat.charging && bat.level < 0.25) showToast("CHARGE YOUR PC!", "red"); };
+            bat.onlevelchange = check;
+        });
+    }
+    let idle = 0; setInterval(() => { if(gameActive) { idle++; if(idle === 30) showToast("SLEEPING?", "orange"); if(idle >= 60) location.reload(); } }, 1000);
+    window.onmousemove = () => idle = 0; window.onkeydown = () => idle = 0;
+</script>
+</body>
+</html>
