@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <title>Labyrint – Kamek Race</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #eee;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #blocker {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      color: #fff;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+      z-index: 9999;
+    }
+    #ui {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    select, button {
+      padding: 5px 10px;
+      font-size: 14px;
+    }
+    #sevenSegment {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #000;
+      padding: 10px 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #0f0;
+      min-width: 260px;
+    }
+    .seg-line {
+      font-family: "Courier New", monospace;
+      font-size: 20px;
+      letter-spacing: 2px;
+      color: #0f0;
+      text-shadow: 0 0 8px #0f0;
+    }
+    #gameContainer {
+      margin-top: 10px;
+    }
+    canvas {
+      background: #222;
+      border: 2px solid #555;
+    }
+    #info {
+      margin-top: 8px;
+      font-size: 13px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<div id="blocker">
+  <div>
+    <h2>Desktop only</h2>
+    <p>
+      Detta spel kan bara köras på dator.<br>
+      This game can only run on a computer.<br>
+      Dette spillet kan bare kjøres på en datamaskin.
+    </p>
+  </div>
+</div>
+
+<h1>Labyrint – Kamek Race</h1>
+
+<div id="ui">
+  <label>
+    Språk / Language / Språk:
+    <select id="langSelect">
+      <option value="sv">Svenska</option>
+      <option value="en">English</option>
+      <option value="no">Norsk</option>
+    </select>
+  </label>
+  <label>
+    Läge / Mode:
+    <select id="modeSelect">
+      <option value="solo">1 spelare</option>
+      <option value="soloCpu">1 spelare vs CPU</option>
+      <option value="versus">2 spelare</option>
+    </select>
+  </label>
+  <button id="startBtn">Starta / Start</button>
+</div>
+
+<div id="sevenSegment">
+  <div class="seg-line" id="segTimer">TIME 00:00</div>
+  <div class="seg-line" id="segPlayers">P1: ---  P2: ---</div>
+  <div class="seg-line" id="segKamek">KAMEK: ...</div>
+</div>
+
+<div id="gameContainer">
+  <canvas id="gameCanvas" width="640" height="480"></canvas>
+</div>
+
+<div id="info">
+  P1: WASD &nbsp; | &nbsp; P2: Piltangenter (Arrow keys)<br>
+  Först till mål vinner – First to goal wins – Først til mål vinner.
+</div>
+
+<script>
+  // --- Desktop check ---
+  const isDesktop = !/Mobi|Android|iPhone|iPad|Tablet/i.test(navigator.userAgent);
+  const blocker = document.getElementById('blocker');
+  const startBtn = document.getElementById('startBtn');
+  if (!isDesktop) {
+    blocker.style.display = 'flex';
+    startBtn.disabled = true;
+  }
+
+  // --- Language texts ---
+  let lang = 'sv';
+  const texts = {
+    sv: {
+      p1: 'Spelare 1',
+      p2: 'Spelare 2',
+      cpu: 'CPU',
+      kStart: 'Kamek: Hitta vägen ut om du kan...',
+      kWinP1: 'Kamek: Spelare 1 vann. Inte helt värdelös.',
+      kWinP2: 'Kamek: Spelare 2 vann. Oväntat.',
+      kWinCPU: 'Kamek: CPU vann. Människor är överskattade.',
+      kTauntSlow: 'Kamek: Du är långsammare än en Boo.',
+      kTauntClose: 'Kamek: Ni är nästan där... eller vilse.',
+      kBlocked: 'Detta spel kräver en dator.'
+    },
+    en: {
+      p1: 'Player 1',
+      p2: 'Player 2',
+      cpu: 'CPU',
+      kStart: 'Kamek: Find the exit if you dare...',
+      kWinP1: 'Kamek: Player 1 wins. Barely impressive.',
+      kWinP2: 'Kamek: Player 2 wins. Unexpected.',
+      kWinCPU: 'Kamek: CPU wins. Humans disappoint me.',
+      kTauntSlow: 'Kamek: You move slower than a Boo.',
+      kTauntClose: 'Kamek: You are almost there... or lost.',
+      kBlocked: 'This game requires a computer.'
+    },
+    no: {
+      p1: 'Spiller 1',
+      p2: 'Spiller 2',
+      cpu: 'CPU',
+      kStart: 'Kamek: Finn veien ut hvis du tør...',
+      kWinP1: 'Kamek: Spiller 1 vant. Sånn passe bra.',
+      kWinP2: 'Kamek: Spiller 2 vant. Overraskende.',
+      kWinCPU: 'Kamek: CPU vant. Mennesker er overvurdert.',
+      kTauntSlow: 'Kamek: Du er tregere enn en Boo.',
+      kTauntClose: 'Kamek: Dere er nesten der... eller helt borte.',
+      kBlocked: 'Dette spillet krever en datamaskin.'
+    }
+  };
+  function t(key) {
+    return texts[lang][key] || key;
+  }
+
+  document.getElementById('langSelect').addEventListener('change', (e) => {
+    lang = e.target.value;
+    updateSevenSegmentPlayers();
+  });
+
+  // --- Canvas & maze setup ---
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+
+  const CELL_SIZE = 32;
+  const MAZE_ROWS = 15;
+  const MAZE_COLS = 20;
+
+  // Simple fixed maze: 0 = wall, 1 = path
+  const maze = [];
+  function buildMaze() {
+    // Basic outer walls + some inner walls
+    for (let r = 0; r < MAZE_ROWS; r++) {
+      maze[r] = [];
+      for (let c = 0; c < MAZE_COLS; c++) {
+        if (r === 0 || c === 0 || r === MAZE_ROWS - 1 || c === MAZE_COLS - 1) {
+          maze[r][c] = 0;
+        } else {
+          maze[r][c] = 1;
+        }
+      }
+    }
+    // Add some walls
+    for (let c = 3; c < 17; c++) maze[3][c] = 0;
+    for (let c = 2; c < 10; c++) maze[7][c] = 0;
+    for (let r = 5; r < 12; r++) maze[r][12] = 0;
+    for (let c = 8; c < 18; c++) maze[10][c] = 0;
+  }
+
+  const startP1 = { r: 1, c: 1 };
+  const startP2 = { r: MAZE_ROWS - 2, c: MAZE_COLS - 2 };
+  const goal = { r: MAZE_ROWS - 2, c: 1 };
+
+  let player1 = { r: startP1.r, c: startP1.c, color: '#0ff' };
+  let player2 = { r: startP2.r, c: startP2.c, color: '#ff0', active: false };
+  let cpu = { r: startP2.r, c: startP2.c, color: '#f0f', active: false, path: [], pathIndex: 0 };
+
+  let mode = 'solo'; // solo, soloCpu, versus
+  let running = false;
+  let winner = null;
+
+  // --- Timer ---
+  let time = 0;
+  let timerInterval = null;
+
+  function startTimer() {
+    time = 0;
+    updateSevenSegmentTimer();
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      time++;
+      updateSevenSegmentTimer();
+      // Kamek taunts
+      if (time === 10) setKamek(t('kTauntSlow'));
+      if (time === 25) setKamek(t('kTauntClose'));
+    }, 1000);
+  }
+  function stopTimer() {
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = null;
+  }
+  function updateSevenSegmentTimer() {
+    const minutes = Math.floor(time / 60).toString().padStart(2, '0');
+    const seconds = (time % 60).toString().padStart(2, '0');
+    document.getElementById('segTimer').textContent = `TIME ${minutes}:${seconds}`;
+  }
+
+  function updateSevenSegmentPlayers() {
+    const p1Name = t('p1');
+    const p2Name = mode === 'soloCpu' ? t('cpu') : t('p2');
+    const showP2 = (mode === 'soloCpu' || mode === 'versus');
+    document.getElementById('segPlayers').textContent =
+      `P1: ${p1Name}  P2: ${showP2 ? p2Name : '---'}`;
+  }
+  function setKamek(msg) {
+    document.getElementById('segKamek').textContent = `KAMEK: ${msg}`;
+  }
+
+  // --- Drawing ---
+  function drawMaze() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let r = 0; r < MAZE_ROWS; r++) {
+      for (let c = 0; c < MAZE_COLS; c++) {
+        const x = c * CELL_SIZE;
+        const y = r * CELL_SIZE;
+        if (maze[r][c] === 0) {
+          ctx.fillStyle = '#333';
+          ctx.fillRect(x, y, CELL_SIZE, CELL_SIZE);
+        } else {
+          ctx.fillStyle = '#111';
+          ctx.fillRect(x, y, CELL_SIZE, CELL_SIZE);
+        }
+      }
+    }
+    // Goal
+    ctx.fillStyle = '#0a0';
+    ctx.fillRect(goal.c * CELL_SIZE + 4, goal.r * CELL_SIZE + 4, CELL_SIZE - 8, CELL_SIZE - 8);
+
+    // Players
+    drawPlayer(player1);
+    if (player2.active) drawPlayer(player2);
+    if (cpu.active) drawPlayer(cpu);
+  }
+
+  function drawPlayer(p) {
+    const x = p.c * CELL_SIZE + CELL_SIZE / 2;
+    const y = p.r * CELL_SIZE + CELL_SIZE / 2;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(x, y, CELL_SIZE / 3, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // --- Movement & collision ---
+  function canMoveTo(r, c) {
+    if (r < 0 || c < 0 || r >= MAZE_ROWS || c >= MAZE_COLS) return false;
+    return maze[r][c] === 1 || (r === goal.r && c === goal.c);
+  }
+
+  function movePlayer(player, dir) {
+    if (!running) return;
+    let dr = 0, dc = 0;
+    if (dir === 'up') dr = -1;
+    if (dir === 'down') dr = 1;
+    if (dir === 'left') dc = -1;
+    if (dir === 'right') dc = 1;
+    const nr = player.r + dr;
+    const nc = player.c + dc;
+    if (canMoveTo(nr, nc)) {
+      player.r = nr;
+      player.c = nc;
+      checkWin();
+      drawMaze();
+    }
+  }
+
+  function checkWin() {
+    if (!running) return;
+    function atGoal(p) {
+      return p.r === goal.r && p.c === goal.c;
+    }
+    if (atGoal(player1)) {
+      winner = 'p1';
+      endGame();
+    } else if (player2.active && atGoal(player2)) {
+      winner = 'p2';
+      endGame();
+    } else if (cpu.active && atGoal(cpu)) {
+      winner = 'cpu';
+      endGame();
+    }
+  }
+
+  function endGame() {
+    running = false;
+    stopTimer();
+    if (winner === 'p1') setKamek(t('kWinP1'));
+    else if (winner === 'p2') setKamek(t('kWinP2'));
+    else if (winner === 'cpu') setKamek(t('kWinCPU'));
+  }
+
+  // --- CPU pathfinding (BFS) ---
+  function findPath(start, goal) {
+    const queue = [];
+    const visited = new Set();
+    const parent = {};
+    const key = (r, c) => `${r},${c}`;
+
+    queue.push(start);
+    visited.add(key(start.r, start.c));
+
+    const dirs = [
+      { dr: -1, dc: 0 },
+      { dr: 1, dc: 0 },
+      { dr: 0, dc: -1 },
+      { dr: 0, dc: 1 }
+    ];
+
+    while (queue.length > 0) {
+      const cur = queue.shift();
+      if (cur.r === goal.r && cur.c === goal.c) {
+        // reconstruct path
+        const path = [];
+        let k = key(cur.r, cur.c);
+        while (k) {
+          const [rr, cc] = k.split(',').map(Number);
+          path.push({ r: rr, c: cc });
+          k = parent[k];
+        }
+        path.reverse();
+        return path;
+      }
+      for (const d of dirs) {
+        const nr = cur.r + d.dr;
+        const nc = cur.c + d.dc;
+        const nk = key(nr, nc);
+        if (!visited.has(nk) && canMoveTo(nr, nc)) {
+          visited.add(nk);
+          parent[nk] = key(cur.r, cur.c);
+          queue.push({ r: nr, c: nc });
+        }
+      }
+    }
+    return [];
+  }
+
+  let cpuInterval = null;
+  function startCpu() {
+    cpu.path = findPath({ r: cpu.r, c: cpu.c }, goal);
+    cpu.pathIndex = 0;
+    if (cpuInterval) clearInterval(cpuInterval);
+    cpuInterval = setInterval(() => {
+      if (!running) {
+        clearInterval(cpuInterval);
+        return;
+      }
+      if (cpu.pathIndex < cpu.path.length) {
+        const step = cpu.path[cpu.pathIndex];
+        cpu.r = step.r;
+        cpu.c = step.c;
+        cpu.pathIndex++;
+        checkWin();
+        drawMaze();
+      } else {
+        clearInterval(cpuInterval);
+      }
+    }, 200);
+  }
+
+  // --- Keyboard controls ---
+  const keysP1 = {
+    'KeyW': 'up',
+    'KeyA': 'left',
+    'KeyS': 'down',
+    'KeyD': 'right',
+    'ArrowUp': 'up',
+    'ArrowLeft': 'left',
+    'ArrowDown': 'down',
+    'ArrowRight': 'right'
+  };
+  const keysP2 = {
+    'ArrowUp': 'up',
+    'ArrowLeft': 'left',
+    'ArrowDown': 'down',
+    'ArrowRight': 'right'
+  };
+
+  window.addEventListener('keydown', (e) => {
+    if (!running) return;
+    if (mode === 'solo' || mode === 'soloCpu') {
+      if (keysP1[e.code]) movePlayer(player1, keysP1[e.code]);
+    } else if (mode === 'versus') {
+      if (keysP1[e.code]) movePlayer(player1, keysP1[e.code]);
+      if (keysP2[e.code]) movePlayer(player2, keysP2[e.code]);
+    }
+  });
+
+  // --- Game start/reset ---
+  document.getElementById('modeSelect').addEventListener('change', (e) => {
+    mode = e.target.value;
+    updateSevenSegmentPlayers();
+  });
+
+  startBtn.addEventListener('click', () => {
+    if (!isDesktop) {
+      setKamek(t('kBlocked'));
+      return;
+    }
+    mode = document.getElementById('modeSelect').value;
+    resetGame();
+    startGame();
+  });
+
+  function resetGame() {
+    buildMaze();
+    player1.r = startP1.r;
+    player1.c = startP1.c;
+    player2.r = startP2.r;
+    player2.c = startP2.c;
+    player2.active = (mode === 'versus');
+    cpu.r = startP2.r;
+    cpu.c = startP2.c;
+    cpu.active = (mode === 'soloCpu');
+    winner = null;
+    updateSevenSegmentPlayers();
+    setKamek(t('kStart'));
+    drawMaze();
+  }
+
+  function startGame() {
+    running = true;
+    startTimer();
+    if (mode === 'soloCpu') startCpu();
+  }
+
+  // Initial setup
+  buildMaze();
+  updateSevenSegmentPlayers();
+  setKamek(t('kStart'));
+  drawMaze();
+</script>
+</body>

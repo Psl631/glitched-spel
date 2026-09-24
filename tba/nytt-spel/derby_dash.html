@@ -1,0 +1,4050 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐎 Derby Dash 2000 - Lilla Gubbens Guldrace</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&family=Comic Sans MS:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        #tournament-final-modal .tournament-box {
+    max-width: 520px;
+    width: 92%;
+    border: 3px solid #ffeb3b;
+    box-shadow: 0 0 25px rgba(255, 235, 59, 0.5);
+}
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0b0f19;
+            color: #fff;
+            font-family: 'Comic Sans MS', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        #game-wrapper {
+            position: relative;
+            border: 4px solid #ffeb3b;
+            box-shadow: 0 0 30px rgba(255, 235, 59, 0.35);
+            border-radius: 8px;
+            background: #000;
+        }
+        canvas {
+            display: block;
+            background-color: #4caf50;
+            border-radius: 4px;
+        }
+        #footer-controls {
+            margin-top: 12px;
+            font-size: 13px;
+            color: #aaa;
+            letter-spacing: 0.5px;
+        }
+        #footer-controls span {
+            color: #00ffcc;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<!-- NOSCRIPT VARNING -->
+<noscript>
+    <div style="position: fixed; top: 0; left: 0; width: 100%; background: #f44336; color: #ffffff; text-align: center; padding: 15px; font-family: 'Courier New', monospace; font-weight: bold; font-size: 16px; z-index: 999999; border-bottom: 3px solid #ffffff;">
+        ⚠️ Spelet fungerar inte utan JavaScript aktiverat! / Game requires JavaScript!
+    </div>
+</noscript>
+
+<!-- RETRO HJÄLPMODAL / INSTRUKTIONER -->
+<div id="help-modal-overlay" class="modal-backdrop" style="display: none;">
+    <div class="retro-window help-box">
+        <div class="window-titlebar">
+            <span id="help-modal-title">📖 HUR SPELAR JAG?</span>
+            <button type="button" class="win-btn-close" onclick="closeHelpModal()">✖</button>
+        </div>
+        <div class="window-body" id="help-modal-content">
+            <!-- Fylls i dynamiskt av språksystemet -->
+        </div>
+        <div class="window-footer">
+            <button type="button" class="retro-btn" onclick="closeHelpModal()" id="help-modal-close-btn">FATTAT! TILLBAKA TILL LOPPET</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.modal-backdrop {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(10, 0, 20, 0.85);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999;
+}
+.help-box {
+    width: 90%;
+    max-width: 560px;
+    background: #1a0826;
+    border: 3px solid #ff007f;
+    box-shadow: 0 0 20px #ff007f;
+    color: #ffffff;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+.window-titlebar {
+    background: #ff007f;
+    padding: 6px 12px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+}
+.win-btn-close {
+    background: #ffffff;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 2px 8px;
+}
+.window-body {
+    padding: 16px;
+    max-height: 70vh;
+    overflow-y: auto;
+    font-size: 13px;
+    line-height: 1.5;
+}
+.window-body h4 {
+    color: #ffeb3b;
+    margin: 10px 0 4px 0;
+    font-size: 14px;
+}
+.window-body p, .window-body ul {
+    margin: 0 0 10px 0;
+}
+
+/* Centrerar knappen över spelets nedre menyhalva */
+#tournament-btn-container {
+    position: absolute;
+    bottom: 18%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 50; /* Ligger alltid ovanpå canvas */
+    display: none; /* Styrs via JS så den bara syns i menyn */
+    pointer-events: auto;
+}
+
+#btn-lan-tournament {
+    background: #120320;
+    color: #ffeb3b;
+    border: 3px solid #ffeb3b;
+    padding: 12px 26px;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(255, 235, 59, 0.6), inset 0 0 8px rgba(255, 235, 59, 0.3);
+    border-radius: 6px;
+    transition: all 0.15s ease-in-out;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+#btn-lan-tournament:hover {
+    background: #ffeb3b;
+    color: #120320;
+    box-shadow: 0 0 25px #ffeb3b;
+    transform: scale(1.05);
+}
+
+#btn-lan-tournament:active {
+    transform: scale(0.96);
+}
+
+.window-body ul {
+    padding-left: 18px;
+}
+.sensory-alert {
+    background: rgba(255, 23, 68, 0.2);
+    border-left: 4px solid #ff1744;
+    padding: 8px;
+    margin-bottom: 12px;
+    font-size: 12px;
+}
+.window-footer {
+    padding: 10px 16px 16px;
+    text-align: center;
+}
+.retro-btn {
+    background: #00ffcc;
+    border: 2px solid #fff;
+    color: #000;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    font-weight: bold;
+    padding: 8px 18px;
+    cursor: pointer;
+}
+</style>
+
+<!-- RETRO VARNINGSSKÄRM MED CANVAS-VEKTORGRAFIK -->
+<div id="browser-warning-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.96); color: #ffffff; font-family: 'Courier New', monospace; z-index: 999998; text-align: center; justify-content: center; align-items: center; flex-direction: column; padding: 20px; box-sizing: border-box;">
+    <div style="border: 3px solid #ff1744; padding: 20px; max-width: 640px; width: 92%; background-color: #0a0a0a; box-shadow: 0 0 25px rgba(255, 23, 68, 0.5); display: flex; flex-direction: column; align-items: center; border-radius: 6px;">
+        <h1 id="browser-warning-title" style="color: #ff1744; margin: 0 0 10px 0; font-size: 19px; letter-spacing: 1px;">🛑 ÅTKOMST NEKAD 🛑</h1>
+        
+        <canvas id="warning-canvas" width="280" height="130" style="background: #111116; border: 2px solid #333344; margin: 8px 0 12px 0; border-radius: 4px;"></canvas>
+
+        <div id="browser-warning-text" style="color: #ffeb3b; font-size: 13px; line-height: 1.5; text-align: center; width: 100%;"></div>
+        
+        <button id="browser-bypass-btn" style="display: none; margin-top: 15px; padding: 10px 18px; background-color: #ff1744; color: #ffffff; border: 2px solid #fff; font-family: 'Courier New', monospace; font-weight: bold; font-size: 12px; cursor: pointer; border-radius: 4px;">
+            [ENTER] JAG ACCEPTERAR RISKERNA – KÖR ÄNDÅ
+        </button>
+    </div>
+</div>
+
+<!-- SPRÅKVÄLJAR-MODAL VID ANNAT SPRÅK ÄN SV/NO/EN -->
+<div id="language-prompt-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.94); color: #ffffff; font-family: 'Comic Sans MS', monospace; z-index: 999999; justify-content: center; align-items: center;">
+    <div style="border: 3px solid #00ffcc; padding: 25px; max-width: 480px; width: 90%; background-color: #0b0f19; box-shadow: 0 0 25px rgba(0, 255, 204, 0.4); text-align: center; border-radius: 8px;">
+        <h2 style="color: #ffeb3b; margin: 0 0 8px 0; font-size: 20px;">🌍 SELECT LANGUAGE</h2>
+        <p style="color: #aaa; font-size: 13px; margin-bottom: 20px;">Choose your language / Vælg sprog / Välj språk:</p>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <button onclick="window.setGameLanguage('sv')" style="padding: 10px; background: #1b5e20; color: #fff; border: 2px solid #4caf50; font-family: inherit; font-size: 14px; font-weight: bold; cursor: pointer; border-radius: 4px;">🇸🇪 SVENSKA</button>
+            <button onclick="window.setGameLanguage('no')" style="padding: 10px; background: #0d47a1; color: #fff; border: 2px solid #2196f3; font-family: inherit; font-size: 14px; font-weight: bold; cursor: pointer; border-radius: 4px;">🇳🇴 NORSK</button>
+            <button onclick="window.setGameLanguage('en')" style="padding: 10px; background: #b71c1c; color: #fff; border: 2px solid #f44336; font-family: inherit; font-size: 14px; font-weight: bold; cursor: pointer; border-radius: 4px;">🇬🇧 ENGLISH</button>
+        </div>
+    </div>
+</div>
+
+<!-- 🧙‍♂️ KAMEK ANTI-CHEAT MODAL MED BILD & COMIC SANS MS -->
+<div id="kamek-anticheat-overlay" style="display: none !important; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(30, 0, 40, 0.98); z-index: 2147483647; justify-content: center; align-items: center; font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif; text-align: center; box-sizing: border-box; padding: 20px;">
+    <div style="background-color: #2a0845; border: 6px dashed #ff00ff; border-radius: 20px; padding: 25px; max-width: 620px; width: 92%; box-shadow: 0 0 50px #ff00ff; color: #fff; max-height: 90vh; overflow-y: auto;">
+        
+        <!-- BILD PÅ KAMEK -->
+        <div style="margin-bottom: 12px;">
+            <img src="kamek.jfif" alt="Kamek Magikoopa" style="max-width: 220px; height: auto; border: 4px solid #ffeb3b; border-radius: 12px; box-shadow: 0 0 20px rgba(255, 235, 59, 0.6); display: inline-block;">
+        </div>
+
+        <h1 id="kamek-cheat-title" style="color: #ffeb3b; font-size: 22px; margin: 0 0 12px 0; text-transform: uppercase; text-shadow: 2px 2px #000;">
+            🧙‍♂️ KAMEK DISKVALIFICERAR DIG!
+        </h1>
+        <p id="kamek-cheat-reason" style="color: #00ffff; font-size: 15px; line-height: 1.5; margin-bottom: 20px; background: rgba(0,0,0,0.5); padding: 14px; border-radius: 10px; border: 2px solid #ffeb3b;">
+            Fusk upptäckt!
+        </p>
+        <button id="kamek-restart-btn" style="background: #ff0055; color: #fff; font-family: 'Comic Sans MS', cursive, sans-serif; font-size: 16px; font-weight: bold; border: 3px solid #fff; border-radius: 12px; padding: 12px 24px; cursor: pointer; text-shadow: 1px 1px #000; box-shadow: 0 5px 15px rgba(0,0,0,0.5);">
+            FÖRLÅT KAMEK, JAG SKA ALDRIG FUSKA IGEN...
+        </button>
+    </div>
+</div>
+
+<!-- 🟣 TELIA HÅRDVARU- & NÄTVERKSMONITOR OVERLAY -->
+<div id="telia-monitor-overlay" style="display: none !important; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(18, 0, 36, 0.98); z-index: 2147483647; justify-content: center; align-items: center; font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif; text-align: center; box-sizing: border-box; padding: 20px;">
+    <div style="background-color: #240046; border: 5px solid #9d4edd; border-radius: 20px; padding: 25px; max-width: 640px; width: 92%; box-shadow: 0 0 50px #7b2cbf; color: #fff; max-height: 92vh; overflow-y: auto;">
+        
+        <!-- TELIA LOGO -->
+        <div style="margin-bottom: 12px;">
+            <img src="telia.png" alt="Telia" style="max-width: 170px; height: auto; display: inline-block; filter: drop-shadow(0 0 10px #c77dff);">
+        </div>
+
+        <div style="background: #ff1744; color: #fff; font-weight: bold; padding: 4px 12px; border-radius: 6px; display: inline-block; font-size: 12px; margin-bottom: 8px; letter-spacing: 1px;">
+            TELIA SÄKERHETSAVDELNING & DRIFTKONTROLL
+        </div>
+
+        <h1 id="telia-lock-title" style="color: #ffeb3b; font-size: 21px; margin: 6px 0 12px 0; text-transform: uppercase; text-shadow: 2px 2px #000;">
+            SYSTEMET LÅST AV TELIA
+        </h1>
+
+        <!-- REALTIME STATUS-STATS -->
+        <div id="telia-live-stats" style="background: rgba(0,0,0,0.5); border: 1px solid #7b2cbf; border-radius: 8px; padding: 8px; font-size: 11px; color: #00ffff; margin-bottom: 14px; display: flex; justify-content: space-around; flex-wrap: wrap; gap: 6px;">
+            <span id="stat-fps">FPS: --</span>
+            <span id="stat-ping">PING: --</span>
+            <span id="stat-loss">LOSS: 0%</span>
+            <span id="stat-bat">BAT: --</span>
+            <span id="stat-ram">RAM: --</span>
+        </div>
+
+        <p id="telia-lock-reason" style="color: #ffffff; font-size: 15px; line-height: 1.5; margin-bottom: 20px; background: rgba(0,0,0,0.6); padding: 16px; border-radius: 10px; border: 2px solid #ff1744;">
+            Ett allvarligt fel upptäcktes på din anslutning eller hårdvara.
+        </p>
+
+        <button id="telia-restart-btn" style="background: #9d4edd; color: #fff; font-family: 'Comic Sans MS', cursive, sans-serif; font-size: 15px; font-weight: bold; border: 3px solid #ffeb3b; border-radius: 12px; padding: 12px 24px; cursor: pointer; text-shadow: 1px 1px #000; box-shadow: 0 4px 15px rgba(0,0,0,0.6);">
+            STARTA OM ROUTERN OCH BE TELIA OM NÅD...
+        </button>
+    </div>
+</div>
+
+<!-- ======================================================== -->
+<!-- 🛑 ES5 MULTI-LANGUAGE SYSTEM & DEVICE BLOCKER           -->
+<!-- ======================================================== -->
+<script>
+(function() {
+    // Språkdetektering: SV, NO eller fallback till EN
+    var rawLang = (window.navigator.language || window.navigator.userLanguage || "sv").toLowerCase();
+    var lang = "en";
+    if (rawLang.indexOf("sv") === 0) lang = "sv";
+    else if (rawLang.indexOf("no") === 0 || rawLang.indexOf("nb") === 0 || rawLang.indexOf("nn") === 0) lang = "no";
+
+    var ua = window.navigator.userAgent.toLowerCase();
+    var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+
+    // --- ÖVERSÄTTNINGAR OCH HÅN FÖR ALLA ENHETER/OS/BROWSERS ---
+    var DICT = {
+        IE: {
+            title: {
+                sv: "🛑 INTERNET EXPLORER?! ÄR DU DUM I HUVUDET?!",
+                no: "🛑 INTERNET EXPLORER?! ER DU HELT SPRØ?!",
+                en: "🛑 INTERNET EXPLORER?! ARE YOU OUT OF YOUR MIND?!"
+            },
+            text: {
+                sv: "Internet Explorer begravdes för ett decennium sedan! Tror du det här är 1999?! Byt till Chrome, Firefox eller stäng av burken innan modemet spricker!",
+                no: "Internet Explorer døde for ti år siden! Tror du dette er 1999?! Bytt til Chrome eller Firefox før modemet eksploderer!",
+                en: "Internet Explorer died a decade ago! Do you think this is 1999?! Switch to Chrome, Firefox, or shut down your PC before your 56k modem explodes!"
+            }
+        },
+        LEGACY_WIN: {
+            title: {
+                sv: "💻 SKROT-WINDOWS DETEKTERAT!",
+                no: "💻 SKRAP-WINDOWS OPPDAGET!",
+                en: "💻 OBSOLETE WINDOWS DETECTED!"
+            },
+            text: {
+                sv: "Windows 7, 8, XP eller Vista?! Konsolen kräver minst Windows 10 eller 11. Ställ tillbaka din dammiga museipryl på tippen och skaffa ett modernt system!",
+                no: "Windows 7, 8, XP eller Vista?! Spillet krever minst Windows 10 eller 11. Sett denne museumsrelikvien på dynga og skaff et moderne OS!",
+                en: "Windows 7, 8, XP, or Vista?! This game requires at least Windows 10 or 11. Donate this museum relic to charity and install a modern OS!"
+            }
+        },
+        LEGACY_MAC: {
+            title: {
+                sv: "🍏 FÖRÅLDRAT MACOS DETEKTERAT",
+                no: "🍏 FORELDET MACOS OPPDAGET",
+                en: "🍏 OUTDATED MACOS DETECTED"
+            },
+            text: {
+                sv: "Ditt macOS är för gammalt! Spelet kräver en modern WebKit-motor för ren 60 FPS arkadrendering. Uppdatera operativsystemet!",
+                no: "Ditt macOS er for gammelt! Spillet krever en moderne WebKit-motor for stabil arkadeopplevelse. Oppdater systemet!",
+                en: "Your macOS is outdated! The game requires a modern WebKit engine for smooth 60 FPS arcade performance. Update your OS!"
+            }
+        },
+        MOBILE: {
+            title: {
+                sv: "📱 MOBIL DETEKTERAD – NOLL TOUCH-STÖD!",
+                no: "📱 MOBIL OPPDAGET – INGEN TOUCH-STØTTE!",
+                en: "📱 MOBILE DEVICE DETECTED – ZERO TOUCH SUPPORT!"
+            },
+            text: {
+                sv: "⚠️ Att försöka tajma hästhopp med tummen på en 6-tumsskärm är dömt att misslyckas! Du täcker hela banan med fingrarna. Sätt dig vid en riktig PC!",
+                no: "⚠️ Å time hestehopp med tommelen på en 6-tommers skjerm er dømt til å gå galt! Sett deg foran en skikkelig PC med tastatur!",
+                en: "⚠️ Timing horse jumps with greasy thumbs on a 6-inch phone screen is impossible! You'll block your own view. Sit down at a real PC with a keyboard!"
+            }
+        },
+        TABLET: {
+            title: {
+                sv: "🐸 EN SURFPLATTA?! FÖR STOR FÖR TOUCH!",
+                no: "🐸 ET NETTBRETT?! FOR STORT FOR TOUCH!",
+                en: "🐸 A TABLET?! NO TOUCHPADS ALLOWED!"
+            },
+            text: {
+                sv: "En gigantisk iPad gör inte saken bättre. Spelet kräver millisekundsprecision via [Mellanslag] eller arkadknappar, inte klumpiga fingertryck!",
+                no: "En svær iPad hjelper ikke. Spillet krever millisekundpresisjon via [Mellomrom] eller arkadeknapper, ikke klossete fingre!",
+                en: "A giant iPad won't help you. This arcade race requires millisecond precision via [Spacebar], not smudgy finger taps!"
+            }
+        },
+        WATCH: {
+            title: {
+                sv: "⌚ EN SMART KLOCKA?! SKÄMTAR DU?!",
+                no: "⌚ EN SMARTKLOKKE?! TULLER DU?!",
+                en: "⌚ A SMARTWATCH?! ARE YOU JOKING?!"
+            },
+            text: {
+                sv: "Skärmen är stor som ett frimärke! Hur i hela friden hade du tänkt se stenmurarna eller sockerdrickan på handleden?! Gå till en dator!",
+                no: "Skjermen er like stor som et frimerke! Hvordan tenkte du å se hindrene på håndleddet?! Finn en PC!",
+                en: "The screen is the size of a postage stamp! How on earth are you going to jump fences on your wrist?! Go find a desktop PC!"
+            }
+        },
+        CONSOLE: {
+            title: {
+                sv: "🎮 KONSOLWEBBLÄSARE DETEKTERAD!",
+                no: "🎮 KONSOLLNETTLESER OPPDAGET!",
+                en: "🎮 CONSOLE BROWSER DETECTED!"
+            },
+            text: {
+                sv: "Du försöker surfa genom spelkonsolens inbyggda nödlösning till webbläsare! Den saknar modern Canvas-timing. Starta datorn istället!",
+                no: "Du prøver å kjøre spillet gjennom konsollens innebygde nettleser! Den mangler skikkelig Canvas-timing. Bruk en datamaskin!",
+                en: "You are running this through a console's clunky emergency browser! It lacks proper Canvas timing. Power up a real PC instead!"
+            }
+        },
+        TV: {
+            title: {
+                sv: "📺 EN SMART TV?! UPP UR SOFFAN!",
+                no: "📺 EN SMART-TV?! OPP AV SOFAEN!",
+                en: "📺 A SMART TV?! GET OFF THE COUCH!"
+            },
+            text: {
+                sv: "Försöker du hoppa häst med TV-fjärrkontrollens 'OK'-knapp och 400ms input lag?! Lilla Gubben kraschar i första staketet. Skrivbordet nästa!",
+                no: "Prøver du å hoppe med fjernkontrollens 'OK'-knapp og 400ms forsinkelse?! Hesten krasjer rett i første gjerde. Sett deg ved et bord!",
+                en: "Are you trying to jump hurdles using a TV remote's 'OK' button with 400ms of lag?! The horse will crash into the first fence. Get to a desk!"
+            }
+        },
+        CAR: {
+            title: {
+                sv: "🚗 EN BILSKÄRM?! HÅLL ÖGONEN PÅ VÄGEN!",
+                no: "🚗 EN BILSKJERM?! FØLG MED PÅ VEIEN!",
+                en: "🚗 A CAR DASHBOARD?! EYES ON THE ROAD!"
+            },
+            text: {
+                sv: "Håll händerna på ratten istället för att försöka rida galopp i bilens mittdisplay! Parkera fordonet omedelbart!",
+                no: "Hold hendene på rattet i stedet for å ri hest på bilens midtkonsoll! Parker bilen umiddelbart!",
+                en: "Keep both hands on the wheel instead of racing virtual horses on your Tesla dashboard! Park the vehicle immediately!"
+            }
+        },
+        EREADER: {
+            title: {
+                sv: "📖 EN E-LÄSARE (E-INK)?!",
+                no: "📖 ET LESERETT (E-INK)?!",
+                en: "📖 AN E-READER (E-INK)?!"
+            },
+            text: {
+                sv: "Försöker du köra 60 FPS arkad-galopp på en skärm med 2 bildrutor per sekund?! Boken är slut – starta en PC!",
+                no: "Prøver du å spille med 2 bilder i sekundet på en digital bokhylle?! Boken er ferdig – start en PC!",
+                en: "Trying to run a 60 FPS arcade race on a grayscale screen that refreshes twice per minute?! The book is over – use a PC!"
+            }
+        },
+        APPLIANCE: {
+            title: {
+                sv: "🧊 ETT SMART KYLSKÅP?!",
+                no: "🧊 ET SMART KJØLESKAP?!",
+                en: "🧊 A SMART REFRIGERATOR?!"
+            },
+            text: {
+                sv: "Står du i köket och bankar med mjölkfingrar på kylskåpsdörren?! Ta din frukost och sätt dig vid datorn!",
+                no: "Står du på kjøkkenet og hamrer på kjøleskapsdøren?! Ta frokosten din og gå til PC-en!",
+                en: "Are you standing in the kitchen smudging milk on your smart fridge door?! Grab your snack and play on a real PC!"
+            }
+        },
+        PRINTER: {
+            title: {
+                sv: "🖨️ EN 3D-SKRIVARE?!",
+                no: "🖨️ EN 3D-PRINTER?!",
+                en: "🖨️ A 3D PRINTER PANEL?!"
+            },
+            text: {
+                sv: "Låt skrivaren smälta plast ifred! Det där lilla kretskortet klarar inte galoppmotorn. Gå till skrivbordet!",
+                no: "La printeren smelte plast i fred! Det lille kortet takler ikke spillmotoren. Finn en PC!",
+                en: "Leave the printer alone to melt plastic! That tiny microcontroller cannot handle our physics loop. Use a PC!"
+            }
+        },
+        LINUX: {
+            title: {
+                sv: "🐧 LINUX DETEKTERAD (EJ OFFICIELLT STÖD)",
+                no: "🐧 LINUX OPPDAGET (IKKE OFFISIELT STØTTET)",
+                en: "🐧 LINUX DETECTED (UNOFFICIAL PLATFORM)"
+            },
+            text: {
+                sv: "Du kör Linux! Spelet är utvecklat för Windows och macOS. Om tangentbordsresponsen laggar rekommenderas Chrome eller Firefox med maskinvaruacceleration.",
+                no: "Du kjører Linux! Spillet er optimalisert for Windows og macOS. Ved tastaturlag anbefales Chrome eller Firefox med maskinvareakselerasjon.",
+                en: "You are running Linux! The game is built for Windows and macOS. If keyboard response lags, ensure hardware acceleration is enabled in Chrome/Firefox."
+            }
+        },
+        CHROMEOS: {
+            title: {
+                sv: "💻 CHROME OS (CHROMEBOOK)",
+                no: "💻 CHROME OS (CHROMEBOOK)",
+                en: "💻 CHROME OS (CHROMEBOOK)"
+            },
+            text: {
+                sv: "Chromebooks har ofta strypt grafikprestanda och budget-processorer. Hästen kan hacka i galoppen om du har för många flikar öppna!",
+                no: "Chromebooks har ofte svak maskinvare. Hesten kan hakke i galoppen dersom du har for mange faner åpne!",
+                en: "Chromebooks often feature low-power hardware. The horse might stutter if you have too many background tabs running!"
+            }
+        }
+    };
+
+    // --- 1. RITA VEKTORILLUSTRATIONER I ES5 ---
+    function drawVectorWarning(ctx, type) {
+        if (!ctx) return;
+        ctx.clearRect(0, 0, 280, 130);
+        ctx.save();
+
+        if (type === "IE" || type === "WIN7") {
+            // Gravsten & Krossad IE-logotyp
+            ctx.fillStyle = "#555566";
+            ctx.fillRect(40, 35, 60, 85);
+            ctx.fillStyle = "#ff1744";
+            ctx.font = "bold 14px monospace";
+            ctx.fillText("RIP", 58, 65);
+            ctx.fillStyle = "#aaaaaa";
+            ctx.font = "bold 10px monospace";
+            ctx.fillText("IE 6.0", 50, 85);
+
+            ctx.strokeStyle = "#00a2ff";
+            ctx.lineWidth = 7;
+            ctx.beginPath();
+            ctx.arc(180, 65, 30, 0.2 * Math.PI, 1.8 * Math.PI);
+            ctx.stroke();
+            ctx.fillRect(150, 61, 55, 7);
+
+            ctx.strokeStyle = "#ff1744";
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(145, 30); ctx.lineTo(215, 100);
+            ctx.moveTo(215, 30); ctx.lineTo(145, 100);
+            ctx.stroke();
+        } else if (type === "MOBILE" || type === "TABLET" || type === "WATCH") {
+            // Mobil med sikte / fingerförbud
+            ctx.fillStyle = "#22222a";
+            ctx.strokeStyle = "#00ffcc";
+            ctx.lineWidth = 3;
+            ctx.fillRect(100, 10, 80, 110);
+            ctx.strokeRect(100, 10, 80, 110);
+
+            ctx.fillStyle = "#111118";
+            ctx.fillRect(108, 18, 64, 85);
+
+            ctx.strokeStyle = "#ff1744";
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(140, 60, 22, 0, Math.PI * 2);
+            ctx.moveTo(140, 32); ctx.lineTo(140, 88);
+            ctx.moveTo(112, 60); ctx.lineTo(168, 60);
+            ctx.stroke();
+        } else if (type === "CAR") {
+            // Ratt & Varningsskylt
+            ctx.fillStyle = "#161622";
+            ctx.fillRect(30, 15, 220, 100);
+
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.arc(140, 65, 38, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.fillStyle = "#ff1744";
+            ctx.font = "bold 13px monospace";
+            ctx.fillText("! STOP !", 114, 70);
+        } else if (type === "APPLIANCE" || type === "PRINTER") {
+            // Kylskåp
+            ctx.fillStyle = "#e0e6ed";
+            ctx.strokeStyle = "#334155";
+            ctx.lineWidth = 4;
+            ctx.fillRect(95, 10, 90, 110);
+            ctx.strokeRect(95, 10, 90, 110);
+
+            ctx.strokeStyle = "#64748b";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(95, 45); ctx.lineTo(185, 45);
+            ctx.stroke();
+
+            ctx.fillStyle = "#ff1744";
+            ctx.beginPath();
+            ctx.moveTo(120, 25); ctx.lineTo(135, 30); ctx.lineTo(120, 35); ctx.fill();
+            ctx.moveTo(160, 25); ctx.lineTo(145, 30); ctx.lineTo(160, 35); ctx.fill();
+        } else {
+            // Generisk hårdvara
+            ctx.fillStyle = "#1e1e24";
+            ctx.strokeStyle = "#00a2ff";
+            ctx.lineWidth = 3;
+            ctx.fillRect(70, 30, 140, 70);
+            ctx.strokeRect(70, 30, 140, 70);
+
+            ctx.fillStyle = "#ffeb3b";
+            ctx.font = "bold 12px monospace";
+            ctx.fillText("PC ONLY", 112, 70);
+        }
+
+        ctx.restore();
+    }
+
+    // --- 2. DETEKTERING AV SYSTEM, ENHETER OCH WEBBLÄSARE ---
+    var isIE = ua.indexOf('msie') > -1 || ua.indexOf('trident/') > -1;
+    var isWin = ua.indexOf('windows nt') > -1;
+    var isWin10Or11 = ua.indexOf('windows nt 10.0') > -1;
+    var isLegacyWin = isWin && !isWin10Or11;
+
+    var isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    var isMobile = /android|webos|iphone|ipod|blackberry|iemobile|opera mini/i.test(ua);
+    var isTablet = /ipad|tablet|playbook|silk/i.test(ua) || (isTouch && screenWidth >= 600 && screenWidth <= 1024);
+
+    var isConsole = /playstation|xbox|nintendo|wii|switch/i.test(ua);
+    var isSmartTV = /smart-tv|smarttv|googletv|appletv|hbbtv|netcast|vizio|tizen|webos/i.test(ua);
+    var isCar = /qtcarbrowser|tesla|automotive|carbrowser/i.test(ua);
+    var isEReader = /kindle|kobo|bookeen|pocketbook|nook|paperwhite/i.test(ua);
+    var isSmartWatch = /applewatch|watchos|wear os|wearable/i.test(ua);
+    var isSmartAppliance = /familyhub|smartfridge|smart_appliance/i.test(ua);
+    var is3DPrinter = /octoprint|klipper|mainsail|fluidd|creality/i.test(ua);
+
+    var isMac = ua.indexOf('mac os x') > -1 && !isMobile && !isTablet;
+    var isLegacyMac = false;
+    if (isMac) {
+        var macMatch = ua.match(/mac os x (\d+)[_.](\d+)/);
+        if (macMatch) {
+            var major = parseInt(macMatch[1], 10);
+            var minor = parseInt(macMatch[2], 10);
+            if (major < 10 || (major === 10 && minor < 15)) {
+                isLegacyMac = true;
+            }
+        }
+    }
+
+    var isChromeOS = ua.indexOf('cros') > -1;
+    var isLinux = ua.indexOf('linux') > -1 && !isChromeOS && !isMobile && !isTablet;
+
+    // --- 3. VISA BLOCKERING / VARNING ---
+    function showBlockScreen(itemKey, visualType, isHardBlock) {
+        var overlay = document.getElementById('browser-warning-overlay');
+        var titleEl = document.getElementById('browser-warning-title');
+        var textEl = document.getElementById('browser-warning-text');
+        var bypassBtn = document.getElementById('browser-bypass-btn');
+        var canvasEl = document.getElementById('warning-canvas');
+
+        var entry = DICT[itemKey] || DICT.MOBILE;
+        var title = entry.title[lang] || entry.title.en;
+        var text = entry.text[lang] || entry.text.en;
+
+        if (titleEl) titleEl.innerHTML = title;
+        if (textEl) textEl.innerHTML = text;
+
+        if (canvasEl && canvasEl.getContext) {
+            var cctx = canvasEl.getContext('2d');
+            drawVectorWarning(cctx, visualType);
+        }
+
+        if (overlay) overlay.style.display = 'flex';
+
+        if (!isHardBlock && bypassBtn) {
+            bypassBtn.style.display = 'inline-block';
+            bypassBtn.onclick = function() {
+                overlay.style.display = 'none';
+            };
+
+            var handleEnter = function(e) {
+                if (e.key === 'Enter' || e.keyCode === 13) {
+                    overlay.style.display = 'none';
+                    window.removeEventListener('keydown', handleEnter);
+                }
+            };
+            window.addEventListener('keydown', handleEnter);
+        } else if (isHardBlock) {
+            if (bypassBtn) bypassBtn.style.display = 'none';
+            throw new Error("System blocked: Unsupported device/platform.");
+        }
+    }
+
+    // Kör kontrollerna i strikt prioritetsordning
+    if (isIE) {
+        showBlockScreen("IE", "IE", true);
+    } else if (isLegacyWin) {
+        showBlockScreen("LEGACY_WIN", "WIN7", true);
+    } else if (isSmartWatch) {
+        showBlockScreen("WATCH", "WATCH", true);
+    } else if (isConsole) {
+        showBlockScreen("CONSOLE", "CONSOLE", true);
+    } else if (isSmartTV) {
+        showBlockScreen("TV", "TV", true);
+    } else if (isCar) {
+        showBlockScreen("CAR", "CAR", true);
+    } else if (isEReader) {
+        showBlockScreen("EREADER", "IE", true);
+    } else if (isSmartAppliance) {
+        showBlockScreen("APPLIANCE", "APPLIANCE", true);
+    } else if (is3DPrinter) {
+        showBlockScreen("PRINTER", "PRINTER", true);
+    } else if (isLegacyMac) {
+        showBlockScreen("LEGACY_MAC", "WIN7", true);
+    } else if (isLinux) {
+        showBlockScreen("LINUX", "HARDWARE", false);
+    } else if (isChromeOS) {
+        showBlockScreen("CHROMEOS", "HARDWARE", false);
+    }
+})();
+
+
+</script>
+
+<div id="game-wrapper">
+    <canvas id="derbyCanvas" width="854" height="480"></canvas>
+</div>
+
+<div id="footer-controls">
+    Styrning: <span>[MELLANSLAG]</span> / <span>[W]</span> / <span>[PIL UPP]</span> = Hoppa | <span>[M]</span> = Ljud Av/På | <span>[ESC]</span> = Paus
+</div>
+<!-- RETRO TURNERINGSKNAPP OVANPÅ MENYN -->
+<div id="tournament-btn-container">
+    <button id="btn-lan-tournament" type="button" onclick="window.triggerTournamentReload()">
+        🏆 TURNERINGSLÄGE
+    </button>
+</div>
+
+<!-- ======================================================== -->
+<!-- 🐎 DERBY DASH 2000 SPELMOTOR                            -->
+<!-- ======================================================== -->
+<script>
+    // Globala variabler så att konsolen ALDRIG kastar ReferenceError på clientX/clientY
+var clientX = 0;
+var clientY = 0;
+
+// ============================================================================
+// GLOBAL SÄKERHETSBLOCK: FÖRREGLING MOT ALLA UNCAUGHT REFERENCEERROR
+// ============================================================================
+window.clientX = window.clientX || 0;
+window.clientY = window.clientY || 0;
+window.isTournamentMode = (new URLSearchParams(window.location.search)).get("tournament") === "true";
+
+window.tournamentPlayer = window.tournamentPlayer || {
+    name: "",
+    currentAttempt: 1,
+    scores: [],
+    bestScore: 0
+};
+
+// 1. BEKRÄFTA SPELARE (Kopplad till start-knappen på rad 3522)
+window.confirmTournamentPlayer = function() {
+    try {
+        var input = document.getElementById("tourney-player-name");
+        var err = document.getElementById("tourney-input-error");
+        if (!input) return;
+
+        var rawName = (input.value || "").trim().toUpperCase();
+
+        // Validering: A-Z, 0-9, ÅÄÖ, ÆØ, mellanslag (1-15 tecken)
+        var validRegex = /^[A-Z0-9ÅÄÖÆØ\s]{1,15}$/i;
+        if (!validRegex.test(rawName)) {
+            if (err) {
+                err.style.display = "block";
+                var p = (typeof window.getTourneyLangPack === "function") ? window.getTourneyLangPack() : null;
+                err.innerText = p ? p.inputError : "ENDAST BOKSTÄVER (A-Ö, Æ, Ø, Å) OCH SIFFROR (0-9)!";
+            }
+            return;
+        }
+
+        if (err) err.style.display = "none";
+
+        window.tournamentPlayer.name = rawName;
+        window.tournamentPlayer.currentAttempt = 1;
+        window.tournamentPlayer.scores = [];
+        window.tournamentPlayer.bestScore = 0;
+        window.isTournamentMode = true;
+
+        var regModal = document.getElementById("tournament-reg-modal");
+        if (regModal) regModal.style.display = "none";
+
+        // Starta loppet säkert
+        if (typeof window.resetGame === "function") window.resetGame();
+        window.gameState = "PLAYING";
+    } catch (ex) {
+        console.warn("Manuell hantering av turneringsstart:", ex.message);
+    }
+};
+
+// 2. AVBRYT TURNERINGSLÄGE (Kopplad till avbryt-knappen på rad 3523)
+window.abortTournamentMode = function() {
+    try {
+        window.isTournamentMode = false;
+        var regModal = document.getElementById("tournament-reg-modal");
+        if (regModal) regModal.style.display = "none";
+
+        // Återvänd till ren URL utan turneringsparametrar
+        var currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.delete("tournament");
+        window.history.replaceState({}, document.title, currentUrl.pathname + currentUrl.search);
+
+        if (typeof window.resetGame === "function") window.resetGame();
+        window.gameState = "MENU";
+    } catch (ex) {
+        console.warn("Manuell hantering av avbruten turnering:", ex.message);
+    }
+};
+
+// 3. AVSLUTA OMGÅNG EFTER 3 FÖRSÖK (För modalens slutknapp)
+window.finishTournamentTurn = function() {
+    try {
+        var finalModal = document.getElementById("tournament-final-modal");
+        if (finalModal) finalModal.style.display = "none";
+
+        window.tournamentPlayer.name = "";
+        window.tournamentPlayer.currentAttempt = 1;
+        window.tournamentPlayer.scores = [];
+        window.tournamentPlayer.bestScore = 0;
+
+        if (typeof window.resetGame === "function") window.resetGame();
+        window.gameState = "MENU";
+
+        // Om vi fortfarande kör turneringsterminal: Öppna direkt för nästa spelare
+        if (window.isTournamentMode && typeof window.startTournamentRegistration === "function") {
+            setTimeout(function() {
+                window.startTournamentRegistration();
+            }, 250);
+        }
+    } catch (ex) {
+        console.warn("Manuell hantering av turneringsavslut:", ex.message);
+    }
+};
+
+// Skapa lokala alias så att både raka anrop och window.*-anrop fungerar
+var confirmTournamentPlayer = window.confirmTournamentPlayer;
+var abortTournamentMode = window.abortTournamentMode;
+var finishTournamentTurn = window.finishTournamentTurn;
+
+// Garantera att funktionen finns globalt på window omedelbart vid boot
+window.startTournamentRegistration = function() {
+    var p = (typeof getTourneyLangPack === 'function') 
+        ? getTourneyLangPack() 
+        : {
+            regTitle: "🏆 LAN TOURNAMENT: REGISTRERING",
+            regRules: "REGLER: 3 FÖRSÖK. BÄSTA POÄNG SPARAS. INGEN PAUS TILLÅTEN!",
+            inputLabel: "SKRIV DITT LAN-NICK (MAX 15 TECKEN):",
+            inputPlaceholder: "T.EX. PIPPIMÄSTAREN",
+            inputError: "ENDAST BOKSTÄVER (A-Ö, Æ, Ø, Å) OCH SIFFROR (0-9)!",
+            startBtn: "STARTA FÖRSÖK 1 AV 3",
+            cancelBtn: "AVBRYT"
+        };
+
+    var titleEl = document.getElementById("tourney-reg-title");
+    var rulesEl = document.getElementById("tourney-reg-rules");
+    var labelEl = document.getElementById("tourney-reg-label");
+    var inputEl = document.getElementById("tourney-player-name");
+    var errEl = document.getElementById("tourney-input-error");
+    var startBtn = document.getElementById("tourney-btn-start");
+    var cancelBtn = document.getElementById("tourney-btn-cancel");
+
+    if (titleEl) titleEl.innerText = p.regTitle;
+    if (rulesEl) rulesEl.innerText = p.regRules;
+    if (labelEl) labelEl.innerText = p.inputLabel;
+    if (inputEl) {
+        inputEl.placeholder = p.inputPlaceholder;
+        inputEl.value = "";
+    }
+    if (errEl) {
+        errEl.innerText = p.inputError;
+        errEl.style.display = "none";
+    }
+    if (startBtn) startBtn.innerText = p.startBtn;
+    if (cancelBtn) cancelBtn.innerText = p.cancelBtn;
+
+    var modal = document.getElementById("tournament-reg-modal");
+    if (modal) {
+        modal.style.display = "flex";
+    }
+    if (inputEl) {
+        setTimeout(function() { inputEl.focus(); }, 100);
+    }
+};
+
+// Skapa alias så anrop både med och utan "window." fungerar
+var startTournamentRegistration = window.startTournamentRegistration;
+
+    var HELP_TRANSLATIONS = {
+    sv: {
+        title: "📖 REGLEMENTE: LILLA GUBBENS GULDRACE",
+        sensoryTitle: "⚠️ SENSORISK VARNING / EPILEPSI & LJUD",
+        sensoryBody: "Spelet innehåller snabbt blinkande skärmeffekter vid skada, pulserande färger vid barfotaläge samt retro arkadljud på hög volym. Stäng av effekter eller sänk ljudet via ikonerna om du är känslig!",
+        rulesTitle: "🏁 HUR EN OMGÅNG GÅR TILL",
+        rulesBody: "1. Rid ut från Villa Villekulla! Banan scrollar automatiskt snabbare ju längre du överlever.<br>" +
+                   "2. Hoppa över staket, murar och sockerdricka.<br>" +
+                   "3. Samla guldmynt för extra bonuspoäng.<br>" +
+                   "4. Du har 4 gyllene hästskor (liv). Vid kollision flyger en sko av. Tappar du alla 4 är loppet över och 5 sekunders betänketid aktiveras!",
+        controlsTitle: "🎮 STYRNING & KNAPPAR",
+        controlsBody: "• <b>Hoppa:</b> Mellanslag, W, Upp-pil eller Tryck på skärmen.<br>" +
+                      "• <b>Paus:</b> [ESC] på PC eller [⏸️]-knappen uppe i vänstra hörnet på mobil.<br>" +
+                      "• <b>Ljud & Musik:</b> Ikoner nere i högra hörnet eller [M] på tangentbordet.<br>" +
+                      "• <b>Byt låt:</b> [N] på tangentbordet.",
+        closeBtn: "FATTAT! TILLBAKA TILL LOPPET"
+    },
+    no: {
+        title: "📖 REGLEMENT: LILLE GUBBENS GULLRACE",
+        sensoryTitle: "⚠️ SENSORISK ADVARSEL / EPILEPSI OG LYD",
+        sensoryBody: "Spillet inneholder raskt blinkende skjermeffekter ved skade, pulserende farger i barbent-modus og høye retro arkadelyder. Slå av effekter eller demp lyden via ikonene dersom du er følsom!",
+        rulesTitle: "🏁 HVORDAN EN RUNDE FOREGÅR",
+        rulesBody: "1. Ri ut fra Villa Villekulla! Banen ruller automatisk raskere jo lenger du overlever.<br>" +
+                   "2. Hopp over gjerder, murer og sukkerdråper.<br>" +
+                   "3. Samle gullmynter for ekstra bonuspoeng.<br>" +
+                   "4. Du har 4 gylne hestesko (liv). Ved krasj ryker en sko. Mister du alle 4 er løpet over, og en 5-sekunders tenkepause låser skjermen!",
+        controlsTitle: "🎮 STYRING OG KNAPPER",
+        controlsBody: "• <b>Hopp:</b> Mellomrom, W, Pil opp eller Trykk på skjermen.<br>" +
+                      "• <b>Pause:</b> [ESC] på PC eller [⏸️]-knappen øverst til venstre på mobil.<br>" +
+                      "• <b>Lyd og Musikk:</b> Ikoner nede i høyre hjørne eller [M] på tastaturet.<br>" +
+                      "• <b>Bytt låt:</b> [N] på tastaturet.",
+        closeBtn: "SKJØNT DET! TILBAKE TIL LØPET"
+    },
+    en: {
+        title: "📖 RULEBOOK: LILLA GUBBEN'S GOLD RACE",
+        sensoryTitle: "⚠️ SENSORY WARNING / FLASHING LIGHTS & AUDIO",
+        sensoryBody: "This game features rapid screen flashes on collision, flashing colors during barefoot warning, and loud retro sound synthesis. Mute or adjust sound using the corner icons if you are sensitive!",
+        rulesTitle: "🏁 HOW TO PLAY A ROUND",
+        rulesBody: "1. Gallop out of Villa Villekulla! The track accelerates continuously the longer you survive.<br>" +
+                   "2. Leap over wooden fences, stone walls, and soda creeks.<br>" +
+                   "3. Snatch gold coins along the way for bonus score.<br>" +
+                   "4. You begin with 4 golden horseshoes (lives). Hitting obstacles loses a shoe. Lose all four, and the race ends with an unskippable 5-second lock timer!",
+        controlsTitle: "🎮 CONTROLS & SHORTCUTS",
+        controlsBody: "• <b>Jump:</b> Spacebar, W, Up Arrow, or Tap the screen.<br>" +
+                      "• <b>Pause:</b> [ESC] on PC or the [⏸️] button top-left on mobile.<br>" +
+                      "• <b>Audio & Music:</b> Corner icons or [M] on the keyboard.<br>" +
+                      "• <b>Skip Track:</b> [N] on the keyboard.",
+        closeBtn: "GOT IT! BACK TO THE RACE"
+    }
+};
+    // Exponera globalt för att eliminera ReferenceError
+window.openHelpModal = function() {
+    var overlay = document.getElementById("help-modal-overlay");
+    var titleEl = document.getElementById("help-modal-title");
+    var contentEl = document.getElementById("help-modal-content");
+    var btnEl = document.getElementById("help-modal-close-btn");
+
+    if (!overlay || !contentEl) return;
+
+    var currentLang = (typeof activeLang !== 'undefined' && HELP_TRANSLATIONS[activeLang]) ? activeLang : "sv";
+    var pack = HELP_TRANSLATIONS[currentLang];
+
+    if (titleEl) titleEl.innerText = pack.title;
+    if (btnEl) btnEl.innerText = pack.closeBtn;
+
+    contentEl.innerHTML = 
+        '<div class="help-sensory-box">' +
+            '<strong>' + pack.sensoryTitle + '</strong>' +
+            pack.sensoryBody +
+        '</div>' +
+        '<h4>' + pack.rulesTitle + '</h4>' +
+        '<p>' + pack.rulesBody + '</p>' +
+        '<h4>' + pack.controlsTitle + '</h4>' +
+        '<p>' + pack.controlsBody + '</p>';
+
+    overlay.style.display = "flex";
+
+    // Pausa spel & musik automatiskt när reglementet öppnas
+    if (typeof gameState !== 'undefined' && gameState === "PLAYING") {
+        gameState = "PAUSED";
+        if (typeof AudioEngine !== 'undefined' && AudioEngine.pause) AudioEngine.pause();
+        if (typeof TournamentJukebox !== 'undefined' && TournamentJukebox.pause) TournamentJukebox.pause();
+    }
+};
+
+window.closeHelpModal = function() {
+    var overlay = document.getElementById("help-modal-overlay");
+    if (overlay) {
+        overlay.style.display = "none";
+    }
+};
+
+// Garantera att funktionen finns globalt på window för HTML-knappens onclick
+window.triggerTournamentReload = function() {
+    var lang = (typeof activeLang !== 'undefined') ? activeLang : "sv";
+    var currentUrl = new URL(window.location.href);
+    
+    currentUrl.searchParams.set("tournament", "true");
+    currentUrl.searchParams.set("lang", lang);
+
+    // Laddar om direkt i turneringsläget
+    window.location.href = currentUrl.toString();
+};
+
+// Koppla stängknappen via EventListener istället för inline onclick
+document.addEventListener("DOMContentLoaded", function() {
+    var urlParams = new URLSearchParams(window.location.search);
+
+// Rad ~795-802: Säkert anrop med fallback
+if (urlParams.get("tournament") === "true") {
+    isTournamentMode = true;
+    
+    // Säkerställ att anropet väntar tills DOM och funktioner är redo
+    window.addEventListener("DOMContentLoaded", function() {
+        if (typeof window.startTournamentRegistration === "function") {
+            window.startTournamentRegistration();
+        } else {
+            console.warn("startTournamentRegistration laddas om 200ms...");
+            setTimeout(function() {
+                if (typeof window.startTournamentRegistration === "function") {
+                    window.startTournamentRegistration();
+                }
+            }, 200);
+        }
+    });
+}
+    var closeBtn = document.getElementById("help-modal-close-btn");
+    if (closeBtn) {
+        closeBtn.addEventListener("click", function(e) {
+            e.stopPropagation();
+            window.closeHelpModal();
+        });
+    }
+});
+
+var BTN_HELP_RECT = { x: 0, y: 12, w: 42, h: 42 };
+
+// Hämtar gränserna säkert även om variabeln canvas inte är deklarerad globalt än
+function getHelpBtnBounds() {
+    var cvs = (typeof canvas !== 'undefined' && canvas) ? canvas : document.getElementById("gameCanvas");
+    var currentWidth = cvs ? cvs.width : 800; // Använder spelets canvasbredd eller 800 som fallback
+    return {
+        x: currentWidth - 15 - BTN_HELP_RECT.w,
+        y: 12,
+        w: BTN_HELP_RECT.w,
+        h: BTN_HELP_RECT.h
+    };
+}
+
+function drawCornerUIButtons() {
+    var cvs = (typeof canvas !== 'undefined' && canvas) ? canvas : document.getElementById("gameCanvas");
+    if (!cvs) return;
+    var context = (typeof ctx !== 'undefined' && ctx) ? ctx : cvs.getContext("2d");
+    if (!context) return;
+
+    context.save();
+    var btn = getHelpBtnBounds();
+
+    // 1. RITA FRÅGETECKNET (ALLTID ETT TYDLIGT "?", ALDRIG ETT KRYSS)
+    context.fillStyle = 'rgba(25, 5, 40, 0.90)';
+    context.fillRect(btn.x, btn.y, btn.w, btn.h);
+    context.strokeStyle = '#00ffcc';
+    context.lineWidth = 2.5;
+    context.strokeRect(btn.x, btn.y, btn.w, btn.h);
+
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillStyle = '#00ffcc';
+    context.font = "bold 24px 'Comic Sans MS', cursive, sans-serif";
+    context.fillText("?", btn.x + btn.w / 2, btn.y + btn.h / 2 + 1);
+
+    // 2. MOBIL-PAUSKNAPP (visas endast vid touch/mobil under aktivt spel)
+    var shouldShowPause = (typeof isMobileDevice === 'function' && isMobileDevice()) || ('ontouchstart' in window);
+    if (shouldShowPause && (typeof gameState !== 'undefined') && (gameState === "PLAYING" || gameState === "PAUSED")) {
+        var pX = 15, pY = 52, pW = 38, pH = 38;
+        context.fillStyle = 'rgba(25, 5, 40, 0.90)';
+        context.fillRect(pX, pY, pW, pH);
+        context.strokeStyle = '#ffeb3b';
+        context.lineWidth = 2.5;
+        context.strokeRect(pX, pY, pW, pH);
+
+        // Vektorritade stolpar för paus
+        context.fillStyle = '#ffeb3b';
+        context.fillRect(pX + 11, pY + 9, 5, 20);
+        context.fillRect(pX + 22, pY + 9, 5, 20);
+    }
+
+    context.restore();
+}
+(function() {
+    var canvas = document.getElementById('derbyCanvas');
+    var ctx = canvas.getContext('2d');
+
+    function isMobileDevice() {
+    var ua = navigator.userAgent || navigator.vendor || window.opera;
+    var hasTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    return /android|iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && hasTouch);
+}
+
+function checkLegacyAndroidBrowser() {
+    var ua = navigator.userAgent || navigator.vendor || window.opera;
+    
+    // Identifiera gamla stock Android Browser ("Webbläsare")
+    // Typisk UA: Mozilla/5.0 (Linux; U; Android 4.4.2; ... ) AppleWebKit/... Version/4.0 Mobile Safari/...
+    var isAndroid = /android/i.test(ua);
+    var isLegacyStockBrowser = isAndroid && 
+        /Version\/[0-9\.]+/i.test(ua) && 
+        !/Chrome\/[0-9\.]+/i.test(ua) && 
+        !/Firefox\/[0-9\.]+/i.test(ua);
+
+    if (isLegacyStockBrowser) {
+        blockLegacyDevice(
+            "🛑 FORNTIDA ANDROID-WEBBLÄSARE DETEKTERAD!",
+            "Du kör Androids gamla 'Webbläsare'-app från 2012! Den har varken kraft för hästens hovar eller ljudmotorn. Öppna spelet i Google Chrome, Firefox eller en modern webbläsare!"
+        );
+        return false;
+    }
+    return true;
+}
+
+// Kör spärren direkt vid laddning
+checkLegacyAndroidBrowser();
+
+function checkOrientationNotice(ctx, canvas) {
+    // 1. Kontrollera om enheten är mobil/padda och om skärmen är i stående läge
+    if (!isMobileDevice()) return;
+    if (window.innerHeight <= window.innerWidth) return; // Redan i liggande läge
+
+    // 2. Avgör om det är en surfplatta/padda eller vanlig mobil
+    var ua = navigator.userAgent.toLowerCase();
+    var isTablet = /ipad|tablet/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+    // 3. Lokala översättningar (helt isolerade från GAME_TRANSLATIONS)
+    var notices = {
+        sv: {
+            phone: "📱 Vrid mobilen till liggande läge för bäst upplevelse!",
+            tablet: "📲 Vrid paddan till liggande läge för bäst upplevelse!",
+            sub: "Hästens hovar behöver fri sikt framåt! 🔄"
+        },
+        no: {
+            phone: "📱 Vri mobilen til liggende stilling for best opplevelse!",
+            tablet: "📲 Vri nettbrettet til liggende stilling for best opplevelse!",
+            sub: "Hestens hover trenger fri sikt fremover! 🔄"
+        },
+        en: {
+            phone: "📱 Rotate your phone to landscape for the best experience!",
+            tablet: "📲 Rotate your tablet to landscape for the best experience!",
+            sub: "The horse hooves need a clear view ahead! 🔄"
+        }
+    };
+
+    var currentLangPack = notices[activeLang] || notices.no;
+    var mainMsg = isTablet ? currentLangPack.tablet : currentLangPack.phone;
+    var subMsg = currentLangPack.sub;
+
+    // 4. Rita varningsbannern högst upp på canvasen
+    ctx.save();
+    var boxW = Math.min(canvas.width - 20, 520);
+    var boxH = 50;
+    var boxX = (canvas.width - boxW) / 2;
+    var boxY = 12;
+
+    ctx.fillStyle = "rgba(10, 0, 20, 0.90)";
+    ctx.fillRect(boxX, boxY, boxW, boxH);
+    ctx.strokeStyle = "#ffeb3b";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(boxX, boxY, boxW, boxH);
+
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#ffeb3b";
+    ctx.font = "bold 13px 'Comic Sans MS', cursive, sans-serif";
+    ctx.fillText(mainMsg, canvas.width / 2, boxY + 20);
+
+    ctx.fillStyle = "#00ffcc";
+    ctx.font = "italic 11px 'Comic Sans MS', cursive, sans-serif";
+    ctx.fillText(subMsg, canvas.width / 2, boxY + 38);
+    ctx.restore();
+}
+
+
+// 2. Visa/Dölj knappen och uppdatera dess text efter valt språk
+function updateTournamentButtonVisibility() {
+    var btnCont = document.getElementById("tournament-btn-container");
+    var btn = document.getElementById("btn-lan-tournament");
+    if (!btnCont || !btn) return;
+
+    // Om vi redan är i en turnering eller kör ett lopp: Dölj knappen!
+    if ((typeof isTournamentMode !== 'undefined' && isTournamentMode) || 
+        (typeof gameState !== 'undefined' && gameState !== "MENU")) {
+        btnCont.style.display = "none";
+        return;
+    }
+
+    // Visa endast i Huvudmenyn (gameState === "MENU")
+    if (typeof gameState === 'undefined' || gameState === "MENU") {
+        btnCont.style.display = "block";
+
+        // Dynamisk text beroende på språk (SV / NO / EN)
+        var lang = (typeof activeLang !== 'undefined') ? activeLang : "sv";
+        if (lang === "no") {
+            btn.innerText = "🏆 TURNERINGSMODUS";
+        } else if (lang === "en") {
+            btn.innerText = "🏆 TOURNAMENT MODE";
+        } else {
+            btn.innerText = "🏆 TURNERINGSLÄGE";
+        }
+    }
+}
+    // --- 🌍 ORDBOK FÖR DERBY DASH (SV / NO / EN) ---
+var GAME_TRANSLATIONS = {
+    sv: {
+        controls: function(isMob) {
+            return isMob 
+                ? "Styrning: <span>[TRYCK PÅ SKÄRMEN]</span> = Hoppa | <span>[IKONER]</span> = Ljud" 
+                : "Styrning: <span>[MELLANSLAG]</span> / <span>[W]</span> / <span>[PIL UPP]</span> = Hoppa | <span>[M]</span> = Ljud | <span>[ESC]</span> = Paus";
+        },
+        hudShoes: "HOVAR / SKOR:",
+        hudDist: "DISTANS: ",
+        hudGold: "GULD: ",
+        warnBarefoot: "⚠️ HÄSTEN SPRINGER BARFOTA! 1 SKO KVAR! ⚠️",
+        menuTournamentBtn: "🏆 TURNERINGSLÄGE",
+        menuTitle: "🐎 DERBY DASH 2000",
+        menuSub: "LILLA GUBBENS GULDRACE",
+        menuDesc1: "Rid ut från Villa Villekulla! Hoppa över staket och sockerdricka.",
+        menuDesc2: "Du startar med 4 gyllene hästskor. Tappa inte alla!",
+        menuStart: function(isMob) {
+            return isMob ? "[ PEKA PÅ SKÄRMEN FÖR ATT STARTA ]" : "[ TRYCK MELLANSLAG ELLER KLICKA FÖR ATT STARTA ]";
+        },
+        langSwitchHint: function(isMob) {
+            return isMob ? "🌍 BYT SPRÅK (PEKA HÄR): " : "🌍 SPRÅK / LANGUAGE [TRYCK L]: ";
+        },
+        pausedTitle: "⏸️ PAUSAD",
+        pausedDesc: function(isMob) {
+            return isMob ? "Peka på skärmen för att fortsätta" : "Tryck [ESC] för att fortsätta";
+        },
+        gameOverStats: function(dist, gold) {
+            return "DISTANS: " + dist + " M   |   PENGAR: " + gold + " GULD";
+        },
+        gameOverLockWait: function(sec) {
+            return "🛑 STOPP OCH BELÄGG! VÄNTA PÅ DUM-KLOCKAN... (" + sec + "S)";
+        },
+        gameOverRestart: function(isMob) {
+            return isMob ? "[ PEKA PÅ SKÄRMEN FÖR ATT FÖRSÖKA IGEN ]" : "[ TRYCK MELLANSLAG ELLER KLICKA FÖR ATT FÖRSÖKA IGEN ]";
+        },
+        gameOverTitles: [
+            "💀 PLATT FALL I RABATTEN! 💀",
+            "🐎 HOVARNA FLÖG ÅT SKOGEN! 🐎",
+            "🛑 TVÄRNIT VID KÖKSTRAPPAN! 🛑",
+            "🥞 PANNKAKSKRASCH I DIKET! 🥞",
+            "💤 HÄSTEN TOG SEMESTER! 💤"
+        ],
+        tiers: {
+            useless: [
+                "👧 PIPPI: 'Ajajaj! Ramlade du av innan grinden ens öppnades?! Du rider som en påse ruttna kålrötter!'",
+                "🧙‍♂️ KAMEK: 'Buhahaha! 10 meter och noll skor kvar! Det där var det mest tragiska jag sett!'",
+                "👮 KLING: 'Här blir det omedelbart beslagtagande av hästlicensen! Total katastrof!'"
+            ],
+            bad: [
+                "👧 PIPPI: 'Hoppsan hejsan! Hästen snubblade på en kotte och du flög ner i sockerdrickan!'",
+                "🧙‍♂️ KAMEK: 'Krasch bom bang! Du styr ju som en full kundvagn med plastdäck!'",
+                "👮 KLANG: 'Ajabaja! Vårdslöshet i trafiken! Staketet är helt i flisor!'"
+            ],
+            medium: [
+                "👧 PIPPI: 'Inte helt tokigt, men Prusseluskan cyklar fortfarande snabbare!'",
+                "🧙‍♂️ KAMEK: 'Mutter... Halvvägs, men du har reflexer som en trött daggmask!'",
+                "🐵 HERR NILSSON: '*Tjatter tjatter!* (Betyder: Helt okej galopp, men hatten flög av!)'"
+            ],
+            good: [
+                "👧 PIPPI: 'Tjohooo! Snyggt hoppat! Nu börjar det likna en riktig cirkusryttare!'",
+                "🧙‍♂️ KAMEK: 'Grumble... Du duckade mina fällor, men nästa gång blir det värre!'",
+                "👮 KLING & KLANG: 'Det går undan här! Men snyggt hoppat över stenmuren!'"
+            ],
+            best: [
+                "👧 PIPPI: 'Dunder och snus vad du rider! Du är nästan lika snabb som jag!'",
+                "🧙‍♂️ KAMEK: 'Vad i hela... Hur lyckades du parera alla mina fällor?! Ren tur!'",
+                "🐵 HERR NILSSON: '*Gurgel och applåder!* (Betyder: Mästerligt! Ta två bananer!)'"
+            ],
+            super: [
+                "👧 PIPPI: 'TJOHO OCH GULDSTJÄRNA! Snabbare än en kanonkula! VÄRLDSMÄSTARE!'",
+                "🧙‍♂️ KAMEK: 'OMÖJLIGT! Staven min glöder av raseri! Du är ju omänskligt snabb!'",
+                "👑 KUNG EFRAIM: 'Skål från Söderhavet! Det där åket går till historien!'"
+            ]
+        }
+    },
+    no: {
+        controls: function(isMob) {
+            return isMob 
+                ? "Styring: <span>[TRYKK PÅ SKJERMEN]</span> = Hopp | <span>[IKONER]</span> = Lyd" 
+                : "Styring: <span>[MELLOMROM]</span> / <span>[W]</span> / <span>[PIL OPP]</span> = Hopp | <span>[M]</span> = Lyd | <span>[ESC]</span> = Pause";
+        },
+        hudShoes: "HOVER / SKO:",
+        hudDist: "DISTANSE: ",
+        hudGold: "GULL: ",
+        warnBarefoot: "⚠️ HESTEN LØPER BARBENT! 1 SKO IGJEN! ⚠️",
+        menuTitle: "🐎 DERBY DASH 2000",
+        menuSub: "LILLE GUBBENS GULLRACE",
+        menuDesc1: "Ri ut fra Villa Villekulla! Hopp over gjerder og sukkerdråper.",
+        menuDesc2: "Du starter med 4 gylne hestesko. Ikke mist alle sammen!",
+        menuTournamentBtn: "🏆 TURNERINGSMODUS",
+        menuStart: function(isMob) {
+            return isMob ? "[ PEK PÅ SKJERMEN FOR Å STARTE ]" : "[ TRYKK MELLOMROM ELLER KLIKK FOR Å STARTE ]";
+        },
+        langSwitchHint: function(isMob) {
+            return isMob ? "🌍 BYTT SPRÅK (TRYKK HER): " : "🌍 SPRÅK / LANGUAGE [TRYKK L]: ";
+        },
+        pausedTitle: "⏸️ PAUSE",
+        pausedDesc: function(isMob) {
+            return isMob ? "Trykk på skjermen for å fortsette" : "Trykk [ESC] for å fortsette";
+        },
+        gameOverStats: function(dist, gold) {
+            return "DISTANSE: " + dist + " M   |   PENGER: " + gold + " GULL";
+        },
+        gameOverLockWait: function(sec) {
+            return "🛑 NEI NEI NEI! VENT PÅ KLOVI-KLOKKEN... (" + sec + "S)";
+        },
+        gameOverRestart: function(isMob) {
+            return isMob ? "[ PEK PÅ SKJERMEN FOR Å PRØVE IGJEN ]" : "[ TRYKK MELLOMROM ELLER KLIKK FOR Å PRØVE IGJEN ]";
+        },
+        gameOverTitles: [
+            "💀 PLASK I GRØFTEN! 💀",
+            "🐎 SKOENE FLØY TIL SKOGS! 🐎",
+            "🛑 BRÅSTOPP VED GJÉRDET! 🛑",
+            "🥞 VAFFELKRASJ PÅ TUNET! 🥞",
+            "💤 HESTEN TOK MIDDAGSHVIL! 💤"
+        ],
+        tiers: {
+            useless: [
+                "👧 PIPPI: 'Uffameg og ajajaj! Datt du av før start?! Du rir som en sekk råtne poteter!'",
+                "🧙‍♂️ KAMEK: 'Buhahaha! Krasj etter to meter! Det mest pinlige løpet i historien!'",
+                "👮 BETJENTENE: 'Her blir det førerkortbeslag på flekken! Uakseptabel ridning!'"
+            ],
+            bad: [
+                "👧 PIPPI: 'Oj sann! Hesten snublet og du fløy som en vante rett i gjørma!'",
+                "🧙‍♂️ KAMEK: 'Krasj bom bang! Du styrer jo hesten som en handlevogn med knekt hjul!'",
+                "👮 BETJENTENE: 'Stopp i lovens navn! Dette er råkjøring uten lisens!'"
+            ],
+            medium: [
+                "👧 PIPPI: 'Ikke helt håpløst, men Prusselusken sykler fremdeles fortere!'",
+                "🧙‍♂️ KAMEK: 'Mutter... Grei distanse, men reaksjonsevne som en halvdød snegle!'",
+                "🐵 HERR NILSSON: '*Skravle skravle!* (Betyr: Helt greit, men lua mi datt av!)'"
+            ],
+            good: [
+                "👧 PIPPI: 'Oi oi oi, dæven så stilig! Nå begynner du å ri som en sjørøver!'",
+                "🧙‍♂️ KAMEK: 'Grrr... Du unngikk fellene mine, men neste gang tryller jeg banen full av slim!'",
+                "👮 BETJENTENE: 'Det går unna! Men imponerende hopp over muren!'"
+            ],
+            best: [
+                "👧 PIPPI: 'Hoppla hei! Du rir jo nesten like raskt og tøft som meg selv!'",
+                "🧙‍♂️ KAMEK: 'Hva i alle dager?! Hvordan klarte du det hinderet?! Ren flaks!'",
+                "🐵 HERR NILSSON: '*Hopper og jubler!* (Betyr: Kjempeflott galopp, ta to bananer!)'"
+            ],
+            super: [
+                "👧 PIPPI: 'HURRA OG GULLPOKAL! Du galopperer raskere enn en kanonkule! MESTER!'",
+                "🧙‍♂️ KAMEK: 'UMULIG! Tryllestaven min koker av sinne! Du er ustoppelig!'",
+                "👑 KONG EFRAIM: 'Skål fra Sydhavet! Dette rittet skal synges om på øya!'"
+            ]
+        }
+    },
+    en: {
+        controls: function(isMob) {
+            return isMob 
+                ? "Controls: <span>[TAP SCREEN]</span> = Jump | <span>[ICONS]</span> = Audio" 
+                : "Controls: <span>[SPACEBAR]</span> / <span>[W]</span> / <span>[UP ARROW]</span> = Jump | <span>[M]</span> = Audio | <span>[ESC]</span> = Pause";
+        },
+        hudShoes: "HOOVES / SHOES:",
+        hudDist: "DISTANCE: ",
+        hudGold: "GOLD: ",
+        warnBarefoot: "⚠️ HORSE IS RUNNING BAREFOOT! 1 SHOE LEFT! ⚠️",
+        menuTitle: "🐎 DERBY DASH 2000",
+        menuSub: "LILLA GUBBEN'S GOLD RACE",
+        menuDesc1: "Ride out from Villa Villekulla! Clear fences and soda creeks.",
+        menuDesc2: "You start with 4 golden horseshoes. Don't drop them all!",
+        menuTournamentBtn: "🏆 TOURNAMENT MODE",
+        menuStart: function(isMob) {
+            return isMob ? "[ TAP SCREEN TO START ]" : "[ PRESS SPACEBAR OR CLICK TO START ]";
+        },
+        langSwitchHint: function(isMob) {
+            return isMob ? "🌍 SWITCH LANGUAGE (TAP HERE): " : "🌍 LANGUAGE [PRESS L]: ";
+        },
+        pausedTitle: "⏸️ PAUSED",
+        pausedDesc: function(isMob) {
+            return isMob ? "Tap screen to resume" : "Press [ESC] to resume";
+        },
+        gameOverStats: function(dist, gold) {
+            return "DISTANCE: " + dist + " M   |   GOLD: " + gold + " COINS";
+        },
+        gameOverLockWait: function(sec) {
+            return "🛑 HOLD YOUR HORSES! WAIT FOR SILLY TIMER... (" + sec + "S)";
+        },
+        gameOverRestart: function(isMob) {
+            return isMob ? "[ TAP SCREEN TO TRY AGAIN ]" : "[ PRESS SPACEBAR OR CLICK TO PLAY AGAIN ]";
+        },
+        gameOverTitles: [
+            "💀 DIRT NAP IN THE BUSHES! 💀",
+            "🐎 THE HORSESHOES FLEW AWAY! 🐎",
+            "🛑 TOTAL WIPEOUT AT THE FENCE! 🛑",
+            "🥞 PANCAKE CRASH IN THE DITCH! 🥞",
+            "💤 THE HORSE WENT ON VACATION! 💤"
+        ],
+        tiers: {
+            useless: [
+                "👧 PIPPI: 'Ouchie-ouch! Did you fall off before the gate opened?! You steer like rotten turnips!'",
+                "🧙‍♂️ KAMEK: 'Bwahaha! 10 meters and zero shoes left! The most pathetic derby in history!'",
+                "👮 THE COPS: 'License revoked immediately! Total donkey-tier riding!'"
+            ],
+            bad: [
+                "👧 PIPPI: 'Oopsie-daisy! The horse tripped and you flew like a ragdoll into the mud!'",
+                "🧙‍♂️ KAMEK: 'Crash and burn! You steer like a broken shopping cart on ice!'",
+                "👮 THE COPS: 'Hold it! You completely shattered the fence into toothpicks!'"
+            ],
+            medium: [
+                "👧 PIPPI: 'Not totally dreadful, but Miss Prysselius still cycles faster than that!'",
+                "🧙‍♂️ KAMEK: 'Grumble... Average run, but reflexes like a sleepy earthworm!'",
+                "🐵 MR. NILSSON: '*Chatter chatter!* (Translates to: Decent run, but I lost my hat!)'"
+            ],
+            good: [
+                "👧 PIPPI: 'Yaaaay! Look at you go! Now you ride like a proper circus acrobat!'",
+                "🧙‍♂️ KAMEK: 'Grrr... You dodged my traps, but next run I turn hurdles into frogs!'",
+                "👮 THE COPS: 'A bit over the speed limit, but that jump over the wall was mighty fine!'"
+            ],
+            best: [
+                "👧 PIPPI: 'Holy macaroni! You ride almost as fearless and fast as me!'",
+                "🧙‍♂️ KAMEK: 'WHAT?! How did you clear all those traps?! Pure luck!'",
+                "🐵 MR. NILSSON: '*Claps hands!* (Translates to: Magnificent! Have two bananas!)'"
+            ],
+            super: [
+                "👧 PIPPI: 'HOORAY AND GOLD MEDAL! Faster than a pirate cannonball! LEGENDARY!'",
+                "🧙‍♂️ KAMEK: 'IMPOSSIBLE! My magic wand is overheating! You are faster than lightning!'",
+                "👑 KING EFRAIM: 'Cheers from the South Seas! This run will be sung about forever!'"
+            ]
+        }
+    }
+};
+
+var gameOverLockTimer = 0; // 5 sekunder = 300 bildrutor vid 60 FPS
+var activeHumorComment = ""; // Sparar vald kommentar för Game Over-skärmen
+var activeGameOverTitle = "";
+    var lostShoeBlinkTimers = [0, 0, 0, 0]; // Håller koll på blinkning för varje sko
+    // Status för musik respektive ljudeffekter
+var isMusicMuted = false;
+var isSfxMuted = false;
+var isTournamentMode = false;
+var tournamentPlayer = {
+    name: "",
+    currentAttempt: 1,
+    scores: [], // Sparar poängen från omgång 1, 2 och 3
+    bestScore: 0
+};
+
+// Knapparnas placering i nedre högra hörnet (40x40 px styck)
+var BTN_MUSIC_RECT = { x: 0, y: 0, w: 40, h: 40 };
+var BTN_SFX_RECT   = { x: 0, y: 0, w: 40, h: 40 };
+var BTN_PAUSE_RECT = { x: 15, y: 15, w: 36, h: 36 };
+function drawCornerUIButtons() {
+    ctx.save();
+    var btn = getHelpBtnBounds();
+
+    // Bakgrund och ram
+    ctx.fillStyle = 'rgba(25, 5, 40, 0.90)';
+    ctx.fillRect(btn.x, btn.y, btn.w, btn.h);
+    ctx.strokeStyle = '#00ffcc';
+    ctx.lineWidth = 2.5;
+    ctx.strokeRect(btn.x, btn.y, btn.w, btn.h);
+
+    // Frågetecknet
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#00ffcc';
+    ctx.font = "bold 24px 'Comic Sans MS', cursive, sans-serif";
+    ctx.fillText("?", btn.x + btn.w / 2, btn.y + btn.h / 2 + 1);
+
+    // Mobil-pausknapp (visas under hästskorna vid touch/mobil)
+    var shouldShowPause = (typeof isMobileDevice === 'function' && isMobileDevice()) || ('ontouchstart' in window);
+    if (shouldShowPause && (gameState === "PLAYING" || gameState === "PAUSED")) {
+        var pX = 15, pY = 52, pW = 38, pH = 38;
+        ctx.fillStyle = 'rgba(25, 5, 40, 0.90)';
+        ctx.fillRect(pX, pY, pW, pH);
+        ctx.strokeStyle = '#ffeb3b';
+        ctx.lineWidth = 2.5;
+        ctx.strokeRect(pX, pY, pW, pH);
+
+        ctx.fillStyle = '#ffeb3b';
+        ctx.fillRect(pX + 11, pY + 9, 5, 20);
+        ctx.fillRect(pX + 22, pY + 9, 5, 20);
+    }
+
+    ctx.restore();
+}
+// Initiera språket enbart om det inte redan är satt
+var activeLang = "sv"; // Förvalt språk
+
+function initGameLanguage() {
+    // 1. Prioritera URL-parameter om turneringen startats med t.ex. ?lang=no
+    var urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has("lang")) {
+        var l = urlParams.get("lang").toLowerCase();
+        if (l === "sv" || l === "no" || l === "en") {
+            activeLang = l;
+            updateAllUIMenus();
+            return;
+        }
+    }
+
+    // 2. Kontrollera enhetens/webbläsarens språk
+    var raw = (navigator.language || navigator.userLanguage || "").toLowerCase();
+
+    if (raw.indexOf("sv") === 0) {
+        activeLang = "sv";
+    } else if (raw.indexOf("no") === 0 || raw.indexOf("nb") === 0 || raw.indexOf("nn") === 0) {
+        activeLang = "no";
+    } else if (raw.indexOf("en") === 0) {
+        activeLang = "en";
+    } else {
+        // 🛑 Enheten har ett annat språk (t.ex. tyska, franska, spanska, danska m.fl.):
+        // Visa den retro Select Language-modalen direkt!
+        var modal = document.getElementById("language-prompt-overlay");
+        if (modal) {
+            modal.style.display = "flex";
+        }
+        activeLang = "en"; // Standard i bakgrunden tills val gjorts
+    }
+
+    updateAllUIMenus();
+}
+
+window.setGameLanguage = function(chosenLang) {
+    activeLang = chosenLang;
+
+    // Dölj språkväljaren
+    var modal = document.getElementById("language-prompt-overlay");
+    if (modal) modal.style.display = "none";
+
+    // Synka index för menyns språkväxling [L]
+    for (var i = 0; i < AVAILABLE_LANGS.length; i++) {
+        if (AVAILABLE_LANGS[i].code === activeLang) {
+            currentLangMenuIndex = i;
+            break;
+        }
+    }
+
+    // Uppdatera samtliga menyer och texter i DOM
+    updateAllUIMenus();
+
+    if (typeof AudioEngine !== 'undefined' && AudioEngine.coin) {
+        AudioEngine.coin();
+    }
+};
+
+// Samlad funktion som uppdaterar alla menyer och modaler
+function updateAllUIMenus() {
+    // 1. Kontrolltext i botten
+    if (typeof updateFooterControlsText === "function") {
+        updateFooterControlsText();
+    }
+
+    // 2. HTML-turneringsknappen i menyn
+    if (typeof updateTournamentButtonVisibility === "function") {
+        updateTournamentButtonVisibility();
+    }
+
+    // 3. Hjälpmodalfönstret (om det är öppet)
+    var helpOverlay = document.getElementById("help-modal-overlay");
+    if (helpOverlay && helpOverlay.style.display === "flex") {
+        if (typeof window.openHelpModal === "function") {
+            window.openHelpModal();
+        }
+    }
+
+    // 4. Turneringsregistreringen (om den är öppen)
+    var tourneyModal = document.getElementById("tournament-reg-modal");
+    if (tourneyModal && tourneyModal.style.display === "flex") {
+        if (typeof window.startTournamentRegistration === "function") {
+            window.startTournamentRegistration();
+        }
+    }
+}
+
+// Kör språkkontrollen direkt vid laddning
+initGameLanguage();
+
+
+
+
+// Lokala översättningar för mobilspärrarna (SV / NO / EN)
+var LEGACY_BLOCK_TEXTS = {
+    sv: {
+        androidOldTitle: "🟣 MOBIL-VETO: FÖR GAMMAL ANDROID!",
+        androidOldDesc: function(ver) {
+            return "Du kör Android " + ver + "! Spelet kräver minst Android 10. Lägg tillbaka pappas gamla lånepanna i byrålådan!";
+        },
+        iosOldTitle: "🟣 MOBIL-VETO: FÖR GAMMAL IPHONE/IPAD!",
+        iosOldDesc: function(ver) {
+            return "Detekterade iOS " + ver + "! Derby Dash kräver minst iOS 18 för att hästens hovar ska orka galoppera utan lagg. Uppdatera enheten eller spela på PC!";
+        },
+        stockBrowserTitle: "🛑 FORNTIDA ANDROID-WEBBLÄSARE DETEKTERAD!",
+        stockBrowserDesc: "Du kör Androids gamla 'Webbläsare'-app! Den saknar modern grafik- och ljudmotor. Öppna spelet i Chrome eller Firefox!"
+    },
+    no: {
+        androidOldTitle: "🟣 MOBIL-VETO: FOR GAMMEL ANDROID!",
+        androidOldDesc: function(ver) {
+            return "Du kjører Android " + ver + "! Spillet krever minst Android 10. Legg den gamle reservemobilen tilbake i skuffen!";
+        },
+        iosOldTitle: "🟣 MOBIL-VETO: FOR GAMMEL IPHONE/IPAD!",
+        iosOldDesc: function(ver) {
+            return "Oppdaget iOS " + ver + "! Derby Dash krever minst iOS 18 for at hestehovene skal orke å løpe uten hakking. Oppdater eller spill på PC!";
+        },
+        stockBrowserTitle: "🛑 UTDATERT ANDROID-NETTLESER OPPDAGET!",
+        stockBrowserDesc: "Du bruker den gamle standardnettleseren til Android! Den støtter verken lydmotoren eller spillet. Åpne spillet i Chrome eller Firefox!"
+    },
+    en: {
+        androidOldTitle: "🟣 MOBILE VETO: OUTDATED ANDROID!",
+        androidOldDesc: function(ver) {
+            return "You are running Android " + ver + "! Derby Dash requires at least Android 10. Put that ancient brick back in the drawer!";
+        },
+        iosOldTitle: "🟣 MOBILE VETO: OUTDATED IPHONE/IPAD!",
+        iosOldDesc: function(ver) {
+            return "Detected iOS " + ver + "! Derby Dash requires at least iOS 18 for the hooves to run smoothly. Update your device or play on a PC!";
+        },
+        stockBrowserTitle: "🛑 ANCIENT ANDROID BROWSER DETECTED!",
+        stockBrowserDesc: "You are using the legacy stock Android Browser! It lacks audio and modern canvas rendering. Please open the game in Chrome or Firefox!"
+    }
+};
+
+function getBlockLang() {
+    // Använd activeLang om det är satt, annars webbläsarens språk
+    if (typeof activeLang !== 'undefined' && LEGACY_BLOCK_TEXTS[activeLang]) {
+        return activeLang;
+    }
+    var navLang = (navigator.language || navigator.userLanguage || "no").toLowerCase();
+    if (navLang.indexOf("sv") === 0) return "sv";
+    if (navLang.indexOf("en") === 0) return "en";
+    return "no"; // Standard för LAN i Norge
+}
+
+function checkMobileOSRequirements() {
+    var lang = getBlockLang();
+    var t = LEGACY_BLOCK_TEXTS[lang];
+    var ua = navigator.userAgent || navigator.vendor || window.opera;
+    var isAndroid = /android/i.test(ua);
+    var isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+    // 1. Spärr mot gamla Android Browser ("Blå globen" / Stock AOSP)
+    var isLegacyStockBrowser = isAndroid && 
+        /Version\/[0-9\.]+/i.test(ua) && 
+        !/Chrome\/[0-9\.]+/i.test(ua) && 
+        !/Firefox\/[0-9\.]+/i.test(ua);
+
+    if (isLegacyStockBrowser) {
+        blockLegacyDevice(t.stockBrowserTitle, t.stockBrowserDesc);
+        return false;
+    }
+
+    // 2. Android Versionskontroll (Minst Android 10)
+    if (isAndroid) {
+        var matchAndroid = ua.match(/Android\s([0-9\.]+)/i);
+        if (matchAndroid) {
+            var androidVer = parseFloat(matchAndroid[1]);
+            if (androidVer < 10.0) {
+                blockLegacyDevice(t.androidOldTitle, t.androidOldDesc(androidVer));
+                return false;
+            }
+        }
+    }
+
+    // 3. iOS Versionskontroll (Minst iOS 18)
+    if (isIOS) {
+        var matchIOS = ua.match(/OS\s([0-9_]+)/i);
+        var iosVer = 0;
+        if (matchIOS) {
+            iosVer = parseFloat(matchIOS[1].replace(/_/g, '.'));
+        }
+        if (iosVer > 0 && iosVer < 18.0) {
+            blockLegacyDevice(t.iosOldTitle, t.iosOldDesc(iosVer));
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function blockLegacyDevice(title, desc) {
+    if (typeof gameState !== 'undefined') gameState = "DEVICE_BLOCKED";
+    
+    var overlay = document.getElementById("telia-monitor-overlay");
+    var titleEl = document.getElementById("telia-lock-title");
+    var reasonEl = document.getElementById("telia-lock-reason");
+    
+    if (titleEl) titleEl.innerText = title;
+    if (reasonEl) reasonEl.innerText = desc;
+    if (overlay) overlay.style.setProperty("display", "flex", "important");
+}
+
+// Kör kollen direkt
+checkMobileOSRequirements();
+
+// ========================================================
+// 📻 TOURNAMENT JUKEBOX MED SPRÅKSTYRDA SPELLISTOR
+// ========================================================
+var TournamentJukebox = (function() {
+    // 1. ALLMÄNNA LÅTAR (Kan spelas på alla språk: Engelska klassiker, Eurodance, Gaming-soundtracks)
+    var GLOBAL_TRACKS = [
+        "alone.mp3", "alone_ii.mp3", "alone_iii.mp3", "animals.mp3", 
+        "baby_i_love_your_way.mp3", "bad_romance.mp3", "barbie_girl.mp3", 
+        "be_my_lover.mp3", "beauty_and_a_beat.mp3", "better_off_alone.mp3", "billie_jean.mp3",
+        "blinding_lights.mp3", "blue.mp3", "boom_boom_boom.mp3", "born_in_the_usa.mp3",
+        "bowsers_galaxy.mp3", "bring_me_to_life.mp3",  "chop_suey.mp3",
+        "clarity.mp3", "coco_jamboo.mp3", "coconut_mall.mp3", "cotton_eye_joe.mp3",
+        "could_you_be_loved.mp3", "counting_stars.mp3", "dancing_queen.mp3", "danger_zone.mp3",
+        "darkside.mp3", "despre_tine.mp3", "diamond_heart.mp3", "died_in_your_arms.mp3",
+        "dont_you_worry_child.mp3", "dragostea_din_tei.mp3", "du_hast.mp3", "dynamite_bts.mp3",
+        "ecstasy.mp3", "eurodancer.mp3", "everytime_we_touch.mp3", "eye_of_the_tiger.mp3",
+        "faded.mp3", "fever_dream.mp3", "freestyler.mp3",  "gerudo_valley.mp3",
+        "god_is_a_dj.mp3", "gods_plan.mp3", "golden.mp3", "good_feeling.mp3", "gusty_garden.mp3",
+        "headlights.mp3", "heartbreak.mp3", "heartbreak_melody.mp3", "hero_i_go_again.mp3",
+        "hero_i_go_again_ws.mp3", "how_you_like_that.mp3", "i_wont_let_the_sun_go_down_remix.mp3",
+        "ice_ice_baby.mp3", "ignite.mp3", "in_the_end.mp3", "infinity_2008.mp3", "insomnia.mp3",
+        "it_has_begun_starset.mp3", "just_wanna_rock.mp3", "kickstart_my_heart.mp3",
+        "knowing_me_knowing_you.mp3", "l_amour_toujours.mp3", "lean_on.mp3",
+        "levitating.mp3", "livin_on_a_prayer.mp3", "lose_yourself.mp3", "love_again.mp3",
+        "low.mp3", "lucid_dreams.mp3", "ma_baker.mp3", "mamma_mia.mp3", "mario64_slider.mp3",
+        "miracle.mp3", "mk64_raceway.mp3", "mk64_rr.mp3", "montero.mp3", "moviestar.mp3",
+        "mr_saxobeat.mp3", "my_system.mp3", "never_going_home_tonight.mp3", "no_limit.mp3",
+        "old_town_road.mp3", "on_the_floor.mp3", "one_more_time.mp3", "party_rock_anthem.mp3",
+        "permission_to_dance.mp3", "pokemon_main.mp3", "popular.mp3", "pump_up_the_jam.mp3",
+        "rasputin.mp3", "rhythm_is_a_dancer.mp3", "rockstar.mp3", "rockstar_dababy.mp3",
+        "sandstorm.mp3", "scooter.mp3", "self_control.mp3", "send_me_an_angel.mp3",
+        "set_the_world_on_fire.mp3", "smalltown_boy.mp3", "sound_of_silence_remix.mp3",
+        "starships.mp3", "stereo_love.mp3", "strong_enough.mp3", "sweet_dreams.mp3",
+        "sweet_dreams_beyonce.mp3", "sweet_home_alabama.mp3", "take_a_chance.mp3",
+        "take_me_home_country_roads.mp3", "take_on_me.mp3", "tattoo.mp3", "the_bad_touch.mp3",
+        "the_business.mp3", "the_fate_of_ophelia_remix.mp3", "the_final_countdown.mp3",
+        "the_logical_song.mp3", "the_trooper.mp3", "the_winner_takes_it_all.mp3",
+        "this_is_the_way.mp3", "three_little_birds.mp3", "through_the_fire_and_flames.mp3",
+        "thunderstruck.mp3", "tik_tok.mp3", "titanium.mp3", "u_cant_touch_this.mp3",
+        "valhalla.mp3", "we_built_this_city.mp3", "we_like_to_party.mp3", "wellerman.mp3",
+        "what_is_love.mp3", "when_we_were_young.mp3", "where_have_you_been.mp3",
+        "where_them_girls_at.mp3", "wild_ones.mp3", "yeah.mp3", "ymca.mp3",
+        "you_give_love_a_bad_name.mp3", "you_spin_me_round.mp3", "dai_dai.mp3"
+    ];
+
+    // 2. NORSKA LÅTAR (Russehits, Afterski, Norsk fest) - Spelas endast vid activeLang === "no"
+    var NO_EXCLUSIVE_TRACKS = [
+        "afterski.mp3",
+        "mad_max.mp3",
+         "lazertits.mp3",
+        "viva_la_vida.mp3",
+        "globuss.mp3",
+        "bassiani.mp3",
+        "elektrisk.mp3",
+        "nachpit.mp3",
+        "ompa.mp3",
+        "rikerud.mp3",
+        "stormen.mp3"
+    ];
+
+    // 3. SVENSKA LÅTAR (EPA, Dalahäst, Raggen går, Dansband) - Spelas endast vid activeLang === "sv"
+    var SV_EXCLUSIVE_TRACKS = [
+        "30kmh.mp3",
+        "boten_anna.mp3",
+        "bra_vibrationer.mp3",
+        "bubbel_pa_balkongen.mp3",
+        "diggiloo_diggiley.mp3",
+        "eloise.mp3",
+        "elov_beny.mp3",
+        "främling.mp3",
+        "första_gången_i_en_epa.mp3",
+        "guld_och_gröna_skogar.mp3",
+        "ikväll_igen.mp3",
+        "inget_stoppar_oss_nu.mp3",
+        "kan_inte_gå.mp3",
+        "leende_guldbruna_ögon.mp3",
+        "lyssna_till_ditt_hjärta.mp3",
+        "raggen_går.mp3",
+        "rid_mig_som_en_dalahäst.mp3",
+        "rom_cola.mp3",
+        "rödvin_rose.mp3",
+        "trakten_epan.mp3",
+        "trucker_motherfucker.mp3",
+        "varlden_utanför.mp3",
+        "weed_i_raggarbil.mp3"
+    ];
+
+    // 4. TROLL- OCH MEME-LÅTAR (Rickroll, Pippi/Banan-melodi etc.)
+    var TROLL_TRACKS = [
+        "banan_melon_kiwi_citron.mp3",
+        "axel_f.mp3",
+        "caramelldansen.mp3",
+        "pippi_låt.mp3",
+        "sjoeroevar_fabbe.mp3",
+        "Du_kare_lille_snickerbo.mp3",
+        "gangnam_style.mp3",
+        "rosa_helikopter.mp3",
+        "never_gonna_give_you_up.mp3"
+    ];
+
+    var currentAudio = null;
+    var currentTrackName = "";
+    var bannerTimer = 0;
+    var isMuted = false;
+
+    function formatTitle(filename) {
+        return filename
+            .replace(".mp3", "")
+            .replace(/_/g, " ")
+            .toUpperCase();
+    }
+
+    // Bygger den aktiva spellistan dynamiskt beroende på spelets språk
+    function buildActivePlaylist() {
+        var lang = (typeof activeLang !== 'undefined') ? activeLang : "sv";
+        var list = GLOBAL_TRACKS.slice(0); // Grundpoolen
+
+        if (lang === "no") {
+            list = list.concat(NO_EXCLUSIVE_TRACKS);
+        } else if (lang === "sv") {
+            list = list.concat(SV_EXCLUSIVE_TRACKS);
+        }
+
+        // 12% chans att en troll-låt kastas in i rotationen
+        if (Math.random() < 0.12) {
+            return TROLL_TRACKS;
+        }
+
+        return list;
+    }
+
+    return {
+        playRandom: function() {
+            var playlist = buildActivePlaylist();
+            if (!playlist || playlist.length === 0) return;
+            var randIndex = Math.floor(Math.random() * playlist.length);
+            this.playTrack(playlist[randIndex]);
+        },
+
+        playTrack: function(filename) {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+
+            currentTrackName = formatTitle(filename);
+            bannerTimer = 240; // Visas i 4 sekunder
+
+            try {
+                currentAudio = new Audio("../" + filename);
+                currentAudio.volume = isMuted ? 0.0 : 0.65;
+
+                currentAudio.onended = function() {
+                    TournamentJukebox.playRandom();
+                };
+
+                currentAudio.play().catch(function(err) {
+                    console.warn("Autoplay inväntar användarinteraktion.");
+                });
+            } catch (e) {
+                console.warn("Kunde inte starta låt: " + filename);
+            }
+        },
+
+        nextTrack: function() {
+            this.playRandom();
+        },
+
+        pause: function() {
+            if (currentAudio && !currentAudio.paused) {
+                currentAudio.pause();
+            }
+        },
+
+        resume: function() {
+            if (currentAudio && currentAudio.paused && !isMuted) {
+                currentAudio.play().catch(function() {});
+            }
+        },
+
+        toggleMute: function() {
+            isMuted = !isMuted;
+            if (currentAudio) {
+                currentAudio.volume = isMuted ? 0.0 : 0.65;
+            }
+            return isMuted;
+        },
+
+        stop: function() {
+            if (currentAudio) {
+                currentAudio.pause();
+            }
+        },
+
+        renderHUD: function(ctx, canvas) {
+            if (bannerTimer <= 0 || !currentTrackName) return;
+            bannerTimer--;
+
+            ctx.save();
+            var boxW = 420;
+            var boxH = 28;
+            var boxX = (canvas.width - boxW) / 2;
+            var boxY = 44;
+
+            ctx.fillStyle = "rgba(10, 0, 25, 0.85)";
+            ctx.fillRect(boxX, boxY, boxW, boxH);
+            ctx.strokeStyle = "#00ffcc";
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(boxX, boxY, boxW, boxH);
+
+            ctx.textAlign = "center";
+            ctx.fillStyle = "#ffeb3b";
+            ctx.font = "bold 11px 'Comic Sans MS', cursive, sans-serif";
+            ctx.fillText("🎵 SPELAR: " + currentTrackName + " [N = NÄSTA]", canvas.width / 2, boxY + 18);
+            ctx.restore();
+        }
+    };
+})();
+
+
+
+var TOURNAMENT_TRANSLATIONS = {
+    sv: {
+        regTitle: "🏆 LAN TOURNAMENT: REGISTRERING",
+        regRules: "REGLER: 3 FÖRSÖK. BÄSTA POÄNG SPARAS. INGEN PAUS TILLÅTEN!",
+        inputLabel: "SKRIV DITT LAN-NICK (MAX 15 TECKEN):",
+        inputPlaceholder: "T.EX. PIPPIMÄSTAREN",
+        inputError: "ENDAST BOKSTÄVER (A-Ö, Æ, Ø, Å) OCH SIFFROR (0-9)!",
+        startBtn: "STARTA FÖRSÖK 1 AV 3",
+        cancelBtn: "AVBRYT",
+        finalTitle: "🏁 TURNERINGSOMGÅNGEN AVSLUTAD",
+        rider: "RYTTARE",
+        attempt: "Försök",
+        bestResult: "BÄSTA RESULTAT",
+        points: "POÄNG",
+        savedNotice: "Resultatet har sparats till LAN-topplistan!",
+        nextRiderBtn: "NÄSTA SPELARE KLIV FRAM",
+        hudAttempt: "FÖRSÖK",
+        hudBest: "BÄST"
+    },
+    no: {
+        regTitle: "🏆 LAN TOURNAMENT: REGISTRERING",
+        regRules: "REGLER: 3 FORSØK. BESTE POENG LAGRES. INGEN PAUSE TILLATT!",
+        inputLabel: "SKRIV DITT LAN-KALLENAVN (MAKS 15 TEGN):",
+        inputPlaceholder: "F.EKS. GULLGUBBEN",
+        inputError: "KUN BOKSTAVER (A-Å, Æ, Ø) OG TALL (0-9)!",
+        startBtn: "START FORSØK 1 AV 3",
+        cancelBtn: "AVBRYT",
+        finalTitle: "🏁 TURNERINGSRUNDEN ER FERDIG",
+        rider: "RYTTER",
+        attempt: "Forsøk",
+        bestResult: "BESTE RESULTAT",
+        points: "POENG",
+        savedNotice: "Resultatet er lagret på LAN-topplisten!",
+        nextRiderBtn: "NESTE SPILLER GÅR OPP",
+        hudAttempt: "FORSØK",
+        hudBest: "BEST"
+    },
+    en: {
+        regTitle: "🏆 LAN TOURNAMENT: REGISTRATION",
+        regRules: "RULES: 3 ATTEMPTS. BEST SCORE SAVED. NO PAUSE ALLOWED!",
+        inputLabel: "ENTER YOUR LAN NICKNAME (MAX 15 CHARS):",
+        inputPlaceholder: "E.G. ARCADE_KING",
+        inputError: "ONLY LETTERS (A-Z, Æ, Ø, Å) AND NUMBERS (0-9)!",
+        startBtn: "START ATTEMPT 1 OF 3",
+        cancelBtn: "CANCEL",
+        finalTitle: "🏁 TOURNAMENT ROUND COMPLETED",
+        rider: "RIDER",
+        attempt: "Attempt",
+        bestResult: "BEST RESULT",
+        points: "POINTS",
+        savedNotice: "Score has been saved to the LAN leaderboard!",
+        nextRiderBtn: "NEXT PLAYER STEP UP",
+        hudAttempt: "ATTEMPT",
+        hudBest: "BEST"
+    }
+};
+
+function getTourneyLangPack() {
+    var lang = (typeof activeLang !== 'undefined' && TOURNAMENT_TRANSLATIONS[activeLang]) ? activeLang : "sv";
+    return TOURNAMENT_TRANSLATIONS[lang];
+}
+
+
+
+function startTournamentRegistration() {
+    var p = getTourneyLangPack();
+
+    // Uppdatera texterna i DOM
+    var titleEl = document.getElementById("tourney-reg-title");
+    var rulesEl = document.getElementById("tourney-reg-rules");
+    var labelEl = document.getElementById("tourney-reg-label");
+    var inputEl = document.getElementById("tourney-player-name");
+    var errEl = document.getElementById("tourney-input-error");
+    var startBtn = document.getElementById("tourney-btn-start");
+    var cancelBtn = document.getElementById("tourney-btn-cancel");
+
+    if (titleEl) titleEl.innerText = p.regTitle;
+    if (rulesEl) rulesEl.innerText = p.regRules;
+    if (labelEl) labelEl.innerText = p.inputLabel;
+    if (inputEl) {
+        inputEl.placeholder = p.inputPlaceholder;
+        inputEl.value = "";
+    }
+    if (errEl) {
+        errEl.innerText = p.inputError;
+        errEl.style.display = "none";
+    }
+    if (startBtn) startBtn.innerText = p.startBtn;
+    if (cancelBtn) cancelBtn.innerText = p.cancelBtn;
+
+    var modal = document.getElementById("tournament-reg-modal");
+    if (modal) modal.style.display = "flex";
+    if (inputEl) inputEl.focus();
+}
+
+function showTournamentSummary() {
+    var p = getTourneyLangPack();
+    var modal = document.getElementById("tournament-final-modal");
+    var titleEl = document.getElementById("tourney-final-title");
+    var body = document.getElementById("tourney-final-summary");
+    var nextBtn = document.getElementById("tourney-btn-next");
+
+    if (!modal || !body) return;
+
+    if (titleEl) titleEl.innerText = p.finalTitle;
+    if (nextBtn) nextBtn.innerText = p.nextRiderBtn;
+
+    body.innerHTML = 
+        '<h3 style="color:#00ffcc; margin-top:0;">' + p.rider + ': ' + tournamentPlayer.name + '</h3>' +
+        '<p>' + p.attempt + ' 1: <b>' + (tournamentPlayer.scores[0] || 0) + ' ' + p.points.toLowerCase() + '</b></p>' +
+        '<p>' + p.attempt + ' 2: <b>' + (tournamentPlayer.scores[1] || 0) + ' ' + p.points.toLowerCase() + '</b></p>' +
+        '<p>' + p.attempt + ' 3: <b>' + (tournamentPlayer.scores[2] || 0) + ' ' + p.points.toLowerCase() + '</b></p>' +
+        '<div style="background: rgba(0,255,204,0.15); border: 2px solid #00ffcc; padding: 10px; margin-top: 10px;">' +
+        '  <span style="font-size: 16px; font-weight: bold; color: #ffeb3b;">' + p.bestResult + ': ' + tournamentPlayer.bestScore + ' ' + p.points + '</span><br>' +
+        '  <small>' + p.savedNotice + '</small>' +
+        '</div>';
+
+    modal.style.display = "flex";
+}
+
+// ========================================================
+// 🟣 TELIA HARDWARE & NETWORK MONITOR (ES5)
+// ========================================================
+(function() {
+    var isTeliaLocked = false;
+    var consecutiveHighPingCount = 0; // 👈 Lägg till denna här!
+    var curLang = (typeof activeLang !== 'undefined') ? activeLang : "sv";
+
+    // Mätvärden
+    var frameCounter = 0;
+    var lastFpsTime = Date.now();
+    var currentFps = 60;
+    var currentPing = 0;
+    var packetLossStreak = 0;
+    var logicalCores = navigator.hardwareConcurrency || 1;
+    var memoryGB = navigator.deviceMemory || 2;
+    var batteryLevel = 1.0;
+    var isBatteryCharging = true;
+    var batterySupported = false;
+
+    // Telia-hån och förklaringar
+    var TELIA_DIAGNOSTICS = {
+        NO_WEBGL: {
+            title: {
+                sv: "🟣 TELIA: INGEN WEBGL / MASKINVARUACCELERATION!",
+                no: "🟣 TELIA: INGEN WEBGL / MASKINVAREAKSELERASJON!",
+                en: "🟣 TELIA: NO WEBGL / HARDWARE ACCELERATION!"
+            },
+            text: {
+                sv: "Hur i hela friden hade du tänkt rita grafik utan WebGL och hårdvaruacceleration?! Försöker du köra Lilla Gubben via text-TV, en miniräknare eller har du personligen stängt av grafikkortet i webbläsaren?! Telia Kundtjänst vägrar felsöka ditt haveri förrän du slår på maskinvaruacceleration och skaffar en dator som inte drivs av ånga!",
+                no: "Hvordan i all verden hadde du tenkt å tegne grafikk uten WebGL?! Prøver du å kjøre hesteløpet via tekst-TV, en kalkulator eller har du slått av skjermkortet?! Telia Kundeservice nekter å feilsøke dette vraket før du slår på maskinvareakselerasjon!",
+                en: "How on earth did you plan to render graphics without WebGL and hardware acceleration?! Are you trying to run this horse race through teletext or an old calculator?! Telia Support refuses to troubleshoot your disaster until you turn on hardware acceleration and get a PC not powered by steam!"
+            }
+        },
+        DEAD_BATTERY: {
+            title: {
+                sv: "🟣 TELIA: KÖRA BIL UTAN BRÄNSLE?! PINSAMT!",
+                no: "🟣 TELIA: KJØRE BIL UTEN DRIVSTOFF?! PINLIG!",
+                en: "🟣 TELIA: DRIVING A CAR WITH NO FUEL?! IDIOTIC!"
+            },
+            text: {
+                sv: "Batteriet är under 5% och sladden är urdragen! Att spela på det här viset är som att sätta sig i en bil med tom tank, ignorera varningslampan, rulla ut på motorvägen och sedan bli chockad när motorn dör mitt i rusningstrafiken! Hur dum får man vara?! Koppla in laddaren innan hela burken svartnar!",
+                no: "Batteriet er under 5% og laderen er koblet fra! Å spille slik er som å kjøre bil med tom tank, ignorere varsellampen, rulle ut på E18 og bli sjokkert når motoren kutter! Plugg inn laderen umiddelbart!",
+                en: "Battery is below 5% and unplugged! Gaming like this is like hopping into a car with zero gas, ignoring the fuel light, speeding onto the highway, and acting shocked when it dies in rush hour traffic! How foolish can you be?! Plug in the charger!"
+            }
+        },
+        LOW_FPS: {
+            title: {
+                sv: "🟣 TELIA: DIABILDVISNING DETEKTERAD (< 15 FPS)!",
+                no: "🟣 TELIA: LYSBILDEVISNING OPPDAGET (< 15 FPS)!",
+                en: "🟣 TELIA: SLIDESHOW DETECTED (< 15 FPS)!"
+            },
+            text: {
+                sv: "Spelet tuffar fram i 10 bildrutor per sekund! Det här är inte ett retrolopp, det är en PowerPoint-presentation från 1994! Telia har mätt upp att din processor smälter och vi låser spelet innan kretskortet fattar eld!",
+                no: "Spillet hakker i 10 bilder i sekundet! Dette er ikke et hesteløp, det er et lysbildeshow fra 1994! Telia stenger spillet før kretskortet ditt tar fyr!",
+                en: "The game is chugging at under 15 FPS! This isn't a horse derby, it's a 1994 PowerPoint presentation! Telia is locking the session before your overheating CPU catches fire!"
+            }
+        },
+        NO_DEDICATED_GPU: {
+            title: {
+                sv: "🟣 TELIA: INTEGRERAT GRAFIKSKRÄP DETEKTERAT!",
+                no: "🟣 TELIA: INTEGRERT GRAFIKKSKRAP OPPDAGET!",
+                en: "🟣 TELIA: INTEGRATED GRAPHICS TRASH DETECTED!"
+            },
+            text: {
+                sv: "Intel HD Graphics eller delat kretsminne?! Spelet kräver ett DEDIKERAT grafikkort från NVIDIA eller AMD Radeon! Telia vägrar godkänna en kontorsburk som ritar pixlar med processorns spillvärme!",
+                no: "Intel HD Graphics eller delt minne?! Spillet krever et DEDIKERT skjermkort fra NVIDIA eller AMD! Telia godkjenner ikke kontor-PC-er som tegner piksler på nødbluss!",
+                en: "Intel HD Graphics or shared memory?! The game requires a DEDICATED GPU from NVIDIA or AMD Radeon! Telia refuses to approve office hardware drawing pixels with leftover CPU heat!"
+            }
+        },
+        WEAK_HARDWARE: {
+            title: {
+                sv: "🟣 TELIA: KONTORSDATOR FRÅN STENÅLDERN DETEKTERAD!",
+                no: "🟣 TELIA: KONTOR-PC FRA STEINALDEREN OPPDAGET!",
+                en: "🟣 TELIA: ANCIENT OFFICE PC DETECTED!"
+            },
+            text: {
+                sv: "Mindre än 8 GB RAM eller sämre än Core i5 / Ryzen 5?! Tror du att du kan tävla på Telias fibernät med en dammig skoldator från kommunens överskottslager?! Köp en riktig rigg innan du skämmer ut dig!",
+                no: "Under 8 GB RAM eller dårligere enn Core i5 / Ryzen 5?! Tror du at du kan spille på Telias nett med en støvete skole-PC?! Kjøp en skikkelig rigg før du driter deg ut!",
+                en: "Under 8 GB RAM or worse than an Intel Core i5 / AMD Ryzen 5?! Do you expect to compete on Telia's network using a rusty school laptop from government surplus?! Get a real gaming PC!"
+            }
+        },
+        HIGH_PING: {
+            title: {
+                sv: "🟣 TELIA: FINLANDSFÄRJA ELLER UPPRINGT MODEM DETEKTERAT!",
+                no: "🟣 TELIA: DANSKEBÅT ELLER MODEM OPPDAGET!",
+                en: "🟣 TELIA: CRUISE FERRY OR 56K DIAL-UP DETECTED!"
+            },
+            text: {
+                sv: "Över 10 ms ping eller under 5 Mbit/s?! Spelar du via satellit-Wi-Fi på en Finlandsfärja mitt ute på Östersjön, från ett SAS-plan på 10 000 meters höjd eller sitter du med ett sprakande 56k-modem och ockuperar telefonlinjen?! Telias fiber kräver ren e-sportstandard under 10 ms ping och minst 5 Mbit/s!",
+                no: "Over 10 ms ping eller under 5 Mbit/s?! Spiller du via satellitt på Danskebåten midt i Skagerrak, fra et SAS-fly i 10 000 meters høyde eller ringer du opp med et 56k-modem?! Telias fibernett krever under 10 ms ping og minst 5 Mbit/s!",
+                en: "Over 10 ms ping or under 5 Mbit/s?! Are you gaming on satellite Wi-Fi aboard a Baltic ferry in the middle of nowhere, from a SAS flight at 35,000 feet, or are you dialing in on a screeching 56k modem?! Telia's fiber requires under 10 ms ping and at least 5 Mbit/s!"
+            }
+        },
+        PACKET_LOSS: {
+            title: {
+                sv: "🟣 TELIA: 100% PAKETFÖRLUST! TELIA-KABELN AVGRÄVD!",
+                no: "🟣 TELIA: 100% PAKKETAP! KABELEN ER KUTTET!",
+                en: "🟣 TELIA: 100% PACKET LOSS! FIBER CUT!"
+            },
+            text: {
+                sv: "Inte ett enda datapaket kommer fram! Har grannen grävt av fiberkabeln med en spade, eller tuggar familjens kanin på nätverkssladden bakom soffan?! All trafik är stendöd och linjen är låst!",
+                no: "Ingen pakker slipper gjennom! Har noen gravd over fiberkabelen med spade, eller spiser kaninen på nettverkskabelen bak sofaen?! Alt er nede!",
+                en: "100% packet loss! Did someone cut your fiber line with a rusty shovel, or is your pet rabbit chewing on the ethernet cord?! Complete network blackout!"
+            }
+        },
+        POTATO_RAM: {
+            title: {
+                sv: "🟣 TELIA: BRÖDROST TILL DATOR DETEKTERAD!",
+                no: "🟣 TELIA: BRØDRISTER AV EN PC OPPDAGET!",
+                en: "🟣 TELIA: TOASTER HARDWARE DETECTED!"
+            },
+            text: {
+                sv: "Datorn har 1 processorkärna och mindre än 2 GB RAM?! Telias nätverksmonitor vägrar låta dig belasta infrastrukturen med en antik skoldator från stenåldern!",
+                no: "Maskinen har 1 kjerne og under 2 GB RAM?! Telia nekter å la deg belaste nettet med en antikvarisk skole-PC!",
+                en: "System has 1 CPU core and under 2 GB RAM?! Telia refuses to let you choke our network with a prehistoric toaster!"
+            }
+        }
+    };
+
+    function triggerTeliaLock(diagnosticKey) {
+        if (isTeliaLocked) return;
+        isTeliaLocked = true;
+
+        if (typeof gameState !== 'undefined') {
+            gameState = "TELIA_LOCKED";
+        }
+        AudioEngine.teliaAlarm();
+
+        var langCode = (typeof activeLang !== 'undefined') ? activeLang : "sv";
+        var diag = TELIA_DIAGNOSTICS[diagnosticKey] || TELIA_DIAGNOSTICS.NO_WEBGL;
+
+        var titleStr = (diag.title && diag.title[langCode]) ? diag.title[langCode] : diag.title.en;
+        var textStr = (diag.text && diag.text[langCode]) ? diag.text[langCode] : diag.text.en;
+
+        var overlay = document.getElementById("telia-monitor-overlay");
+        var titleEl = document.getElementById("telia-lock-title");
+        var reasonEl = document.getElementById("telia-lock-reason");
+        var btnEl = document.getElementById("telia-restart-btn");
+
+        if (titleEl) titleEl.innerHTML = titleStr;
+        if (reasonEl) reasonEl.innerHTML = textStr;
+
+        // Uppdatera live-statistikraden i overlayen
+        var fpsEl = document.getElementById("stat-fps");
+        var pingEl = document.getElementById("stat-ping");
+        var lossEl = document.getElementById("stat-loss");
+        var batEl = document.getElementById("stat-bat");
+        var ramEl = document.getElementById("stat-ram");
+
+        if (fpsEl) fpsEl.innerHTML = "FPS: " + Math.round(currentFps);
+        if (pingEl) pingEl.innerHTML = "PING: " + (currentPing > 0 ? currentPing + "ms" : "N/A");
+        if (lossEl) lossEl.innerHTML = "LOSS: " + (packetLossStreak > 0 ? "100%" : "0%");
+        if (batEl) batEl.innerHTML = "BAT: " + (batterySupported ? Math.round(batteryLevel * 100) + "%" : "AC");
+        if (ramEl) ramEl.innerHTML = "RAM: ~" + memoryGB + "GB (" + logicalCores + " Cores)";
+
+        if (overlay) {
+            overlay.style.setProperty("display", "flex", "important");
+        }
+
+        if (btnEl) {
+            if (diagnosticKey === "NO_DEDICATED_GPU") {
+                btnEl.innerText = "JAG ACCEPTERAR RISKERNA – STARTA SPELET ÄNDÅ";
+                btnEl.style.background = "#ff1744";
+                btnEl.onclick = function() {
+                    overlay.style.setProperty("display", "none", "important");
+                    isTeliaLocked = false;
+                    if (typeof AudioEngine !== 'undefined' && AudioEngine.pause) {
+                        AudioEngine.pause();
+                    }
+                    if (typeof gameState !== 'undefined') {
+                        gameState = "MENU";
+                    }
+                };
+            } else {
+                btnEl.innerText = "STARTA OM ROUTERN OCH BE TELIA OM NÅD...";
+                btnEl.style.background = "#9d4edd";
+                btnEl.onclick = function() {
+                    window.location.reload();
+                };
+            }
+        }
+    }
+
+    function drawCornerUIButtons() {
+    // 1. HJÄLPKNAPP (?) - ÖVRE HÖGRA HÖRNET
+    BTN_HELP_RECT.x = canvas.width - 15 - BTN_HELP_RECT.w;
+    
+    ctx.save();
+    ctx.fillStyle = 'rgba(20, 0, 35, 0.75)';
+    ctx.fillRect(BTN_HELP_RECT.x, BTN_HELP_RECT.y, BTN_HELP_RECT.w, BTN_HELP_RECT.h);
+    ctx.strokeStyle = '#00ffcc';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(BTN_HELP_RECT.x, BTN_HELP_RECT.y, BTN_HELP_RECT.w, BTN_HELP_RECT.h);
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#00ffcc';
+    ctx.font = "bold 20px 'Comic Sans MS', cursive, sans-serif";
+    ctx.fillText("?", BTN_HELP_RECT.x + BTN_HELP_RECT.w / 2, BTN_HELP_RECT.y + BTN_HELP_RECT.h / 2 + 1);
+    ctx.restore();
+
+    // 2. PAUSKNAPP (⏸️) PÅ MOBILER/PADDOR - ÖVRE VÄNSTRA HÖRNET
+    if (isMobileDevice() && (gameState === "PLAYING" || gameState === "PAUSED")) {
+        ctx.save();
+        ctx.fillStyle = 'rgba(20, 0, 35, 0.75)';
+        ctx.fillRect(BTN_PAUSE_RECT.x, BTN_PAUSE_RECT.y, BTN_PAUSE_RECT.w, BTN_PAUSE_RECT.h);
+        ctx.strokeStyle = '#ffeb3b';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(BTN_PAUSE_RECT.x, BTN_PAUSE_RECT.y, BTN_PAUSE_RECT.w, BTN_PAUSE_RECT.h);
+
+        // Vektorritade paus-streck
+        ctx.fillStyle = '#ffeb3b';
+        var px = BTN_PAUSE_RECT.x + 11;
+        var py = BTN_PAUSE_RECT.y + 10;
+        ctx.fillRect(px, py, 4, 16);
+        ctx.fillRect(px + 10, py, 4, 16);
+        ctx.restore();
+    }
+}
+
+    function isMobileDevice() {
+    var ua = navigator.userAgent || navigator.vendor || window.opera;
+    var hasTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    return /android|iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && hasTouch);
+}
+    // 1. KONTROLLERA DEDIKERAT GRAFIKKORT (MOBIL UNDANTAGEN)
+function verifyWebGL() {
+    if (isMobileDevice()) return true; // 📱 Mobiler och paddor slipper GPU-kravet!
+
+    try {
+        var testCanvas = document.createElement("canvas");
+        var gl = testCanvas.getContext("webgl") || testCanvas.getContext("experimental-webgl");
+        if (!gl) {
+            triggerTeliaLock("NO_WEBGL");
+            return false;
+        }
+        var debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
+        if (debugInfo) {
+            var renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL).toLowerCase();
+            if (renderer.indexOf("swiftshader") > -1 || renderer.indexOf("basic render") > -1 || renderer.indexOf("software") > -1) {
+                triggerTeliaLock("NO_WEBGL");
+                return false;
+            }
+            var hasDedicatedGpu = (
+                renderer.indexOf("nvidia") > -1 || renderer.indexOf("geforce") > -1 ||
+                renderer.indexOf("rtx") > -1 || renderer.indexOf("gtx") > -1 ||
+                (renderer.indexOf("amd") > -1 && (renderer.indexOf("radeon") > -1 || renderer.indexOf("rx") > -1)) ||
+                renderer.indexOf("arc") > -1
+            );
+            var isIntegrated = (renderer.indexOf("intel hd") > -1 || renderer.indexOf("intel uhd") > -1 || renderer.indexOf("intel iris") > -1);
+            if (isIntegrated || !hasDedicatedGpu) {
+                triggerTeliaLock("NO_DEDICATED_GPU");
+                return true; // Tillåter spelet att köra vidare när bypass-knappen trycks
+            }
+        }
+    } catch (e) {
+        triggerTeliaLock("NO_WEBGL");
+        return false;
+    }
+    return true;
+}
+
+// 2. KONTROLLERA MINNE & CPU (MOBIL UNDANTAGEN)
+function verifySystemSpecs() {
+    if (isMobileDevice()) return true; // 📱 Undantagen
+    if (logicalCores < 4 || memoryGB < 8) {
+        triggerTeliaLock("WEAK_HARDWARE");
+        return false;
+    }
+    return true;
+}
+
+// 3. PING-MÄTNING (MOBIL UNDANTAGEN FÖR ATT SLIPPA 4G/5G-LÅS)
+function measureNetworkLatency() {
+    if (isMobileDevice() || isTeliaLocked) return; // 📱 Slipper ping-spärrar
+
+        var start = performance.now();
+        var img = new Image();
+        var timedOut = false;
+
+        var timer = setTimeout(function() {
+            timedOut = true;
+            img.src = "";
+            packetLossStreak++;
+            if (packetLossStreak >= 3) {
+                triggerTeliaLock("PACKET_LOSS");
+            }
+        }, 3000);
+
+        img.onload = function() {
+            if (timedOut) return;
+            clearTimeout(timer);
+            packetLossStreak = 0;
+            currentPing = Math.round(performance.now() - start);
+
+            // Kräver nu minst 3 mätningar i rad över 180 ms innan Telia klipper linjen
+            if (currentPing >= 180) {
+                consecutiveHighPingCount++;
+                if (consecutiveHighPingCount >= 3) {
+                    triggerTeliaLock("HIGH_PING");
+                }
+            } else {
+                consecutiveHighPingCount = 0;
+            }
+        };
+
+        img.onerror = function() {
+            if (timedOut) return;
+            clearTimeout(timer);
+            currentPing = Math.round(performance.now() - start);
+
+            if (currentPing >= 180) {
+                consecutiveHighPingCount++;
+                if (consecutiveHighPingCount >= 3) {
+                    triggerTeliaLock("HIGH_PING");
+                }
+            } else {
+                consecutiveHighPingCount = 0;
+            }
+        };
+
+        img.src = "https://www.google.com/favicon.ico?telia=" + Date.now();
+    }
+
+    // 3. BATTERI-ÖVERVAKNING (KÖRA BIL UTAN BRÄNSLE)
+    if (navigator.getBattery) {
+        navigator.getBattery().then(function(battery) {
+            batterySupported = true;
+            function checkBattery() {
+                batteryLevel = battery.level;
+                isBatteryCharging = battery.charging;
+
+                // Om batteriet är <= 4% och laddaren inte sitter i: TVÄRNIT!
+                if (!isBatteryCharging && batteryLevel <= 0.04) {
+                    triggerTeliaLock("DEAD_BATTERY");
+                }
+            }
+            battery.addEventListener("levelchange", checkBattery);
+            battery.addEventListener("chargingchange", checkBattery);
+            checkBattery();
+        }).catch(function() {});
+    }
+
+    // 4. FPS-ÖVERVAKNING (DIABILDVISNING)
+    var lowFpsConsecutiveCount = 0;
+    function monitorFps() {
+        frameCounter++;
+        var now = Date.now();
+        var delta = now - lastFpsTime;
+
+        if (delta >= 1000) {
+            currentFps = (frameCounter * 1000) / delta;
+            frameCounter = 0;
+            lastFpsTime = now;
+
+            // Om FPS är under 14 tre mätningar i rad under pågående lopp
+            if (typeof gameState !== 'undefined' && gameState === "PLAYING") {
+                if (currentFps < 14) {
+                    lowFpsConsecutiveCount++;
+                    if (lowFpsConsecutiveCount >= 3) {
+                        triggerTeliaLock("LOW_FPS");
+                    }
+                } else {
+                    lowFpsConsecutiveCount = 0;
+                }
+            }
+        }
+        requestAnimationFrame(monitorFps);
+    }
+    requestAnimationFrame(monitorFps);
+
+    // Kör kontroll vid start och schemalägg nätverkskoll
+    setTimeout(function() {
+        if (verifyWebGL() && verifySystemSpecs()) {
+            setInterval(measureNetworkLatency, 6000);
+        }
+    }, 1000);
+})();
+
+// Hanterar tryck på hörnknapparna (Hjälp ? och Paus)
+function handleCornerButtonTouches(clientX, clientY) {
+    var cvs = (typeof canvas !== 'undefined' && canvas) ? canvas : document.getElementById("gameCanvas");
+    if (!cvs) return false;
+
+    var rect = cvs.getBoundingClientRect();
+    var scaleX = cvs.width / rect.width;
+    var scaleY = cvs.height / rect.height;
+    var clickX = (clientX - rect.left) * scaleX;
+    var clickY = (clientY - rect.top) * scaleY;
+
+    // 1. HJÄLPKNAPP (?) - Öppnar reglementet oavsett spelläge
+    if (typeof getHelpBtnBounds === 'function') {
+        var hBtn = getHelpBtnBounds();
+        if (clickX >= hBtn.x && clickX <= hBtn.x + hBtn.w &&
+            clickY >= hBtn.y && clickY <= hBtn.y + hBtn.h) {
+            if (typeof window.openHelpModal === 'function') {
+                window.openHelpModal();
+            }
+            return true; // Träff
+        }
+    }
+
+    // 2. MOBIL-PAUSKNAPP (x: 15, y: 52, w: 38, h: 38)
+    var pX = 15, pY = 52, pW = 38, pH = 38;
+    if (clickX >= pX && clickX <= pX + pW &&
+        clickY >= pY && clickY <= pY + pH) {
+
+        // 🛑 Totalblockera paus om turneringsläget är igång!
+        if (typeof isTournamentMode !== 'undefined' && isTournamentMode) {
+            return true; // Ät upp touchen så hästen inte hoppar av misstag
+        }
+
+        // Tillåt endast paus vid aktivt spel eller pausat läge
+        if (typeof gameState !== 'undefined' && (gameState === "PLAYING" || gameState === "PAUSED")) {
+            if (typeof togglePause === 'function') {
+                togglePause();
+            }
+            return true; // Träff
+        }
+    }
+
+    return false; // Inget hörnknappstryck detekterades
+}
+
+// ========================================================
+// 🧙‍♂️ KAMEK ANTI-CHEAT & INTEGRITY ENGINE (ES5)
+// ========================================================
+(function() {
+    var isDisqualified = false;
+    var lastJumpTime = 0;
+    var rapidJumpCount = 0;
+
+    // AFK-bevakning
+    var lastActivityTime = Date.now();
+    var afkCheckInterval = null;
+    var AFK_TIMEOUT_MS = 25000; // 25 sekunder utan aktivitet
+
+    // Nätverksbevakning (ping mot publik favicon med cache-busting)
+    var pingInterval = null;
+    var consecutiveFailedPings = 0;
+
+    var KAMEK_MOCKS = {
+        TAB_SWITCH: {
+            title: {
+                sv: "🧙‍♂️ KAMEK: SLUTA SMYGA MED ANDRA FLIKAR!",
+                no: "🧙‍♂️ KAMEK: SLUTT Å SNEKE MED ANDRE FANER!",
+                en: "🧙‍♂️ KAMEK: STOP SNEAKING INTO OTHER TABS!"
+            },
+            text: {
+                sv: "Bytte du precis flik mitt i loppet för att googla fusk-koder eller kolla Discord?! Hästen stannade och åt upp alla dina guldmynt. Du är officiellt diskad!",
+                no: "Byttet du fane midt i løpet for å google juksekoder?! Hesten stoppet og spiste opp gullmyntene dine mens du var borte. Diskvalifisert!",
+                en: "Did you just switch tabs mid-race to look up cheats or check Discord?! The horse stopped and ate all your gold coins. Disqualified!"
+            }
+        },
+        DEVTOOLS: {
+            title: {
+                sv: "🧙‍♂️ KAMEK: F12?! TROR DU ATT DU ÄR HACKERMAN?!",
+                no: "🧙‍♂️ KAMEK: F12?! TROR DU AT DU ER EN HACKER?!",
+                en: "🧙‍♂️ KAMEK: F12?! DO YOU THINK YOU'RE HACKERMAN?!"
+            },
+            text: {
+                sv: "Trycka på F12 och inspektera koden i ett hästspel?! Vad trodde du att du skulle hitta, en hemlig penga-cheat?! Kamek förvandlar ditt tangentbord till en banan!",
+                no: "Trykke F12 og inspisere kildekoden i et hestespill?! Hva forventet du å finne, en uovervinnelig-knapp?! Kamek forvandler tastaturet til en banan!",
+                en: "Inspecting elements and hitting F12 in a horse racing game?! What did you expect to find, free gold?! Kamek turns your keyboard into a banana!"
+            }
+        },
+        TRACKPAD: {
+            title: {
+                sv: "🧙‍♂️ KAMEK: EN FLOTTIG STYRPLATTA?! PINSAMT!",
+                no: "🧙‍♂️ KAMEK: EN FETETE STYREFLATE?! PINLIG!",
+                en: "🧙‍♂️ KAMEK: A GREASY LAPTOP TRACKPAD?! EMBARRASSING!"
+            },
+            text: {
+                sv: "Står du och klickar på en laptop-trackpad med svettiga fingrar?! Lilla Gubben vägrar galoppera med trackpad-lagg! Koppla in en riktig mus!",
+                no: "Sitter du på en laptop og trykker på en styreflate med svette fingre?! Hesten nekter å hoppe med styreflate-lag! Plugg inn en skikkelig mus!",
+                en: "Are you tapping on a laptop trackpad with greasy fingers?! The horse refuses to gallop with trackpad lag! Plug in a real mouse!"
+            }
+        },
+        TURBO: {
+            title: {
+                sv: "🧙‍♂️ KAMEK: AUTOCLICKER DETEKTERAD, DIN FUSKARE!",
+                no: "🧙‍♂️ KAMEK: AUTOKLIKKER OPPDAGET, DIN JUKSEMAKER!",
+                en: "🧙‍♂️ KAMEK: AUTOCLICKER DETECTED, YOU CHEATER!"
+            },
+            text: {
+                sv: "Över 20 hopp i sekunden?! Ingen mänsklig tumme kan trycka så fort utan att vibrera sönder i atomer! Stäng av ditt macro omedelbart!",
+                no: "Over 20 hopp i sekundet?! Ingen menneskelig tommel kan trykke så fort! Skru av makroen din umiddelbart!",
+                en: "Over 20 jumps per second?! No human finger can tap that fast without vaporizing! Turn off your auto-clicker macro immediately!"
+            }
+        },
+        AFK: {
+            title: {
+                sv: "🧙‍♂️ KAMEK: AFK DETEKTERAD! SOMNADE DU?!",
+                no: "🧙‍♂️ KAMEK: AFK OPPDAGET! SOVNET DU?!",
+                en: "🧙‍♂️ KAMEK: AFK DETECTED! DID YOU FALL ASLEEP?!"
+            },
+            text: {
+                sv: "Står du och sover vid tangentbordet, eller gick du för att hämta snacks mitt under ett pågående mästerskap?! Hästen tröttnade på din passivitet och lade sig ner för en tupplur!",
+                no: "Står du og sover ved tastaturet, eller gikk du for å hente potetgull?! Hesten ble lei av å vente og sovnet i gresset!",
+                en: "Did you pass out at your desk or leave for snacks mid-race?! The horse got bored waiting for your reflexes and took a nap in the grass!"
+            }
+        },
+        OFFLINE: {
+            title: {
+                sv: "🧙‍♂️ KAMEK: NÄTVERKET DOG! NÅGON DROG UR KABELN!",
+                no: "🧙‍♂️ KAMEK: NETTVERKET DØDE! NOEN DRO UT KABELEN!",
+                en: "🧙‍♂️ KAMEK: CONNECTION DEAD! SOMEONE PULLED THE PLUG!"
+            },
+            text: {
+                sv: "Nätverkskabeln rycktes ur eller så tappade du 4G/Wi-Fi! Tror du att du kan koppla bort nätet för att slippa förlora dina rekord?! Göran och Kamek kräver ren uppkoppling!",
+                no: "Nettverkskabelen ble dratt ut eller så mistet du 4G/Wi-Fi! Prøver du å manipulere poengsummen ved å kutte nettet?! Diskvalifisert!",
+                en: "Someone tripped over the LAN cable or your Wi-Fi dropped dead! Did you yank your ethernet cord to fake a disconnect?! Kamek demands an active connection!"
+            }
+        },
+        NO_INTERNET: {
+            title: {
+                sv: "🧙‍♂️ KAMEK: ANSLUTEN UTAN INTERNET?! SLUTA LAGGA!",
+                no: "🧙‍♂️ KAMEK: TILKOBLET UTEN INTERNETT?! SLUTT Å LAGGE!",
+                en: "🧙‍♂️ KAMEK: CONNECTED WITHOUT INTERNET?! PACKET HELL!"
+            },
+            text: {
+                sv: "Din dator påstår att den är ansluten, men inte ett enda datapaket når fram till omvärlden! Sitter du fast bakom en sunkig hotell-login eller delar du mobilsurf från 2004?!",
+                no: "Maskinen påstår den har nett, men ingen pakker slipper gjennom! Sitter du fast bak en hotell-innlogging eller deler du 3G fra 2004?!",
+                en: "Your system claims it is online, but zero packets reach the outside world! Are you stuck behind a captive portal or tethering from a 2004 flip phone?!"
+            }
+        }
+    };
+
+    function triggerKamekDisqualification(cheatType) {
+        if (isDisqualified) return;
+        isDisqualified = true;
+
+        if (typeof gameState !== 'undefined') {
+            gameState = "DISQUALIFIED";
+        }
+        AudioEngine.kamekMagic();
+
+        if (afkCheckInterval) clearInterval(afkCheckInterval);
+        if (pingInterval) clearInterval(pingInterval);
+
+        var curLang = (typeof activeLang !== 'undefined') ? activeLang : "sv";
+        var mock = KAMEK_MOCKS[cheatType] || KAMEK_MOCKS.TURBO;
+
+        var titleStr = (mock.title && mock.title[curLang]) ? mock.title[curLang] : mock.title.en;
+        var textStr = (mock.text && mock.text[curLang]) ? mock.text[curLang] : mock.text.en;
+
+        var overlay = document.getElementById("kamek-anticheat-overlay");
+        var titleEl = document.getElementById("kamek-cheat-title");
+        var reasonEl = document.getElementById("kamek-cheat-reason");
+        var btnEl = document.getElementById("kamek-restart-btn");
+
+        if (titleEl) titleEl.innerHTML = titleStr;
+        if (reasonEl) reasonEl.innerHTML = textStr;
+
+        if (overlay) {
+            overlay.style.setProperty("display", "flex", "important");
+        }
+
+        if (btnEl) {
+            btnEl.onclick = function() {
+                window.location.reload();
+            };
+        }
+    }
+
+    function registerActivity() {
+        lastActivityTime = Date.now();
+    }
+
+    // --- 1. AFK-BEVAKNING ---
+    window.addEventListener("keydown", registerActivity);
+    window.addEventListener("mousedown", registerActivity);
+    window.addEventListener("mousemove", registerActivity);
+
+    afkCheckInterval = setInterval(function() {
+        if (typeof gameState !== 'undefined' && gameState === "PLAYING") {
+            if (Date.now() - lastActivityTime > AFK_TIMEOUT_MS) {
+                triggerKamekDisqualification("AFK");
+            }
+        }
+    }, 2000);
+
+    // --- 2. NÄTVERKSBEVAKNING (OFFLINE & ANSLUTEN UTAN INTERNET) ---
+    // Direkt fysiskt kabelbrott / Wi-Fi av
+    window.addEventListener("offline", function() {
+        if (typeof gameState !== 'undefined' && gameState === "PLAYING") {
+            triggerKamekDisqualification("OFFLINE");
+        }
+    });
+
+    // Faktiskt ping-test för att fånga "ansluten till router men saknar internet"
+    function testRealConnection() {
+        if (typeof gameState === 'undefined' || gameState !== "PLAYING") return;
+
+        if (!navigator.onLine) {
+            triggerKamekDisqualification("OFFLINE");
+            return;
+        }
+
+        var img = new Image();
+        var timeout = setTimeout(function() {
+            img.src = "";
+            consecutiveFailedPings++;
+            if (consecutiveFailedPings >= 2) {
+                triggerKamekDisqualification("NO_INTERNET");
+            }
+        }, 3000);
+
+        img.onload = function() {
+            clearTimeout(timeout);
+            consecutiveFailedPings = 0;
+        };
+
+        img.onerror = function() {
+            clearTimeout(timeout);
+            consecutiveFailedPings++;
+            if (consecutiveFailedPings >= 2) {
+                triggerKamekDisqualification("NO_INTERNET");
+            }
+        };
+
+        // Cache-busting för att tvinga en verklig nätverkstransfer
+        img.src = "https://www.google.com/favicon.ico?kamek=" + Date.now();
+    }
+
+    // Kör test var 7:e sekund
+    pingInterval = setInterval(testRealConnection, 7000);
+
+    // --- 3. FLIKBYTE / MINIMERING ---
+    window.addEventListener("blur", function() {
+        if (typeof gameState !== 'undefined' && (gameState === "PLAYING" || gameState === "PAUSED")) {
+            triggerKamekDisqualification("TAB_SWITCH");
+        }
+    });
+
+    document.addEventListener("visibilitychange", function() {
+        if (document.hidden && typeof gameState !== 'undefined' && (gameState === "PLAYING" || gameState === "PAUSED")) {
+            triggerKamekDisqualification("TAB_SWITCH");
+        }
+    });
+
+    // --- 4. F12, DEVTOOLS & TURBO-HOPP ---
+    window.addEventListener("keydown", function(e) {
+        var code = e.keyCode || e.which;
+        var key = (e.key || "").toUpperCase();
+
+        if (code === 123 || key === "F12") {
+            e.preventDefault();
+            triggerKamekDisqualification("DEVTOOLS");
+            return false;
+        }
+
+        if (e.ctrlKey && ((e.shiftKey && (key === "I" || key === "J" || key === "C")) || key === "U")) {
+            e.preventDefault();
+            triggerKamekDisqualification("DEVTOOLS");
+            return false;
+        }
+
+        if (key === " " || key === "SPACEBAR" || key === "W" || key === "ARROWUP") {
+            var now = Date.now();
+            var diff = now - lastJumpTime;
+            lastJumpTime = now;
+
+            if (diff < 45) {
+                rapidJumpCount++;
+                if (rapidJumpCount >= 4) {
+                    triggerKamekDisqualification("TURBO");
+                }
+            } else {
+                rapidJumpCount = Math.max(0, rapidJumpCount - 1);
+            }
+        }
+    });
+
+    // --- 5. STYRPLATTA / TRACKPAD-DETEKTERING ---
+    window.addEventListener("wheel", function(e) {
+        if (Math.abs(e.deltaY) > 0 && Math.abs(e.deltaY) < 15 && !e.ctrlKey) {
+            if (typeof gameState !== 'undefined' && gameState === "PLAYING") {
+                triggerKamekDisqualification("TRACKPAD");
+            }
+        }
+    }, { passive: true });
+})();
+
+function isHelpButtonClicked(clientX, clientY) {
+    var cvs = (typeof canvas !== 'undefined' && canvas) ? canvas : document.getElementById("gameCanvas");
+    if (!cvs) return false;
+
+    var rect = cvs.getBoundingClientRect();
+    var scaleX = cvs.width / rect.width;
+    var scaleY = cvs.height / rect.height;
+    var clickX = (clientX - rect.left) * scaleX;
+    var clickY = (clientY - rect.top) * scaleY;
+
+    var btn = getHelpBtnBounds();
+    return (clickX >= btn.x && clickX <= btn.x + btn.w &&
+            clickY >= btn.y && clickY <= btn.y + btn.h);
+}
+
+var AVAILABLE_LANGS = [
+        { code: 'no', label: '🇳🇴 NORSK (POLAR PARTY / ASKER)' },
+        { code: 'sv', label: '🇸🇪 SVENSKA' },
+        { code: 'en', label: '🇬🇧 ENGLISH' }
+    ];
+    var currentLangMenuIndex = 0; // Börjar på Norsk för turneringen
+
+    function cycleLanguage() {
+        currentLangMenuIndex = (currentLangMenuIndex + 1) % AVAILABLE_LANGS.length;
+        activeLang = AVAILABLE_LANGS[currentLangMenuIndex].code;
+        updateAllUIMenus();
+        if (typeof AudioEngine !== 'undefined' && AudioEngine.coin) {
+            AudioEngine.coin();
+        }
+    }
+
+    // Syntetiserad Web Audio API för retro-ljudeffekter
+    var AudioEngine = (function() {
+        var audioCtx = null;
+        var isMuted = false;
+
+        function getCtx() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        return {
+            toggleMute: function() {
+                isMuted = !isMuted;
+                return isMuted;
+            },
+            jump: function() {
+                if (isMuted) return;
+                var actx = getCtx();
+                var osc = actx.createOscillator();
+                var gain = actx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(150, actx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(450, actx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.3, actx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, actx.currentTime + 0.18);
+                osc.connect(gain);
+                gain.connect(actx.destination);
+                osc.start();
+                osc.stop(actx.currentTime + 0.18);
+            },
+            coin: function() {
+                if (isMuted) return;
+                var actx = getCtx();
+                var osc = actx.createOscillator();
+                var gain = actx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(987.77, actx.currentTime);
+                osc.frequency.setValueAtTime(1318.51, actx.currentTime + 0.08);
+                gain.gain.setValueAtTime(0.25, actx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, actx.currentTime + 0.25);
+                osc.connect(gain);
+                gain.connect(actx.destination);
+                osc.start();
+                osc.stop(actx.currentTime + 0.25);
+            },
+            // Pausljud (kort retro-dubbelsvep)
+            pause: function() {
+                if (isMuted) return;
+                var actx = getCtx();
+                var osc = actx.createOscillator();
+                var gain = actx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, actx.currentTime);
+                osc.frequency.setValueAtTime(660, actx.currentTime + 0.07);
+                gain.gain.setValueAtTime(0.2, actx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, actx.currentTime + 0.16);
+                osc.connect(gain);
+                gain.connect(actx.destination);
+                osc.start();
+                osc.stop(actx.currentTime + 0.16);
+            },
+
+            // Kamek Magikoopa-trollstavsljud (glissando med fyrkantsvåg)
+            kamekMagic: function() {
+                if (isMuted) return;
+                var actx = getCtx();
+                var osc = actx.createOscillator();
+                var gain = actx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(250, actx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1400, actx.currentTime + 0.35);
+                gain.gain.setValueAtTime(0.25, actx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, actx.currentTime + 0.4);
+                osc.connect(gain);
+                gain.connect(actx.destination);
+                osc.start();
+                osc.stop(actx.currentTime + 0.4);
+            },
+
+            // Telia felton / Modem-kollaps (bruten modemkoppling)
+            teliaAlarm: function() {
+                if (isMuted) return;
+                var actx = getCtx();
+                var osc1 = actx.createOscillator();
+                var osc2 = actx.createOscillator();
+                var gain = actx.createGain();
+                osc1.type = 'sawtooth';
+                osc2.type = 'square';
+                osc1.frequency.setValueAtTime(941, actx.currentTime);
+                osc2.frequency.setValueAtTime(1336, actx.currentTime);
+                gain.gain.setValueAtTime(0.3, actx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, actx.currentTime + 0.55);
+                osc1.connect(gain);
+                osc2.connect(gain);
+                gain.connect(actx.destination);
+                osc1.start();
+                osc2.start();
+                osc1.stop(actx.currentTime + 0.55);
+                osc2.stop(actx.currentTime + 0.55);
+            },
+
+            // Pulserande EN 54-akutlarm för sista hästskon
+            lastShoeAlarm: function() {
+                if (isMuted) return;
+                var actx = getCtx();
+                var osc = actx.createOscillator();
+                var gain = actx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(880, actx.currentTime);
+                osc.frequency.setValueAtTime(620, actx.currentTime + 0.08);
+                gain.gain.setValueAtTime(0.18, actx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, actx.currentTime + 0.16);
+                osc.connect(gain);
+                gain.connect(actx.destination);
+                osc.start();
+                osc.stop(actx.currentTime + 0.16);
+            },
+            hit: function() {
+                if (isMuted) return;
+                var actx = getCtx();
+                var osc = actx.createOscillator();
+                var gain = actx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(120, actx.currentTime);
+                osc.frequency.linearRampToValueAtTime(40, actx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.4, actx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, actx.currentTime + 0.22);
+                osc.connect(gain);
+                gain.connect(actx.destination);
+                osc.start();
+                osc.stop(actx.currentTime + 0.22);
+            },
+            gameOver: function() {
+                if (isMuted) return;
+                var actx = getCtx();
+                var notes = [300, 280, 260, 200];
+                for (var i = 0; i < notes.length; i++) {
+                    (function(idx) {
+                        var osc = actx.createOscillator();
+                        var gain = actx.createGain();
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(notes[idx], actx.currentTime + idx * 0.15);
+                        gain.gain.setValueAtTime(0.3, actx.currentTime + idx * 0.15);
+                        gain.gain.linearRampToValueAtTime(0.01, actx.currentTime + idx * 0.15 + 0.14);
+                        osc.connect(gain);
+                        gain.connect(actx.destination);
+                        osc.start(actx.currentTime + idx * 0.15);
+                        osc.stop(actx.currentTime + idx * 0.15 + 0.15);
+                    })(i);
+                }
+            }
+        };
+    })();
+
+    var gameState = "MENU";
+    var groundY = 380;
+    var distance = 0;
+    var goldCoins = 0;
+    var baseSpeed = 6;
+    var currentSpeed = 6;
+    var shoes = 4;
+    var barefootWarningTimer = 0;
+    var lastShoeAlarmTimer = 0; // 👈 Ny timer för konstant pipande
+
+    var horse = {
+        x: 120,
+        y: groundY,
+        vy: 0,
+        width: 60,
+        height: 48,
+        isGrounded: true,
+        jumpForce: -13.5,
+        gravity: 0.65,
+        legPhase: 0
+    };
+
+    var obstacles = [];
+    var pickups = [];
+    var scenery = [];
+    var obstacleTimer = 0;
+    var pickupTimer = 0;
+    var flashDamageTimer = 0;
+
+    function initScenery() {
+        scenery = [];
+        for (var i = 0; i < 8; i++) {
+            scenery.push({
+                x: i * 140,
+                type: (i % 2 === 0) ? 'TREE' : 'BUSH',
+                speedMult: 0.5
+            });
+        }
+    }
+
+    function resetGame() {
+        distance = 0;
+        goldCoins = 0;
+        currentSpeed = baseSpeed;
+        shoes = 4;
+        TournamentJukebox.playRandom();
+        obstacles = [];
+        pickups = [];
+        obstacleTimer = 60;
+        pickupTimer = 120;
+        flashDamageTimer = 0;
+        barefootWarningTimer = 0;
+        lastShoeAlarmTimer = 0; // 👈 Nollställ larmtimern
+
+        horse.y = groundY;
+        horse.vy = 0;
+        horse.isGrounded = true;
+
+        initScenery();
+        gameState = "PLAYING";
+    }
+
+function doJump() {
+    
+        if (gameState === "MENU") {
+            resetGame();
+            return;
+        }
+        if (gameState === "GAMEOVER") {
+            if (gameOverLockTimer > 0) {
+                return; // Blockerar Mellanslag / Pilar / W
+            }
+            resetGame();
+            return;
+        }
+        if (gameState === "PLAYING" && horse.isGrounded) {
+            horse.vy = horse.jumpForce;
+            horse.isGrounded = false;
+            AudioEngine.jump();
+        }
+    }
+
+    window.addEventListener('keydown', function(e) {
+        if (e.code === 'Space' || e.key === ' ' || e.code === 'KeyW' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            doJump();
+        } else if (e.code === 'KeyM' || e.key === 'm') {
+            AudioEngine.toggleMute();
+        } else if (e.code === 'Escape' || e.key === 'Escape') {
+            if (gameState === "PLAYING") {
+                gameState = "PAUSED"; TournamentJukebox.pause();
+                AudioEngine.pause();
+            } else if (gameState === "PAUSED") {
+                gameState = "PLAYING"; TournamentJukebox.resume();
+                AudioEngine.pause();
+            }
+        }
+        // Tryck N för att byta låt under turneringen
+if (e.code === 'KeyN' || e.key === 'n' || e.key === 'N') {
+    TournamentJukebox.nextTrack();
+}
+
+// Mute / Unmute både ljudeffekter och bakgrundsmusik
+if (e.code === 'KeyM' || e.key === 'm' || e.key === 'M') {
+    AudioEngine.toggleMute();
+    TournamentJukebox.toggleMute();
+}
+
+if (handleCornerButtonTouches(clientX, clientY)) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+        return;
+    }
+        if (e.code === 'KeyL' || e.key === 'l' || e.key === 'L') {
+            if (gameState === "MENU") {
+                cycleLanguage();
+                return;
+            }
+        }
+    });
+
+    // Hjälpfunktion som kollar om koordinaten träffar någon av ljudikonerna
+function isAudioButtonClicked(clientX, clientY) {
+    var rect = canvas.getBoundingClientRect();
+    var scaleX = canvas.width / rect.width;
+    var scaleY = canvas.height / rect.height;
+    var clickX = (clientX - rect.left) * scaleX;
+    var clickY = (clientY - rect.top) * scaleY;
+
+    // 1. Klick på Musik-knappen (Noten)
+    if (clickX >= BTN_MUSIC_RECT.x && clickX <= BTN_MUSIC_RECT.x + BTN_MUSIC_RECT.w &&
+        clickY >= BTN_MUSIC_RECT.y && clickY <= BTN_MUSIC_RECT.y + BTN_MUSIC_RECT.h) {
+        isMusicMuted = !isMusicMuted;
+        TournamentJukebox.toggleMute();
+        return true; // 🛑 Träffade musikknappen
+    }
+
+    // 2. Klick på Ljudeffekts-knappen (Högtalaren)
+    if (clickX >= BTN_SFX_RECT.x && clickX <= BTN_SFX_RECT.x + BTN_SFX_RECT.w &&
+        clickY >= BTN_SFX_RECT.y && clickY <= BTN_SFX_RECT.y + BTN_SFX_RECT.h) {
+        isSfxMuted = !isSfxMuted;
+        AudioEngine.toggleMute();
+        return true; // 🛑 Träffade ljudknappen
+    }
+
+    return false;
+}
+
+canvas.addEventListener('touchstart', function(e) {
+    if (!e) return;
+    
+    // Hämta koordinater säkert från touch-listan
+    var touch = (e.touches && e.touches.length > 0) ? e.touches[0] : (e.changedTouches && e.changedTouches.length > 0 ? e.changedTouches[0] : null);
+    if (!touch) return;
+
+    var cX = touch.clientX;
+    var cY = touch.clientY;
+
+    // Kör knappkontroller med de extraherade koordinaterna
+    if (typeof handleCornerButtonTouches === 'function' && handleCornerButtonTouches(cX, cY)) {
+        if (e.cancelable) e.preventDefault();
+        e.stopPropagation();
+        return;
+    }
+
+    if (typeof checkTournamentMenuClick === 'function' && checkTournamentMenuClick(cX, cY)) {
+        if (e.cancelable) e.preventDefault();
+        e.stopPropagation();
+        return;
+    }
+
+    if (typeof isAudioButtonClicked === 'function' && isAudioButtonClicked(cX, cY)) {
+        if (e.cancelable) e.preventDefault();
+        e.stopPropagation();
+        return;
+    }
+
+    if (typeof doJump === 'function') {
+        doJump();
+    }
+}, { passive: false });
+
+canvas.addEventListener('mousedown', function(e) {
+    if (!e) return;
+
+    // För mus ligger clientX och clientY direkt på e
+    var cX = e.clientX;
+    var cY = e.clientY;
+
+    if (typeof handleCornerButtonTouches === 'function' && handleCornerButtonTouches(cX, cY)) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+    }
+
+    if (typeof checkTournamentMenuClick === 'function' && checkTournamentMenuClick(cX, cY)) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+    }
+
+    if (typeof isAudioButtonClicked === 'function' && isAudioButtonClicked(cX, cY)) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+    }
+
+    if (typeof doJump === 'function') {
+        doJump();
+    }
+});
+
+// Om du har en generell 'click'-lyssnare på canvas/window:
+canvas.addEventListener('click', function(e) {
+    var rect = canvas.getBoundingClientRect();
+    var scaleX = canvas.width / rect.width;
+    var scaleY = canvas.height / rect.height;
+    var clickX = (e.clientX - rect.left) * scaleX;
+    var clickY = (e.clientY - rect.top) * scaleY;
+
+    // Fånga upp och döda klick-eventet om det skedde på ikonerna
+    if ((clickX >= BTN_MUSIC_RECT.x && clickX <= BTN_MUSIC_RECT.x + BTN_MUSIC_RECT.w &&
+         clickY >= BTN_MUSIC_RECT.y && clickY <= BTN_MUSIC_RECT.y + BTN_MUSIC_RECT.h) ||
+        (clickX >= BTN_SFX_RECT.x && clickX <= BTN_SFX_RECT.x + BTN_SFX_RECT.w &&
+         clickY >= BTN_SFX_RECT.y && clickY <= BTN_SFX_RECT.y + BTN_SFX_RECT.h)) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+    }
+});
+
+
+    var OBSTACLE_TYPES = [
+        { id: 'WOOD_FENCE', width: 28, height: 38, color: '#8d6e63' },
+        { id: 'STONE_WALL', width: 36, height: 50, color: '#78909c' },
+        { id: 'WATER_STREAM', width: 65, height: 18, color: '#00e5ff', isWater: true }
+    ];
+
+    function spawnObstacle() {
+        var type = OBSTACLE_TYPES[Math.floor(Math.random() * OBSTACLE_TYPES.length)];
+        obstacles.push({
+            x: canvas.width + 40,
+            y: groundY - (type.isWater ? 6 : type.height),
+            width: type.width,
+            height: type.height,
+            color: type.color,
+            isWater: Boolean(type.isWater),
+            passed: false
+        });
+    }
+
+    function spawnPickup() {
+        var isShoe = (shoes < 4 && Math.random() < 0.28);
+        pickups.push({
+            x: canvas.width + 40,
+            y: groundY - 50 - (Math.random() * 45),
+            type: isShoe ? 'SHOE' : 'COIN',
+            radius: 12
+        });
+    }
+
+    // Fallbacks för hörnknappar och kontroller så inget kastar ReferenceError
+if (typeof window.handleCornerButtonTouches !== "function") {
+    window.handleCornerButtonTouches = function() { return false; };
+}
+if (typeof window.openHelpModal !== "function") {
+    window.openHelpModal = function() {
+        var modal = document.getElementById("help-modal-overlay") || document.getElementById("help-modal");
+        if (modal) modal.style.display = "flex";
+    };
+}
+if (typeof window.togglePause !== "function") {
+    window.togglePause = function() {
+        if (window.isTournamentMode) return;
+        if (window.gameState === "PLAYING") window.gameState = "PAUSED";
+        else if (window.gameState === "PAUSED") window.gameState = "PLAYING";
+    };
+}
+
+// ==========================================================
+// TURNERINGSLÄGE: AUTOMATISKT FLÖDE (RUNDA 1 -> 2 -> 3 -> TOPPLISTA)
+// ==========================================================
+
+window.showTournamentSummary = function() {
+    var p = (typeof getTourneyLangPack === 'function') ? getTourneyLangPack() : {
+        finalTitle: "🏁 TURNERINGSOMGÅNGEN AVSLUTAD",
+        rider: "RYTTARE",
+        attempt: "Försök",
+        points: "poäng",
+        bestResult: "BÄSTA RESULTAT",
+        nextRiderBtn: "NÄSTA SPELARE KLIV FRAM"
+    };
+
+    var modal = document.getElementById("tournament-final-modal");
+    var titleEl = document.getElementById("tourney-final-title");
+    var body = document.getElementById("tourney-final-summary");
+    var nextBtn = document.getElementById("tourney-btn-next");
+
+    if (!modal || !body) return;
+    if (titleEl) titleEl.innerText = p.finalTitle;
+    if (nextBtn) nextBtn.innerText = p.nextRiderBtn;
+
+    // Hämta och sanera topplistan
+    var rawBoard = JSON.parse(localStorage.getItem("derby_tournament_board") || "[]");
+    
+    // Bygg topp 8-rader
+    var leaderboardRowsHtml = "";
+    for (var i = 0; i < 8; i++) {
+        var entry = rawBoard[i];
+        var pos = i + 1;
+        var rankBadge = pos + ".";
+        if (pos === 1) rankBadge = "🥇 1.";
+        else if (pos === 2) rankBadge = "🥈 2.";
+        else if (pos === 3) rankBadge = "🥉 3.";
+
+        if (entry) {
+            var rowName = window.sanitizePlayerName(entry.name);
+            var isCurrentPlayer = (rowName === window.sanitizePlayerName(window.tournamentPlayer.name) && entry.score === window.tournamentPlayer.bestScore);
+            var rowColor = isCurrentPlayer ? "#ffeb3b" : "#ffffff";
+            var bgHighlight = isCurrentPlayer ? "background: rgba(255, 235, 59, 0.18); font-weight: bold;" : "";
+
+            leaderboardRowsHtml += 
+                '<tr style="border-bottom: 1px solid rgba(255,255,255,0.1); ' + bgHighlight + ' color: ' + rowColor + ';">' +
+                    '<td style="padding: 4px 8px; text-align: left; width: 45px;">' + rankBadge + '</td>' +
+                    '<td style="padding: 4px 8px; text-align: left;">' + rowName + '</td>' +
+                    '<td style="padding: 4px 8px; text-align: right; color: #00ffcc; font-weight: bold;">' + entry.score + ' p</td>' +
+                '</tr>';
+        } else {
+            // Tomma platser upp till plats 8
+            leaderboardRowsHtml += 
+                '<tr style="border-bottom: 1px solid rgba(255,255,255,0.05); color: #555;">' +
+                    '<td style="padding: 4px 8px; text-align: left; width: 45px;">' + rankBadge + '</td>' +
+                    '<td style="padding: 4px 8px; text-align: left;">------</td>' +
+                    '<td style="padding: 4px 8px; text-align: right;">0 p</td>' +
+                '</tr>';
+        }
+    }
+
+    var cleanCurName = window.sanitizePlayerName(window.tournamentPlayer.name);
+
+    body.innerHTML = 
+        '<div style="display: flex; flex-direction: column; gap: 10px;">' +
+            // Spelarens egna resultat
+            '<div style="background: rgba(0,0,0,0.4); border: 2px solid #00ffcc; border-radius: 6px; padding: 10px; text-align: center;">' +
+                '<h3 style="color:#00ffcc; margin: 0 0 6px 0; font-size: 16px;">' + p.rider + ': ' + cleanCurName + '</h3>' +
+                '<div style="display: flex; justify-content: space-around; font-size: 13px; color: #bbb; margin-bottom: 6px;">' +
+                    '<span>' + p.attempt + ' 1: <b style="color:#fff;">' + (window.tournamentPlayer.scores[0] || 0) + '</b></span>' +
+                    '<span>' + p.attempt + ' 2: <b style="color:#fff;">' + (window.tournamentPlayer.scores[1] || 0) + '</b></span>' +
+                    '<span>' + p.attempt + ' 3: <b style="color:#fff;">' + (window.tournamentPlayer.scores[2] || 0) + '</b></span>' +
+                '</div>' +
+                '<div style="font-size: 16px; font-weight: bold; color: #ffeb3b;">' +
+                    p.bestResult + ': ' + window.tournamentPlayer.bestScore + ' POÄNG' +
+                '</div>' +
+            '</div>' +
+
+            // Topplista 1-8
+            '<div style="background: #080112; border: 2px solid #ffeb3b; border-radius: 6px; padding: 8px;">' +
+                '<div style="color: #ffeb3b; font-weight: bold; font-size: 13px; text-align: center; margin-bottom: 6px; letter-spacing: 1px;">' +
+                    '🏆 ARCADE TOPP 8 (LAN RECORD)' +
+                '</div>' +
+                '<table style="width: 100%; border-collapse: collapse; font-size: 13px; font-family: monospace;">' +
+                    leaderboardRowsHtml +
+                '</table>' +
+            '</div>' +
+        '</div>';
+
+    modal.style.display = "flex";
+};
+
+window.handleTournamentGameOver = function(dist, gold) {
+    try {
+        if (!window.isTournamentMode) return false;
+
+        var roundScore = Math.floor(dist || 0) + ((gold || 0) * 10);
+        window.tournamentPlayer.scores.push(roundScore);
+
+        if (roundScore > window.tournamentPlayer.bestScore) {
+            window.tournamentPlayer.bestScore = roundScore;
+        }
+
+        // Slumpa titel från språkmallen
+        var titles = GAME_TRANSLATIONS[activeLang].gameOverTitles;
+        activeGameOverTitle = titles[Math.floor(Math.random() * titles.length)];
+
+        // Välj kommentar/hån baserat på totalpoäng (distans + guldmynt * 10)
+        var t = GAME_TRANSLATIONS[activeLang].tiers;
+        var pool;
+        if (roundScore < 1000) pool = t.useless;
+        else if (roundScore < 2000) pool = t.bad;
+        else if (roundScore < 3000) pool = t.medium;
+        else if (roundScore < 5000) pool = t.good;
+        else if (roundScore < 7500) pool = t.best;
+        else pool = t.super;
+
+        activeHumorComment = pool[Math.floor(Math.random() * pool.length)];
+
+        // Om 3 försök har körts: spara till topplistan och öppna slutrutan efter 3 sekunder
+        if (window.tournamentPlayer.currentAttempt >= 3) {
+            window.saveTournamentLeaderboard(window.tournamentPlayer.name, window.tournamentPlayer.bestScore);
+            gameOverLockTimer = 180; // 3 sekunder vid 60 FPS
+            setTimeout(function() {
+                if (typeof window.showTournamentSummary === "function") {
+                    window.showTournamentSummary();
+                }
+            }, 3000);
+        } else {
+            // Försök 1 och 2: räkna ner i 3 sekunder och starta om automatiskt
+            gameOverLockTimer = 180;
+            setTimeout(function() {
+                if (window.isTournamentMode && gameState === "GAMEOVER") {
+                    window.tournamentPlayer.currentAttempt++;
+                    if (typeof resetGame === "function") resetGame();
+                    gameState = "PLAYING";
+                }
+            }, 3000);
+        }
+        return true;
+    } catch (e) {
+        console.warn("Fel vid turnerings-game over:", e.message);
+        return false;
+    }
+};
+
+// Filter för tomma namn och fula ord
+window.sanitizePlayerName = function(rawName) {
+    if (!rawName || typeof rawName !== "string") return "GÄST";
+    var clean = rawName.trim().toUpperCase();
+    if (clean.length === 0) return "GÄST";
+
+    // Lista över blockerade ord (svenska, norska, engelska)
+    var profanities = [
+        "FAN", "JÄVEL", "JAVEL", "HELVETE", "KUK", "FITTA", "KUKEN", "FITTAN",
+        "HORA", "NEGER", "BLATTE", "KUKHUVUD", "FITTUNGE", "SKIT", "PISS",
+        "FAEN", "HELVETE", "KUKK", "DRAITT", "PUL", "HORE", "HOMO",
+        "FUCK", "SHIT", "BITCH", "ASSHOLE", "DICK", "CUNT", "NIGGER", "NIGGA", "PENIS"
+    ];
+
+    for (var i = 0; i < profanities.length; i++) {
+        var bad = profanities[i];
+        // Kontrollera om ordet förekommer som helord eller del i nicket
+        var regex = new RegExp("(^|[^A-Z0-9ÅÄÖÆØ])" + bad + "([^A-Z0-9ÅÄÖÆØ]|$)", "i");
+        if (regex.test(clean) || clean.indexOf(bad) !== -1) {
+            return "GÄST";
+        }
+    }
+
+    return clean;
+};
+
+// Spara automatiskt till lokal topplista i localStorage
+window.saveTournamentLeaderboard = function(name, score) {
+    try {
+        var cleanName = window.sanitizePlayerName(name);
+        var finalScore = parseInt(score, 10) || 0;
+        var key = "derby_tournament_board";
+        var board = JSON.parse(localStorage.getItem(key) || "[]");
+
+        board.push({
+            name: cleanName,
+            score: finalScore,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        });
+
+        // Sortera fallande: högst poäng först
+        board.sort(function(a, b) { return b.score - a.score; });
+
+        // Spara topp 50
+        board = board.slice(0, 50);
+        localStorage.setItem(key, JSON.stringify(board));
+    } catch (err) {
+        console.warn("Kunde inte spara till topplistan:", err.message);
+    }
+};
+
+    function update() {
+        if (gameState === "GAMEOVER") {
+            if (gameOverLockTimer > 0) {
+                gameOverLockTimer--;
+            }
+            return;
+        }
+        if (gameState !== "PLAYING") return;
+        
+
+        currentSpeed = baseSpeed + (distance / 500);
+        distance += currentSpeed * 0.1;
+
+        horse.vy += horse.gravity;
+        horse.y += horse.vy;
+
+        if (horse.y >= groundY) {
+            horse.y = groundY;
+            horse.vy = 0;
+            horse.isGrounded = true;
+        }
+
+        if (horse.isGrounded) {
+            horse.legPhase += currentSpeed * 0.08;
+        }
+
+        for (var s = 0; s < scenery.length; s++) {
+            scenery[s].x -= currentSpeed * scenery[s].speedMult;
+            if (scenery[s].x < -100) scenery[s].x = canvas.width + 80;
+        }
+
+        obstacleTimer--;
+        if (obstacleTimer <= 0) {
+            spawnObstacle();
+            obstacleTimer = Math.floor(65 + Math.random() * 55 - (currentSpeed * 2));
+            if (obstacleTimer < 42) obstacleTimer = 42;
+        }
+
+        pickupTimer--;
+        if (pickupTimer <= 0) {
+            spawnPickup();
+            pickupTimer = Math.floor(80 + Math.random() * 90);
+        }
+
+        for (var b = 0; b < 4; b++) {
+            if (lostShoeBlinkTimers[b] > 0) {
+                lostShoeBlinkTimers[b]--;
+            }
+        }
+
+        if (shoes === 1) {
+            lastShoeAlarmTimer--;
+            if (lastShoeAlarmTimer <= 0) {
+                AudioEngine.lastShoeAlarm();
+                lastShoeAlarmTimer = 30; // Piper var 0.5 sekund (vid 60 FPS)
+            }
+        } else {
+            lastShoeAlarmTimer = 0; // Tystnar om man plockar upp en ny sko
+        }
+
+        for (var i = obstacles.length - 1; i >= 0; i--) {
+            var obs = obstacles[i];
+            obs.x -= currentSpeed;
+
+            var horseBox = {
+                x: horse.x + 8,
+                y: horse.y - horse.height + 6,
+                w: horse.width - 16,
+                h: horse.height - 8
+            };
+
+            var obsBox = {
+                x: obs.x,
+                y: obs.y,
+                w: obs.width,
+                h: obs.height
+            };
+
+            var collides = (
+                horseBox.x < obsBox.x + obsBox.w &&
+                horseBox.x + horseBox.w > obsBox.x &&
+                horseBox.y < obsBox.y + obsBox.h &&
+                horseBox.y + horseBox.h > obsBox.y
+            );
+
+            if (collides && !obs.passed) {
+                obs.passed = true;
+                shoes--;
+                flashDamageTimer = 18;
+                AudioEngine.hit();
+
+                // Starta 30-bildrutors snabb-blink på den sko som precis rök
+                if (shoes >= 0 && shoes < 4) {
+                    lostShoeBlinkTimers[shoes] = 30;
+                }
+
+                if (shoes === 1) {
+                    barefootWarningTimer = 180;
+                    lastShoeAlarmTimer = 0;
+                }
+
+                if (shoes <= 0) {
+                    gameState = "GAMEOVER";
+                    TournamentJukebox.stop();
+                    // 🛑 Om turnering är aktiv: Kör det automatiska flödet
+    if (window.isTournamentMode) {
+    if (typeof window.handleTournamentGameOver === "function") {
+        window.handleTournamentGameOver(distance, goldCoins);
+    }
+    return;
+}
+                    gameOverLockTimer = 300; // 5 sekunders lås
+
+                    // 1. Slumpa rolig rubrik istället för standardtext
+                    var titles = GAME_TRANSLATIONS[activeLang].gameOverTitles;
+                    activeGameOverTitle = titles[Math.floor(Math.random() * titles.length)];
+
+                    // 2. Välj kommentar utifrån 6 prestationsnivåer
+                    var t = GAME_TRANSLATIONS[activeLang].tiers;
+                    var pool;
+                    if (distance < 1000) pool = t.useless;
+                    else if (distance < 2000) pool = t.bad;
+                    else if (distance < 3000) pool = t.medium;
+                    else if (distance < 5000) pool = t.good;
+                    else if (distance < 7500) pool = t.best;
+                    else pool = t.super;
+
+                    activeHumorComment = pool[Math.floor(Math.random() * pool.length)];
+
+                    AudioEngine.gameOver();
+                }
+            }
+
+            if (obs.x + obs.width < -50) {
+                obstacles.splice(i, 1);
+            }
+        }
+
+        for (var pIdx = pickups.length - 1; pIdx >= 0; pIdx--) {
+            var p = pickups[pIdx];
+            p.x -= currentSpeed;
+
+            var dist = Math.hypot((horse.x + horse.width / 2) - p.x, (horse.y - horse.height / 2) - p.y);
+            if (dist < p.radius + 24) {
+                if (p.type === 'COIN') {
+                    goldCoins += 50;
+                    distance += 20;
+                    AudioEngine.coin();
+                } else if (p.type === 'SHOE') {
+                    if (shoes < 4) shoes++;
+                    AudioEngine.coin();
+                }
+                pickups.splice(pIdx, 1);
+                continue;
+            }
+
+            if (p.x < -30) {
+                pickups.splice(pIdx, 1);
+            }
+        }
+
+        if (flashDamageTimer > 0) flashDamageTimer--;
+        if (barefootWarningTimer > 0) barefootWarningTimer--;
+    }
+
+    function drawScenery() {
+        var skyGrad = ctx.createLinearGradient(0, 0, 0, groundY);
+        skyGrad.addColorStop(0, '#1a237e');
+        skyGrad.addColorStop(0.6, '#3949ab');
+        skyGrad.addColorStop(1, '#81d4fa');
+        ctx.fillStyle = skyGrad;
+        ctx.fillRect(0, 0, canvas.width, groundY);
+
+        ctx.fillStyle = '#fff59d';
+        ctx.beginPath();
+        ctx.arc(720, 80, 36, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#2e7d32';
+        ctx.beginPath();
+        ctx.moveTo(0, groundY);
+        for (var x = 0; x <= canvas.width; x += 40) {
+            ctx.lineTo(x, groundY - 40 - Math.sin((x + distance * 2) * 0.005) * 20);
+        }
+        ctx.lineTo(canvas.width, groundY);
+        ctx.closePath();
+        ctx.fill();
+
+        for (var s = 0; s < scenery.length; s++) {
+            var sc = scenery[s];
+            if (sc.type === 'TREE') {
+                ctx.fillStyle = '#5d4037';
+                ctx.fillRect(sc.x + 12, groundY - 55, 8, 55);
+                ctx.fillStyle = '#1b5e20';
+                ctx.beginPath();
+                ctx.arc(sc.x + 16, groundY - 65, 22, 0, Math.PI * 2);
+                ctx.fill();
+            } else {
+                ctx.fillStyle = '#388e3c';
+                ctx.beginPath();
+                ctx.arc(sc.x, groundY - 14, 18, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        ctx.fillStyle = '#43a047';
+        ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
+        ctx.fillStyle = '#2e7d32';
+        ctx.fillRect(0, groundY, canvas.width, 8);
+    }
+
+    function drawHorse() {
+        ctx.save();
+        ctx.translate(horse.x, horse.y);
+
+        if (flashDamageTimer > 0 && Math.floor(Date.now() / 40) % 2 === 0) {
+            ctx.globalAlpha = 0.4;
+        }
+
+        ctx.fillStyle = '#f5f5f5';
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 2;
+
+        ctx.beginPath();
+        ctx.ellipse(26, -26, 24, 14, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#212121';
+        ctx.beginPath();
+        ctx.arc(18, -26, 3.5, 0, Math.PI * 2);
+        ctx.arc(32, -22, 4, 0, Math.PI * 2);
+        ctx.arc(26, -32, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#f5f5f5';
+        ctx.beginPath();
+        ctx.moveTo(38, -32);
+        ctx.lineTo(48, -48);
+        ctx.lineTo(58, -44);
+        ctx.lineTo(44, -20);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(52, -45, 7, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#212121';
+        ctx.fillRect(53, -48, 2, 2);
+        ctx.fillStyle = '#f5f5f5';
+        ctx.beginPath();
+        ctx.moveTo(46, -52);
+        ctx.lineTo(49, -46);
+        ctx.lineTo(44, -46);
+        ctx.fill();
+
+        var legSwing = Math.sin(horse.legPhase) * 12;
+        ctx.strokeStyle = '#f5f5f5';
+        ctx.lineWidth = 4;
+
+        ctx.beginPath();
+        ctx.moveTo(12, -16);
+        ctx.lineTo(12 - legSwing, 0);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(40, -16);
+        ctx.lineTo(40 + legSwing, 0);
+        ctx.stroke();
+
+        ctx.fillStyle = shoes > 0 ? '#ffd700' : '#424242';
+        ctx.fillRect(10 - legSwing, -3, 6, 4);
+        ctx.fillRect(38 + legSwing, -3, 6, 4);
+
+        ctx.strokeStyle = '#eeeeee';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(4, -28);
+        ctx.quadraticCurveTo(-10, -22 + Math.sin(horse.legPhase) * 5, -8, -10);
+        ctx.stroke();
+
+        ctx.restore();
+    }
+
+    function drawObstacles() {
+        for (var i = 0; i < obstacles.length; i++) {
+            var obs = obstacles[i];
+            ctx.fillStyle = obs.color;
+            if (obs.isWater) {
+                ctx.fillRect(obs.x, obs.y + 4, obs.width, obs.height);
+                ctx.fillStyle = '#e0f7fa';
+                ctx.fillRect(obs.x + 4, obs.y + 6, obs.width - 8, 3);
+            } else {
+                ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+                ctx.strokeStyle = '#222';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(obs.x, obs.y, obs.width, obs.height);
+
+                if (obs.width < 32) {
+                    ctx.fillStyle = '#d7ccc8';
+                    ctx.fillRect(obs.x + 4, obs.y + 8, obs.width - 8, 4);
+                    ctx.fillRect(obs.x + 4, obs.y + 22, obs.width - 8, 4);
+                }
+            }
+        }
+    }
+
+    function drawPickups() {
+        for (var i = 0; i < pickups.length; i++) {
+            var p = pickups[i];
+            if (p.type === 'COIN') {
+                ctx.fillStyle = '#ffd700';
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.fillStyle = '#000';
+                ctx.font = 'bold 11px monospace';
+                ctx.textAlign = 'center';
+                ctx.fillText('G', p.x, p.y + 4);
+            } else {
+                ctx.strokeStyle = '#ffd700';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0.2 * Math.PI, 0.8 * Math.PI, true);
+                ctx.stroke();
+            }
+        }
+    }
+
+    function drawHUD() {
+        ctx.textAlign = 'left';
+        ctx.font = 'bold 14px "Comic Sans MS", sans-serif';
+        ctx.fillStyle = '#ffeb3b';
+        ctx.fillText(GAME_TRANSLATIONS[activeLang].hudShoes, 20, 32);
+
+        for (var i = 0; i < 4; i++) {
+            var isShoeActive = i < shoes;
+            var isBlinking = lostShoeBlinkTimers[i] > 0;
+
+            ctx.save();
+            if (isShoeActive) {
+                ctx.globalAlpha = 1.0;
+                ctx.fillStyle = "#ffd700";
+            } else if (isBlinking) {
+                // Blinkar snabbt i 30 frames vid förlust
+                var toggle = Math.floor(lostShoeBlinkTimers[i] / 4) % 2 === 0;
+                ctx.globalAlpha = toggle ? 1.0 : 0.2;
+                ctx.fillStyle = toggle ? "#ffffff" : "#ff1744";
+            } else {
+                // Helt förlorad och släckt sko
+                ctx.globalAlpha = 0.15;
+                ctx.fillStyle = "#333333";
+            }
+
+            ctx.fillText('🧲', 160 + (i * 28), 32);
+            ctx.restore();
+        }
+
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#00ffcc';
+        ctx.fillText(GAME_TRANSLATIONS[activeLang].hudDist + Math.floor(distance) + ' M', canvas.width / 2, 32);
+
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#ffd700';
+        ctx.fillText(GAME_TRANSLATIONS[activeLang].hudGold + goldCoins + ' G', canvas.width - 24, 32);
+
+        if (barefootWarningTimer > 0 || (shoes === 1 && Math.floor(Date.now() / 200) % 2 === 0)) {
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#ff1744';
+            ctx.font = 'bold 18px "Comic Sans MS", sans-serif';
+            ctx.fillText(GAME_TRANSLATIONS[activeLang].warnBarefoot, canvas.width / 2, 75);
+        }
+    }
+
+    if (isTournamentMode && gameState === "PLAYING") {
+    var p = getTourneyLangPack();
+
+    ctx.save();
+    ctx.fillStyle = 'rgba(18, 3, 32, 0.85)';
+    ctx.fillRect(canvas.width / 2 - 150, 10, 300, 28);
+    ctx.strokeStyle = '#ffeb3b';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(canvas.width / 2 - 150, 10, 300, 28);
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = "bold 12px 'Comic Sans MS', cursive, sans-serif";
+    ctx.fillStyle = '#00ffcc';
+
+    var statusText = tournamentPlayer.name + " | " + 
+                     p.hudAttempt + " " + tournamentPlayer.currentAttempt + "/3 (" + 
+                     p.hudBest + ": " + tournamentPlayer.bestScore + "p)";
+
+    ctx.fillText(statusText, canvas.width / 2, 24);
+    ctx.restore();
+}
+
+    function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawScenery();
+        drawObstacles();
+        drawPickups();
+        drawHorse();
+        drawHUD();
+        updateTournamentButtonVisibility();
+
+        if (gameState === "MENU") {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.84)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#ffeb3b';
+            ctx.font = 'bold 36px "Comic Sans MS", sans-serif';
+            ctx.fillText(GAME_TRANSLATIONS[activeLang].menuTitle, canvas.width / 2, canvas.height / 2 - 80);
+
+            ctx.fillStyle = '#00ffcc';
+            ctx.font = 'bold 18px "Comic Sans MS", monospace';
+            ctx.fillText(GAME_TRANSLATIONS[activeLang].menuSub, canvas.width / 2 - 10, canvas.height / 2 - 45);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '14px "Comic Sans MS", monospace';
+            ctx.fillText(GAME_TRANSLATIONS[activeLang].menuDesc1, canvas.width / 2, canvas.height / 2 - 5);
+            ctx.fillText(GAME_TRANSLATIONS[activeLang].menuDesc2, canvas.width / 2, canvas.height / 2 + 20);
+
+            // 🌍 SPRÅKVALSRUTA I MENYN
+            var langBoxW = 380;
+            var langBoxH = 36;
+            var langBoxX = (canvas.width - langBoxW) / 2;
+            var langBoxY = canvas.height / 2 + 50;
+
+            ctx.fillStyle = '#1a0033';
+            ctx.fillRect(langBoxX, langBoxY, langBoxW, langBoxH);
+            ctx.strokeStyle = '#00ffcc';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(langBoxX, langBoxY, langBoxW, langBoxH);
+
+            ctx.fillStyle = '#ffeb3b';
+            ctx.font = 'bold 13px "Comic Sans MS", monospace';
+           var mob = isMobileDevice();
+ctx.fillText(GAME_TRANSLATIONS[activeLang].langSwitchHint(mob) + AVAILABLE_LANGS[currentLangMenuIndex].label, canvas.width / 2, langBoxY + 23);
+
+            // STARTKNAPP
+            ctx.fillStyle = '#00ffcc';
+            ctx.font = 'bold 16px "Comic Sans MS", sans-serif';
+            ctx.fillText(GAME_TRANSLATIONS[activeLang].menuStart(mob), canvas.width / 2, canvas.height / 2 + 125);
+        } else if (gameState === "PAUSED") {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#00ffcc';
+            ctx.font = 'bold 32px "Comic Sans MS", sans-serif';
+            ctx.fillText('⏸️ PAUSAD', canvas.width / 2, canvas.height / 2 - 10);
+
+            ctx.fillStyle = '#fff';
+            ctx.font = '14px monospace';
+            ctx.fillText('Tryck [ESC] för att fortsätta', canvas.width / 2, canvas.height / 2 + 30);
+        } else if (gameState === "GAMEOVER") {
+            // Mörk retro-bakgrund
+            ctx.fillStyle = 'rgba(25, 0, 35, 0.93)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Titel (t.ex. "PLATT FALL I RABATTEN!")
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#ff1744';
+            ctx.font = "bold 32px 'Comic Sans MS', cursive, sans-serif";
+            ctx.fillText(activeGameOverTitle, canvas.width / 2, canvas.height / 2 - 85);
+
+            // Turneringsbanner med ryttarnamn, försök och bästa resultat
+            if (window.isTournamentMode) {
+                var tp = (typeof getTourneyLangPack === 'function') ? getTourneyLangPack() : null;
+                var attText = tp ? tp.hudAttempt : "FÖRSÖK";
+                var bestText = tp ? tp.hudBest : "BÄST";
+
+                ctx.fillStyle = '#ffeb3b';
+                ctx.font = "bold 15px 'Comic Sans MS', cursive, sans-serif";
+                ctx.fillText("🏆 " + window.tournamentPlayer.name + " | " + attText + " " + window.tournamentPlayer.currentAttempt + "/3 (" + bestText + ": " + window.tournamentPlayer.bestScore + "p)", canvas.width / 2, canvas.height / 2 - 55);
+            }
+
+            // Poängstatistik (Distans & Mynt)
+            ctx.fillStyle = '#ffffff';
+            ctx.font = "bold 16px 'Comic Sans MS', cursive, sans-serif";
+            ctx.fillText(GAME_TRANSLATIONS[activeLang].gameOverStats(Math.floor(distance), goldCoins), canvas.width / 2, canvas.height / 2 - 25);
+
+            // Hån-ruta (Pippi, Kamek eller Kling & Klang)
+            var comBoxW = canvas.width - 100;
+            var comBoxH = 60;
+            var comBoxX = (canvas.width - comBoxW) / 2;
+            var comBoxY = canvas.height / 2 + 5;
+
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+            ctx.fillRect(comBoxX, comBoxY, comBoxW, comBoxH);
+            ctx.strokeStyle = (distance >= 650) ? '#00ffcc' : (distance >= 350 ? '#ffeb3b' : '#ff1744');
+            ctx.lineWidth = 2;
+            ctx.strokeRect(comBoxX, comBoxY, comBoxW, comBoxH);
+
+            ctx.fillStyle = (distance >= 650) ? '#00ffcc' : (distance >= 350 ? '#ffeb3b' : '#ff5252');
+            ctx.font = "italic bold 13px 'Comic Sans MS', cursive, sans-serif";
+            ctx.fillText(activeHumorComment, canvas.width / 2, comBoxY + 35);
+
+            // Sekundräknare & omstartstext
+            var sec = Math.ceil(gameOverLockTimer / 60);
+
+            if (window.isTournamentMode) {
+                if (window.tournamentPlayer.currentAttempt < 3) {
+                    ctx.fillStyle = '#00ffcc';
+                    ctx.font = "bold 16px 'Comic Sans MS', cursive, sans-serif";
+                    ctx.fillText("⏳ NÄSTA FÖRSÖK STARTAR OM " + sec + "S...", canvas.width / 2, canvas.height / 2 + 105);
+                } else {
+                    ctx.fillStyle = '#ffeb3b';
+                    ctx.font = "bold 16px 'Comic Sans MS', cursive, sans-serif";
+                    ctx.fillText("🏁 3 AV 3 FÖRSÖK KÖRDA! SPARAR TILL TOPPLISTAN (" + sec + "S)...", canvas.width / 2, canvas.height / 2 + 105);
+                }
+            } else {
+                // Standardläge vid fritt spel
+                if (gameOverLockTimer > 0) {
+                    ctx.fillStyle = '#ff5252';
+                    ctx.font = "bold 16px 'Comic Sans MS', cursive, sans-serif";
+                    ctx.fillText(GAME_TRANSLATIONS[activeLang].gameOverLockWait(sec), canvas.width / 2, canvas.height / 2 + 105);
+                } else {
+                    ctx.fillStyle = '#76ff03';
+                    ctx.font = "bold 16px 'Comic Sans MS', cursive, sans-serif";
+                    var mob = isMobileDevice();
+                    ctx.fillText(GAME_TRANSLATIONS[activeLang].gameOverRestart(mob), canvas.width / 2, canvas.height / 2 + 105);
+                }
+            }
+        }
+        TournamentJukebox.renderHUD(ctx, canvas);
+
+        function drawAudioButtons() {
+    var margin = 15;
+    var btnSize = 38;
+
+    // Placera i nedre högra hörnet
+    BTN_SFX_RECT.x = canvas.width - margin - btnSize;
+    BTN_SFX_RECT.y = canvas.height - margin - btnSize;
+    BTN_SFX_RECT.w = btnSize;
+    BTN_SFX_RECT.h = btnSize;
+
+    BTN_MUSIC_RECT.x = BTN_SFX_RECT.x - btnSize - 12;
+    BTN_MUSIC_RECT.y = canvas.height - margin - btnSize;
+    BTN_MUSIC_RECT.w = btnSize;
+    BTN_MUSIC_RECT.h = btnSize;
+
+    // Hjälpfunktion för att rita en röd förbudssymbol över ikonen
+    function drawProhibition(cx, cy, r) {
+        ctx.save();
+        ctx.strokeStyle = '#ff1744';
+        ctx.lineWidth = 3.5;
+        // Röd ring
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.stroke();
+        // Rött snedstreck (45 grader)
+        ctx.beginPath();
+        var offset = r * 0.7071;
+        ctx.moveTo(cx - offset, cy - offset);
+        ctx.lineTo(cx + offset, cy + offset);
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    // --- 1. MUSIK-KNAPP (NOT 🎵) ---
+    ctx.save();
+    ctx.fillStyle = 'rgba(20, 0, 35, 0.75)';
+    ctx.fillRect(BTN_MUSIC_RECT.x, BTN_MUSIC_RECT.y, btnSize, btnSize);
+    ctx.strokeStyle = '#9d4edd';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(BTN_MUSIC_RECT.x, BTN_MUSIC_RECT.y, btnSize, btnSize);
+
+    // Vektorritad dubbelnot
+    var mx = BTN_MUSIC_RECT.x;
+    var my = BTN_MUSIC_RECT.y;
+    ctx.fillStyle = isMusicMuted ? '#666666' : '#00ffcc';
+    ctx.strokeStyle = isMusicMuted ? '#666666' : '#00ffcc';
+    ctx.lineWidth = 2.5;
+
+    // Vänster nothuvud & skaft
+    ctx.beginPath();
+    ctx.ellipse(mx + 13, my + 26, 4, 3, -0.3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(mx + 16, my + 25);
+    ctx.lineTo(mx + 16, my + 11);
+    ctx.stroke();
+
+    // Höger nothuvud & skaft
+    ctx.beginPath();
+    ctx.ellipse(mx + 25, my + 22, 4, 3, -0.3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(mx + 28, my + 21);
+    ctx.lineTo(mx + 28, my + 8);
+    ctx.stroke();
+
+    // Binde-balk högst upp
+    ctx.beginPath();
+    ctx.moveTo(mx + 15, my + 11);
+    ctx.lineTo(mx + 29, my + 8);
+    ctx.stroke();
+
+    if (isMusicMuted) {
+        drawProhibition(mx + btnSize / 2, my + btnSize / 2, 14);
+    }
+    ctx.restore();
+
+    // --- 2. LJUDEFFEKTS-KNAPP (HÖGTALARE 🔊) ---
+    ctx.save();
+    ctx.fillStyle = 'rgba(20, 0, 35, 0.75)';
+    ctx.fillRect(BTN_SFX_RECT.x, BTN_SFX_RECT.y, btnSize, btnSize);
+    ctx.strokeStyle = '#9d4edd';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(BTN_SFX_RECT.x, BTN_SFX_RECT.y, btnSize, btnSize);
+
+    // Vektorritad högtalare
+    var sx = BTN_SFX_RECT.x;
+    var sy = BTN_SFX_RECT.y;
+    ctx.fillStyle = isSfxMuted ? '#666666' : '#ffeb3b';
+    ctx.strokeStyle = isSfxMuted ? '#666666' : '#ffeb3b';
+    ctx.lineWidth = 2;
+
+    // Högtalarlåda och kon
+    ctx.beginPath();
+    ctx.rect(sx + 10, sy + 15, 5, 8);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(sx + 15, sy + 15);
+    ctx.lineTo(sx + 22, sy + 10);
+    ctx.lineTo(sx + 22, sy + 28);
+    ctx.lineTo(sx + 15, sy + 23);
+    ctx.closePath();
+    ctx.fill();
+
+    // Ljudvågor (om aktiv)
+    if (!isSfxMuted) {
+        ctx.beginPath();
+        ctx.arc(sx + 20, sy + 19, 6, -0.6, 0.6);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(sx + 20, sy + 19, 10, -0.7, 0.7);
+        ctx.stroke();
+    } else {
+        drawProhibition(sx + btnSize / 2, sy + btnSize / 2, 14);
+    }
+    ctx.restore();
+}drawAudioButtons();
+
+checkOrientationNotice(ctx, canvas);
+drawCornerUIButtons();
+    }
+
+    function gameLoop() {
+        update();
+        render();
+        requestAnimationFrame(gameLoop);
+    }
+
+    initScenery();
+    gameLoop();
+
+    // Fallbacks för hörnknappar och kontroller så inget kastar ReferenceError
+if (typeof window.handleCornerButtonTouches !== "function") {
+    window.handleCornerButtonTouches = function() { return false; };
+}
+if (typeof window.openHelpModal !== "function") {
+    window.openHelpModal = function() {
+        var modal = document.getElementById("help-modal-overlay") || document.getElementById("help-modal");
+        if (modal) modal.style.display = "flex";
+    };
+}
+if (typeof window.togglePause !== "function") {
+    window.togglePause = function() {
+        if (window.isTournamentMode) return;
+        if (window.gameState === "PLAYING") window.gameState = "PAUSED";
+        else if (window.gameState === "PAUSED") window.gameState = "PLAYING";
+    };
+}
+})();
+</script>
+<!-- REGISTRERING AV SPELARE FÖRE TURNERINGSSTART -->
+<div id="tournament-reg-modal" class="modal-backdrop" style="display: none;">
+    <div class="retro-window tournament-box">
+        <div class="window-titlebar">
+            <span id="tourney-reg-title">🏆 LAN TOURNAMENT: REGISTRERING</span>
+        </div>
+        <div class="window-body">
+            <p id="tourney-reg-rules" style="color: #ffeb3b; font-weight: bold; margin-bottom: 8px;"></p>
+            <label id="tourney-reg-label" for="tourney-player-name" style="display: block; margin-bottom: 6px;"></label>
+            <input type="text" id="tourney-player-name" maxlength="15" autocomplete="off" class="retro-input">
+            <div id="tourney-input-error" style="color: #ff1744; font-size: 11px; margin-top: 5px; display: none;"></div>
+        </div>
+        <div class="window-footer">
+    <button type="button" class="retro-btn" id="tourney-btn-start" onclick="window.confirmTournamentPlayer()">
+        STARTA FÖRSÖK 1 AV 3
+    </button>
+    <button type="button" class="retro-btn-cancel" id="tourney-btn-cancel" onclick="window.abortTournamentMode()">
+        AVBRYT
+    </button>
+</div>
+    </div>
+</div>
+
+<!-- RESULTATSKÄRM EFTER 3 FÖRSÖK -->
+<div id="tournament-final-modal" class="modal-backdrop" style="display: none;">
+    <div class="retro-window tournament-box">
+        <div class="window-titlebar">
+            <span id="tourney-final-title">🏁 TURNERINGSOMGÅNGEN AVSLUTAD</span>
+        </div>
+        <div class="window-body" id="tourney-final-summary"></div>
+        <div class="window-footer">
+            <button type="button" class="retro-btn" id="tourney-btn-next" onclick="finishTournamentTurn()">NÄSTA SPELARE</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

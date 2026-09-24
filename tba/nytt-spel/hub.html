@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Retro Arcade - Hub</title>
+    <style>
+        body { margin: 0; background: #08080c; color: #fff; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+        .grid { display: grid; grid-template-columns: repeat(3, 200px); gap: 15px; margin-top: 20px; }
+        .btn { background: #1a162b; border: 2px solid #00ffcc; color: #00ffcc; padding: 20px 10px; text-align: center; text-decoration: none; font-weight: bold; border-radius: 6px; font-size: 14px; transition: 0.2s; }
+        .btn:hover { background: #00ffcc; color: #000; transform: scale(1.05); }
+    </style>
+</head>
+<body>
+    <h1 style="color: #ffeb3b; letter-spacing: 2px;">🕹️ ARKADHALLEN – VÄLJ SPEL</h1>
+    <p style="color: #888;">Varje spel körs fristående med egna kontroller och Kamek Anti-Cheat.</p>
+
+    <div class="grid">
+        <a href="breakout.html" class="btn">🧱 BREAKOUT BLITZ</a>
+        <a href="frogger.html" class="btn">🐸 FROGGER ARCADE</a>
+        <a href="boss_battle.html" class="btn">🎯 BOSS BATTLE</a>
+        <a href="space_race.html" class="btn">🚀 RYMD-RACE</a>
+        <a href="sega_rally.html" class="btn">🏎️ SEGA RALLY 2001</a>
+        <a href="horse_race.html" class="btn">🐎 DERBY DASH</a>
+        <a href="hangman.html" class="btn">🔤 HÄNGA GUBBE</a>
+        <a href="submarine.html" class="btn">🌊 SUBMARINE</a>
+        <a href="quiz_show.html" class="btn">🐝 QUIZ SHOWDOWN</a>
+    </div>
+</body>
+</html>

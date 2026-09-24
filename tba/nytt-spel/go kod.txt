@@ -1,0 +1,252 @@
+            // ==========================================
+// ☠️ DYNAMISKA GAME OVER-ÖVERGÅNGAR (NUKE / DÖD / TID)
+// ==========================================
+if (gameOverSequence.active) {
+    gameOverSequence.timer++;
+    const progress = Math.min(1.0, gameOverSequence.timer / gameOverSequence.maxDuration);
+
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+    // ----------------------------------------------------
+    // ☢️ 1. NUKE-EXPLOSION: Stor ikon, blinkar GUL-VIT-SVART
+    // ----------------------------------------------------
+    if (gameOverSequence.cause === "NUKE") {
+        const flashColors = ["#ffff00", "#ffffff", "#000000", "#ff1744"];
+        const colorIdx = Math.floor(gameOverSequence.timer / 4) % flashColors.length;
+
+        // Blixtrande helskärmsöverdrag
+        ctx.fillStyle = flashColors[colorIdx];
+        ctx.globalAlpha = Math.min(0.9, 0.4 + progress * 0.5);
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.globalAlpha = 1.0;
+
+        // Gigantisk pulserande och expanderande Nuke-symbol
+        const iconScale = 1.0 + progress * 1.8;
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2 - 20);
+        ctx.scale(iconScale, iconScale);
+        ctx.textAlign = "center";
+        ctx.font = "bold 64px sans-serif";
+        ctx.fillStyle = (colorIdx === 2) ? "#ffff00" : "#000000";
+        ctx.fillText("☢️", 0, 20);
+        ctx.restore();
+    }
+
+    // ----------------------------------------------------
+    // 🩸 2. FIENDEDÖD: Skärmen blir rödare och rödare
+    // ----------------------------------------------------
+    else if (gameOverSequence.cause === "ENEMY_KILL") {
+        ctx.fillStyle = "#ff0000";
+        ctx.globalAlpha = progress * 0.85;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Pulserande röd vinjett
+        const pulse = Math.sin(gameOverSequence.timer * 0.1) * 0.1;
+        ctx.fillStyle = "#000000";
+        ctx.globalAlpha = Math.min(0.9, progress * 0.7 + pulse);
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.globalAlpha = 1.0;
+    }
+
+    // ----------------------------------------------------
+    // ⏰ 3. TIMEOUT: Skärmen desatureras till svartvitt
+    // ----------------------------------------------------
+    else if (gameOverSequence.cause === "TIME_OUT") {
+        // Mörknande gråskale-slöja
+        ctx.fillStyle = `rgba(15, 15, 15, ${progress * 0.92})`;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Klockikon som tickar ner
+        ctx.textAlign = "center";
+        ctx.font = "bold 48px sans-serif";
+        ctx.fillStyle = `rgba(255, 235, 59, ${Math.max(0, 1.0 - progress)})`;
+        ctx.fillText("⏰ TIDEN ÄR UTE!", canvas.width / 2, canvas.height / 2 - 40);
+    }
+
+           // ==================== 🏁 SKJUTSPELETS DEDIKERADE GAME OVER ====================
+            if (gameOverSequence.active || isGameOver) {
+    // 1. Öka alfan långsamt först när det inledande ljudet tystnat
+    if (gameOverSequence.soundFinished || isGameOver) {
+        gameOverSequence.fadeInAlpha = Math.min(1.0, gameOverSequence.fadeInAlpha + 0.018);
+    }
+
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalAlpha = gameOverSequence.fadeInAlpha; // 👈 Tonar in din befintliga skärm mjukt
+                ctx.save();
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+                ctx.fillStyle = "rgba(4, 6, 16, 0.95)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                const acc = shotsFired > 0 ? Math.round((shotsHit / shotsFired) * 100) : 0;
+                const misses = Math.max(0, shotsFired - shotsHit);
+                const grade = calculateRank(score, acc);
+
+                // Hämta betygskommentar och dödsorsakshån
+                const gradeThemeObj = GRADE_COMMENTS[theme.id] || GRADE_COMMENTS.WESTERN;
+                const gradeComment = gradeThemeObj[grade] || gradeThemeObj.C;
+
+                const themeMocks = GAME_OVER_MOCKS[theme.id] || GAME_OVER_MOCKS.WESTERN;
+                const causeMock = themeMocks[gameOverCause] || themeMocks.TIME_OUT;
+
+                // 1. DYNAMISKA FÄRGER & RUBRIKER
+                let headerTitle = "🏁 RUNDAN AVSLUTAD! 🏁";
+                let headerColor = "#ffd600";
+                let themeBorderColor = "#38bdf8";
+
+                if (gameOverCause === "NUKE_SELF_DESTRUCT") {
+                    headerTitle = "☢️ ATOMÄR SJÄLVSANERING! ☢️";
+                    headerColor = "#ff1744";
+                    themeBorderColor = "#ff1744";
+                } else if (gameOverCause === "ENEMY_KILL") {
+                    headerTitle = "💀 DU BLEV ELIMINERAD! 💀";
+                    headerColor = "#ff1744";
+                    themeBorderColor = "#f43f5e";
+                } else if (gameOverCause === "TIME_OUT") {
+                    headerTitle = "⏱️ TIDEN RANN UT! ⏱️";
+                    headerColor = "#ffd600";
+                    themeBorderColor = "#eab308";
+                }
+
+                // ==================== 🏆 A. TURNERINGS-PRISPALL ====================
+                if (showTournamentLeaderboard) {
+                    ctx.textAlign = "center";
+                    ctx.fillStyle = "#ffd600";
+                    ctx.font = `bold 24px ${theme.fontFamily}`;
+                    ctx.fillText("🏆 TURNERINGEN AVSLUTAD! 🏆", canvas.width / 2, 40);
+
+                    ctx.fillStyle = "#00ffcc";
+                    ctx.font = `bold 13px ${theme.fontFamily}`;
+                    ctx.fillText(`MÄSTARE: ${tournamentResults[0].player} (${tournamentResults[0].score}p | ${tournamentResults[0].accuracy}% Träff)`, canvas.width / 2, 65);
+
+                    let startY = 95;
+                    tournamentResults.forEach((res, idx) => {
+                        let rankColor = idx === 0 ? "#ffd600" : (idx === 1 ? "#cbd5e1" : (idx === 2 ? "#d97706" : "#ffffff"));
+                        ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
+                        ctx.fillRect(50, startY + (idx * 28) - 16, canvas.width - 100, 24);
+                        ctx.strokeStyle = rankColor;
+                        ctx.lineWidth = 1;
+                        ctx.strokeRect(50, startY + (idx * 28) - 16, canvas.width - 100, 24);
+
+                        ctx.fillStyle = rankColor;
+                        ctx.font = `bold 12px ${theme.fontFamily}`;
+                        ctx.fillText(
+                            `#${idx + 1}  ${res.player.padEnd(12, ' ')}  |  ${res.score}p  |  ${res.accuracy}% TRÄFF  |  BETYG: [${res.rank}]`,
+                            canvas.width / 2,
+                            startY + (idx * 28)
+                        );
+                    });
+
+                    ctx.fillStyle = "#22c55e";
+                    ctx.font = `bold 13px ${theme.fontFamily}`;
+                    ctx.fillText("[ TRYCK ENTER FÖR ATT STARTA NY TURNERING ]", canvas.width / 2, canvas.height - 35);
+                    ctx.fillText("[ ESC: TILLBAKA TILL MENYN ]", canvas.width / 2, canvas.height - 15);
+                    ctx.restore();
+                    return;
+                }
+
+                // ==================== 🎯 B. DEDIKERAD GAME OVER-SKÄRM ====================
+                ctx.textAlign = "center";
+                ctx.fillStyle = headerColor;
+                ctx.font = `bold 20px ${theme.fontFamily}`;
+                ctx.fillText(headerTitle, canvas.width / 2, 30);
+
+                // 2. BETYG (S, A, B, C, D) & POÄNG
+                let gradeColor = grade === "S" ? "#ffd600" : (grade === "A" ? "#22c55e" : (grade === "B" ? "#38bdf8" : (grade === "C" ? "#f97316" : "#ef4444")));
+                ctx.fillStyle = gradeColor;
+                ctx.font = `bold 32px ${theme.fontFamily}`;
+                ctx.fillText(`BETYG: ${grade}`, canvas.width / 2 - 110, 65);
+
+                ctx.fillStyle = "#ffffff";
+                ctx.font = `bold 20px ${theme.fontFamily}`;
+                ctx.fillText(`${score} POÄNG`, canvas.width / 2 + 80, 64);
+
+                // 3. 🎭 BETYGSKOMMENTAR (ROLIG BEDÖMNING AV INSATSEN)
+                ctx.fillStyle = "#ffd600";
+                ctx.font = "italic 11px sans-serif";
+                ctx.fillText(`"${gradeComment}"`, canvas.width / 2, 85);
+
+                // 4. STATISTIK-GRID
+                const statBoxY = 98;
+                ctx.fillStyle = "rgba(15, 23, 42, 0.75)";
+                ctx.fillRect(40, statBoxY, canvas.width - 80, 48);
+                ctx.strokeStyle = themeBorderColor;
+                ctx.lineWidth = 1.5;
+                ctx.strokeRect(40, statBoxY, canvas.width - 80, 48);
+
+                ctx.font = "bold 10px sans-serif";
+                ctx.fillStyle = "#94a3b8";
+                ctx.fillText("SKOTT", 95, statBoxY + 16);
+                ctx.fillText("TRÄFFAR", 205, statBoxY + 16);
+                ctx.fillText("BOMMAR", 315, statBoxY + 16);
+                ctx.fillText("PRECISION", 425, statBoxY + 16);
+                ctx.fillText("MAX STREAK", 535, statBoxY + 16);
+
+                ctx.font = `bold 13px ${theme.fontFamily}`;
+                ctx.fillStyle = "#ffffff";
+                ctx.fillText(`${shotsFired}`, 95, statBoxY + 36);
+                ctx.fillStyle = "#22c55e";
+                ctx.fillText(`${shotsHit}`, 205, statBoxY + 36);
+                ctx.fillStyle = misses > 0 ? "#ef4444" : "#94a3b8";
+                ctx.fillText(`${misses}`, 315, statBoxY + 36);
+                ctx.fillStyle = acc >= 70 ? "#00ffcc" : (acc >= 45 ? "#ffd600" : "#ef4444");
+                ctx.fillText(`${acc}%`, 425, statBoxY + 36);
+                ctx.fillStyle = "#ff007f";
+                ctx.fillText(`x${streak}`, 535, statBoxY + 36);
+
+                // 5. ☠️ DÖDSORSAKSHÅN
+                const mockBoxY = 154;
+                ctx.fillStyle = gameOverCause === "NUKE_SELF_DESTRUCT" ? "rgba(255, 23, 68, 0.2)" : "rgba(56, 189, 248, 0.12)";
+                ctx.fillRect(40, mockBoxY, canvas.width - 80, 36);
+                ctx.strokeStyle = gameOverCause === "NUKE_SELF_DESTRUCT" ? "#ff1744" : themeBorderColor;
+                ctx.lineWidth = 1.5;
+                ctx.strokeRect(40, mockBoxY, canvas.width - 80, 36);
+
+                ctx.fillStyle = gameOverCause === "NUKE_SELF_DESTRUCT" ? "#ff5252" : "#38bdf8";
+                ctx.font = "italic bold 11px sans-serif";
+                ctx.fillText(causeMock, canvas.width / 2, mockBoxY + 22);
+
+                // 6. LOCALSTORAGE TOPPLISTA
+                const savedHs = getThemeLeaderboard(theme.id);
+                const hsBoxY = 202;
+
+                ctx.fillStyle = "#e2e8f0";
+                ctx.font = "bold 11px sans-serif";
+                ctx.fillText(`💾 TOPPLISTA (${theme.name}):`, canvas.width / 2, hsBoxY);
+
+                if (savedHs.length === 0) {
+                    ctx.fillStyle = "#64748b";
+                    ctx.fillText("Inga sparade rekord för detta tema ännu!", canvas.width / 2, hsBoxY + 20);
+                } else {
+                    savedHs.slice(0, 3).forEach((hs, i) => {
+                        let isTopScore = (i === 0 && hs.score === score);
+                        ctx.fillStyle = i === 0 ? "#ffd600" : (i === 1 ? "#cbd5e1" : "#94a3b8");
+                        ctx.font = `bold 11px ${theme.fontFamily}`;
+                        ctx.fillText(`#${i + 1}  ${hs.score}p  (${hs.accuracy}% Träff)  [${hs.date}] ${isTopScore ? "⭐ NYTT REKORD!" : ""}`, canvas.width / 2, hsBoxY + 18 + (i * 17));
+                    });
+                }
+
+                // 7. KNAPPGUIDE
+                ctx.fillStyle = "#22c55e";
+                ctx.font = `bold 12px ${theme.fontFamily}`;
+                if (isTournamentMode && currentTournamentPlayer <= tournamentPlayerCount) {
+                    ctx.fillText(`[ NÄSTA: SPELARE ${currentTournamentPlayer} - TRYCK ENTER ]`, canvas.width / 2, canvas.height - 36);
+                } else {
+                    ctx.fillText("[ TRYCK ENTER / MELLANSLAG FÖR ATT SPELA IGEN ]", canvas.width / 2, canvas.height - 36);
+                }
+
+                ctx.fillStyle = "#94a3b8";
+                ctx.font = "10px sans-serif";
+                ctx.fillText("[T: Byt Tema | Y: Ändra Svårighet | P: Turneringsläge | ESC: Tillbaka]", canvas.width / 2, canvas.height - 16);
+
+                ctx.restore();
+            }
+            // När animationen är helt klar flaggas isGameOver
+    // När intoningen är klar sätts isGameOver till true
+    if (gameOverSequence.fadeInAlpha >= 1.0) {
+        isGameOver = true;
+    }
+    return;
+}

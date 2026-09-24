@@ -1,0 +1,174 @@
+{
+    "title": {
+        "sv": "Pussel, Quiz & Boss - Gamepad Stöd",
+        "en": "Puzzle, Quiz & Boss - Gamepad Support"
+    },
+    "access_denied_heading": {
+        "sv": "🛑 ÅTKOMST NEKAD 🛑",
+        "en": "🛑 ACCESS DENIED 🛑"
+    },
+    "game_guide_heading": {
+        "sv": "📖 LEKGUIDE - ALLA SPEL",
+        "en": "📖 GAME GUIDE - ALL GAMES"
+    },
+    "close_button": {
+        "sv": "[X]",
+        "en": "[X]"
+    },
+    "story_button": {
+        "sv": "1. STORY",
+        "en": "1. STORY"
+    },
+    "base_defense_button": {
+        "sv": "2. BASE DEFENSE",
+        "en": "2. BASE DEFENSE"
+    },
+    "quiz_show_button": {
+        "sv": "3. QUIZ SHOW",
+        "en": "3. QUIZ SHOW"
+    },
+    "space_race_button": {
+        "sv": "4. RYMD-RACE",
+        "en": "4. SPACE RACE"
+    },
+    "sega_rally_button": {
+        "sv": "5. SEGA RALLY 2001",
+        "en": "5. SEGA RALLY 2001"
+    },
+    "frogger_button": {
+        "sv": "6. FROGGER",
+        "en": "6. FROGGER"
+    },
+    "breakout_button": {
+        "sv": "7. BREAKOUT",
+        "en": "7. BREAKOUT"
+    },
+    "hangman_button": {
+        "sv": "8. HÄNGA GUBBE",
+        "en": "8. HANGMAN"
+    },
+    "derby_dash_button": {
+        "sv": "🐎 DERBY DASH",
+        "en": "🐎 DERBY DASH"
+    },
+    "submarine_button": {
+        "sv": "🌊 SUBMARINE",
+        "en": "🌊 SUBMARINE"
+    },
+    "mecha_goran_button": {
+        "sv": "🤖 MECHA-GÖRAN",
+        "en": "🤖 MECHA-GÖRAN"
+    },
+    "tips_button": {
+        "sv": "💡 TIPS & REGLER",
+        "en": "💡 TIPS & RULES"
+    },
+    "story_mode_heading": {
+        "sv": "🧩 Story Mode - Äventyret",
+        "en": "🧩 Story Mode - The Adventure"
+    },
+    "base_defense_heading": {
+        "sv": "🛡️ FPS Base Defense Ultra (1-4P)",
+        "en": "🛡️ FPS Base Defense Ultra (1-4P)"
+    },
+    "quiz_show_heading": {
+        "sv": "🐝 Buzz! Quiz Showdown (1-4P)",
+        "en": "🐝 Buzz! Quiz Showdown (1-4P)"
+    },
+    "space_race_heading": {
+        "sv": "🚀 Rymd-Race: Circuit Showdown",
+        "en": "🚀 Space Race: Circuit Showdown"
+    },
+    "sega_rally_heading": {
+        "sv": "🏎️ Sega Rally 2001 (Hazard Run)",
+        "en": "🏎️ Sega Rally 2001 (Hazard Run)"
+    },
+    "frogger_heading": {
+        "sv": "🐸 Frogger Arcade",
+        "en": "🐸 Frogger Arcade"
+    },
+    "breakout_heading": {
+        "sv": "🧱 Breakout Blitz",
+        "en": "🧱 Breakout Blitz"
+    },
+    "hangman_heading": {
+        "sv": "🔤 Hänga Gubbe (Hangman)",
+        "en": "🔤 Hangman"
+    },
+    "anti_smile_heading": {
+        "sv": "📷 Anti-Smile: Survival",
+        "en": "📷 Anti-Smile: Survival"
+    },
+    "derby_dash_2000_heading": {
+        "sv": "🐎 Derby Dash 2000 (Lilla Gubbens Guldrace)",
+        "en": "🐎 Derby Dash 2000 (Little Old Man's Gold Race)"
+    },
+    "submarine_descent_heading": {
+        "sv": "🌊 Submarine Descent (Djupdykning)",
+        "en": "🌊 Submarine Descent (Deep Dive)"
+    },
+    "boss_battle_heading": {
+        "sv": "🎯 Boss Battle: Prickskyttetävling",
+        "en": "🎯 Boss Battle: Shooting Competition"
+    },
+    "game_guide_description": {
+        "sv": "💡 Komplett Spelguide, Tips & Accessibility",
+        "en": "💡 Complete Game Guide, Tips & Accessibility"
+    },
+    "sensory_warning": {
+        "sv": "Spelet innehåller sensoriska inslag som kan påverka ljus-, ljud- och stresskänsliga deltagare:",
+        "en": "The game contains sensory elements that may affect light-, sound-, and stress-sensitive participants:"
+    },
+    "story_mode_instructions": {
+        "sv": "1. 🧩 Story Mode:Lugnt tempo. Använd [WASD]/Pilar. Knuffa blocket rakt mot knappen för att inte fastna i hörn. Börja här för uppvärmning!",
+        "en": "1. 🧩 Story Mode: Relaxed pace. Use [WASD]/Arrow Keys. Push the block straight toward the button to avoid getting stuck in corners. Start here for warm-up!"
+    },
+    "base_defense_instructions": {
+        "sv": "2. 🛡️ Base Defense Ultra:• Prioritera röda bomber – de gör störst skada på muren!• Ladda om med [R], Högerklick eller genom att ropa 'LADDA OM!' när det är lugnt mellan vågorna.• Skjut Power-ups direkt i luften: ❤️ ger hälsa, 📦 ger skott, 🕒 ger Slow-Mo och ⭐ ger odödlighet!• Håll koll på ammunitionsreserven längst upp – skjuter du helt slut rasar muren direkt!",
+        "en": "2. 🛡️ Base Defense Ultra:• Prioritize red bombs – they deal the most damage to the wall!• Reload with [R], Right-Click, or by shouting 'RELOAD!' when it's calm between waves.• Shoot Power-ups directly in the air: ❤️ gives health, 📦 gives ammo, 🕒 gives Slow-Mo, and ⭐ gives invincibility!• Keep an eye on the ammo reserve at the top – if you run out completely, the wall collapses instantly!"
+    },
+    "quiz_show_instructions": {
+        "sv": "3. 🐝 Buzz! Quiz Showdown:• Chansa aldrig! Ett felaktigt svar nollställer hela din combo-multiplikator.• Rätta svar i rad ger multiplicerade poäng (2X, 3X, 4X combo!).• Använd Buzz!-sirener eller sifferknapparna [1-4] för snabbast responstid.",
+        "en": "3. 🐝 Buzz! Quiz Showdown:• Never guess! A wrong answer resets your entire combo multiplier.• Correct answers in a row give multiplied points (2X, 3X, 4X combo!).• Use Buzz! buzzers or number keys [1-4] for the fastest response time."
+    },
+    "space_race_instructions": {
+        "sv": "4. 🚀 Rymd-Race (Circuit Showdown):• Spara Boost [Mellanslag] till raksträckorna och släpp gasen helt i snäva S-chikaner.• Se upp för Svarta Hål – yttre zonen drar i skeppet och kärnan ger direkt skada!• I 2P-läge: Spelare 2 kan skuta sönder minfällor 💣 åt P1 eller attackera P1:s sköldar med musen/ljuspistolen.",
+        "en": "4. 🚀 Space Race (Circuit Showdown):• Save Boost [Space] for straight sections and release the gas completely in tight S-chicanes.• Watch out for Black Holes – the outer zone pulls your ship, and the core deals direct damage!• In 2P mode: Player 2 can shoot down mine traps 💣 for P1 or attack P1's shields with the mouse/light gun."
+    },
+    "frogger_instructions": {
+        "sv": "5. 🐸 Frogger Arcade:• Du måste landa EXAKT mitt i en av de 3 målrutorna längst upp (inom ±14px) – landar du snett räknas det som en bom!• Trästockarna rör sig i olika hastigheter – planera två hopp i förväg.• Använd en USB-Dansmatta på golvet för maximal fysik-känsla och träning!",
+        "en": "5. 🐸 Frogger Arcade:• You must land EXACTLY in the center of one of the 3 target squares at the top (within ±14px) – if you land crookedly, it counts as a miss!• The logs move at different speeds – plan two jumps ahead.• Use a USB dance mat on the floor for maximum physical feel and training!"
+    },
+    "breakout_instructions": {
+        "sv": "6. 🧱 Breakout Blitz:• Träffa bollen med kanten av plattformen för att ge bollen en snävare vinkel mot tegelstenarna.• Försök skapa en glipa i översta raden så att bollen studsar fast ovanför alla tegelstenar!",
+        "en": "6. 🧱 Breakout Blitz:• Hit the ball with the edge of the platform to give it a sharper angle toward the bricks.• Try to create a gap in the top row so the ball gets stuck bouncing above all the bricks!"
+    },
+    "hangman_instructions": {
+        "sv": "7. 🔤 Hänga Gubbe (Hangman):• Ingen tidsstress per bokstav.• Gissa alltid vokaler (A, E, I, O, U, Å, Ä, Ö) först för att avslöja ordets struktur.• Sök efter vanliga svenska ändelser som -ING, -AR, -ER eller -EN.",
+        "en": "7. 🔤 Hangman:• No time pressure per letter.• Always guess vowels (A, E, I, O, U, Å, Ä, Ö) first to reveal the word's structure.• Look for common Swedish endings like -ING, -AR, -ER, or -EN."
+    },
+    "anti_smile_instructions": {
+        "sv": "8. 📷 Anti-Smile (Survival):• Kräver webbkamera. Titta rakt in i linserna och håll ett helt neutralt ansikte utan att le eller fnissa.• Om du råkar visa tänderna känner kameradetektorn av det direkt!• Kan enkelt hoppas över i menyn om du inte vill använda kameran.",
+        "en": "8. 📷 Anti-Smile (Survival):• Requires a webcam. Look directly into the lens and maintain a completely neutral face without smiling or grinning.• If you accidentally show your teeth, the camera detector will notice immediately!• Can easily be skipped in the menu if you don't want to use the camera."
+    },
+    "sega_rally_instructions": {
+        "sv": "9. 🏎️ Sega Rally 2001:• Spara Nitro Boost till raka sträckor för att nå nästa checkpoint i tid!• Kör in i gula Bensinstationer (Mackar) till vänster för att reparera bilen till 100 HP.• Se upp för spikmattor efter 2 km – får du punktering börjar bilen sladda kraftigt!",
+        "en": "9. 🏎️ Sega Rally 2001:• Save Nitro Boost for straight sections to reach the next checkpoint in time!• Drive into yellow Gas Stations (Macks) on the left to repair the car to 100 HP.• Watch out for spike strips after 2 km – if you get a puncture, the car will start skidding heavily!"
+    },
+    "hp_label": {
+        "sv": "HP:",
+        "en": "HP:"
+    },
+    "language_button_sv": {
+        "sv": "SV",
+        "en": "SV"
+    },
+    "goran_angry_heading": {
+        "sv": "GÖRAN HÅNAR DIN DOSA!",
+        "en": "GÖRAN IS ANGRY AT YOUR COMPUTER!"
+    },
+    "ignore_risk_button": {
+        "sv": "[ENTER] JAG BRYR MIG INTE – KÖR ÄNDÅ!",
+        "en": "[ENTER] I DON'T CARE – PLAY ANYWAY!"
+    }
+}

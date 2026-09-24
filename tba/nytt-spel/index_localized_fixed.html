@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+
+<html lang="sv">
+<head>
+
+
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&amp;family=Comic+Neue:ital,wght@0,400;0,700;1,400&amp;family=Michroma&amp;family=Orbitron:wght@400;700;900&amp;family=VT323&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&amp;family=Permanent+Marker&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Almendra:ital,wght@0,400;0,700;1,400&amp;family=Luckiest+Guy&amp;display=swap" rel="stylesheet"/>
+<meta charset="utf-8"/>
+<title data-localize="title">Pussel, Quiz &amp; Boss - Gamepad Stöd</title>
+<style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background-color: #121212;
+            color: #fff;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        #game-container {
+            position: relative;
+            border: 4px solid #fff;
+            box-shadow: 0 0 20px rgba(255,255,255,0.2);
+            width: 640px;
+            height: 480px;
+        }
+        canvas {
+            background-color: #2e7d32;
+            display: block;
+        }
+        
+        .ui-box {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.85);
+            border: 2px solid #fff;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        #hud {
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .hp-bar-bg {
+            width: 140px;
+            height: 16px;
+            background: #444;
+            border: 1px solid #fff;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 5px;
+        }
+        .hp-bar-fill {
+            height: 100%;
+            background: #4caf50;
+            width: 100%;
+            transition: width 0.3s ease;
+        }
+
+        #quiz-overlay {
+            display: none;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: #1a1a1a;
+            border: 3px solid #ffeb3b;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        #quiz-question {
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #ffeb3b;
+            min-height: 40px;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        button {
+            background: #333;
+            color: #fff;
+            border: 2px solid #666;
+            padding: 8px;
+            font-family: inherit;
+            cursor: pointer;
+            text-align: left;
+        }
+        button:hover {
+            background: #555;
+            border-color: #fff;
+        }
+
+        #lang-btn {
+            cursor: pointer;
+            padding: 4px 8px;
+            background: #fff;
+            color: #000;
+            border: none;
+            font-weight: bold;
+        }
+        
+        #gamepad-status {
+            font-size: 11px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+<div id="language-switcher" style="position: fixed; top: 10px; right: 10px; z-index: 1000;">
+<button data-localize="language_button_sv" onclick="switchLanguage('sv')" style="background: rgba(0, 0, 0, 0.85); border: 2px solid #fff; color: #fff; padding: 5px 10px; cursor: pointer;">SV</button>
+<button onclick="switchLanguage('en')" style="background: rgba(0, 0, 0, 0.85); border: 2px solid #fff; color: #fff; padding: 5px 10px; cursor: pointer;">EN</button>
+</div>
+<!-- BANNER OM JAVASCRIPT ÄR AVSTÄNGT -->
+<noscript>
+<div style="position: fixed; top: 0; left: 0; width: 100%; background: #f44336; color: #ffffff; text-align: center; padding: 15px; font-family: 'Courier New', monospace; font-weight: bold; font-size: 16px; z-index: 999999; border-bottom: 3px solid #ffffff;">
+        ⚠️ Spelet fungerar inte utan JavaScript aktiverat!
+    </div>
+</noscript>
+<!-- SVART VARNINGSSKÄRM MED VEKTORRITAD CANVAS -->
+<div id="browser-warning-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.96); color: #ffffff; font-family: 'Courier New', monospace; z-index: 999998; text-align: center; justify-content: center; align-items: center; flex-direction: column; padding: 20px; box-sizing: border-box;">
+<div style="border: 3px solid #ff1744; padding: 20px; max-width: 620px; width: 90%; background-color: #0a0a0a; box-shadow: 0 0 25px rgba(255, 23, 68, 0.5); display: flex; flex-direction: column; align-items: center; border-radius: 6px;">
+<h1 data-localize="access_denied_heading" id="browser-warning-title" style="color: #ff1744; margin: 0 0 10px 0; font-size: 20px; letter-spacing: 1px;">🛑 ÅTKOMST NEKAD 🛑</h1>
+<!-- CANVAS FÖR DETALJERAD VEKTORRITNING -->
+<canvas height="150" id="warning-canvas" style="background: #111116; border: 2px solid #333344; margin: 8px 0 12px 0; border-radius: 4px;" width="280"></canvas>
+<div id="browser-warning-text" style="color: #ffeb3b; font-size: 13px; line-height: 1.5; text-align: center; width: 100%;"></div>
+<button id="browser-bypass-btn" style="display: none; margin-top: 15px; padding: 10px 18px; background-color: #ff1744; color: #ffffff; border: 2px solid #fff; font-family: 'Courier New', monospace; font-weight: bold; font-size: 12px; cursor: pointer; border-radius: 4px;">
+            [ENTER] JAG ACCEPTERAR RISKERNA – KÖR SPELET ÄNDÅ
+        </button>
+</div>
+</div>
+
+<div id="game-container">
+<!-- HTML GUIDEMODAL MED FLIKAR -->
+<!-- HTML GUIDEMODAL MED UPPDRAGS- OCH SPELGUIDER FÖR ALLA SPEL -->
+<!-- HTML GUIDEMODAL MED ALMENDRA, IMPACT OCH HELVETICA/ARIAL -->
+<div id="guide-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.95); z-index: 99999; justify-content: center; align-items: center; font-family: Helvetica, Arial, sans-serif;">
+<div style="background: #0b0f19; border: 4px solid #00ffcc; width: 95%; max-width: 740px; height: 88vh; border-radius: 8px; padding: 20px; box-shadow: 0 0 30px rgba(0, 255, 204, 0.4); color: #fff; display: flex; flex-direction: column; box-sizing: border-box;">
+<!-- RUBRIK OCH STÄNGKNAPP -->
+<div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #00ffcc; padding-bottom: 10px; margin-bottom: 12px;">
+<h2 data-localize="game_guide_heading" style="margin: 0; color: #ffeb3b; font-family: Impact, Charcoal, sans-serif; font-size: 24px; letter-spacing: 1px; text-transform: uppercase;">📖 LEKGUIDE - ALLA SPEL</h2>
+<button data-localize="close_button" onclick="closeGuideModal()" style="background: #ff1744; color: #fff; border: 2px solid #fff; padding: 4px 12px; font-family: Impact, sans-serif; font-size: 16px; cursor: pointer; border-radius: 4px;">[X]</button>
+</div>
+<!-- FLIKAR MELLAN ALLA SPEL -->
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px;">
+<button class="guide-tab" data-localize="story_button" onclick="switchGuideTab('story')" style="background: #00ffcc; color: #000; font-family: Impact, sans-serif; padding: 8px 2px; border: none; cursor: pointer; font-size: 13px; border-radius: 4px;">1. STORY</button>
+<button class="guide-tab" data-localize="base_defense_button" onclick="switchGuideTab('fps')" style="background: #222; color: #fff; font-family: Impact, sans-serif; padding: 8px 2px; border: none; cursor: pointer; font-size: 13px; border-radius: 4px;">2. BASE DEFENSE</button>
+<button class="guide-tab" data-localize="quiz_show_button" onclick="switchGuideTab('quiz')" style="background: #222; color: #fff; font-family: Impact, sans-serif; padding: 8px 2px; border: none; cursor: pointer; font-size: 13px; border-radius: 4px;">3. QUIZ SHOW</button>
+<button class="guide-tab" data-localize="space_race_button" onclick="switchGuideTab('space')" style="background: #222; color: #fff; font-family: Impact, sans-serif; padding: 8px 2px; border: none; cursor: pointer; font-size: 13px; border-radius: 4px;">4. RYMD-RACE</button>
+<button class="guide-tab" data-localize="sega_rally_button" onclick="switchGuideTab('racer')" style="background: #222; color: #fff; font-family: Impact, sans-serif; padding: 8px 2px; border: none; cursor: pointer; font-size: 13px; border-radius: 4px;">5. SEGA RALLY 2001</button>
+<button class="guide-tab" data-localize="frogger_button" onclick="switchGuideTab('frogger')" style="background: #222; color: #fff; font-family: Impact, sans-serif; padding: 8px 2px; border: none; cursor: pointer; font-size: 13px; border-radius: 4px;">6. FROGGER</button>
+<button class="guide-tab" data-localize="breakout_button" onclick="switchGuideTab('breakout')" style="background: #222; color: #fff; font-family: Impact, sans-serif; padding: 8px 2px; border: none; cursor: pointer; font-size: 13px; border-radius: 4px;">7. BREAKOUT</button>
+<button class="guide-tab" data-localize="hangman_button" onclick="switchGuideTab('hangman')" style="background: #222; color: #fff; font-family: Impact, sans-serif; padding: 8px 2px; border: none; cursor: pointer; font-size: 13px; border-radius: 4px;">8. HÄNGA GUBBE</button>
+<button class="guide-tab" data-localize="derby_dash_button" onclick="switchGuideTab('horse')" style="background: #222; color: #fff; font-family: Impact, sans-serif; padding: 8px 2px; border: none; cursor: pointer; font-size: 13px; border-radius: 4px;">🐎 DERBY DASH</button>
+<button class="guide-tab" data-localize="submarine_button" onclick="switchGuideTab('sub')" style="background: #222; color: #fff; font-family: Impact, sans-serif; padding: 8px 2px; border: none; cursor: pointer; font-size: 13px; border-radius: 4px;">🌊 SUBMARINE</button>
+<button class="guide-tab" data-localize="mecha_goran_button" onclick="switchGuideTab('boss')" style="background: #222; color: #fff; font-family: Impact, sans-serif; padding: 8px 2px; border: none; cursor: pointer; font-size: 13px; border-radius: 4px;">🤖 MECHA-GÖRAN</button>
+<button class="guide-tab" data-localize="tips_button" onclick="switchGuideTab('tips')" style="background: #ffeb3b; color: #000; font-family: Impact, sans-serif; padding: 8px 2px; border: none; cursor: pointer; font-size: 13px; border-radius: 4px;">💡 TIPS &amp; REGLER</button>
+</div>
+<!-- SCROLLBART INNEHÅLLSKORT (BRÖDTEXT I HELVETICA/ARIAL) -->
+<div style="flex: 1; overflow-y: auto; padding-right: 8px; background: rgba(255,255,255,0.03); border-radius: 8px; padding: 16px; font-size: 14px; line-height: 1.6; font-family: Helvetica, Arial, sans-serif;">
+<!-- 1. STORY & PUSSELBANA -->
+<div class="guide-content" id="tab-story" style="display: block;">
+<h3 data-localize="story_mode_heading" style="color: #00ffcc; margin-top: 0; font-family: 'Almendra', serif; font-size: 24px; letter-spacing: 1px;">🧩 Story Mode - Äventyret</h3>
+<div style="background: rgba(0,255,204,0.1); border-left: 4px solid #00ffcc; padding: 10px; margin-bottom: 12px; border-radius: 4px;">
+<strong style="font-family: Impact, sans-serif; font-size: 15px; color: #ffeb3b;">MÅL:</strong> Lös pusslet i 2D-världen, besegra bossen i Quizet och försvara muren i skjutspelet!
+                </div>
+<strong style="color: #00ffcc; font-family: Impact, sans-serif; font-size: 16px; letter-spacing: 0.5px;">SÅ SPELAR DU:</strong>
+<ol style="padding-left: 20px; margin-top: 6px;">
+<li><strong>Gå med gubben:</strong> Använd [WASD], Piltangenter eller vänster spak på handkontroll.</li>
+<li><strong>Knuffa klossen:</strong> Knuffa det blåa blocket hela vägen till den gula knappen för att öppna den låsta dörren.</li>
+<li><strong>Möt Bossen Göran:</strong> Gå fram till bossen och tryck på [Mellanslag] eller [A]-knappen för att starta Quiz-duellen!</li>
+</ol>
+</div>
+<!-- 2. BASE DEFENSE -->
+<div class="guide-content" id="tab-fps" style="display: none;">
+<h3 data-localize="base_defense_heading" style="color: #ff1744; margin-top: 0; font-family: 'Almendra', serif; font-size: 24px; letter-spacing: 1px;">🛡️ FPS Base Defense Ultra (1-4P)</h3>
+<div style="background: rgba(255,23,68,0.1); border-left: 4px solid #ff1744; padding: 10px; margin-bottom: 12px; border-radius: 4px;">
+<strong style="font-family: Impact, sans-serif; font-size: 15px; color: #ffeb3b;">MÅL:</strong> Skjut ner fallande bomber, monster och tankar innan de förstör basmuren!
+                </div>
+<strong style="color: #ff1744; font-family: Impact, sans-serif; font-size: 16px; letter-spacing: 0.5px;">SÅ SPELAR DU:</strong>
+<ul style="padding-left: 20px; margin-top: 6px;">
+<li><strong>Sikta &amp; Skjut:</strong> Rör musen/handkontrollen för att sikta. Vänsterklicka, tryck [A] eller [R2] på dosan för att skjuta. Siktet blir rött när du pekar på en fiende.</li>
+<li><strong>Ladda om:</strong> Tryck på [R] på tangentbordet, [X] på dosan, eller ROPA "LADDA OM!" i mikrofonen om röststyrning är på.</li>
+<li><strong>Samla Power-ups:</strong> Skjut på ❤️ (Hälsa), 📦 (Ammo), 🕒 (Slow-Mo) och ⭐ (Odödlighet).</li>
+</ul>
+</div>
+<!-- 3. BUZZ! QUIZ SHOW -->
+<div class="guide-content" id="tab-quiz" style="display: none;">
+<h3 data-localize="quiz_show_heading" style="color: #ffeb3b; margin-top: 0; font-family: 'Almendra', serif; font-size: 24px; letter-spacing: 1px;">🐝 Buzz! Quiz Showdown (1-4P)</h3>
+<div style="background: rgba(255,235,59,0.1); border-left: 4px solid #ffeb3b; padding: 10px; margin-bottom: 12px; border-radius: 4px;">
+<strong style="font-family: Impact, sans-serif; font-size: 15px; color: #ffeb3b;">MÅL:</strong> Svara rätt på frågor innan tiden tar slut och bygg upp din poäng-combo!
+                </div>
+<strong style="color: #ffeb3b; font-family: Impact, sans-serif; font-size: 16px; letter-spacing: 0.5px;">SÅ SPELAR DU:</strong>
+<ul style="padding-left: 20px; margin-top: 6px;">
+<li><strong>Mus/Tangentbord:</strong> Klicka på rätt svar eller tryck [1], [2], [3], [4] (motsvarar A, B, X, Y).</li>
+<li><strong>Speldosa / Buzz!-kontroller:</strong> Tryck på motsvarande färgknapp på handkontrollen eller Buzz-sirenerna.</li>
+<li><strong>Combo:</strong> Rätta svar i rad höjer din combo-multiplikator och ger massor av bonuspoäng!</li>
+</ul>
+</div>
+<!-- 4. RYMD-RACE -->
+<div class="guide-content" id="tab-space" style="display: none;">
+<h3 data-localize="space_race_heading" style="color: #00a2ff; margin-top: 0; font-family: 'Almendra', serif; font-size: 24px; letter-spacing: 1px;">🚀 Rymd-Race: Circuit Showdown</h3>
+<div style="background: rgba(0,162,255,0.1); border-left: 4px solid #00a2ff; padding: 10px; margin-bottom: 12px; border-radius: 4px;">
+<strong style="font-family: Impact, sans-serif; font-size: 15px; color: #ffeb3b;">MÅL:</strong> Kör 3 varv runt rymdbanan utan att förstöra skeppet mot laserväggar eller svarta hål!
+                </div>
+<strong style="color: #00a2ff; font-family: Impact, sans-serif; font-size: 16px; letter-spacing: 0.5px;">SÅ SPELAR DU:</strong>
+<ul style="padding-left: 20px; margin-top: 6px;">
+<li><strong>P1 (Skepp):</strong> Styr med [WASD] eller Piltangenter. Tryck [Mellanslag] eller [Shift] för Boost.</li>
+<li><strong>P2 (Jagande Sikte):</strong> I 2-spelarläge styrs siktet med musen, ljuspistol eller Dosa 2. Vänsterklicka för att skjuta och skada P1:s skepp eller skjuta sönder minfällor! Klicka på skrollhjulet för att återställa siktet.</li>
+<li><strong>Svårighetsgrader:</strong> Högre nivå ger längre bana, smalare väggar, skjutbara minfällor och rörliga svarta hål.</li>
+</ul>
+</div>
+<!-- 🏎️ SEGA RALLY 2001 GUIDE -->
+<div class="guide-content" id="tab-racer" style="display: none;">
+<h3 data-localize="sega_rally_heading" style="color: #ffeb3b; margin-top: 0; font-family: 'Almendra', serif; font-size: 24px; letter-spacing: 1px;">🏎️ Sega Rally 2001 (Hazard Run)</h3>
+<div style="background: rgba(255, 235, 59, 0.1); border-left: 4px solid #ffeb3b; padding: 10px; margin-bottom: 12px; border-radius: 4px;">
+<strong style="font-family: Impact, sans-serif; font-size: 15px; color: #ffeb3b;">MÅL:</strong> Kör så långt du kan längs den farliga motorvägen innan tiden tar slut eller bilen blir totalt kvaddad!
+                </div>
+<strong style="color: #ffeb3b; font-family: Impact, sans-serif; font-size: 16px; letter-spacing: 0.5px;">🎮 SÅ SPELAR DU &amp; STYRNING:</strong>
+<ul style="padding-left: 20px; margin-top: 6px;">
+<li><strong>Gasa &amp; Bromsa:</strong> [W] / [Pil Upp] för att gasa, [S] / [Pil Ned] för att bromsa och backa.</li>
+<li><strong>Styra:</strong> [A] / [D] eller [Vänster] / [Höger] pilknapp för att svänga.</li>
+<li><strong>Nitro Boost:</strong> Håll inne [MELLANSLAG] eller [SHIFT] för att aktivera lustgasen och nå över 200 km/h!</li>
+<li><strong>Bilstereo &amp; Radio:</strong> Tryck på [R] för att byta radiokanaler på bilstereon eller bläddra i MP3-spellistan.</li>
+<li><strong>Muta Ljudeffekter:</strong> Tryck på [M] för att stänga av motor- och kraschljud medan du har kvar radion.</li>
+<li><strong>Skjuta Vapen:</strong> Vänsterklicka med musen på hinder eller poliser för att skjuta bort dem från vägen!</li>
+</ul>
+<strong style="color: #00ffcc; font-family: Impact, sans-serif; font-size: 16px; letter-spacing: 0.5px; margin-top: 12px; display: block;">🏁 CHECKPOINTS &amp; DÖDSORSAKER:</strong>
+<ul style="padding-left: 20px; margin-top: 6px;">
+<li><strong>⏱️ Checkpoints (Var 500m):</strong> Var 500:e meter passerar du en grön checkpoint-linje som ger dig dyrbar extratid (+10s till +25s beroende på svårighetsgrad).</li>
+<li><strong>💥 Kvaddad Bil:</strong> Om chassit når 0 HP på grund av krockar med väggar, trafikerade bilar eller gruvor exploderar bilen i bildelar.</li>
+<li><strong>🚨 Busted (Polisen):</strong> Polisen sätter upp vägspärrar med polisbussar och spikmattor efter 2 km (2000m). Krockar du med spikmattan får du punktering och bilen blir extremt svårkontrollerad!</li>
+</ul>
+<strong style="color: #ff1744; font-family: Impact, sans-serif; font-size: 16px; letter-spacing: 0.5px; margin-top: 12px; display: block;">💡 PRO-TIPS &amp; STRATEGIER:</strong>
+<ul style="padding-left: 20px; margin-top: 6px;">
+<li><strong>⛽ Kör in i Bensinstationen (Mack):</strong> Håll dig till vänster på vägen när du ser en gul mack – kör du nära vägkanten återställs bilens hälsa till 100 HP och din Nitro laddas upp fullt!</li>
+<li><strong>🔧 Samla Power-ups:</strong> Kör över gröna 🔧 Reparationskit på vägen för att laga 40 HP chassiskada i farten.</li>
+<li><strong>🛢️ Undvik Oljefläckar:</strong> Kör du över svarta oljefläckar tappar bilen allt fäste och roterar i en 360-graders sladd.</li>
+<li><strong>🚀 Spara Nitron:</strong> Använd din Nitro Boost [Mellanslag] när du ligger på raka sträckor för att tjäna in sekunder inför nästa checkpoint!</li>
+</ul>
+</div>
+<!-- 5. FROGGER -->
+<div class="guide-content" id="tab-frogger" style="display: none;">
+<h3 data-localize="frogger_heading" style="color: #4caf50; margin-top: 0; font-family: 'Almendra', serif; font-size: 24px; letter-spacing: 1px;">🐸 Frogger Arcade</h3>
+<div style="background: rgba(76,175,80,0.1); border-left: 4px solid #4caf50; padding: 10px; margin-bottom: 12px; border-radius: 4px;">
+<strong style="font-family: Impact, sans-serif; font-size: 15px; color: #ffeb3b;">MÅL:</strong> Hjälp 3 grodor över den tunga bilvägen och det strömmande vattnet hela vägen upp i mål!
+                </div>
+<strong style="color: #4caf50; font-family: Impact, sans-serif; font-size: 16px; letter-spacing: 0.5px;">SÅ SPELAR DU:</strong>
+<ul style="padding-left: 20px; margin-top: 6px;">
+<li><strong>Styrning:</strong> Hoppa med [WASD] eller Piltangenterna.</li>
+<li><strong>Fara:</strong> Bilar kör över grodan och vattnet dränker dig om du inte landar mitt på trästockarna!</li>
+</ul>
+</div>
+<!-- 6. BREAKOUT -->
+<div class="guide-content" id="tab-breakout" style="display: none;">
+<h3 data-localize="breakout_heading" style="color: #e91e63; margin-top: 0; font-family: 'Almendra', serif; font-size: 24px; letter-spacing: 1px;">🧱 Breakout Blitz</h3>
+<div style="background: rgba(233,30,99,0.1); border-left: 4px solid #e91e63; padding: 10px; margin-bottom: 12px; border-radius: 4px;">
+<strong style="font-family: Impact, sans-serif; font-size: 15px; color: #ffeb3b;">MÅL:</strong> Studsa bollen på plattformen och slå sönder alla tegelstenar!
+                </div>
+<strong style="color: #e91e63; font-family: Impact, sans-serif; font-size: 16px; letter-spacing: 0.5px;">SÅ SPELAR DU:</strong>
+<ul style="padding-left: 20px; margin-top: 6px;">
+<li><strong>Styrning:</strong> Dra musen åt vänster och höger för att flytta plattformen.</li>
+<li><strong>Missa inte bollen:</strong> Om bollen ramlar ner under plattformen förlorar du ett liv!</li>
+</ul>
+</div>
+<!-- 7. HÄNGA GUBBE -->
+<div class="guide-content" id="tab-hangman" style="display: none;">
+<h3 data-localize="hangman_heading" style="color: #ff9800; margin-top: 0; font-family: 'Almendra', serif; font-size: 24px; letter-spacing: 1px;">🔤 Hänga Gubbe (Hangman)</h3>
+<div style="background: rgba(255,152,0,0.1); border-left: 4px solid #ff9800; padding: 10px; margin-bottom: 12px; border-radius: 4px;">
+<strong style="font-family: Impact, sans-serif; font-size: 15px; color: #ffeb3b;">MÅL:</strong> Gissa rätt ord bokstav för bokstav innan galgen blir helt färdigritad!
+                </div>
+<strong style="color: #ff9800; font-family: Impact, sans-serif; font-size: 16px; letter-spacing: 0.5px;">SÅ SPELAR DU:</strong>
+<ul style="padding-left: 20px; margin-top: 6px;">
+<li><strong>Gissa:</strong> Tryck på valfri bokstav [A-Ö] på tangentbordet.</li>
+<li><strong>Anpassad svårighetsgrad:</strong> Högre svårighetsgrad ger svårare ord och färre tillåtna felgissningar!</li>
+</ul>
+</div>
+<!-- 8. ANTI-SMILE -->
+<div class="guide-content" id="tab-smile" style="display: none;">
+<h3 data-localize="anti_smile_heading" style="color: #ff007f; margin-top: 0; font-family: 'Almendra', serif; font-size: 24px; letter-spacing: 1px;">📷 Anti-Smile: Survival</h3>
+<div style="background: rgba(255,0,127,0.1); border-left: 4px solid #ff007f; padding: 10px; margin-bottom: 12px; border-radius: 4px;">
+<strong style="font-family: Impact, sans-serif; font-size: 15px; color: #ffeb3b;">MÅL:</strong> Titta in i webbkameran och håll ett helt stenansikte utan att le eller fnissa!
+                </div>
+<strong style="color: #ff007f; font-family: Impact, sans-serif; font-size: 16px; letter-spacing: 0.5px;">SÅ SPELAR DU:</strong>
+<ul style="padding-left: 20px; margin-top: 6px;">
+<li><strong>Kamera:</strong> Tillåt kameran i webbläsaren.</li>
+<li><strong>Håll maskan:</strong> Om du visar tänderna, ler eller skrattar upptäcker ansiktsdetektorn det direkt och du tar skada!</li>
+</ul>
+</div>
+<!-- 🐎 10. DERBY DASH (LILLA GUBBENS GULDRACE) -->
+<div class="guide-content" id="tab-horse" style="display: none;">
+<h3 data-localize="derby_dash_2000_heading" style="color: #ffeb3b; margin-top: 0; font-family: 'Almendra', serif; font-size: 24px; letter-spacing: 1px;">🐎 Derby Dash 2000 (Lilla Gubbens Guldrace)</h3>
+<div style="background: rgba(255, 235, 59, 0.1); border-left: 4px solid #ffeb3b; padding: 10px; margin-bottom: 12px; border-radius: 4px;">
+<strong style="font-family: Impact, sans-serif; font-size: 15px; color: #ffeb3b;">MÅL:</strong> Rid ut på äventyr från Villa Villekulla och nå så lång distans som möjligt innan hästen tappar alla sina 4 gyllene hästskor!
+    </div>
+<strong style="color: #00ffcc; font-family: Impact, sans-serif; font-size: 16px; letter-spacing: 0.5px;">🎮 SÅ SPELAR DU &amp; STYRNING:</strong>
+<ul style="padding-left: 20px; margin-top: 6px;">
+<li><strong>Hoppa över hinder:</strong> Tryck på [MELLANSLAG], [W], [PIL UPP] eller [A]/[KRYSS] på handkontroll.</li>
+<li><strong>Hästsko-systemet (4 Liv):</strong> Hästen startar med 4 hästskor. Varje rivet hinder (eller om du hoppar för sent) slår bort en hästsko. Tappar du alla fyra bryter hästen loppet direkt.</li>
+<li><strong>💰 Samla Guldpengar:</strong> Fånga guldmynt i luften för att tjäna extrapoäng (+25m distans / +50G).</li>
+<li><strong>🧲 Fånga Hästskor (Extraliv):</strong> Hästskor dyker upp sällsynt i banan – plocka dem för att laga hovarna (+1 Liv, max 4). Har du redan fulla liv ger de en stor guld- och distansbonus.</li>
+<li><strong>📻 MP3 Player:</strong> Byt mellan eurodance- och 90-talslåtar med [N] eller [R], och stäng av musiken med [M].</li>
+</ul>
+<strong style="color: #ff1744; font-family: Impact, sans-serif; font-size: 16px; letter-spacing: 0.5px; margin-top: 12px; display: block;">🏁 HINDERTYPER &amp; FARTÖKNING:</strong>
+<ul style="padding-left: 20px; margin-top: 6px;">
+<li><strong>Trästaket:</strong> Klassiska hinder som kräver ett normalt grundhopp.</li>
+<li><strong>Stenmurar:</strong> Höga hinder som kräver att du hoppar i god tid för att inte slå i hovarna.</li>
+<li><strong>Sockerdricks-bäckar:</strong> Breda vattenhinder där du måste tajma hoppet precis vid kanten för att inte landa i plurret.</li>
+<li><strong>Hastighetsökning:</strong> Ju längre du rider, desto snabbare ökar galoppen från 40 km/h upp till maxfart runt 100 km/h.</li>
+</ul>
+</div>
+<!-- 🌊 SUBMARINE DESCENT -->
+<div class="guide-content" id="tab-sub" style="display: none;">
+<h3 data-localize="submarine_descent_heading" style="color: #00e5ff; margin-top: 0; font-family: 'Almendra', serif; font-size: 24px; letter-spacing: 1px;">🌊 Submarine Descent (Djupdykning)</h3>
+<div style="background: rgba(0, 229, 255, 0.1); border-left: 4px solid #00e5ff; padding: 10px; margin-bottom: 12px; border-radius: 4px;">
+<strong style="font-family: Impact, sans-serif; font-size: 15px; color: #ffeb3b;">MÅL:</strong> Dyk ner i djuphavet, undvik klippor och minor, och samla skatter utan att krossa skrovet eller få slut på syre!
+    </div>
+<strong style="color: #00e5ff; font-family: Impact, sans-serif; font-size: 16px; letter-spacing: 0.5px;">🎮 SÅ SPELAR DU:</strong>
+<ul style="padding-left: 20px; margin-top: 6px;">
+<li><strong>Manövrera:</strong> [W] / [Pil Upp] för att stiga, [S] / [Pil Ned] för att sjunka, [A] / [D] för att styra i sidled.</li>
+<li><strong>Ekolod &amp; Belysning:</strong> Tryck [Mellanslag] för att tända strålkastaren och upptäcka dolda undervattensklippor.</li>
+<li><strong>Skrovtryck &amp; Krockar:</strong> Hårda smällar mot bergväggar skadar skrovet. Noll HP resulterar i direkt skrovimplosion!</li>
+<li><strong>Syrebehållare:</strong> Håll koll på syremätaren – plocka blå syretankar på vägen för att inte kvävas.</li>
+</ul>
+</div>
+<!-- 🎯 11. BOSS BATTLE / SKYTTETÄVLING (7+) -->
+<div class="guide-content" id="tab-boss" style="display: none;">
+<h3 data-localize="boss_battle_heading" style="color: #ffeb3b; margin-top: 0; font-family: 'Almendra', serif; font-size: 24px; letter-spacing: 1px;">🎯 Boss Battle: Prickskyttetävling</h3>
+<div style="background: rgba(255, 235, 59, 0.12); border-left: 4px solid #ffeb3b; padding: 10px; margin-bottom: 12px; border-radius: 4px;">
+<strong style="font-family: Impact, sans-serif; font-size: 15px; color: #ffeb3b;">MÅL:</strong> Sikta och pricka alla busar innan tiden tar slut! Skjut inte dina snälla vänner och akta dig för de svarta minorna!
+    </div>
+<strong style="color: #00ffcc; font-family: Impact, sans-serif; font-size: 16px; letter-spacing: 0.5px;">🎮 SÅ HÄR STYR DU:</strong>
+<ul style="padding-left: 20px; margin-top: 6px;">
+<li><strong>Sikta:</strong> Rör musen, ljuspistolen eller styrspaken på handkontrollen.</li>
+<li><strong>Skjut:</strong> [Vänsterklick], avtryckaren på pistolen, [A]/[R2] på dosan eller ropa <em>"SKJUT!"</em> i mikrofonen.</li>
+<li><strong>Ladda om:</strong> Tryck [Mellanslag], [Högerklick], [R] på tangentbordet eller ropa högt: <em>"LADDA OM!"</em></li>
+<li><strong>Nödstopp (E-STOP):</strong> Tryck [Backspace], [Delete], [Scroll Lock], [◄ Bakåtpil], [R3] på dosan eller ropa <em>"STOPP!"</em></li>
+</ul>
+<strong style="color: #22c55e; font-family: Impact, sans-serif; font-size: 16px; letter-spacing: 0.5px; margin-top: 12px; display: block;">⭐ BONUSDINGAR ATT SKJUTA PÅ:</strong>
+<ul style="padding-left: 20px; margin-top: 6px;">
+<li>⏱️ <strong>Gyllene Klocka:</strong> Ger <strong>+5 sekunder</strong> extra tid på klockan!</li>
+<li>➕ <strong>Grönt Kors (Liv):</strong> Lagar din hälsa med <strong>+1 liv</strong> (du kan ha max 5 kors)!</li>
+<li>⭐ <strong>Gyllene Stjärna:</strong> Gör dig helt <strong>odödlig</strong> i 6 sekunder!</li>
+<li>✖️2 <strong>Rosa 2X-Ring:</strong> Ger dig <strong>dubbla poäng</strong> för alla träffar under en stund!</li>
+<li>☢️ <strong>Svart Nuke-Mina (RÖR EJ!):</strong> Exploderar, tar bort <strong>1 grönt kors</strong> och <strong>halverar dina poäng</strong>!</li>
+</ul>
+<strong style="color: #ffd600; font-family: Impact, sans-serif; font-size: 16px; letter-spacing: 0.5px; margin-top: 14px; display: block;">🗺️ ALLA 8 BANOR – SNÄLL ELLER ELAK?</strong>
+<!-- VILDA VÄSTERN -->
+<div style="background: rgba(180, 83, 9, 0.15); border-left: 3px solid #b45309; padding: 8px; margin-top: 8px; border-radius: 4px;">
+<strong style="color: #fbbf24;">🤠 1. Vilda Västern:</strong>
+<br/>• 🎯 <strong>Skjut:</strong> Bandit (100 P), Röd Dynamit (250 P) och Prickskytten (450 P).
+        <br/>• ❌ <strong>Rör ej:</strong> Snäll Sheriff med guldstjärna (-300 P).
+    </div>
+<!-- DUCK HUNT -->
+<div style="background: rgba(34, 197, 94, 0.15); border-left: 3px solid #22c55e; padding: 8px; margin-top: 6px; border-radius: 4px;">
+<strong style="color: #4ade80;">🦆 2. Duck Hunt Retro:</strong>
+<br/>• 🎯 <strong>Skjut:</strong> Grön Anka (150 P), Gyllene Anka (500 P) och Cyborg-Anka med laseröga (600 P).
+        <br/>• ❌ <strong>Rör ej:</strong> Inga civila här – skjut allt som flyger utom svarta minor!
+    </div>
+<!-- CYBERPUNK -->
+<div style="background: rgba(6, 182, 212, 0.15); border-left: 3px solid #06b6d4; padding: 8px; margin-top: 6px; border-radius: 4px;">
+<strong style="color: #22d3ee;">🏙️ 3. Cyberpunk 2084:</strong>
+<br/>• 🎯 <strong>Skjut:</strong> Svävande Drönare (120 P), Rosa Robot (200 P) och Elit-Mech (500 P).
+        <br/>• ❌ <strong>Rör ej:</strong> Lila Hologram-Människa (-250 P).
+    </div>
+<!-- ZOMBIE -->
+<div style="background: rgba(132, 204, 22, 0.15); border-left: 3px solid #84cc16; padding: 8px; margin-top: 6px; border-radius: 4px;">
+<strong style="color: #a3e635;">🧟 4. Zombie Cemetery:</strong>
+<br/>• 🎯 <strong>Skjut:</strong> Grön Walker-Zombie (100 P), Snabb Sprinter (250 P) och Syraspyare (400 P).
+        <br/>• ❌ <strong>Rör ej:</strong> Människa med pannlampa (-400 P).
+    </div>
+<!-- RYMDEN -->
+<div style="background: rgba(168, 85, 247, 0.15); border-left: 3px solid #a855f7; padding: 8px; margin-top: 6px; border-radius: 4px;">
+<strong style="color: #c084fc;">👽 5. Retro Space Invader:</strong>
+<br/>• 🎯 <strong>Skjut:</strong> Grönt Rymdskepp (120 P), Rött UFO (300 P) och Rymdkanon (550 P).
+        <br/>• ❌ <strong>Rör ej:</strong> Inga civila – akta bara minorna!
+    </div>
+<!-- CIRKUS -->
+<div style="background: rgba(244, 63, 94, 0.15); border-left: 3px solid #f43f5e; padding: 8px; margin-top: 6px; border-radius: 4px;">
+<strong style="color: #fb7185;">🎪 6. Cirkus Kaos:</strong>
+<br/>• 🎯 <strong>Skjut:</strong> Arg Rosa Pajclown (120 P), Enhjulingsclown (220 P) och Knivkastare (500 P).
+        <br/>• ❌ <strong>Rör ej:</strong> Snäll vit Mimare med ballonger (-350 P).
+    </div>
+<!-- SAGOVÄRLD -->
+<div style="background: rgba(234, 179, 8, 0.15); border-left: 3px solid #eab308; padding: 8px; margin-top: 6px; border-radius: 4px;">
+<strong style="color: #fde047;">🐉 7. Sagoriket &amp; Draken:</strong>
+<br/>• 🎯 <strong>Skjut:</strong> Skogsgoblin (110 P), Mörk Riddare (240 P) och Arg Eldsprutande Drake (650 P).
+        <br/>• ❌ <strong>Rör ej:</strong> Snäll Rosa Fé/Prinsessa (-450 P).
+    </div>
+<!-- PIRATER -->
+<div style="background: rgba(14, 165, 233, 0.15); border-left: 3px solid #0ea5e9; padding: 8px; margin-top: 6px; border-radius: 4px;">
+<strong style="color: #38bdf8;">🏴‍☠️ 8. Piraternas Bukt:</strong>
+<br/>• 🎯 <strong>Skjut:</strong> Blå Piratmatros (130 P), Rullande Kruttunna (280 P) och Kanonjär-Kapten (550 P).
+        <br/>• ❌ <strong>Rör ej:</strong> Kaptenens snälla Papegoja (-250 P).
+    </div>
+</div>
+<!-- 9. TIPS, REGLER, ACCESSIBILITY & SENSORISKA VARNINGAR -->
+<div class="guide-content" id="tab-tips" style="display: none;">
+<h3 data-localize="game_guide_description" style="color: #ffeb3b; margin-top: 0; font-family: 'Almendra', serif; font-size: 24px; letter-spacing: 1px;">💡 Komplett Spelguide, Tips &amp; Accessibility</h3>
+<!-- ⚠️ SENSORISK ÖVERSIKT OCH VARNINGAR FÖR ALLA 5 SINNEN -->
+<div style="margin-bottom: 14px; background: rgba(255, 23, 68, 0.16); padding: 12px; border: 2px solid #ff1744; border-radius: 6px; box-shadow: 0 0 12px rgba(255, 23, 68, 0.3);">
+<strong style="color: #ff1744; font-family: Impact, sans-serif; font-size: 16px; letter-spacing: 0.5px;">⚠️ SENSORISK VARNING FÖR ALLA 5 SINNEN:</strong>
+<br/><span data-localize="sensory_warning" style="color: #ffffff; font-size: 12px;">Spelet innehåller sensoriska inslag som kan påverka ljus-, ljud- och stresskänsliga deltagare:</span>
+<ul style="margin: 6px 0 0 0; padding-left: 20px; font-size: 11px; color: #ffeb3b; line-height: 1.5;">
+<li><strong>👁️ Syn:</strong> Base Defense och Rymd-Racet innehåller skärmblixtar (Lightgun Flash) vid skott, starka neonkontraster och skärmskakningar (Screen Shake). Alla spel har extra symboler (❤️, 📦, 💣, ❌) för färgblinda.</li>
+<li><strong>👂 Hörsel:</strong> Plötsliga höga ljudstötstoppar som skottbrud, däckskrik, vattenplask och larm vid tidsnöd. Musik och ljudeffekter kan sänkas separat under INSTÄLLNINGAR eller stängas av helt (MUTE).</li>
+<li><strong>🖐️ Känsel:</strong> Vibrationer i handkontroller vid krascher och skada. Moment med snabba knapptryckningar kan ställas om till "Växla" (Toggle) under Inställningar.</li>
+<li><strong>🧠 Kognition &amp; Balans:</strong> Snabba kamerarörelser i Rymd-Racet och Anti-Smile kan orsaka mild yrsel. Alla spel har en timer – välj svårighetsgrad EASY för längre betänketid och mindre stress.</li>
+<li><strong>👃 Doft &amp; Smak:</strong> Vid långa LAN-sessioner med flera bildskärmar blir rummet varmt. Se till att ha god ventilation och dricksvatten nära till hands!</li>
+</ul>
+</div>
+<!-- 🎮 MAXAD LISTA MED TIPS & TRICKS FÖR ALLA SPEL -->
+<div style="margin-bottom: 14px; background: rgba(0, 255, 204, 0.08); padding: 12px; border: 2px solid #00ffcc; border-radius: 6px;">
+<strong style="color: #00ffcc; font-family: Impact, sans-serif; font-size: 16px; letter-spacing: 0.5px;">🎮 PRO-TIPS &amp; STRATEGIER FÖR ALLA 8 SPEL:</strong>
+<div style="margin-top: 8px; font-size: 11px; line-height: 1.5; color: #ffffff;">
+<p data-localize="story_mode_instructions" style="margin: 4px 0;"><strong style="color: #00ffcc;">1. 🧩 Story Mode:</strong> Lugnt tempo. Använd [WASD]/Pilar. Knuffa blocket rakt mot knappen för att inte fastna i hörn. Börja här för uppvärmning!</p>
+<p style="margin: 4px 0;"><strong style="color: #ff1744;">2. 🛡️ Base Defense Ultra:</strong>
+<br/>• Prioritera röda bomber – de gör störst skada på muren!
+                        <br/>• Ladda om med [R], Högerklick eller genom att ropa "LADDA OM!" när det är lugnt mellan vågorna.
+                        <br/>• Skjut Power-ups direkt i luften: ❤️ ger hälsa, 📦 ger skott, 🕒 ger Slow-Mo och ⭐ ger odödlighet!
+                        <br/>• Håll koll på ammunitionsreserven längst upp – skjuter du helt slut rasar muren direkt!</p>
+<p data-localize="quiz_show_instructions" style="margin: 4px 0;"><strong style="color: #ffeb3b;">3. 🐝 Buzz! Quiz Showdown:</strong>
+<br/>• Chansa aldrig! Ett felaktigt svar nollställer hela din combo-multiplikator.
+                        <br/>• Rätta svar i rad ger multiplicerade poäng (2X, 3X, 4X combo!).
+                        <br/>• Använd Buzz!-sirener eller sifferknapparna [1-4] för snabbast responstid.</p>
+<p data-localize="space_race_instructions" style="margin: 4px 0;"><strong style="color: #00a2ff;">4. 🚀 Rymd-Race (Circuit Showdown):</strong>
+<br/>• Spara Boost [Mellanslag] till raksträckorna och släpp gasen helt i snäva S-chikaner.
+                        <br/>• Se upp för Svarta Hål – yttre zonen drar i skeppet och kärnan ger direkt skada!
+                        <br/>• I 2P-läge: Spelare 2 kan skuta sönder minfällor 💣 åt P1 eller attackera P1:s sköldar med musen/ljuspistolen.</p>
+<p data-localize="frogger_instructions" style="margin: 4px 0;"><strong style="color: #4caf50;">5. 🐸 Frogger Arcade:</strong>
+<br/>• Du måste landa EXAKT mitt i en av de 3 målrutorna längst upp (inom ±14px) – landar du snett räknas det som en bom!
+                        <br/>• Trästockarna rör sig i olika hastigheter – planera två hopp i förväg.
+                        <br/>• Använd en USB-Dansmatta på golvet för maximal fysik-känsla och träning!</p>
+<p data-localize="breakout_instructions" style="margin: 4px 0;"><strong style="color: #e91e63;">6. 🧱 Breakout Blitz:</strong>
+<br/>• Träffa bollen med kanten av plattformen för att ge bollen en snävare vinkel mot tegelstenarna.
+                        <br/>• Försök skapa en glipa i översta raden så att bollen studsar fast ovanför alla tegelstenar!</p>
+<p data-localize="hangman_instructions" style="margin: 4px 0;"><strong style="color: #ff9800;">7. 🔤 Hänga Gubbe (Hangman):</strong>
+<br/>• Ingen tidsstress per bokstav.
+                        <br/>• Gissa alltid vokaler (A, E, I, O, U, Å, Ä, Ö) först för att avslöja ordets struktur.
+                        <br/>• Sök efter vanliga svenska ändelser som -ING, -AR, -ER eller -EN.</p>
+<p data-localize="anti_smile_instructions" style="margin: 4px 0;"><strong style="color: #ff007f;">8. 📷 Anti-Smile (Survival):</strong>
+<br/>• Kräver webbkamera. Titta rakt in i linserna och håll ett helt neutralt ansikte utan att le eller fnissa.
+                        <br/>• Om du råkar visa tänderna känner kameradetektorn av det direkt!
+                        <br/>• Kan enkelt hoppas över i menyn om du inte vill använda kameran.</p>
+<p data-localize="sega_rally_instructions" style="margin: 4px 0;"><strong style="color: #ffeb3b;">9. 🏎️ Sega Rally 2001:</strong>
+<br/>• Spara Nitro Boost till raka sträckor för att nå nästa checkpoint i tid!
+                        <br/>• Kör in i gula Bensinstationer (Mackar) till vänster för att reparera bilen till 100 HP.
+                        <br/>• Se upp för spikmattor efter 2 km – får du punktering börjar bilen sladda kraftigt!</p>
+</div>
+</div>
+<!-- 💡 GENERELLA TILLGÄNGLIGHETSREGLER -->
+<div style="margin-bottom: 10px; background: rgba(255, 235, 59, 0.08); padding: 10px; border-left: 4px solid #ffeb3b; border-radius: 4px; font-size: 11px;">
+<strong style="color: #ffeb3b; font-family: Impact, sans-serif; font-size: 15px;">💡 GENERELLA TILLGÄNGLIGHETSREGLER:</strong>
+<br/>• <strong>Pausa när du vill:</strong> Tryck [ESC] för att ta en paus, dricka vatten eller vila ögonen.
+                    <br/>• <strong>Skräddarsy Svårighetsgraden:</strong> Välj EASY i inställningarna om du vill ha längre tid, fler liv och långsammare fiender.
+                    <br/>• <strong>Valfria Styrsätt:</strong> Alla spel stödjer Tangentbord, Mus, Gamepads, Dansmattor och Ljuspistoler. Välj vad som passar din kropp bäst!
+                </div>
+<!-- 🧙‍♂️ KAMEK ANTI-CHEAT REGLER -->
+<div style="margin-bottom: 10px; background: rgba(255, 23, 68, 0.1); padding: 10px; border-left: 4px solid #ff1744; border-radius: 4px; font-size: 11px;">
+<strong style="color: #ff1744; font-family: Impact, sans-serif; font-size: 15px;">🧙‍♂️ KAMEK ANTI-CHEAT REGLER:</strong>
+<br/>• Anti-fuskprotokollet körs kontinuerligt. Om fusk, makron, autoclickers eller laptop-styrplattor detekteras aktiveras Kamek och låser spelet.
+                    <br/>• <strong style="color: #ff1744;">VIKTIGT:</strong> Om spelet låses blir du omedelbart DISKVALIFICERAD och din poäng nollställs!
+                </div>
+</div>
+</div>
+<!-- BOTTEN-FOOTER -->
+<div style="text-align: center; margin-top: 10px; color: #888; font-size: 13px; font-family: Helvetica, Arial, sans-serif;">
+            Tryck [ESC] för att pausa eller stänga menyer under spelets gång!
+        </div>
+</div>
+</div>
+<canvas height="480" id="gameCanvas" width="640"></canvas>
+<div class="ui-box" id="hud">
+<div>
+<span data-localize="hp_label">HP:</span>
+<div class="hp-bar-bg"><div class="hp-bar-fill" id="player-hp"></div></div>
+</div>
+<div id="quest-tracker">Uppdrag: Inget</div>
+<button data-localize="language_button_sv" id="lang-btn" onclick="toggleLanguage()">SV</button>
+</div>
+<div id="quiz-overlay">
+<div id="quiz-speaker" style="color:#aaa; font-size:12px; margin-bottom:4px;"></div>
+<div id="quiz-question">Fråga här...</div>
+<div class="options-grid" id="options-container"></div>
+<div id="gamepad-status">🎮 Dosa ansluten: Tryck A/B/X/Y för svar</div>
+</div>
+</div>
+
+<!-- RETRO GAMEPAD MOCK POPUP -->
+<div id="gamepad-mock-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5, 0, 10, 0.95); z-index: 99999; flex-direction: column; align-items: center; justify-content: center; font-family: 'Courier New', monospace; color: #ffffff;">
+<div style="background: #0d001a; border: 4px solid #ff1744; border-radius: 16px; padding: 30px; width: 90%; max-width: 550px; text-align: center; box-shadow: 0 0 30px rgba(255, 23, 68, 0.5);">
+<div style="font-size: 50px; margin-bottom: 10px;">👾</div>
+<h2 data-localize="goran_angry_heading" style="color: #ff1744; margin: 0 0 15px 0; font-size: 22px;">GÖRAN HÅNAR DIN DOSA!</h2>
+<div id="gamepad-mock-list" style="background: rgba(255, 23, 68, 0.1); border: 1px dashed #ff1744; padding: 12px; border-radius: 8px; color: #ffeb3b; font-size: 13px; text-align: left; margin-bottom: 15px; line-height: 1.5;">
+<!-- Håntext skrivs ut här -->
+</div>
+<div style="background: rgba(0, 255, 204, 0.05); border: 1px solid #00ffcc; padding: 10px; border-radius: 8px; font-size: 12px; color: #aaa; margin-bottom: 20px; text-align: left;">
+<strong style="color: #00ffcc;">💡 REKOMMENDERADE ELIT-DOSOR:</strong><br/>
+            • PlayStation 4 / PlayStation 5 (DualShock 4 / DualSense)<br/>
+            • Xbox 360 / Xbox One / Xbox Series X|S<br/>
+            • Nintendo Switch Pro Controller
+        </div>
+<button data-localize="ignore_risk_button" id="gamepad-mock-bypass-btn" style="background: #4caf50; color: #ffffff; border: none; padding: 12px 24px; font-weight: bold; font-family: 'Courier New', monospace; border-radius: 8px; cursor: pointer; font-size: 14px;">
+            [ENTER] JAG BRYR MIG INTE – KÖR ÄNDÅ!
+        </button>
+</div>
+</div>
+<script>
+// Localization data embedded directly
+const localizationData = {"title": {"sv": "Pussel, Quiz & Boss - Gamepad Stöd", "en": "Puzzle, Quiz & Boss - Gamepad Support"}, "access_denied_heading": {"sv": "🛑 ÅTKOMST NEKAD 🛑", "en": "🛑 ACCESS DENIED 🛑"}, "game_guide_heading": {"sv": "📖 LEKGUIDE - ALLA SPEL", "en": "📖 GAME GUIDE - ALL GAMES"}, "close_button": {"sv": "[X]", "en": "[X]"}, "story_button": {"sv": "1. STORY", "en": "1. STORY"}, "base_defense_button": {"sv": "2. BASE DEFENSE", "en": "2. BASE DEFENSE"}, "quiz_show_button": {"sv": "3. QUIZ SHOW", "en": "3. QUIZ SHOW"}, "space_race_button": {"sv": "4. RYMD-RACE", "en": "4. SPACE RACE"}, "sega_rally_button": {"sv": "5. SEGA RALLY 2001", "en": "5. SEGA RALLY 2001"}, "frogger_button": {"sv": "6. FROGGER", "en": "6. FROGGER"}, "breakout_button": {"sv": "7. BREAKOUT", "en": "7. BREAKOUT"}, "hangman_button": {"sv": "8. HÄNGA GUBBE", "en": "8. HANGMAN"}, "derby_dash_button": {"sv": "🐎 DERBY DASH", "en": "🐎 DERBY DASH"}, "submarine_button": {"sv": "🌊 SUBMARINE", "en": "🌊 SUBMARINE"}, "mecha_goran_button": {"sv": "🤖 MECHA-GÖRAN", "en": "🤖 MECHA-GÖRAN"}, "tips_button": {"sv": "💡 TIPS & REGLER", "en": "💡 TIPS & RULES"}, "story_mode_heading": {"sv": "🧩 Story Mode - Äventyret", "en": "🧩 Story Mode - The Adventure"}, "base_defense_heading": {"sv": "🛡️ FPS Base Defense Ultra (1-4P)", "en": "🛡️ FPS Base Defense Ultra (1-4P)"}, "quiz_show_heading": {"sv": "🐝 Buzz! Quiz Showdown (1-4P)", "en": "🐝 Buzz! Quiz Showdown (1-4P)"}, "space_race_heading": {"sv": "🚀 Rymd-Race: Circuit Showdown", "en": "🚀 Space Race: Circuit Showdown"}, "sega_rally_heading": {"sv": "🏎️ Sega Rally 2001 (Hazard Run)", "en": "🏎️ Sega Rally 2001 (Hazard Run)"}, "frogger_heading": {"sv": "🐸 Frogger Arcade", "en": "🐸 Frogger Arcade"}, "breakout_heading": {"sv": "🧱 Breakout Blitz", "en": "🧱 Breakout Blitz"}, "hangman_heading": {"sv": "🔤 Hänga Gubbe (Hangman)", "en": "🔤 Hangman"}, "anti_smile_heading": {"sv": "📷 Anti-Smile: Survival", "en": "📷 Anti-Smile: Survival"}, "derby_dash_2000_heading": {"sv": "🐎 Derby Dash 2000 (Lilla Gubbens Guldrace)", "en": "🐎 Derby Dash 2000 (Little Old Man's Gold Race)"}, "submarine_descent_heading": {"sv": "🌊 Submarine Descent (Djupdykning)", "en": "🌊 Submarine Descent (Deep Dive)"}, "boss_battle_heading": {"sv": "🎯 Boss Battle: Prickskyttetävling", "en": "🎯 Boss Battle: Shooting Competition"}, "game_guide_description": {"sv": "💡 Komplett Spelguide, Tips & Accessibility", "en": "💡 Complete Game Guide, Tips & Accessibility"}, "sensory_warning": {"sv": "Spelet innehåller sensoriska inslag som kan påverka ljus-, ljud- och stresskänsliga deltagare:", "en": "The game contains sensory elements that may affect light-, sound-, and stress-sensitive participants:"}, "story_mode_instructions": {"sv": "1. 🧩 Story Mode:Lugnt tempo. Använd [WASD]/Pilar. Knuffa blocket rakt mot knappen för att inte fastna i hörn. Börja här för uppvärmning!", "en": "1. 🧩 Story Mode: Relaxed pace. Use [WASD]/Arrow Keys. Push the block straight toward the button to avoid getting stuck in corners. Start here for warm-up!"}, "base_defense_instructions": {"sv": "2. 🛡️ Base Defense Ultra:• Prioritera röda bomber – de gör störst skada på muren!• Ladda om med [R], Högerklick eller genom att ropa 'LADDA OM!' när det är lugnt mellan vågorna.• Skjut Power-ups direkt i luften: ❤️ ger hälsa, 📦 ger skott, 🕒 ger Slow-Mo och ⭐ ger odödlighet!• Håll koll på ammunitionsreserven längst upp – skjuter du helt slut rasar muren direkt!", "en": "2. 🛡️ Base Defense Ultra:• Prioritize red bombs – they deal the most damage to the wall!• Reload with [R], Right-Click, or by shouting 'RELOAD!' when it's calm between waves.• Shoot Power-ups directly in the air: ❤️ gives health, 📦 gives ammo, 🕒 gives Slow-Mo, and ⭐ gives invincibility!• Keep an eye on the ammo reserve at the top – if you run out completely, the wall collapses instantly!"}, "quiz_show_instructions": {"sv": "3. 🐝 Buzz! Quiz Showdown:• Chansa aldrig! Ett felaktigt svar nollställer hela din combo-multiplikator.• Rätta svar i rad ger multiplicerade poäng (2X, 3X, 4X combo!).• Använd Buzz!-sirener eller sifferknapparna [1-4] för snabbast responstid.", "en": "3. 🐝 Buzz! Quiz Showdown:• Never guess! A wrong answer resets your entire combo multiplier.• Correct answers in a row give multiplied points (2X, 3X, 4X combo!).• Use Buzz! buzzers or number keys [1-4] for the fastest response time."}, "space_race_instructions": {"sv": "4. 🚀 Rymd-Race (Circuit Showdown):• Spara Boost [Mellanslag] till raksträckorna och släpp gasen helt i snäva S-chikaner.• Se upp för Svarta Hål – yttre zonen drar i skeppet och kärnan ger direkt skada!• I 2P-läge: Spelare 2 kan skuta sönder minfällor 💣 åt P1 eller attackera P1:s sköldar med musen/ljuspistolen.", "en": "4. 🚀 Space Race (Circuit Showdown):• Save Boost [Space] for straight sections and release the gas completely in tight S-chicanes.• Watch out for Black Holes – the outer zone pulls your ship, and the core deals direct damage!• In 2P mode: Player 2 can shoot down mine traps 💣 for P1 or attack P1's shields with the mouse/light gun."}, "frogger_instructions": {"sv": "5. 🐸 Frogger Arcade:• Du måste landa EXAKT mitt i en av de 3 målrutorna längst upp (inom ±14px) – landar du snett räknas det som en bom!• Trästockarna rör sig i olika hastigheter – planera två hopp i förväg.• Använd en USB-Dansmatta på golvet för maximal fysik-känsla och träning!", "en": "5. 🐸 Frogger Arcade:• You must land EXACTLY in the center of one of the 3 target squares at the top (within ±14px) – if you land crookedly, it counts as a miss!• The logs move at different speeds – plan two jumps ahead.• Use a USB dance mat on the floor for maximum physical feel and training!"}, "breakout_instructions": {"sv": "6. 🧱 Breakout Blitz:• Träffa bollen med kanten av plattformen för att ge bollen en snävare vinkel mot tegelstenarna.• Försök skapa en glipa i översta raden så att bollen studsar fast ovanför alla tegelstenar!", "en": "6. 🧱 Breakout Blitz:• Hit the ball with the edge of the platform to give it a sharper angle toward the bricks.• Try to create a gap in the top row so the ball gets stuck bouncing above all the bricks!"}, "hangman_instructions": {"sv": "7. 🔤 Hänga Gubbe (Hangman):• Ingen tidsstress per bokstav.• Gissa alltid vokaler (A, E, I, O, U, Å, Ä, Ö) först för att avslöja ordets struktur.• Sök efter vanliga svenska ändelser som -ING, -AR, -ER eller -EN.", "en": "7. 🔤 Hangman:• No time pressure per letter.• Always guess vowels (A, E, I, O, U, Å, Ä, Ö) first to reveal the word's structure.• Look for common Swedish endings like -ING, -AR, -ER, or -EN."}, "anti_smile_instructions": {"sv": "8. 📷 Anti-Smile (Survival):• Kräver webbkamera. Titta rakt in i linserna och håll ett helt neutralt ansikte utan att le eller fnissa.• Om du råkar visa tänderna känner kameradetektorn av det direkt!• Kan enkelt hoppas över i menyn om du inte vill använda kameran.", "en": "8. 📷 Anti-Smile (Survival):• Requires a webcam. Look directly into the lens and maintain a completely neutral face without smiling or grinning.• If you accidentally show your teeth, the camera detector will notice immediately!• Can easily be skipped in the menu if you don't want to use the camera."}, "sega_rally_instructions": {"sv": "9. 🏎️ Sega Rally 2001:• Spara Nitro Boost till raka sträckor för att nå nästa checkpoint i tid!• Kör in i gula Bensinstationer (Mackar) till vänster för att reparera bilen till 100 HP.• Se upp för spikmattor efter 2 km – får du punktering börjar bilen sladda kraftigt!", "en": "9. 🏎️ Sega Rally 2001:• Save Nitro Boost for straight sections to reach the next checkpoint in time!• Drive into yellow Gas Stations (Macks) on the left to repair the car to 100 HP.• Watch out for spike strips after 2 km – if you get a puncture, the car will start skidding heavily!"}, "hp_label": {"sv": "HP:", "en": "HP:"}, "language_button_sv": {"sv": "SV", "en": "SV"}, "goran_angry_heading": {"sv": "GÖRAN HÅNAR DIN DOSA!", "en": "GÖRAN IS ANGRY AT YOUR COMPUTER!"}, "ignore_risk_button": {"sv": "[ENTER] JAG BRYR MIG INTE – KÖR ÄNDÅ!", "en": "[ENTER] I DON'T CARE – PLAY ANYWAY!"}};
+
+// Function to update the UI based on the selected language
+function updateLanguage(lang) {
+    // Update all elements with a data-localize attribute
+    document.querySelectorAll('[data-localize]').forEach(element => {
+        const key = element.getAttribute('data-localize');
+        if (localizationData[key] && localizationData[key][lang]) {
+            element.textContent = localizationData[key][lang];
+        }
+    });
+
+    // Update placeholder attributes for input elements
+    document.querySelectorAll('input[data-localize-placeholder]').forEach(input => {
+        const key = input.getAttribute('data-localize-placeholder');
+        if (localizationData[key] && localizationData[key][lang]) {
+            input.placeholder = localizationData[key][lang];
+        }
+    });
+
+    // Update title attribute for elements
+    document.querySelectorAll('[data-localize-title]').forEach(element => {
+        const key = element.getAttribute('data-localize-title');
+        if (localizationData[key] && localizationData[key][lang]) {
+            element.title = localizationData[key][lang];
+        }
+    });
+
+    // Update alt attribute for images
+    document.querySelectorAll('img[data-localize-alt]').forEach(img => {
+        const key = img.getAttribute('data-localize-alt');
+        if (localizationData[key] && localizationData[key][lang]) {
+            img.alt = localizationData[key][lang];
+        }
+    });
+}
+
+// Function to switch language
+function switchLanguage(lang) {
+    updateLanguage(lang);
+    localStorage.setItem('preferredLanguage', lang); // Save preference
+}
+
+// Load saved language preference or default to Swedish
+window.addEventListener('DOMContentLoaded', () => {
+    const savedLang = localStorage.getItem('preferredLanguage') || 'sv';
+    updateLanguage(savedLang);
+});
+</script></body>
+</html>

@@ -1,0 +1,2191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retro Arcade & Quiz Games</title>
+  <meta name="description" content="Multi-game retro arcade featuring Story Mode, Base Defense, Quiz Showdown, Space Race, Rally 2001, Frogger, Breakout, Hangman, Derby Dash, Submarine, and Boss Battle with support for English, Danish, Norwegian, and Swedish.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700;900&family=VT323&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #090a10;
+      color: #fff;
+      font-family: 'Chakra Petch', monospace, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      overflow-x: hidden;
+      user-select: none;
+    }
+    #cabinet {
+      position: relative;
+      background: #121420;
+      border: 4px solid #00ffcc;
+      border-radius: 12px;
+      box-shadow: 0 0 35px rgba(0, 255, 204, 0.35), inset 0 0 20px rgba(0, 0, 0, 0.8);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 100%;
+    }
+    #cabinet-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 8px;
+      border-bottom: 2px solid rgba(0, 255, 204, 0.4);
+      margin-bottom: 8px;
+    }
+    .badge {
+      font-size: 13px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .badge-arcade { background: #ff0055; color: #fff; }
+    .btn-lang {
+      background: #00ffcc;
+      color: #000;
+      border: none;
+      font-family: inherit;
+      font-weight: 900;
+      font-size: 13px;
+      padding: 5px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: transform 0.1s, background 0.2s;
+    }
+    .btn-lang:hover { background: #ffeb3b; transform: scale(1.05); }
+    #canvas-container {
+      position: relative;
+      width: 640px;
+      height: 480px;
+      background: #000;
+      border: 2px solid #333850;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.9);
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated;
+    }
+    #hud {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(8, 10, 20, 0.85);
+      border: 1px solid #00ffcc;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      pointer-events: none;
+    }
+    .hp-track {
+      width: 130px;
+      height: 14px;
+      background: #252836;
+      border: 1px solid #fff;
+      border-radius: 2px;
+      overflow: hidden;
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: 6px;
+    }
+    .hp-fill {
+      height: 100%;
+      background: #00e676;
+      width: 100%;
+      transition: width 0.2s;
+    }
+    #quiz-overlay {
+      display: none;
+      position: absolute;
+      bottom: 15px;
+      left: 15px;
+      right: 15px;
+      background: rgba(14, 16, 28, 0.95);
+      border: 3px solid #ffeb3b;
+      padding: 14px;
+      border-radius: 8px;
+      box-shadow: 0 0 20px rgba(255, 235, 59, 0.3);
+    }
+    #quiz-title {
+      color: #aaa;
+      font-size: 12px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    #quiz-question {
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffeb3b;
+      min-height: 42px;
+      margin-bottom: 10px;
+      line-height: 1.35;
+    }
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .quiz-btn {
+      background: #1e2235;
+      color: #fff;
+      border: 2px solid #444c68;
+      padding: 8px 10px;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: left;
+      transition: 0.15s;
+    }
+    .quiz-btn:hover {
+      background: #2c3350;
+      border-color: #00ffcc;
+      color: #00ffcc;
+    }
+    #guide-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+    #guide-content {
+      background: #0e1220;
+      border: 3px solid #00ffcc;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 700px;
+      height: 85vh;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      box-shadow: 0 0 35px rgba(0, 255, 204, 0.4);
+    }
+    .guide-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .tab-btn {
+      background: #1b2034;
+      color: #bbb;
+      border: 1px solid #3d4668;
+      padding: 6px 4px;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      text-align: center;
+    }
+    .tab-btn.active {
+      background: #00ffcc;
+      color: #000;
+      border-color: #00ffcc;
+    }
+    .guide-body {
+      flex: 1;
+      overflow-y: auto;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid #222a44;
+      border-radius: 6px;
+      padding: 14px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    #cabinet-footer {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 11px;
+      color: #7b88aa;
+    }
+  </style>
+</head>
+<body>
+
+<div id="cabinet">
+  <div id="cabinet-header">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span class="badge badge-arcade">ARCADE 2000</span>
+      <span style="font-weight: 900; letter-spacing: 1px; color: #00ffcc;" id="ui-title">RETRO ARCADE & QUIZ</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <button class="btn-lang" onclick="openGuideModal()" id="btn-guide-open">📖 GUIDE</button>
+      <button class="btn-lang" onclick="toggleLanguage()" id="lang-btn">🇬🇧 EN</button>
+    </div>
+  </div>
+
+  <div id="canvas-container">
+    <canvas id="gameCanvas" width="640" height="480"></canvas>
+
+    <div id="hud">
+      <div>
+        <span>HP:</span>
+        <div class="hp-track"><div id="player-hp" class="hp-fill"></div></div>
+      </div>
+      <div id="quest-tracker" style="color: #ffeb3b; font-weight: bold;">Quest: Push the block!</div>
+      <div id="hud-lives" style="color: #ff0055;">❤️❤️❤️</div>
+    </div>
+
+    <div id="quiz-overlay">
+      <div id="quiz-title">Boss Quiz Challenge</div>
+      <div id="quiz-question">Question text appears here...</div>
+      <div id="options-container" class="options-grid"></div>
+    </div>
+  </div>
+
+  <div id="cabinet-footer">
+    <span>[WASD / ARROWS] Move • [SPACE] Action / Boost / Jump</span>
+    <span>[ESC] Menu / Back • [1-4] Quiz Select</span>
+  </div>
+</div>
+
+<!-- Modal Guide -->
+<div id="guide-modal">
+  <div id="guide-content">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+      <h2 style="color: #ffeb3b; font-size: 18px; margin: 0;" id="guide-header-title">📖 GAME GUIDE & RULES</h2>
+      <button onclick="closeGuideModal()" style="background: #ff1744; color: #fff; border: none; padding: 4px 10px; font-family: inherit; font-weight: bold; border-radius: 4px; cursor: pointer;">[X]</button>
+    </div>
+    <div class="guide-tabs" id="guide-tab-bar">
+      <!-- Generated via JS -->
+    </div>
+    <div class="guide-body" id="guide-body-text">
+      <!-- Content via JS -->
+    </div>
+  </div>
+</div>
+
+<script>
+// =========================================================================
+// 1. SOUND SYNTHESIZER (WEB AUDIO API - ZERO MISSING AUDIO DEPENDENCY)
+// =========================================================================
+const Sound = (() => {
+  let ctx = null;
+  function getCtx() {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (ctx.state === 'suspended') ctx.resume();
+    return ctx;
+  }
+  function tone(freq, type, duration, vol = 0.2, endFreq = null) {
+    try {
+      const c = getCtx();
+      const osc = c.createOscillator();
+      const gain = c.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, c.currentTime);
+      if (endFreq) osc.frequency.exponentialRampToValueAtTime(endFreq, c.currentTime + duration);
+      gain.gain.setValueAtTime(vol, c.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(c.destination);
+      osc.start();
+      osc.stop(c.currentTime + duration);
+    } catch(e) {}
+  }
+  return {
+    step: () => tone(220, 'triangle', 0.05, 0.06, 120),
+    push: () => tone(150, 'square', 0.08, 0.08, 80),
+    correct: () => { tone(523, 'sine', 0.1, 0.15); setTimeout(() => tone(659, 'sine', 0.2, 0.15), 100); },
+    wrong: () => { tone(180, 'sawtooth', 0.15, 0.2, 90); },
+    shot: () => tone(800, 'sawtooth', 0.08, 0.18, 120),
+    hit: () => tone(280, 'square', 0.09, 0.15, 70),
+    boom: () => tone(120, 'sawtooth', 0.35, 0.3, 30),
+    jump: () => tone(260, 'sine', 0.14, 0.18, 520),
+    coin: () => { tone(987, 'sine', 0.08, 0.14); setTimeout(() => tone(1318, 'sine', 0.18, 0.14), 70); },
+    sonar: () => tone(1200, 'sine', 0.28, 0.15, 800),
+    splash: () => tone(160, 'triangle', 0.18, 0.2, 60),
+    pause: () => tone(440, 'square', 0.1, 0.12, 330),
+    victory: () => {
+      [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => tone(f, 'sine', 0.2, 0.2), i * 90));
+    }
+  };
+})();
+
+// =========================================================================
+// 2. I18N SYSTEM (ENGLISH, DANISH, NORWEGIAN, SWEDISH)
+// =========================================================================
+const LANGUAGES = [
+  { code: 'en', flag: '🇬🇧 EN', name: 'English', voice: 'en-US' },
+  { code: 'da', flag: '🇩🇰 DA', name: 'Dansk', voice: 'da-DK' },
+  { code: 'no', flag: '🇳🇴 NO', name: 'Norsk', voice: 'nb-NO' },
+  { code: 'sv', flag: '🇸🇪 SV', name: 'Svenska', voice: 'sv-SE' }
+];
+let currentLang = 'en';
+
+const I18N = {
+  en: {
+    appTitle: "RETRO ARCADE & QUIZ",
+    btnGuide: "📖 GUIDE",
+    quest1: "Quest: Push the blue block onto the button!",
+    quest2: "Quest: Confront Göran the Troll!",
+    questDone: "Quest: Defeated! Enter Base Defense!",
+    bossName: "Göran the Troll (Boss)",
+    correctMsg: "🟢 CORRECT! Boss lost 50 HP!",
+    wrongMsg: "🔴 WRONG! You lost 25 HP!",
+    gameOver: "GAME OVER",
+    victory: "VICTORY!",
+    playAgain: "[ PRESS ENTER TO PLAY AGAIN ]",
+    start: "PRESS ENTER / SPACE TO START",
+    score: "SCORE",
+    lives: "LIVES",
+    time: "TIME",
+    health: "HULL",
+    oxygen: "OXYGEN",
+    ammo: "AMMO",
+    reload: "RELOAD [R]",
+    speed: "SPEED",
+    dist: "DISTANCE",
+    menuMain: "MAIN MENU",
+    menuArcade: "ARCADE MODE",
+    menuStory: "STORY MODE",
+    menuSettings: "SETTINGS",
+    modeSelect: "SELECT GAME MODE",
+    storyDesc: "Solve the block puzzle, answer trivia & save the base!",
+    arcadeDesc: "Choose any retro arcade game instantly!",
+    games: [
+      "BASE DEFENSE ULTRA", "QUIZ SHOWDOWN", "SPACE RACE", "SEGA RALLY 2001",
+      "FROGGER ARCADE", "BREAKOUT BLITZ", "HANGMAN", "DERBY DASH",
+      "SUBMARINE DESCENT", "MECHA-GÖRAN BOSS"
+    ]
+  },
+  da: {
+    appTitle: "RETRO ARKADE & QUIZ",
+    btnGuide: "📖 GUIDE",
+    quest1: "Opgave: Skub den blå blok over på knappen!",
+    quest2: "Opgave: Udfordr Trolden Gøran!",
+    questDone: "Opgave: Besejret! Gå til Baseforsvar!",
+    bossName: "Trolden Gøran (Boss)",
+    correctMsg: "🟢 KORREKT! Bossen mistede 50 HP!",
+    wrongMsg: "🔴 FORKERT! Du mistede 25 HP!",
+    gameOver: "SPILLET ER SLUT",
+    victory: "SEJR!",
+    playAgain: "[ TRYK ENTER FOR AT SPILLE IGEN ]",
+    start: "TRYK ENTER / MELLEMRUM FOR AT STARTE",
+    score: "POINT",
+    lives: "LIV",
+    time: "TID",
+    health: "SKROG",
+    oxygen: "ILTMÅLER",
+    ammo: "SKUD",
+    reload: "GENLAD [R]",
+    speed: "FART",
+    dist: "DISTANCEN",
+    menuMain: "HOVEDMENU",
+    menuArcade: "ARKADETILSTAND",
+    menuStory: "EVENTYRTILSTAND",
+    menuSettings: "INDSTILLINGER",
+    modeSelect: "VÆLG SPILLETILSTAND",
+    storyDesc: "Løs blokpuslespillet, svar på quiz & forsvar muren!",
+    arcadeDesc: "Vælg et hvilket som helst retro arkadespil med det samme!",
+    games: [
+      "BASEFORSVAR ULTRA", "QUIZ SHOWDOWN", "RUM-RACE", "SEGA RALLY 2001",
+      "FROGGER ARKADE", "BREAKOUT BLITZ", "HÆNGT MAND", "DERBY DASH",
+      "UBÅDSDYKKER", "MECHA-GØRAN BOSS"
+    ]
+  },
+  no: {
+    appTitle: "RETRO ARKADE & QUIZ",
+    btnGuide: "📖 GUIDE",
+    quest1: "Oppdrag: Skyv den blå blokken på knappen!",
+    quest2: "Oppdrag: Utfordre Trollet Gøran!",
+    questDone: "Oppdrag: Beseiret! Start Baseforsvar!",
+    bossName: "Trollet Gøran (Boss)",
+    correctMsg: "🟢 RIKTIG! Bossen mistet 50 HP!",
+    wrongMsg: "🔴 FEIL! Du mistet 25 HP!",
+    gameOver: "SPILLET ER OVER",
+    victory: "SEIER!",
+    playAgain: "[ TRYKK ENTER FOR Å SPILLE IGJEN ]",
+    start: "TRYKK ENTER / MELLOMROM FOR Å STARTE",
+    score: "POENG",
+    lives: "LIV",
+    time: "TID",
+    health: "SKROG",
+    oxygen: "OKSYGEN",
+    ammo: "SKUDD",
+    reload: "LAD OM [R]",
+    speed: "FART",
+    dist: "DISTANSE",
+    menuMain: "HOVEDMENY",
+    menuArcade: "ARKADEMODUS",
+    menuStory: "HISTORIEMODUS",
+    menuSettings: "INNSTILLINGER",
+    modeSelect: "VELG SPILLEMODUS",
+    storyDesc: "Løs gåten, svar på trivia og forsvar basen din!",
+    arcadeDesc: "Velg hvilket som helst retro-arkadespill direkte!",
+    games: [
+      "BASE DEFENSE ULTRA", "QUIZ SHOWDOWN", "ROM-RACE", "SEGA RALLY 2001",
+      "FROGGER ARKADE", "BREAKOUT BLITZ", "HENGE MANN", "DERBY DASH",
+      "UBÅT DYKKING", "MECHA-GØRAN BOSS"
+    ]
+  },
+  sv: {
+    appTitle: "RETRO ARKAD & QUIZ",
+    btnGuide: "📖 GUIDE",
+    quest1: "Uppdrag: Knuffa det blåa blocket på knappen!",
+    quest2: "Uppdrag: Utmana Trollet Göran!",
+    questDone: "Uppdrag: Besegrad! Startar basförsvar!",
+    bossName: "Trollet Göran (Boss)",
+    correctMsg: "🟢 RÄTT! Bossen förlorade 50 HP!",
+    wrongMsg: "🔴 FEL! Du förlorade 25 HP!",
+    gameOver: "GAME OVER",
+    victory: "SEGER!",
+    playAgain: "[ TRYCK ENTER FÖR ATT SPELA IGEN ]",
+    start: "TRYCK ENTER / MELLANSLAG FÖR ATT STARTA",
+    score: "POÄNG",
+    lives: "LIV",
+    time: "TID",
+    health: "SKROV",
+    oxygen: "SYRE",
+    ammo: "SKOTT",
+    reload: "LADDA OM [R]",
+    speed: "HASTIGHET",
+    dist: "DISTANS",
+    menuMain: "HUVUDMENY",
+    menuArcade: "ARKADLÄGE",
+    menuStory: "ÄVENTYRLÄGE",
+    menuSettings: "INSTÄLLNINGAR",
+    modeSelect: "VÄLJ SPELLÄGE",
+    storyDesc: "Lös pusslet, svara på quiz och försvara basen!",
+    arcadeDesc: "Välj valfritt retro-arkadspel direkt!",
+    games: [
+      "BASE DEFENSE ULTRA", "QUIZ SHOWDOWN", "RYMD-RACE", "SEGA RALLY 2001",
+      "FROGGER ARKAD", "BREAKOUT BLITZ", "HÄNGA GUBBE", "DERBY DASH",
+      "UBÅTSDYK", "MECHA-GÖRAN BOSS"
+    ]
+  }
+};
+
+function t(key) {
+  return (I18N[currentLang] && I18N[currentLang][key]) || (I18N.en[key] || key);
+}
+
+function toggleLanguage() {
+  const idx = LANGUAGES.findIndex(l => l.code === currentLang);
+  currentLang = LANGUAGES[(idx + 1) % LANGUAGES.length].code;
+  updateLanguageUI();
+  Sound.correct();
+}
+
+function updateLanguageUI() {
+  const langObj = LANGUAGES.find(l => l.code === currentLang);
+  document.getElementById('lang-btn').innerText = langObj.flag;
+  document.getElementById('ui-title').innerText = t('appTitle');
+  document.getElementById('btn-guide-open').innerText = t('btnGuide');
+  document.getElementById('quest-tracker').innerText = t('quest1');
+}
+
+// =========================================================================
+// 3. EXTENDED MULTILINGUAL QUIZ QUESTION BANK
+// =========================================================================
+const QUIZ_QUESTIONS = [
+  {
+    en: { q: "Which company released the Nintendo Entertainment System (NES) in 1985?", a: ["Nintendo", "Sega", "Atari", "Sony"], c: 0, exp: "Nintendo saved the video game industry in North America in 1985." },
+    da: { q: "Hvilket firma udgav Nintendo Entertainment System (NES) i 1985?", a: ["Nintendo", "Sega", "Atari", "Sony"], c: 0, exp: "Nintendo genoplivede videospilsindustrien i 1985." },
+    no: { q: "Hvilket selskap lanserte Nintendo Entertainment System (NES) i 1985?", a: ["Nintendo", "Sega", "Atari", "Sony"], c: 0, exp: "Nintendo reddet videospillmarkedet i 1985." },
+    sv: { q: "Vilket företag lanserade Nintendo Entertainment System (NES) 1985?", a: ["Nintendo", "Sega", "Atari", "Sony"], c: 0, exp: "Nintendo revolutionerade spelvärlden 1985." }
+  },
+  {
+    en: { q: "What is the capital of Denmark?", a: ["Copenhagen", "Aarhus", "Odense", "Aalborg"], c: 0, exp: "Copenhagen (København) has been the capital since 1443." },
+    da: { q: "Hvad er Danmarks hovedstad?", a: ["København", "Aarhus", "Odense", "Aalborg"], c: 0, exp: "København har været rigets hovedstad siden 1443." },
+    no: { q: "Hva er hovedstaden i Danmark?", a: ["København", "Aarhus", "Odense", "Aalborg"], c: 0, exp: "København er Danmarks pulserende hovedstad." },
+    sv: { q: "Vad heter Danmarks huvudstad?", a: ["Köpenhamn", "Aarhus", "Odense", "Aalborg"], c: 0, exp: "Köpenhamn är Danmarks vackra huvudstad." }
+  },
+  {
+    en: { q: "What is the capital of Norway?", a: ["Oslo", "Bergen", "Trondheim", "Stavanger"], c: 0, exp: "Oslo was historically also known as Christiania." },
+    da: { q: "Hvad er Norges hovedstad?", a: ["Oslo", "Bergen", "Trondheim", "Stavanger"], c: 0, exp: "Oslo ligger inderst i den smukke Oslofjord." },
+    no: { q: "Hva er hovedstaden i Norge?", a: ["Oslo", "Bergen", "Trondheim", "Stavanger"], c: 0, exp: "Oslo har vært Norges hovedstad i mange århundrer." },
+    sv: { q: "Vad heter Norges huvudstad?", a: ["Oslo", "Bergen", "Trondheim", "Stavanger"], c: 0, exp: "Oslo hette tidigare Kristiania." }
+  },
+  {
+    en: { q: "Which blue hedgehog is the legendary mascot of SEGA?", a: ["Sonic", "Tails", "Knuckles", "Shadow"], c: 0, exp: "Sonic debuted in 1991 on the Sega Genesis / Mega Drive." },
+    da: { q: "Hvilket blåt pindsvin er SEGAs legendariske maskot?", a: ["Sonic", "Tails", "Knuckles", "Shadow"], c: 0, exp: "Sonic the Hedgehog debuterede i 1991." },
+    no: { q: "Hvilket blått pinnsvin er SEGAs legendariske maskot?", a: ["Sonic", "Tails", "Knuckles", "Shadow"], c: 0, exp: "Sonic debuterte på Sega Mega Drive i 1991." },
+    sv: { q: "Vilken blå igelkott är SEGAs klassiska maskot?", a: ["Sonic", "Tails", "Knuckles", "Shadow"], c: 0, exp: "Sonic the Hedgehog debuterade 1991." }
+  },
+  {
+    en: { q: "What is the chemical symbol for water?", a: ["H2O", "CO2", "NaCl", "O2"], c: 0, exp: "Two hydrogen atoms bonded with one oxygen atom." },
+    da: { q: "Hvad er den kemiske formel for vand?", a: ["H2O", "CO2", "NaCl", "O2"], c: 0, exp: "Vand består af to brintatomer og ét iltatom." },
+    no: { q: "Hva er den kjemiske formelen for vann?", a: ["H2O", "CO2", "NaCl", "O2"], c: 0, exp: "Vann består av to hydrogenatomer og ett oksygenatom." },
+    sv: { q: "Vad är den kemiska beteckningen för vatten?", a: ["H2O", "CO2", "NaCl", "O2"], c: 0, exp: "Vatten består av två väteatomer och en syreatom." }
+  },
+  {
+    en: { q: "In Minecraft, which mineral is required to craft diamond tools?", a: ["Diamonds", "Emeralds", "Netherite", "Obsidian"], c: 0, exp: "Diamonds are mined deep underground at levels below Y=16." },
+    da: { q: "Hvilket mineral skal du bruge til diamantværktøj i Minecraft?", a: ["Diamant", "Smaragd", "Netherite", "Obsidian"], c: 0, exp: "Diamanter graves dybt nede under jorden." },
+    no: { q: "Hvilket mineral kreves for å lage diamantverktøy i Minecraft?", a: ["Diamant", "Smaragd", "Netherite", "Obsidian"], c: 0, exp: "Diamanter finnes dypt under bakkenivå." },
+    sv: { q: "Vilket mineral krävs för diamanthacka i Minecraft?", a: ["Diamant", "Smaragd", "Netherit", "Obsidian"], c: 0, exp: "Diamanter bryts djupt nere i berggrunden." }
+  },
+  {
+    en: { q: "What does HTML stand for in web development?", a: ["HyperText Markup Language", "High Tech Modern Link", "Hyperlink Text Module", "Home Tool Markup Language"], c: 0, exp: "HTML is the standard language for documents designed to be displayed in a browser." },
+    da: { q: "Hvad står HTML for inden for webudvikling?", a: ["HyperText Markup Language", "High Tech Modern Link", "Hyperlink Text Module", "Home Tool Markup Language"], c: 0, exp: "HTML definerer strukturen på en webside." },
+    no: { q: "Hva står HTML for i webutvikling?", a: ["HyperText Markup Language", "High Tech Modern Link", "Hyperlink Text Module", "Home Tool Markup Language"], c: 0, exp: "HTML strukturerer innhold på nettsider." },
+    sv: { q: "Vad står HTML för inom webbutveckling?", a: ["HyperText Markup Language", "High Tech Modern Link", "Hyperlink Text Module", "Home Tool Markup Language"], c: 0, exp: "HTML bygger upp grundstrukturen för webbsidor." }
+  },
+  {
+    en: { q: "Which planet is known as the Red Planet?", a: ["Mars", "Venus", "Jupiter", "Mercury"], c: 0, exp: "Iron oxide (rust) on its surface gives Mars its reddish hue." },
+    da: { q: "Hvilken planet er kendt som den Røde Planet?", a: ["Mars", "Venus", "Jupiter", "Merkur"], c: 0, exp: "Jernoxid på overfladen giver Mars sin rødlige farve." },
+    no: { q: "Hvilken planet er kjent som den røde planeten?", a: ["Mars", "Venus", "Jupiter", "Merkur"], c: 0, exp: "Jernoksid gir Mars den karakteristiske røde fargen." },
+    sv: { q: "Vilken planet kallas för den röda planeten?", a: ["Mars", "Venus", "Jupiter", "Merkurius"], c: 0, exp: "Järnoxid (rost) gör Mars rödaktig." }
+  },
+  {
+    en: { q: "What year did the original Sony PlayStation launch in Japan?", a: ["1994", "1996", "1991", "1998"], c: 0, exp: "December 3, 1994 launched the 32-bit CD gaming revolution." },
+    da: { q: "Hvilket år blev den første Sony PlayStation lanceret i Japan?", a: ["1994", "1996", "1991", "1998"], c: 0, exp: "PlayStation udkom 3. december 1994 i Japan." },
+    no: { q: "Hvilket år ble den originale Sony PlayStation lansert i Japan?", a: ["1994", "1996", "1991", "1998"], c: 0, exp: "PS1 ble lansert i Japan i desember 1994." },
+    sv: { q: "Vilket år lanserades PlayStation 1 i Japan?", a: ["1994", "1996", "1991", "1998"], c: 0, exp: "PS1 släpptes i december 1994 och förändrade spelhistorien." }
+  },
+  {
+    en: { q: "Who created the famous character Mario for Nintendo?", a: ["Shigeru Miyamoto", "Hideo Kojima", "Satoru Iwata", "Eiji Aonuma"], c: 0, exp: "Miyamoto introduced Jumpman (Mario) in the 1981 Donkey Kong arcade game." },
+    da: { q: "Hvem skabte Nintendos berømte figur Mario?", a: ["Shigeru Miyamoto", "Hideo Kojima", "Satoru Iwata", "Eiji Aonuma"], c: 0, exp: "Miyamoto skabte Mario i 1981 til arkadespillet Donkey Kong." },
+    no: { q: "Hvem skapte den berømte spillfiguren Mario for Nintendo?", a: ["Shigeru Miyamoto", "Hideo Kojima", "Satoru Iwata", "Eiji Aonuma"], c: 0, exp: "Miyamoto designet Mario til arkadespillet Donkey Kong." },
+    sv: { q: "Vem skapade Nintendos berömda spelfigur Mario?", a: ["Shigeru Miyamoto", "Hideo Kojima", "Satoru Iwata", "Eiji Aonuma"], c: 0, exp: "Shigeru Miyamoto skapade Mario till arkadspelet Donkey Kong 1981." }
+  }
+];
+
+// =========================================================================
+// 4. GAME STATE ENGINE
+// =========================================================================
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+const STATES = {
+  MAIN_MENU: 'MAIN_MENU',
+  MODE_SELECT: 'MODE_SELECT',
+  ARCADE_MENU: 'ARCADE_MENU',
+  STORY: 'STORY',
+  QUIZ: 'QUIZ',
+  SHOOTER: 'SHOOTER',
+  SPACE_RACE: 'SPACE_RACE',
+  RACER: 'RACER',
+  FROGGER: 'FROGGER',
+  BREAKOUT: 'BREAKOUT',
+  HANGMAN: 'HANGMAN',
+  HORSE: 'HORSE',
+  SUBMARINE: 'SUBMARINE',
+  BOSS: 'BOSS'
+};
+let currentState = STATES.MAIN_MENU;
+let menuSelection = 0;
+let arcadeSelection = 0;
+
+// Shared input tracker
+const keys = {};
+window.addEventListener('keydown', e => {
+  keys[e.code] = true;
+  handleGlobalKey(e);
+});
+window.addEventListener('keyup', e => {
+  keys[e.code] = false;
+});
+
+// =========================================================================
+// 5. GAME IMPLEMENTATIONS
+// =========================================================================
+
+// --- 5.1 STORY / PUZZLE MODE ---
+const StoryMode = {
+  player: { x: 80, y: 360, size: 24, speed: 3.5 },
+  block: { x: 220, y: 340, size: 32 },
+  button: { x: 380, y: 220, size: 36, pressed: false },
+  door: { x: 0, y: 150, width: 640, height: 18, open: false },
+  boss: { x: 480, y: 70, size: 44, hp: 100 },
+  playerHp: 100,
+
+  reset() {
+    this.player = { x: 80, y: 360, size: 24, speed: 3.5 };
+    this.block = { x: 220, y: 340, size: 32 };
+    this.button.pressed = false;
+    this.door.open = false;
+    this.boss = { x: 480, y: 70, size: 44, hp: 100 };
+    this.playerHp = 100;
+    document.getElementById('hud').style.display = 'flex';
+    this.updateHUD();
+  },
+
+  updateHUD() {
+    const hpBar = document.getElementById('player-hp');
+    if (hpBar) hpBar.style.width = this.playerHp + '%';
+    const tracker = document.getElementById('quest-tracker');
+    if (tracker) {
+      tracker.innerText = !this.button.pressed ? t('quest1') : (this.boss.hp > 0 ? t('quest2') : t('questDone'));
+    }
+  },
+
+  update() {
+    let dx = 0, dy = 0;
+    if (keys['ArrowUp'] || keys['KeyW']) dy -= 1;
+    if (keys['ArrowDown'] || keys['KeyS']) dy += 1;
+    if (keys['ArrowLeft'] || keys['KeyA']) dx -= 1;
+    if (keys['ArrowRight'] || keys['KeyD']) dx += 1;
+
+    if (dx !== 0 || dy !== 0) {
+      this.player.x += dx * this.player.speed;
+      this.player.y += dy * this.player.speed;
+      this.player.x = Math.max(10, Math.min(610, this.player.x));
+      this.player.y = Math.max(10, Math.min(450, this.player.y));
+
+      // Door constraint
+      if (!this.door.open && this.player.y < this.door.y + this.door.height) {
+        this.player.y = this.door.y + this.door.height;
+      }
+
+      // Block push
+      if (Math.hypot(this.player.x - this.block.x, this.player.y - this.block.y) < 30) {
+        this.block.x += dx * this.player.speed;
+        this.block.y += dy * this.player.speed;
+        this.block.x = Math.max(20, Math.min(600, this.block.x));
+        this.block.y = Math.max(this.door.y + 25, Math.min(440, this.block.y));
+        Sound.push();
+
+        // Check button trigger
+        if (Math.hypot(this.block.x - this.button.x, this.block.y - this.button.y) < 22) {
+          if (!this.button.pressed) {
+            this.button.pressed = true;
+            this.door.open = true;
+            Sound.correct();
+            this.updateHUD();
+          }
+        }
+      }
+    }
+
+    // Approach boss
+    if (this.door.open && this.boss.hp > 0) {
+      if (Math.hypot(this.player.x - this.boss.x, this.player.y - this.boss.y) < 55) {
+        QuizMode.start(true);
+      }
+    }
+  },
+
+  draw() {
+    ctx.fillStyle = '#141824';
+    ctx.fillRect(0, 0, 640, 480);
+
+    // Floor grid
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+    for (let x = 0; x < 640; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 480); ctx.stroke(); }
+    for (let y = 0; y < 480; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(640, y); ctx.stroke(); }
+
+    // Door
+    if (!this.door.open) {
+      ctx.fillStyle = '#8d4f2a';
+      ctx.fillRect(this.door.x, this.door.y, this.door.width, this.door.height);
+      ctx.fillStyle = '#f5b041';
+      ctx.font = 'bold 12px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText("LOCKED GATE", 320, this.door.y + 13);
+    } else {
+      ctx.strokeStyle = '#00ffcc';
+      ctx.strokeRect(280, this.door.y, 80, this.door.height);
+    }
+
+    // Button
+    ctx.fillStyle = this.button.pressed ? '#00e676' : '#ffd600';
+    ctx.beginPath();
+    ctx.arc(this.button.x + 18, this.button.y + 18, 18, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // Block
+    ctx.fillStyle = '#00a2ff';
+    ctx.fillRect(this.block.x, this.block.y, this.block.size, this.block.size);
+    ctx.strokeStyle = '#fff';
+    ctx.strokeRect(this.block.x, this.block.y, this.block.size, this.block.size);
+
+    // Boss
+    if (this.boss.hp > 0) {
+      ctx.fillStyle = '#ff1744';
+      ctx.fillRect(this.boss.x, this.boss.y, this.boss.size, this.boss.size);
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(t('bossName'), this.boss.x + 22, this.boss.y - 8);
+    }
+
+    // Player
+    ctx.fillStyle = '#00ffcc';
+    ctx.fillRect(this.player.x, this.player.y, this.player.size, this.player.size);
+    ctx.fillStyle = '#000';
+    ctx.fillRect(this.player.x + 4, this.player.y + 6, 4, 4);
+    ctx.fillRect(this.player.x + 16, this.player.y + 6, 4, 4);
+  }
+};
+
+// --- 5.2 QUIZ SHOWDOWN MODE ---
+const QuizMode = {
+  isStoryBoss: false,
+  currentQ: null,
+  qIdx: 0,
+  score: 0,
+  streak: 0,
+  lives: 3,
+  timer: 15,
+  timerId: null,
+  answered: false,
+
+  start(storyBoss = false) {
+    this.isStoryBoss = storyBoss;
+    this.score = 0;
+    this.streak = 0;
+    this.lives = 3;
+    currentState = STATES.QUIZ;
+    document.getElementById('quiz-overlay').style.display = 'block';
+    this.nextQuestion();
+  },
+
+  nextQuestion() {
+    this.answered = false;
+    this.timer = 15;
+    this.currentQ = QUIZ_QUESTIONS[Math.floor(Math.random() * QUIZ_QUESTIONS.length)];
+    const qData = this.currentQ[currentLang] || this.currentQ.en;
+
+    document.getElementById('quiz-title').innerText = this.isStoryBoss ? t('bossName') : `${t('score')}: ${this.score} • STREAK: ${this.streak}x`;
+    document.getElementById('quiz-question').innerText = qData.q;
+
+    const cont = document.getElementById('options-container');
+    cont.innerHTML = '';
+    qData.a.forEach((opt, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'quiz-btn';
+      btn.innerText = `[${idx + 1}] ${opt}`;
+      btn.onclick = () => this.answer(idx);
+      cont.appendChild(btn);
+    });
+
+    if (this.timerId) clearInterval(this.timerId);
+    this.timerId = setInterval(() => {
+      if (currentState !== STATES.QUIZ) return clearInterval(this.timerId);
+      this.timer--;
+      if (this.timer <= 0) {
+        clearInterval(this.timerId);
+        this.answer(-1);
+      }
+    }, 1000);
+  },
+
+  answer(chosenIdx) {
+    if (this.answered) return;
+    this.answered = true;
+    clearInterval(this.timerId);
+
+    const qData = this.currentQ[currentLang] || this.currentQ.en;
+    const isCorrect = (chosenIdx === qData.c);
+
+    if (isCorrect) {
+      Sound.correct();
+      this.streak++;
+      this.score += 100 * this.streak;
+      if (this.isStoryBoss) {
+        StoryMode.boss.hp -= 50;
+      }
+    } else {
+      Sound.wrong();
+      this.streak = 0;
+      this.lives--;
+      if (this.isStoryBoss) {
+        StoryMode.playerHp -= 25;
+        StoryMode.updateHUD();
+      }
+    }
+
+    const qEl = document.getElementById('quiz-question');
+    qEl.innerText = (isCorrect ? t('correctMsg') : t('wrongMsg')) + ` (${qData.exp})`;
+
+    setTimeout(() => {
+      if (this.isStoryBoss) {
+        if (StoryMode.boss.hp <= 0) {
+          document.getElementById('quiz-overlay').style.display = 'none';
+          StoryMode.updateHUD();
+          ShooterMode.start();
+          return;
+        }
+        if (StoryMode.playerHp <= 0) {
+          document.getElementById('quiz-overlay').style.display = 'none';
+          currentState = STATES.MAIN_MENU;
+          return;
+        }
+      }
+      if (this.lives <= 0) {
+        document.getElementById('quiz-overlay').style.display = 'none';
+        currentState = STATES.ARCADE_MENU;
+        return;
+      }
+      this.nextQuestion();
+    }, 1600);
+  },
+
+  draw() {
+    ctx.fillStyle = '#0e111f';
+    ctx.fillRect(0, 0, 640, 480);
+    ctx.fillStyle = this.timer <= 5 ? '#ff1744' : '#00ffcc';
+    ctx.font = 'bold 20px monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText(`${t('time')}: ${this.timer}s`, 620, 40);
+
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#ff0055';
+    let hearts = '';
+    for (let i = 0; i < this.lives; i++) hearts += '❤️ ';
+    ctx.fillText(`${t('lives')}: ${hearts}`, 20, 40);
+  }
+};
+
+// --- 5.3 BASE DEFENSE ULTRA (FPS SHOOTER) ---
+const ShooterMode = {
+  aimX: 320,
+  aimY: 240,
+  baseHp: 100,
+  ammo: 10,
+  maxAmmo: 10,
+  reserveAmmo: 40,
+  score: 0,
+  wave: 1,
+  enemies: [],
+  particles: [],
+  spawnTimer: 0,
+
+  start() {
+    this.baseHp = 100;
+    this.ammo = 10;
+    this.reserveAmmo = 40;
+    this.score = 0;
+    this.wave = 1;
+    this.enemies = [];
+    this.particles = [];
+    currentState = STATES.SHOOTER;
+    document.getElementById('hud').style.display = 'none';
+  },
+
+  update() {
+    this.spawnTimer++;
+    if (this.spawnTimer % 55 === 0) {
+      const isPower = Math.random() < 0.2;
+      this.enemies.push({
+        x: 40 + Math.random() * 560,
+        y: -30,
+        vy: 1.2 + Math.random() * 1.5,
+        size: isPower ? 26 : 34,
+        hp: isPower ? 1 : 2,
+        isPower: isPower,
+        type: isPower ? 'HEART' : 'ENEMY'
+      });
+    }
+
+    // Move enemies
+    for (let i = this.enemies.length - 1; i >= 0; i--) {
+      const e = this.enemies[i];
+      e.y += e.vy;
+      if (e.y >= 430) {
+        if (!e.isPower) {
+          this.baseHp -= 15;
+          Sound.boom();
+        }
+        this.enemies.splice(i, 1);
+        if (this.baseHp <= 0) {
+          this.baseHp = 0;
+          Sound.wrong();
+        }
+      }
+    }
+
+    // Update particles
+    for (let i = this.particles.length - 1; i >= 0; i--) {
+      const p = this.particles[i];
+      p.x += p.vx; p.y += p.vy; p.life -= 0.05;
+      if (p.life <= 0) this.particles.splice(i, 1);
+    }
+  },
+
+  shoot() {
+    if (this.ammo <= 0) {
+      Sound.wrong();
+      return;
+    }
+    this.ammo--;
+    Sound.shot();
+
+    for (let i = this.enemies.length - 1; i >= 0; i--) {
+      const e = this.enemies[i];
+      if (Math.hypot(this.aimX - e.x, this.aimY - e.y) < e.size) {
+        e.hp--;
+        Sound.hit();
+        if (e.hp <= 0) {
+          if (e.isPower) {
+            this.baseHp = Math.min(100, this.baseHp + 25);
+            Sound.correct();
+          } else {
+            this.score += 150;
+            // Particles
+            for (let k = 0; k < 8; k++) {
+              this.particles.push({
+                x: e.x, y: e.y,
+                vx: (Math.random() - 0.5) * 6, vy: (Math.random() - 0.5) * 6,
+                life: 1.0, color: '#ff1744'
+              });
+            }
+          }
+          this.enemies.splice(i, 1);
+        }
+        break;
+      }
+    }
+  },
+
+  reload() {
+    if (this.reserveAmmo <= 0 || this.ammo === this.maxAmmo) return;
+    const need = this.maxAmmo - this.ammo;
+    const take = Math.min(need, this.reserveAmmo);
+    this.ammo += take;
+    this.reserveAmmo -= take;
+    Sound.push();
+  },
+
+  draw() {
+    ctx.fillStyle = '#080911';
+    ctx.fillRect(0, 0, 640, 480);
+
+    // Wall at bottom
+    ctx.fillStyle = '#42485c';
+    ctx.fillRect(0, 430, 640, 50);
+    ctx.fillStyle = '#ffeb3b';
+    ctx.fillRect(0, 430, (this.baseHp / 100) * 640, 6);
+
+    // Enemies
+    this.enemies.forEach(e => {
+      ctx.fillStyle = e.isPower ? '#00e676' : '#ff1744';
+      ctx.fillRect(e.x - e.size / 2, e.y - e.size / 2, e.size, e.size);
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(e.isPower ? '❤️' : '👾', e.x, e.y + 4);
+    });
+
+    // Particles
+    this.particles.forEach(p => {
+      ctx.fillStyle = p.color;
+      ctx.fillRect(p.x, p.y, 4, 4);
+    });
+
+    // Crosshair
+    ctx.strokeStyle = '#00ffcc';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(this.aimX, this.aimY, 14, 0, Math.PI * 2);
+    ctx.moveTo(this.aimX - 20, this.aimY); ctx.lineTo(this.aimX + 20, this.aimY);
+    ctx.moveTo(this.aimX, this.aimY - 20); ctx.lineTo(this.aimX, this.aimY + 20);
+    ctx.stroke();
+
+    // HUD Top
+    ctx.fillStyle = '#00ffcc';
+    ctx.font = 'bold 14px monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText(`${t('score')}: ${this.score}  |  ${t('health')}: ${this.baseHp}%`, 15, 25);
+    ctx.textAlign = 'right';
+    ctx.fillText(`${t('ammo')}: ${this.ammo}/${this.reserveAmmo}  [R: RELOAD]`, 625, 25);
+
+    if (this.baseHp <= 0) {
+      ctx.fillStyle = 'rgba(0,0,0,0.85)';
+      ctx.fillRect(0, 0, 640, 480);
+      ctx.fillStyle = '#ff1744';
+      ctx.font = 'bold 36px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(t('gameOver'), 320, 220);
+      ctx.fillStyle = '#ffeb3b';
+      ctx.font = '16px monospace';
+      ctx.fillText(t('playAgain'), 320, 260);
+    }
+  }
+};
+
+// --- 5.4 SPACE RACE (CYBER CIRCUIT) ---
+const SpaceRaceMode = {
+  ship: { x: 320, y: 390, vx: 0, vy: 0, angle: -Math.PI / 2, boost: 100 },
+  laps: 0,
+  maxLaps: 3,
+  lapTime: 0,
+  totalTime: 0,
+  blackHoles: [{ x: 320, y: 240, r: 24 }],
+
+  start() {
+    this.ship = { x: 320, y: 390, vx: 0, vy: 0, angle: -Math.PI / 2, boost: 100 };
+    this.laps = 0;
+    this.totalTime = 0;
+    currentState = STATES.SPACE_RACE;
+  },
+
+  update() {
+    if (this.laps >= this.maxLaps) return;
+    this.totalTime += 1 / 60;
+
+    // Controls
+    if (keys['ArrowLeft'] || keys['KeyA']) this.ship.angle -= 0.06;
+    if (keys['ArrowRight'] || keys['KeyD']) this.ship.angle += 0.06;
+    if (keys['ArrowUp'] || keys['KeyW']) {
+      this.ship.vx += Math.cos(this.ship.angle) * 0.22;
+      this.ship.vy += Math.sin(this.ship.angle) * 0.22;
+    }
+    // Boost
+    if (keys['Space'] && this.ship.boost > 0) {
+      this.ship.boost -= 0.6;
+      this.ship.vx += Math.cos(this.ship.angle) * 0.45;
+      this.ship.vy += Math.sin(this.ship.angle) * 0.45;
+    } else if (this.ship.boost < 100) {
+      this.ship.boost += 0.15;
+    }
+
+    // Black hole gravitational pull
+    this.blackHoles.forEach(bh => {
+      const dx = bh.x - this.ship.x;
+      const dy = bh.y - this.ship.y;
+      const d = Math.hypot(dx, dy);
+      if (d < 160 && d > 10) {
+        this.ship.vx += (dx / d) * 0.12;
+        this.ship.vy += (dy / d) * 0.12;
+      }
+    });
+
+    this.ship.vx *= 0.98;
+    this.ship.vy *= 0.98;
+    this.ship.x += this.ship.vx;
+    this.ship.y += this.ship.vy;
+
+    // Outer / Inner track collision boundaries
+    const dCenter = Math.hypot(this.ship.x - 320, this.ship.y - 240);
+    if (dCenter > 210 || dCenter < 80) {
+      this.ship.vx *= -0.5;
+      this.ship.vy *= -0.5;
+      Sound.hit();
+    }
+
+    // Finish gate at x=320, y > 240
+    if (this.ship.x >= 315 && this.ship.x <= 325 && this.ship.y > 240 && this.ship.vy > 0) {
+      this.laps++;
+      Sound.coin();
+      if (this.laps >= this.maxLaps) Sound.victory();
+    }
+  },
+
+  draw() {
+    ctx.fillStyle = '#04050e';
+    ctx.fillRect(0, 0, 640, 480);
+
+    // Track
+    ctx.strokeStyle = '#00ffcc';
+    ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.arc(320, 240, 210, 0, Math.PI * 2); ctx.stroke();
+    ctx.strokeStyle = '#ff0055';
+    ctx.beginPath(); ctx.arc(320, 240, 80, 0, Math.PI * 2); ctx.stroke();
+
+    // Finish line
+    ctx.strokeStyle = '#fff';
+    ctx.beginPath(); ctx.moveTo(320, 240 + 80); ctx.lineTo(320, 240 + 210); ctx.stroke();
+
+    // Black hole
+    this.blackHoles.forEach(bh => {
+      ctx.fillStyle = '#9c27b0';
+      ctx.beginPath(); ctx.arc(bh.x, bh.y, bh.r, 0, Math.PI * 2); ctx.fill();
+    });
+
+    // Ship
+    ctx.save();
+    ctx.translate(this.ship.x, this.ship.y);
+    ctx.rotate(this.ship.angle);
+    ctx.fillStyle = '#ffd600';
+    ctx.beginPath();
+    ctx.moveTo(14, 0); ctx.lineTo(-10, -8); ctx.lineTo(-6, 0); ctx.lineTo(-10, 8); ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    // HUD
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 14px monospace';
+    ctx.fillText(`LAPS: ${Math.min(this.maxLaps, this.laps)}/${this.maxLaps}  |  TIME: ${this.totalTime.toFixed(1)}s`, 20, 30);
+    ctx.fillText(`BOOST: ${Math.round(this.ship.boost)}%`, 520, 30);
+
+    if (this.laps >= this.maxLaps) {
+      ctx.fillStyle = 'rgba(0,0,0,0.8)';
+      ctx.fillRect(0, 0, 640, 480);
+      ctx.fillStyle = '#00ffcc';
+      ctx.font = 'bold 36px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(t('victory'), 320, 240);
+      ctx.fillStyle = '#fff';
+      ctx.font = '16px monospace';
+      ctx.fillText(`Final Time: ${this.totalTime.toFixed(2)}s`, 320, 280);
+    }
+  }
+};
+
+// --- 5.5 SEGA RALLY 2001 (HAZARD HIGHWAY) ---
+const RallyMode = {
+  carX: 320,
+  speed: 0,
+  maxSpeed: 14,
+  distance: 0,
+  health: 100,
+  traffic: [],
+  roadOffset: 0,
+
+  start() {
+    this.carX = 320;
+    this.speed = 0;
+    this.distance = 0;
+    this.health = 100;
+    this.traffic = [];
+    currentState = STATES.RACER;
+  },
+
+  update() {
+    if (this.health <= 0) return;
+
+    if (keys['ArrowUp'] || keys['KeyW']) this.speed = Math.min(this.maxSpeed, this.speed + 0.18);
+    else if (keys['ArrowDown'] || keys['KeyS']) this.speed = Math.max(0, this.speed - 0.3);
+    else this.speed *= 0.98;
+
+    if (keys['ArrowLeft'] || keys['KeyA']) this.carX -= 4.5 * (this.speed / this.maxSpeed + 0.2);
+    if (keys['ArrowRight'] || keys['KeyD']) this.carX += 4.5 * (this.speed / this.maxSpeed + 0.2);
+
+    this.carX = Math.max(160, Math.min(480, this.carX));
+    this.distance += this.speed * 0.25;
+    this.roadOffset = (this.roadOffset + this.speed * 2) % 40;
+
+    // Traffic spawn
+    if (Math.random() < 0.03 && this.traffic.length < 5) {
+      this.traffic.push({
+        x: 180 + Math.random() * 280,
+        y: -50,
+        speed: 3 + Math.random() * 4,
+        color: ['#ff1744', '#ffeb3b', '#2979ff'][Math.floor(Math.random() * 3)]
+      });
+    }
+
+    // Traffic movement & collision
+    for (let i = this.traffic.length - 1; i >= 0; i--) {
+      const c = this.traffic[i];
+      c.y += (this.speed - c.speed);
+      if (Math.hypot(this.carX - c.x, 400 - c.y) < 32) {
+        this.health -= 25;
+        this.speed *= 0.4;
+        Sound.boom();
+        this.traffic.splice(i, 1);
+      } else if (c.y > 520 || c.y < -120) {
+        this.traffic.splice(i, 1);
+      }
+    }
+  },
+
+  draw() {
+    ctx.fillStyle = '#1b5e20';
+    ctx.fillRect(0, 0, 640, 480);
+
+    // Road
+    ctx.fillStyle = '#263238';
+    ctx.fillRect(150, 0, 340, 480);
+
+    // Strips
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 4;
+    ctx.setLineDash([20, 20]);
+    ctx.lineDashOffset = -this.roadOffset;
+    ctx.beginPath(); ctx.moveTo(320, 0); ctx.lineTo(320, 480); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Traffic
+    this.traffic.forEach(c => {
+      ctx.fillStyle = c.color;
+      ctx.fillRect(c.x - 14, c.y - 24, 28, 48);
+    });
+
+    // Player Car
+    ctx.fillStyle = '#00e676';
+    ctx.fillRect(this.carX - 16, 400 - 26, 32, 52);
+    ctx.fillStyle = '#222';
+    ctx.fillRect(this.carX - 12, 400 - 10, 24, 18);
+
+    // HUD
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 14px monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText(`${t('speed')}: ${Math.round(this.speed * 12)} KM/H  |  ${t('dist')}: ${Math.round(this.distance)} M`, 20, 30);
+    ctx.textAlign = 'right';
+    ctx.fillText(`${t('health')}: ${this.health}%`, 620, 30);
+
+    if (this.health <= 0) {
+      ctx.fillStyle = 'rgba(0,0,0,0.85)';
+      ctx.fillRect(0, 0, 640, 480);
+      ctx.fillStyle = '#ff1744';
+      ctx.font = 'bold 36px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(t('gameOver'), 320, 240);
+      ctx.fillStyle = '#ffeb3b';
+      ctx.font = '16px monospace';
+      ctx.fillText(t('playAgain'), 320, 280);
+    }
+  }
+};
+
+// --- 5.6 FROGGER ARCADE ---
+const FroggerMode = {
+  frog: { x: 304, y: 448, size: 28 },
+  homes: [false, false, false],
+  lanes: [
+    { y: 384, speed: 2, w: 50, color: '#ff1744', isWater: false },
+    { y: 320, speed: -3, w: 60, color: '#ffeb3b', isWater: false },
+    { y: 256, speed: 2.5, w: 45, color: '#00a2ff', isWater: false },
+    { y: 160, speed: -2, w: 90, color: '#8d4f2a', isWater: true },
+    { y: 96, speed: 2.5, w: 110, color: '#8d4f2a', isWater: true }
+  ],
+  entities: [],
+  lives: 3,
+
+  start() {
+    this.frog = { x: 304, y: 448, size: 28 };
+    this.homes = [false, false, false];
+    this.lives = 3;
+    this.initEntities();
+    currentState = STATES.FROGGER;
+  },
+
+  initEntities() {
+    this.entities = [];
+    this.lanes.forEach(l => {
+      for (let i = 0; i < 3; i++) {
+        this.entities.push({
+          x: i * 220,
+          y: l.y,
+          speed: l.speed,
+          w: l.w,
+          color: l.color,
+          isWater: l.isWater
+        });
+      }
+    });
+  },
+
+  hop(dx, dy) {
+    this.frog.x += dx * 32;
+    this.frog.y += dy * 32;
+    this.frog.x = Math.max(16, Math.min(608, this.frog.x));
+    this.frog.y = Math.max(32, Math.min(448, this.frog.y));
+    Sound.jump();
+
+    // Check lilypad goals
+    if (this.frog.y <= 32) {
+      const targets = [128, 320, 512];
+      let wonSlot = false;
+      targets.forEach((tx, idx) => {
+        if (Math.abs(this.frog.x - tx) < 32 && !this.homes[idx]) {
+          this.homes[idx] = true;
+          wonSlot = true;
+          Sound.coin();
+        }
+      });
+      if (!wonSlot) this.die();
+      else {
+        if (this.homes.every(Boolean)) Sound.victory();
+        else this.resetFrog();
+      }
+    }
+  },
+
+  die() {
+    Sound.splash();
+    this.lives--;
+    if (this.lives <= 0) Sound.wrong();
+    else this.resetFrog();
+  },
+
+  resetFrog() {
+    this.frog = { x: 304, y: 448, size: 28 };
+  },
+
+  update() {
+    if (this.lives <= 0) return;
+
+    // Move entities
+    let onLog = false;
+    this.entities.forEach(e => {
+      e.x += e.speed;
+      if (e.speed > 0 && e.x > 660) e.x = -e.w;
+      if (e.speed < 0 && e.x < -e.w) e.x = 660;
+
+      // Collision
+      if (this.frog.y === e.y && this.frog.x + 20 > e.x && this.frog.x < e.x + e.w) {
+        if (e.isWater) {
+          onLog = true;
+          this.frog.x += e.speed;
+        } else {
+          this.die();
+        }
+      }
+    });
+
+    // In water zone but not on log
+    if ((this.frog.y === 160 || this.frog.y === 96) && !onLog) {
+      this.die();
+    }
+  },
+
+  draw() {
+    ctx.fillStyle = '#001020';
+    ctx.fillRect(0, 0, 640, 480);
+
+    // River
+    ctx.fillStyle = '#0277bd';
+    ctx.fillRect(0, 64, 640, 160);
+
+    // Road
+    ctx.fillStyle = '#37474f';
+    ctx.fillRect(0, 224, 640, 192);
+
+    // Entities (cars & logs)
+    this.entities.forEach(e => {
+      ctx.fillStyle = e.color;
+      ctx.fillRect(e.x, e.y - 12, e.w, 24);
+    });
+
+    // Home slots
+    [128, 320, 512].forEach((x, i) => {
+      ctx.fillStyle = this.homes[i] ? '#00e676' : '#1b5e20';
+      ctx.fillRect(x - 20, 16, 40, 32);
+    });
+
+    // Frog
+    ctx.fillStyle = '#00e676';
+    ctx.fillRect(this.frog.x - 12, this.frog.y - 12, 24, 24);
+
+    // HUD
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 14px monospace';
+    ctx.fillText(`${t('lives')}: ${this.lives}`, 20, 24);
+
+    if (this.lives <= 0) {
+      ctx.fillStyle = 'rgba(0,0,0,0.8)';
+      ctx.fillRect(0, 0, 640, 480);
+      ctx.fillStyle = '#ff1744';
+      ctx.font = 'bold 36px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(t('gameOver'), 320, 240);
+    }
+  }
+};
+
+// --- 5.7 BREAKOUT BLITZ ---
+const BreakoutMode = {
+  paddleX: 270,
+  ball: { x: 320, y: 360, vx: 4, vy: -4, r: 7 },
+  bricks: [],
+  score: 0,
+  lives: 3,
+
+  start() {
+    this.paddleX = 270;
+    this.ball = { x: 320, y: 360, vx: 4, vy: -4, r: 7 };
+    this.score = 0;
+    this.lives = 3;
+    this.initBricks();
+    currentState = STATES.BREAKOUT;
+  },
+
+  initBricks() {
+    this.bricks = [];
+    const colors = ['#ff1744', '#ff9100', '#ffd600', '#00e676', '#00e5ff'];
+    for (let r = 0; r < 5; r++) {
+      for (let c = 0; c < 8; c++) {
+        this.bricks.push({
+          x: 40 + c * 70,
+          y: 60 + r * 24,
+          w: 62,
+          h: 18,
+          color: colors[r],
+          alive: true
+        });
+      }
+    }
+  },
+
+  update() {
+    if (this.lives <= 0) return;
+
+    if (keys['ArrowLeft'] || keys['KeyA']) this.paddleX = Math.max(10, this.paddleX - 7);
+    if (keys['ArrowRight'] || keys['KeyD']) this.paddleX = Math.min(530, this.paddleX + 7);
+
+    this.ball.x += this.ball.vx;
+    this.ball.y += this.ball.vy;
+
+    // Walls
+    if (this.ball.x < 10 || this.ball.x > 630) { this.ball.vx *= -1; Sound.step(); }
+    if (this.ball.y < 10) { this.ball.vy *= -1; Sound.step(); }
+
+    // Paddle collision
+    if (this.ball.y >= 430 && this.ball.y <= 444 && this.ball.x >= this.paddleX && this.ball.x <= this.paddleX + 100) {
+      this.ball.vy = -Math.abs(this.ball.vy);
+      const hitRatio = (this.ball.x - (this.paddleX + 50)) / 50;
+      this.ball.vx = hitRatio * 6;
+      Sound.push();
+    }
+
+    // Bottom loss
+    if (this.ball.y > 470) {
+      this.lives--;
+      Sound.wrong();
+      if (this.lives > 0) {
+        this.ball = { x: 320, y: 360, vx: 4, vy: -4, r: 7 };
+      }
+    }
+
+    // Brick collisions
+    this.bricks.forEach(b => {
+      if (b.alive && this.ball.x > b.x && this.ball.x < b.x + b.w && this.ball.y > b.y && this.ball.y < b.y + b.h) {
+        b.alive = false;
+        this.ball.vy *= -1;
+        this.score += 50;
+        Sound.coin();
+      }
+    });
+  },
+
+  draw() {
+    ctx.fillStyle = '#080a14';
+    ctx.fillRect(0, 0, 640, 480);
+
+    // Bricks
+    this.bricks.forEach(b => {
+      if (b.alive) {
+        ctx.fillStyle = b.color;
+        ctx.fillRect(b.x, b.y, b.w, b.h);
+      }
+    });
+
+    // Paddle
+    ctx.fillStyle = '#00e5ff';
+    ctx.fillRect(this.paddleX, 434, 100, 14);
+
+    // Ball
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(this.ball.x, this.ball.y, this.ball.r, 0, Math.PI * 2); ctx.fill();
+
+    // HUD
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 14px monospace';
+    ctx.fillText(`${t('score')}: ${this.score}  |  ${t('lives')}: ${this.lives}`, 20, 30);
+
+    if (this.lives <= 0) {
+      ctx.fillStyle = 'rgba(0,0,0,0.85)';
+      ctx.fillRect(0, 0, 640, 480);
+      ctx.fillStyle = '#ff1744';
+      ctx.font = 'bold 36px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(t('gameOver'), 320, 240);
+    }
+  }
+};
+
+// --- 5.8 HANGMAN MODE ---
+const HangmanMode = {
+  words: {
+    en: ["NINTENDO", "ARCADE", "CIRCUIT", "GALAXY", "VICTORY", "PIXEL"],
+    da: ["NINTENDO", "ARKADE", "KREDSLØB", "GALAKSE", "SEJRSRUS", "PIXEL"],
+    no: ["NINTENDO", "ARKADE", "KRETSLØP", "GALAKSE", "SEIEREN", "PIXEL"],
+    sv: ["NINTENDO", "ARKADEN", "KRETSKORT", "GALAXEN", "SEGERN", "PIXEL"]
+  },
+  word: "",
+  guesses: [],
+  wrongCount: 0,
+
+  start() {
+    const list = this.words[currentLang] || this.words.en;
+    this.word = list[Math.floor(Math.random() * list.length)];
+    this.guesses = [];
+    this.wrongCount = 0;
+    currentState = STATES.HANGMAN;
+  },
+
+  guess(letter) {
+    letter = letter.toUpperCase();
+    if (this.guesses.includes(letter) || this.wrongCount >= 6) return;
+    this.guesses.push(letter);
+    if (!this.word.includes(letter)) {
+      this.wrongCount++;
+      Sound.wrong();
+    } else {
+      Sound.coin();
+    }
+  },
+
+  draw() {
+    ctx.fillStyle = '#101322';
+    ctx.fillRect(0, 0, 640, 480);
+
+    // Gallows drawing
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(120, 380); ctx.lineTo(260, 380);
+    ctx.moveTo(190, 380); ctx.lineTo(190, 100); ctx.lineTo(340, 100); ctx.lineTo(340, 140);
+    ctx.stroke();
+
+    // Stickman parts
+    if (this.wrongCount > 0) { ctx.beginPath(); ctx.arc(340, 165, 25, 0, Math.PI * 2); ctx.stroke(); }
+    if (this.wrongCount > 1) { ctx.beginPath(); ctx.moveTo(340, 190); ctx.lineTo(340, 270); ctx.stroke(); }
+    if (this.wrongCount > 2) { ctx.beginPath(); ctx.moveTo(340, 210); ctx.lineTo(300, 245); ctx.stroke(); }
+    if (this.wrongCount > 3) { ctx.beginPath(); ctx.moveTo(340, 210); ctx.lineTo(380, 245); ctx.stroke(); }
+    if (this.wrongCount > 4) { ctx.beginPath(); ctx.moveTo(340, 270); ctx.lineTo(305, 335); ctx.stroke(); }
+    if (this.wrongCount > 5) { ctx.beginPath(); ctx.moveTo(340, 270); ctx.lineTo(375, 335); ctx.stroke(); }
+
+    // Word display
+    let won = true;
+    let disp = '';
+    for (let ch of this.word) {
+      if (this.guesses.includes(ch)) disp += ch + ' ';
+      else { disp += '_ '; won = false; }
+    }
+    ctx.fillStyle = '#00ffcc';
+    ctx.font = 'bold 28px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(disp, 420, 200);
+
+    ctx.fillStyle = '#aaa';
+    ctx.font = '14px monospace';
+    ctx.fillText(`Guessed: ${this.guesses.join(' ')}`, 420, 260);
+
+    if (won) {
+      ctx.fillStyle = '#00e676';
+      ctx.fillText(t('victory'), 420, 320);
+    } else if (this.wrongCount >= 6) {
+      ctx.fillStyle = '#ff1744';
+      ctx.fillText(`${t('gameOver')} (Word: ${this.word})`, 420, 320);
+    }
+  }
+};
+
+// --- 5.9 DERBY DASH 2000 ---
+const DerbyMode = {
+  horseY: 340,
+  vy: 0,
+  jumping: false,
+  hurdles: [],
+  coins: [],
+  score: 0,
+  lives: 4,
+
+  start() {
+    this.horseY = 340;
+    this.vy = 0;
+    this.jumping = false;
+    this.hurdles = [];
+    this.coins = [];
+    this.score = 0;
+    this.lives = 4;
+    currentState = STATES.HORSE;
+  },
+
+  jump() {
+    if (!this.jumping) {
+      this.jumping = true;
+      this.vy = -12.5;
+      Sound.jump();
+    }
+  },
+
+  update() {
+    if (this.lives <= 0) return;
+
+    if (this.jumping) {
+      this.vy += 0.65;
+      this.horseY += this.vy;
+      if (this.horseY >= 340) {
+        this.horseY = 340;
+        this.jumping = false;
+      }
+    }
+
+    // Spawn hurdles
+    if (Math.random() < 0.02 && this.hurdles.length < 4) {
+      this.hurdles.push({ x: 660, w: 22, h: 36, hit: false });
+    }
+    if (Math.random() < 0.03 && this.coins.length < 5) {
+      this.coins.push({ x: 660, y: 280 + Math.random() * 40, taken: false });
+    }
+
+    this.score += 0.2;
+
+    // Move & collide
+    for (let i = this.hurdles.length - 1; i >= 0; i--) {
+      const h = this.hurdles[i];
+      h.x -= 6;
+      if (!h.hit && h.x < 140 && h.x > 80 && this.horseY > 310) {
+        h.hit = true;
+        this.lives--;
+        Sound.hit();
+      }
+      if (h.x < -30) this.hurdles.splice(i, 1);
+    }
+
+    for (let i = this.coins.length - 1; i >= 0; i--) {
+      const c = this.coins[i];
+      c.x -= 6;
+      if (!c.taken && Math.hypot(110 - c.x, this.horseY - c.y) < 32) {
+        c.taken = true;
+        this.score += 50;
+        Sound.coin();
+      }
+      if (c.x < -30 || c.taken) this.coins.splice(i, 1);
+    }
+  },
+
+  draw() {
+    ctx.fillStyle = '#4caf50';
+    ctx.fillRect(0, 0, 640, 480);
+    ctx.fillStyle = '#8d6e63';
+    ctx.fillRect(0, 360, 640, 120);
+
+    // Horse
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(90, this.horseY - 20, 48, 28);
+    ctx.fillRect(124, this.horseY - 36, 16, 20);
+
+    // Hurdles
+    this.hurdles.forEach(h => {
+      ctx.fillStyle = '#d32f2f';
+      ctx.fillRect(h.x, 340 - h.h + 20, h.w, h.h);
+    });
+
+    // Coins
+    this.coins.forEach(c => {
+      ctx.fillStyle = '#ffd600';
+      ctx.beginPath(); ctx.arc(c.x, c.y, 8, 0, Math.PI * 2); ctx.fill();
+    });
+
+    // HUD
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 14px monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText(`${t('dist')}: ${Math.round(this.score)} M  |  HORSESHOES: ${this.lives}`, 20, 30);
+
+    if (this.lives <= 0) {
+      ctx.fillStyle = 'rgba(0,0,0,0.85)';
+      ctx.fillRect(0, 0, 640, 480);
+      ctx.fillStyle = '#ff1744';
+      ctx.font = 'bold 36px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(t('gameOver'), 320, 240);
+    }
+  }
+};
+
+// --- 5.10 SUBMARINE DESCENT ---
+const SubmarineMode = {
+  subX: 320,
+  depth: 0,
+  oxygen: 100,
+  hull: 100,
+  mines: [],
+
+  start() {
+    this.subX = 320;
+    this.depth = 0;
+    this.oxygen = 100;
+    this.hull = 100;
+    this.mines = [];
+    currentState = STATES.SUBMARINE;
+  },
+
+  update() {
+    if (this.hull <= 0 || this.oxygen <= 0) return;
+
+    if (keys['ArrowLeft'] || keys['KeyA']) this.subX -= 4;
+    if (keys['ArrowRight'] || keys['KeyD']) this.subX += 4;
+    this.subX = Math.max(40, Math.min(600, this.subX));
+
+    this.depth += 0.8;
+    this.oxygen -= 0.04;
+
+    if (Math.random() < 0.03 && this.mines.length < 5) {
+      this.mines.push({ x: 60 + Math.random() * 520, y: 500, r: 16 });
+    }
+
+    for (let i = this.mines.length - 1; i >= 0; i--) {
+      const m = this.mines[i];
+      m.y -= 2.5;
+      if (Math.hypot(this.subX - m.x, 180 - m.y) < m.r + 18) {
+        this.hull -= 25;
+        Sound.boom();
+        this.mines.splice(i, 1);
+      } else if (m.y < -30) {
+        this.mines.splice(i, 1);
+      }
+    }
+  },
+
+  draw() {
+    ctx.fillStyle = '#021226';
+    ctx.fillRect(0, 0, 640, 480);
+
+    // Mines
+    this.mines.forEach(m => {
+      ctx.fillStyle = '#ff1744';
+      ctx.beginPath(); ctx.arc(m.x, m.y, m.r, 0, Math.PI * 2); ctx.fill();
+    });
+
+    // Submarine
+    ctx.fillStyle = '#ffd600';
+    ctx.beginPath(); ctx.ellipse(this.subX, 180, 28, 14, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillRect(this.subX - 6, 160, 12, 10);
+
+    // HUD
+    ctx.fillStyle = '#00e5ff';
+    ctx.font = 'bold 14px monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText(`DEPTH: ${Math.round(this.depth)} M  |  ${t('oxygen')}: ${Math.round(this.oxygen)}%  |  ${t('health')}: ${this.hull}%`, 20, 30);
+
+    if (this.hull <= 0 || this.oxygen <= 0) {
+      ctx.fillStyle = 'rgba(0,0,0,0.85)';
+      ctx.fillRect(0, 0, 640, 480);
+      ctx.fillStyle = '#ff1744';
+      ctx.font = 'bold 36px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(t('gameOver'), 320, 240);
+    }
+  }
+};
+
+// --- 5.11 MECHA-GÖRAN BOSS BATTLE ---
+const BossBattleMode = {
+  aimX: 320,
+  aimY: 240,
+  bossX: 320,
+  bossY: 140,
+  bossHp: 100,
+  ammo: 6,
+  score: 0,
+  timer: 30,
+  missiles: [],
+
+  start() {
+    this.bossX = 320;
+    this.bossY = 140;
+    this.bossHp = 100;
+    this.ammo = 6;
+    this.score = 0;
+    this.timer = 30;
+    this.missiles = [];
+    currentState = STATES.BOSS;
+  },
+
+  shoot() {
+    if (this.ammo <= 0) { Sound.wrong(); return; }
+    this.ammo--;
+    Sound.shot();
+
+    // Check hit on boss
+    if (Math.hypot(this.aimX - this.bossX, this.aimY - this.bossY) < 60) {
+      this.bossHp -= 8;
+      this.score += 200;
+      Sound.hit();
+      if (this.bossHp <= 0) Sound.victory();
+    }
+  },
+
+  update() {
+    if (this.bossHp <= 0) return;
+    this.bossX = 320 + Math.sin(Date.now() / 600) * 140;
+
+    // Missiles
+    if (Math.random() < 0.03 && this.missiles.length < 3) {
+      this.missiles.push({ x: this.bossX, y: this.bossY, vy: 3 });
+    }
+    for (let i = this.missiles.length - 1; i >= 0; i--) {
+      const m = this.missiles[i];
+      m.y += m.vy;
+      if (m.y > 480) this.missiles.splice(i, 1);
+    }
+  },
+
+  draw() {
+    ctx.fillStyle = '#140c1c';
+    ctx.fillRect(0, 0, 640, 480);
+
+    // Mecha Göran
+    ctx.fillStyle = '#7b1fa2';
+    ctx.fillRect(this.bossX - 50, this.bossY - 40, 100, 80);
+    ctx.fillStyle = '#ff1744';
+    ctx.fillRect(this.bossX - 25, this.bossY - 20, 16, 12);
+    ctx.fillRect(this.bossX + 9, this.bossY - 20, 16, 12);
+
+    // Missiles
+    this.missiles.forEach(m => {
+      ctx.fillStyle = '#ffd600';
+      ctx.fillRect(m.x - 4, m.y - 8, 8, 16);
+    });
+
+    // Crosshair
+    ctx.strokeStyle = '#00ffcc';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(this.aimX, this.aimY, 16, 0, Math.PI * 2);
+    ctx.moveTo(this.aimX - 22, this.aimY); ctx.lineTo(this.aimX + 22, this.aimY);
+    ctx.moveTo(this.aimX, this.aimY - 22); ctx.lineTo(this.aimX, this.aimY + 22);
+    ctx.stroke();
+
+    // HP Bar
+    ctx.fillStyle = '#333';
+    ctx.fillRect(170, 20, 300, 14);
+    ctx.fillStyle = '#ff0055';
+    ctx.fillRect(170, 20, Math.max(0, this.bossHp * 3), 14);
+
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 12px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText("MECHA-GÖRAN", 320, 15);
+    ctx.textAlign = 'left';
+    ctx.fillText(`AMMO: ${this.ammo}/6  [R: RELOAD]`, 20, 460);
+
+    if (this.bossHp <= 0) {
+      ctx.fillStyle = 'rgba(0,0,0,0.85)';
+      ctx.fillRect(0, 0, 640, 480);
+      ctx.fillStyle = '#00ffcc';
+      ctx.font = 'bold 36px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(t('victory'), 320, 240);
+    }
+  }
+};
+
+// =========================================================================
+// 6. GLOBAL INPUT & MENU ROUTING
+// =========================================================================
+function handleGlobalKey(e) {
+  if (e.code === 'Escape') {
+    if (currentState !== STATES.MAIN_MENU) {
+      document.getElementById('hud').style.display = 'none';
+      document.getElementById('quiz-overlay').style.display = 'none';
+      currentState = STATES.MAIN_MENU;
+      Sound.pause();
+    }
+    return;
+  }
+
+  // Quiz keyboard answer numbers (1-4)
+  if (currentState === STATES.QUIZ) {
+    if (e.key >= '1' && e.key <= '4') {
+      QuizMode.answer(parseInt(e.key) - 1);
+    }
+    return;
+  }
+
+  // Hangman typing
+  if (currentState === STATES.HANGMAN) {
+    if (e.key.length === 1 && e.key.match(/[a-zåæøö]/i)) {
+      HangmanMode.guess(e.key);
+    }
+    return;
+  }
+
+  // Reloads
+  if (e.code === 'KeyR') {
+    if (currentState === STATES.SHOOTER) ShooterMode.reload();
+    if (currentState === STATES.BOSS) { BossBattleMode.ammo = 6; Sound.push(); }
+  }
+
+  // Jumps
+  if (e.code === 'Space') {
+    if (currentState === STATES.HORSE) DerbyMode.jump();
+  }
+
+  // Menu navigation
+  if (currentState === STATES.MAIN_MENU) {
+    if (e.code === 'ArrowUp' || e.code === 'KeyW') { menuSelection = (menuSelection - 1 + 2) % 2; Sound.step(); }
+    if (e.code === 'ArrowDown' || e.code === 'KeyS') { menuSelection = (menuSelection + 1) % 2; Sound.step(); }
+    if (e.code === 'Enter' || e.code === 'Space') {
+      Sound.correct();
+      if (menuSelection === 0) StoryMode.reset(), currentState = STATES.STORY;
+      else currentState = STATES.ARCADE_MENU;
+    }
+  } else if (currentState === STATES.ARCADE_MENU) {
+    const total = 10;
+    if (e.code === 'ArrowUp' || e.code === 'KeyW') { arcadeSelection = (arcadeSelection - 1 + total) % total; Sound.step(); }
+    if (e.code === 'ArrowDown' || e.code === 'KeyS') { arcadeSelection = (arcadeSelection + 1) % total; Sound.step(); }
+    if (e.code === 'Enter' || e.code === 'Space') {
+      Sound.correct();
+      switch (arcadeSelection) {
+        case 0: ShooterMode.start(); break;
+        case 1: QuizMode.start(false); break;
+        case 2: SpaceRaceMode.start(); break;
+        case 3: RallyMode.start(); break;
+        case 4: FroggerMode.start(); break;
+        case 5: BreakoutMode.start(); break;
+        case 6: HangmanMode.start(); break;
+        case 7: DerbyMode.start(); break;
+        case 8: SubmarineMode.start(); break;
+        case 9: BossBattleMode.start(); break;
+      }
+    }
+  } else if (currentState === STATES.FROGGER) {
+    if (e.code === 'ArrowUp' || e.code === 'KeyW') FroggerMode.hop(0, -1);
+    if (e.code === 'ArrowDown' || e.code === 'KeyS') FroggerMode.hop(0, 1);
+    if (e.code === 'ArrowLeft' || e.code === 'KeyA') FroggerMode.hop(-1, 0);
+    if (e.code === 'ArrowRight' || e.code === 'KeyD') FroggerMode.hop(1, 0);
+  }
+}
+
+// Mouse aiming & shooting
+canvas.addEventListener('mousemove', e => {
+  const rect = canvas.getBoundingClientRect();
+  const x = (e.clientX - rect.left) * (640 / rect.width);
+  const y = (e.clientY - rect.top) * (480 / rect.height);
+  ShooterMode.aimX = x; ShooterMode.aimY = y;
+  BossBattleMode.aimX = x; BossBattleMode.aimY = y;
+});
+
+canvas.addEventListener('mousedown', e => {
+  if (currentState === STATES.SHOOTER) ShooterMode.shoot();
+  if (currentState === STATES.BOSS) BossBattleMode.shoot();
+});
+
+// =========================================================================
+// 7. GUIDE MODAL DIALOG
+// =========================================================================
+const GUIDE_DATA = {
+  en: [
+    { title: "Story Mode", desc: "Push the blue block onto the yellow pressure switch to unlock the gate. Proceed north and confront Göran the Troll in a high-stakes trivia quiz to unlock the base defense!" },
+    { title: "Base Defense", desc: "Defend your base from incoming falling bombs, glitches and mutant tanks! Aim with mouse, shoot with click, reload with [R]. Collect green hearts to repair your wall." },
+    { title: "Quiz Showdown", desc: "Battle the clock with 15 seconds per question. Keep consecutive correct answers to multiply your score combo! Supports full Danish, Norwegian, Swedish and English." },
+    { title: "Space Race", desc: "Pilot your cyber-ship around the neon circuit for 3 laps! Steer with WASD, boost with [SPACE]. Watch out for the gravitational pull of black holes." },
+    { title: "Sega Rally", desc: "Hazard highway run! Accelerate with [W/UP], steer around traffic and oil slicks. Don't crash into barriers or you'll total your ride." },
+    { title: "Frogger", desc: "Cross the busy multi-lane highway, then hop onto floating river logs. Guide 3 frogs safely into the 3 home pads at the top!" },
+    { title: "Breakout", desc: "Control the paddle with [A/D] or arrows. Deflect the bouncing energy ball into colored bricks. Don't let it fall below your paddle." },
+    { title: "Hangman", desc: "Guess the secret gaming or sci-fi word before the 6 gallows stages are fully drawn. Type letters on your keyboard." },
+    { title: "Derby Dash", desc: "Gallop along the track with Lilla Gubben! Press [SPACE] to jump over wooden hurdles and brooks while picking up shiny gold coins." },
+    { title: "Submarine", desc: "Descend into the uncharted ocean abyss! Manage your hull integrity and oxygen meters. Avoid naval mines as depth increases." },
+    { title: "Mecha Boss", desc: "Direct crosshair battle against Mecha-Göran! Target his weak points, dodge incoming rockets and reload [R] when out of ammo." }
+  ],
+  da: [
+    { title: "Eventyrtilstand", desc: "Skub den blå blok over på den gule kontakt for at låse porten op. Gå nordpå og udfordr Trolden Gøran i en quiz for at låse op for baseforsvaret!" },
+    { title: "Baseforsvar", desc: "Forsvar din mur mod faldende bomber og tanks! Sigt med musen, skyd med venstreklik, og genlad med [R]. Saml hjerter for reparationer." },
+    { title: "Quiz Showdown", desc: "Kæmp mod uret med 15 sekunder pr. spørgsmål. Rigtige svar i træk giver kombo-point! Fuld dansk, norsk, svensk og engelsk tekst." },
+    { title: "Rum-Race", desc: "Kør 3 omgange på neonbanen! Styr med WASD, giv nitro med [MELLEMRUM]. Pas på sorte huller der suger dit skib ind." },
+    { title: "Sega Rally", desc: "Hæsblæsende motorvejsløb! Giv gas med [W], undvig biler og oliepøle så du ikke totalskader bilen." },
+    { title: "Frogger", desc: "Hop over den travle vej og sejl på træstammer over floden. Få 3 frøer sikkert i mål i toppen!" },
+    { title: "Breakout", desc: "Styr battet med [A/D] eller piletaster. Slå bolden ind i murstenene og lad den ikke falde igennem." },
+    { title: "Hængt mand", desc: "Gæt det hemmelige ord ved at trykke på bogstaver på dit tastatur før manden hænges!" },
+    { title: "Derby Dash", desc: "Rid afsted med Lilla Gubben! Tryk [MELLEMRUM] for at springe over hegn og samle gyldne mønter." },
+    { title: "Ubådsdyk", desc: "Dyk dybt ned i havet! Hold øje med ilt og skrog. Undvig søminer og overlev havets tryk." },
+    { title: "Mecha Boss", desc: "Skydeduel mod Mecha-Gøran! Sigt på hans sårbare punkter og genlad med [R]!" }
+  ],
+  no: [
+    { title: "Historiemodus", desc: "Skyv den blå blokken på den gule bryteren for å låse opp porten. Konfronter Trollet Gøran i quizduell for å låse opp basen!" },
+    { title: "Baseforsvar", desc: "Forsvar basen din mot fallende bomber og fiender! Sikt med musen, skyt og lad om med [R]. Reparer muren med grønne hjerter." },
+    { title: "Quiz Showdown", desc: "Svar på spørsmål innen 15 sekunder. Riktige svar på rad bygger opp kombopoeng! Støtter norsk, dansk, svensk og engelsk." },
+    { title: "Rom-Race", desc: "Fullfør 3 runder rundt banen! Styr med piltaster og boost med [MELLOMROM]. Unngå sorte hull." },
+    { title: "Sega Rally", desc: "Kjør så langt du kan på motorveien! Akselerer med [W], unngå trafikk og oljeflekker." },
+    { title: "Frogger", desc: "Hopp over motorveien og flyt på trestokkene i elven. Led 3 frosker trygt i mål på toppen!" },
+    { title: "Breakout", desc: "Styr plattformen og sprett energiballen inn i teglsteinene. Ikke slipp ballen forbi deg!" },
+    { title: "Henge mann", desc: "Gjett det hemmelige ordet bokstav for bokstav på tastaturet før galgen er ferdigtegnet." },
+    { title: "Derby Dash", desc: "Galopper i full fart med Lilla Gubben! Hopp over hekker med [MELLOMROM] og samle gullmynter." },
+    { title: "Ubåt Dykk", desc: "Dykk ned i havdypet! Pass på oksygen og skrog mens du unngår farlige sjøminer." },
+    { title: "Mecha Boss", desc: "Prickskytterduell mot Mecha-Gøran! Skyt ned raketter og treff bossens svake punkter." }
+  ],
+  sv: [
+    { title: "Äventyrsläge", desc: "Knuffa det blåa blocket på den gula knappen för att öppna grinden. Gå norrut och utmana Trollet Göran i quiz!" },
+    { title: "Basförsvar", desc: "Försvara muren mot fallande bomber och stridsvagnar! Sikta med musen, skjut med klick och ladda om med [R]." },
+    { title: "Quiz Showdown", desc: "Svara på kluriga frågor på tid! Bygg upp combo-streaks med rätt svar. Fullt stöd för svenska, norska, danska och engelska." },
+    { title: "Rymd-Race", desc: "Kör 3 varv runt rymdbanan! Styr med WASD, boosta med [MELLANSLAG] och undvik svarta hål." },
+    { title: "Sega Rally", desc: "Kör längs motorvägen, undvik trafikbilar och oljefläckar innan bilen kvaddas!" },
+    { title: "Frogger", desc: "Hjälp 3 grodor över den tunga bilvägen och det strömmande vattnet upp till målrutorna!" },
+    { title: "Breakout", desc: "Styr plattformen, studsa bollen och slå sönder alla färgade tegelstenar." },
+    { title: "Hänga gubbe", desc: "Gissa det hemliga ordet med bokstäver på tangentbordet innan galgen är färdigritad." },
+    { title: "Derby Dash", desc: "Rid i galopp med Lilla Gubben! Hoppa över staket med [MELLANSLAG] och plocka guldmynt." },
+    { title: "Ubåtsdyk", desc: "Dyk djupt i havet, hantera syre och skrovhälsa medan du undviker minor." },
+    { title: "Mecha Boss", desc: "Duellera mot Mecha-Göran! Träffa hans svaga punkter och undvik inkommande robotar." }
+  ]
+};
+
+function openGuideModal() {
+  const modal = document.getElementById('guide-modal');
+  modal.style.display = 'flex';
+  renderGuideTabs(0);
+}
+
+function closeGuideModal() {
+  document.getElementById('guide-modal').style.display = 'none';
+}
+
+function renderGuideTabs(selectedIdx) {
+  const list = GUIDE_DATA[currentLang] || GUIDE_DATA.en;
+  const bar = document.getElementById('guide-tab-bar');
+  bar.innerHTML = '';
+  list.forEach((item, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (idx === selectedIdx ? ' active' : '');
+    btn.innerText = item.title;
+    btn.onclick = () => renderGuideTabs(idx);
+    bar.appendChild(btn);
+  });
+  document.getElementById('guide-body-text').innerHTML = `
+    <h3 style="color: #00ffcc; margin-bottom: 8px;">${list[selectedIdx].title}</h3>
+    <p>${list[selectedIdx].desc}</p>
+  `;
+}
+
+// =========================================================================
+// 8. MAIN RENDER LOOP & MENUS
+// =========================================================================
+function drawMainMenu() {
+  ctx.fillStyle = '#0a0d18';
+  ctx.fillRect(0, 0, 640, 480);
+
+  ctx.fillStyle = '#00ffcc';
+  ctx.font = '900 32px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText(t('appTitle'), 320, 90);
+
+  ctx.fillStyle = '#aaa';
+  ctx.font = '14px monospace';
+  ctx.fillText("ENGLISH • DANSK • NORSK • SVENSKA", 320, 125);
+
+  const opts = [
+    { name: t('menuStory'), desc: t('storyDesc') },
+    { name: t('menuArcade'), desc: t('arcadeDesc') }
+  ];
+
+  opts.forEach((o, idx) => {
+    const y = 200 + idx * 85;
+    const isSel = (menuSelection === idx);
+    ctx.fillStyle = isSel ? 'rgba(0,255,204,0.15)' : 'rgba(255,255,255,0.03)';
+    ctx.fillRect(120, y - 25, 400, 65);
+    ctx.strokeStyle = isSel ? '#00ffcc' : '#333b5c';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(120, y - 25, 400, 65);
+
+    ctx.fillStyle = isSel ? '#ffeb3b' : '#fff';
+    ctx.font = 'bold 20px monospace';
+    ctx.fillText((isSel ? '> ' : '') + o.name, 320, y + 4);
+    ctx.fillStyle = '#8e9bb8';
+    ctx.font = '12px monospace';
+    ctx.fillText(o.desc, 320, y + 26);
+  });
+
+  ctx.fillStyle = '#00ffcc';
+  ctx.font = 'bold 13px monospace';
+  ctx.fillText(t('start'), 320, 420);
+}
+
+function drawArcadeMenu() {
+  ctx.fillStyle = '#070914';
+  ctx.fillRect(0, 0, 640, 480);
+
+  ctx.fillStyle = '#ff0055';
+  ctx.font = '900 24px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText(t('menuArcade'), 320, 45);
+
+  const games = (I18N[currentLang] && I18N[currentLang].games) || I18N.en.games;
+  games.forEach((g, idx) => {
+    const y = 85 + idx * 36;
+    const isSel = (arcadeSelection === idx);
+    if (isSel) {
+      ctx.fillStyle = 'rgba(0,255,204,0.2)';
+      ctx.fillRect(100, y - 18, 440, 28);
+      ctx.strokeStyle = '#00ffcc';
+      ctx.strokeRect(100, y - 18, 440, 28);
+      ctx.fillStyle = '#ffeb3b';
+      ctx.font = 'bold 16px monospace';
+      ctx.fillText(`► ${g} ◄`, 320, y + 2);
+    } else {
+      ctx.fillStyle = '#bbb';
+      ctx.font = '14px monospace';
+      ctx.fillText(g, 320, y + 2);
+    }
+  });
+
+  ctx.fillStyle = '#00ffcc';
+  ctx.font = '12px monospace';
+  ctx.fillText("[UP / DOWN] Select • [ENTER] Play • [ESC] Back", 320, 465);
+}
+
+function gameLoop() {
+  switch (currentState) {
+    case STATES.MAIN_MENU:
+      drawMainMenu();
+      break;
+    case STATES.ARCADE_MENU:
+      drawArcadeMenu();
+      break;
+    case STATES.STORY:
+      StoryMode.update();
+      StoryMode.draw();
+      break;
+    case STATES.QUIZ:
+      QuizMode.draw();
+      break;
+    case STATES.SHOOTER:
+      ShooterMode.update();
+      ShooterMode.draw();
+      break;
+    case STATES.SPACE_RACE:
+      SpaceRaceMode.update();
+      SpaceRaceMode.draw();
+      break;
+    case STATES.RACER:
+      RallyMode.update();
+      RallyMode.draw();
+      break;
+    case STATES.FROGGER:
+      FroggerMode.update();
+      FroggerMode.draw();
+      break;
+    case STATES.BREAKOUT:
+      BreakoutMode.update();
+      BreakoutMode.draw();
+      break;
+    case STATES.HANGMAN:
+      HangmanMode.draw();
+      break;
+    case STATES.HORSE:
+      DerbyMode.update();
+      DerbyMode.draw();
+      break;
+    case STATES.SUBMARINE:
+      SubmarineMode.update();
+      SubmarineMode.draw();
+      break;
+    case STATES.BOSS:
+      BossBattleMode.update();
+      BossBattleMode.draw();
+      break;
+  }
+  requestAnimationFrame(gameLoop);
+}
+
+// Initial boot
+updateLanguageUI();
+requestAnimationFrame(gameLoop);
+</script>
+</body>
+</html>

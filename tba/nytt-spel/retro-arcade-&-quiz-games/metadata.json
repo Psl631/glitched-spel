@@ -1,0 +1,6 @@
+{
+  "name": "Retro Arcade & Quiz Games",
+  "description": "Multi-game retro arcade featuring Story Mode, Base Defense, Quiz Showdown, Space Race, Rally 2001, Frogger, Breakout, Hangman, Derby Dash, Submarine, and Boss Battle with full support for English, Danish, Norwegian, and Swedish.",
+  "requestFramePermissions": ["camera", "microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

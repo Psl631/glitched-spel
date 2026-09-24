@@ -1,0 +1,117 @@
+if (isGameOver) {
+                // Långsam toning av svärtan/skärmen (max 0.94)
+                if (gameOverFade < 0.94) gameOverFade += 0.015;
+
+                // 💥 A. OM BILEN KVADDAS: Rita sprängda bildelar som flyger ut
+                if (car.hp <= 0 && timeRemaining > 0 && !(police && police.active && Math.hypot(car.x - police.x, car.y - police.y) < 50)) {
+                    carDebris.forEach(p => {
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.vx *= 0.96;
+                        p.vy *= 0.96;
+                        p.rotation += p.vRot;
+
+                        ctx.save();
+                        ctx.translate(p.x, p.y + cameraY);
+                        ctx.rotate(p.rotation);
+                        ctx.fillStyle = p.color;
+                        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                        ctx.restore();
+                    });
+                }
+
+                // 🚨 B. OM POLISEN TAR DIG: Blinka rött/blått mer och mer intensivt över hela skärmen
+                if (police && police.active && Math.hypot(car.x - police.x, car.y - police.y) < 50) {
+                    policeBlinkSpeed += 0.15; // Blinkar snabbare och snabbare!
+                    let isBlue = Math.floor(policeBlinkSpeed) % 2 === 0;
+                    ctx.fillStyle = isBlue ? "rgba(0, 30, 255, 0.25)" : "rgba(255, 0, 0, 0.25)";
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                }
+
+                // ⏱️ C. OM TIDEN TAR SLUT: Mörkna skärmen helt
+                ctx.fillStyle = `rgba(0, 0, 0, ${gameOverFade})`;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // --- GAME OVER KORTET (Tonas in mjukt) ---
+                ctx.save();
+                ctx.globalAlpha = Math.min(1, gameOverFade * 1.2); // Texten tonas in sakta
+
+                let boxW = 500, boxH = 320;
+                let boxX = (canvas.width - boxW) / 2;
+                let boxY = (canvas.height - boxH) / 2;
+
+                // 1. Beräkna Betyg (F till S)
+                let grade = "F";
+                let gradeColor = "#ff1744";
+
+                if (distanceCovered >= 3000)      { grade = "S"; gradeColor = "#00ffcc"; }
+                else if (distanceCovered >= 2000) { grade = "A"; gradeColor = "#4caf50"; }
+                else if (distanceCovered >= 1500) { grade = "B"; gradeColor = "#ffeb3b"; }
+                else if (distanceCovered >= 1000) { grade = "C"; gradeColor = "#ff9800"; }
+                else if (distanceCovered >= 500)  { grade = "D"; gradeColor = "#ff5722"; }
+                else if (distanceCovered >= 200)  { grade = "E"; gradeColor = "#e91e63"; }
+                else                              { grade = "F"; gradeColor = "#ff1744"; }
+
+                // 3. Rita Betygskortets ram
+                ctx.strokeStyle = gradeColor;
+                ctx.lineWidth = 3;
+                ctx.strokeRect(boxX, boxY, boxW, boxH);
+
+                ctx.textAlign = "center";
+                
+                // Titel för förlusten
+                // Dynamisk titel baserad på dödsorsak
+                let causeTitle = "";
+
+                if (timeRemaining <= 0) {
+                    causeTitle = "⏱️ TIDEN TOG SLUT!";
+                } else if (police && police.active && Math.hypot(car.x - police.x, car.y - police.y) < 50) {
+                    causeTitle = "🚨 BUSTED!";
+                } else {
+                    causeTitle = "💥 FORDONET KVADDADES!";
+                }
+
+                ctx.fillStyle = "#ff1744";
+                ctx.font = "bold 22px 'Courier New', monospace";
+                ctx.fillText(causeTitle, canvas.width / 2, boxY + 35);
+
+                // Betygsbokstav (F, E, D, C, B, A, S)
+                ctx.fillStyle = gradeColor;
+                ctx.font = "italic bold 64px 'Courier New', monospace";
+                ctx.fillText(grade, canvas.width / 2, boxY + 105);
+
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "bold 12px 'Courier New', monospace";
+                ctx.fillText(`BETYG: ${grade === "F" ? "UNDERKÄNT" : (grade === "S" ? "LEGENDARISKT" : "GODKÄNT")}`, canvas.width / 2, boxY + 130);
+
+                // Sträcka
+                let finalDistText = distanceCovered >= 1000 ? `${(distanceCovered / 1000).toFixed(2)} KM` : `${distanceCovered} METER`;
+                ctx.fillStyle = "#00ffcc";
+                ctx.font = "bold 14px 'Courier New', monospace";
+                ctx.fillText(`KÖRD STRÄCKA: ${finalDistText}`, canvas.width / 2, boxY + 165);
+
+                let isBusted = (reason === "POLICE");
+                let isTrain = (reason === "TRAIN");
+                let isTime = (reason === "TIME");
+
+                // 😂 RITA DEN ROLIGA ILLUSTRATIONEN
+                let failType = isBusted ? "POLICE_BUSTED" : (isTrain ? "TRAIN_CRASH" : (isTime ? "TIME_OUT" : "CAR_WRECKED"));
+                MishapVisuals.draw(ctx, failType, canvas.width / 2, canvas.height / 2 - 20);
+
+                // Körskolelärarens låsta hån
+                ctx.fillStyle = "#ffeb3b";
+                ctx.font = "11px 'Courier New', monospace";
+                
+                if (selectedMock && selectedMock.length > 55) {
+                    let mid = selectedMock.lastIndexOf(' ', 55);
+                    ctx.fillText(selectedMock.substring(0, mid), canvas.width / 2, boxY + 215);
+                    ctx.fillText(selectedMock.substring(mid + 1), canvas.width / 2, boxY + 235);
+                } else if (selectedMock) {
+                    ctx.fillText(selectedMock, canvas.width / 2, boxY + 225);
+                }
+
+                // Omstartsknapp
+                ctx.fillStyle = "#4caf50";
+                ctx.font = "bold 13px 'Courier New', monospace";
+                ctx.fillText("[ TRYCK ENTER FÖR ATT BOKA NY UPPAKNING ]", canvas.width / 2, boxY + 285);
+            }

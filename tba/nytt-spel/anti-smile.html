@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Don't Smile Arcade Challenge</title>
+    <!-- MediaPipe Face Mesh & Camera Utils via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+    <style>
+        * { box-sizing: border-box; user-select: none; }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #06070a;
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        #game-container {
+            position: relative;
+            border: 4px solid #ff1744;
+            box-shadow: 0 0 35px rgba(255, 23, 68, 0.4);
+            width: 800px;
+            height: 600px;
+            background: #000;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background-color: #0c0d14;
+        }
+        /* Dold video för Face Mesh-inläsning */
+        #webcam {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<video id="webcam" playsinline></video>
+<div id="game-container">
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+</div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const video = document.getElementById('webcam');
+
+// =========================================================================
+// 🌐 I18N LOKALISERING & FLAGGOR
+// =========================================================================
+const I18N_TEXTS = {
+    sv: {
+        title: "😐 RÖR INTE EN MIN! (DON'T SMILE)",
+        reqCam: "KAMERA KRÄVS FÖR ATT STARTA!",
+        camBtn: "📷 AKTIVERA KAMERA",
+        calibrating: "KALIBRERAR ANSIKTE... HÅLL HELT NÖRDIGT STENANSIKTE!",
+        smileMeter: "LEENDE-MÄTARE:",
+        danger: "VARNING: DU LER!",
+        gameover: "DU LOG! MATCHARVBRUTEN!",
+        score: "TID DU KLARADE DIG: ",
+        restart: "[ KLICKA ELLER ENTER FÖR ATT STARTA OM ]",
+        ERR_NOT_FOUND: {
+            title: "🙈 INGEN KAMERA HITTADES!",
+            desc: "Är du osynlig eller glömde du stoppa i sladden?! Spelet kan inte se om du håller stenansikte om linsen ligger kvar i kartongen på vinden!",
+            action: "Koppla in en webbkamera eller sätt dig vid en laptop med inbyggd kamera!"
+        },
+        ERR_NOT_SUPPORTED: {
+            title: "🥔 DENNA KAMERA STÖDS EJ!",
+            desc: "Vad har du kopplat in, en potatis med lins från 1998?! Den levererar en upplösning som ser ut som ett suddigt korsord och orkar inte köra ansiktsigenkänning!",
+            action: "Byt ut din Game Boy Camera mot en modern webbkamera med minst 720p!"
+        },
+        ERR_PERMISSION_DENIED: {
+            title: "⛔ KAMERATILLSTÅND NEKADES!",
+            desc: "Fick du panik och klickade 'Blockera'?! Tror du att Kamek eller Biltema sitter och tjuvkikar på dig i smyg?! Utan bild kan domaren inte se om du ler!",
+            action: "Klicka på hänglåset uppe vid adressfältet i webbläsaren och välj 'Tillåt kamera'!"
+        },
+        ERR_GENERAL: {
+            title: "💥 TOTALT KAMERAHAVERI!",
+            desc: "Kameraströmmen kraschade och slog knut på sig själv! Antingen kapades signalen av ett annat program eller så fick kamerasensorn hicka!",
+            action: "Stäng Discord, Zoom, Teams eller starta om webbläsaren och försök igen!"
+        },
+        noFace: "INGET ANSIKTE DETEKTERAT! TITTA IN I KAMERAN!"
+    },
+    en: {
+        title: "😐 DO NOT SMILE CHALLENGE",
+        reqCam: "CAMERA IS MANDATORY TO PLAY!",
+        camBtn: "📷 ACTIVATE CAMERA",
+        calibrating: "CALIBRATING FACE... KEEP A TOTAL STONEFACE!",
+        smileMeter: "SMILE METER:",
+        danger: "WARNING: YOU ARE SMILING!",
+        gameover: "YOU SMILED! CHALLENGE FAILED!",
+        score: "SURVIVED TIME: ",
+        restart: "[ CLICK OR ENTER TO RETRY ]",
+        ERR_NOT_FOUND: {
+            title: "🙈 NO CAMERA FOUND!",
+            desc: "Are you invisible or did you forget the cable?! The game cannot verify your stone face if your webcam is still sitting in its box in the attic!",
+            action: "Plug in a webcam or move to a laptop with a built-in camera!"
+        },
+        ERR_NOT_SUPPORTED: {
+            title: "🥔 CAMERA NOT SUPPORTED!",
+            desc: "What did you plug in, a potato with a lens from 1998?! The resolution looks like a blurry crossword and cannot track facial landmarks!",
+            action: "Ditch your Game Boy Camera and get a modern webcam supporting at least 720p!"
+        },
+        ERR_PERMISSION_DENIED: {
+            title: "⛔ CAMERA ACCESS DENIED!",
+            desc: "Did you panic and hit 'Block'?! Do you think Kamek or Biltema are secretly spying on you?! Without video, the ref cannot see if you crack a smile!",
+            action: "Click the lock icon in your browser's address bar and set Camera to 'Allow'!"
+        },
+        ERR_GENERAL: {
+            title: "💥 COMPLETE CAMERA CRASH!",
+            desc: "The video stream choked and tied itself into a knot! Another background app hijacked the feed or the camera sensor had a hiccup!",
+            action: "Close Discord, Zoom, Teams or restart your browser and try again!"
+        },
+        noFace: "NO FACE DETECTED! LOOK AT THE CAMERA!"
+    }
+};
+
+let currentLang = localStorage.getItem('dont_smile_lang') || 'sv';
+function t(key) { return I18N_TEXTS[currentLang][key] || key; }
+function toggleLanguage(target) {
+    currentLang = target || (currentLang === 'sv' ? 'en' : 'sv');
+    localStorage.setItem('dont_smile_lang', currentLang);
+}
+
+function drawSwedishFlag(ctx, x, y, w, h) {
+    ctx.save();
+    ctx.fillStyle = "#006aa7"; ctx.fillRect(x, y, w, h);
+    ctx.fillStyle = "#fecc00";
+    ctx.fillRect(x + w * 0.31, y, w * 0.16, h);
+    ctx.fillRect(x, y + h * 0.38, w, h * 0.24);
+    ctx.strokeStyle = currentLang === 'sv' ? "#00ffcc" : "#ffffff";
+    ctx.lineWidth = 2; ctx.strokeRect(x, y, w, h);
+    ctx.restore();
+}
+
+function drawBritishFlag(ctx, x, y, w, h) {
+    ctx.save();
+    ctx.fillStyle = "#012169"; ctx.fillRect(x, y, w, h);
+    ctx.strokeStyle = "#ffffff"; ctx.lineWidth = h * 0.26;
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + w, y + h); ctx.moveTo(x + w, y); ctx.lineTo(x, y + h); ctx.stroke();
+    ctx.strokeStyle = "#c8102e"; ctx.lineWidth = h * 0.12;
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + w, y + h); ctx.moveTo(x + w, y); ctx.lineTo(x, y + h); ctx.stroke();
+    ctx.fillStyle = "#ffffff"; ctx.fillRect(x + w * 0.38, y, w * 0.24, h); ctx.fillRect(x, y + h * 0.35, w, h * 0.30);
+    ctx.fillStyle = "#c8102e"; ctx.fillRect(x + w * 0.42, y, w * 0.16, h); ctx.fillRect(x, y + h * 0.40, w, h * 0.20);
+    ctx.strokeStyle = currentLang === 'en' ? "#00ffcc" : "#ffffff";
+    ctx.lineWidth = 2; ctx.strokeRect(x, y, w, h);
+    ctx.restore();
+}
+
+// =========================================================================
+// 🔊 LJUDMOTOR
+// =========================================================================
+const AudioEngine = {
+    playBuzzer: function() {
+        try {
+            const a = new Audio('windows_error.mp3');
+            a.volume = 0.9;
+            a.play().catch(() => {});
+        } catch(e) {}
+    },
+    playBoooop: function() {
+        try {
+            const a = new Audio('boooop.mp3');
+            a.volume = 0.9;
+            a.play().catch(() => {});
+        } catch(e) {}
+    },
+    playTick: function() {
+        try {
+            const a = new Audio('step.wav');
+            a.volume = 0.3;
+            a.play().catch(() => {});
+        } catch(e) {}
+    }
+};
+
+// =========================================================================
+// 📷 KAMERA & MEDIAPIPE FACE MESH ANSIKTSANALYS
+// =========================================================================
+let gameState = "NO_CAMERA"; // "NO_CAMERA", "CALIBRATING", "PLAYING", "GAMEOVER"
+let cameraReady = false;
+let faceDetected = false;
+
+let smileValue = 0;           // 0.0 - 1.0
+let baselineMouthRatio = 0.0; // Kalibrerad nollpunkt för neutral mun
+let calibrationSamples = [];
+let calibrationFrames = 0;
+let smileStrikes = 0;       // Antal kryss (max 3)
+let isSmilingTriggered = false; // Hindrar ljud- och kryss-spam medan leendet hålls
+
+let surviveFrames = 0;
+let distractorIndex = 0;
+let distractorTimer = 0;
+
+// Roliga/konstiga texter och memes som poppar upp för att få spelaren att skratta
+const DISTRACTORS = [
+    "🍍 Pizza med banan, kaviar och ananas!",
+    "🧙‍♂️ Kamek snubblade på sin klänning!",
+    "🦆 'Quack.' - Den hemliga agenten",
+    "🧦 Tänk på en blöt strumpa i en gummistövel.",
+    "🚗 Biltema-körv för 5 kronor i motvind.",
+    "👀 TITTA INTE PÅ MÄTAREN, DU HÅLLER PÅ ATT LE!",
+    "🤡 Föreställ dig din lärare dansa breakdance.",
+    "🗿 STENANSIKTE. RÖR INTE EN MUSKEL."
+];
+
+// MediaPipe Landmark Index
+// 61: Vänster mungipa, 291: Höger mungipa
+// 13: Överläpp mitt, 14: Underläpp mitt
+// 1: Nästipp (referenspunkt)
+function calculateSmileRatio(landmarks) {
+    const leftCorner = landmarks[61];
+    const rightCorner = landmarks[291];
+    const upperLip = landmarks[13];
+    const lowerLip = landmarks[14];
+    const nose = landmarks[1];
+
+    // Munbredd (horisontellt avstånd mellan mungipor)
+    const mouthWidth = Math.hypot(rightCorner.x - leftCorner.x, rightCorner.y - leftCorner.y);
+    // Ansiktsbredd / referensmått (avstånd från näsa till mungipor)
+    const refScale = Math.hypot(nose.x - leftCorner.x, nose.y - leftCorner.y) + Math.hypot(nose.x - rightCorner.x, nose.y - rightCorner.y);
+
+    // Mungipornas höjd relativt överläppen (när man ler dras mungiporna uppåt)
+    const avgCornerY = (leftCorner.y + rightCorner.y) / 2;
+    const lipLift = upperLip.y - avgCornerY;
+
+    // Normaliserad munnivå
+    return (mouthWidth / refScale) + (lipLift * 1.5);
+}
+
+const faceMesh = new FaceMesh({
+    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+});
+
+faceMesh.setOptions({
+    maxNumFaces: 1,
+    refineLandmarks: true,
+    minDetectionConfidence: 0.6,
+    minTrackingConfidence: 0.6
+});
+
+faceMesh.onResults((results) => {
+    if (!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0) {
+        faceDetected = false;
+        return;
+    }
+
+    faceDetected = true;
+    const landmarks = results.multiFaceLandmarks[0];
+    const currentRatio = calculateSmileRatio(landmarks);
+
+    // 1. KALIBRERINGSFAS (Spelaren håller stenansikte i 60 frames)
+    if (gameState === "CALIBRATING") {
+        calibrationSamples.push(currentRatio);
+        calibrationFrames++;
+        if (calibrationFrames >= 60) {
+            baselineMouthRatio = calibrationSamples.reduce((a, b) => a + b, 0) / calibrationSamples.length;
+            gameState = "PLAYING";
+            surviveFrames = 0;
+        }
+        return;
+    }
+
+    // 2. SPELARFAS: Beräkna leendegrad
+    if (gameState === "PLAYING") {
+        const delta = currentRatio - baselineMouthRatio;
+        // Mappa avvikelsen till 0.0 -> 1.0 mätare
+        smileValue = Math.max(0, Math.min(1.0, (delta * 14)));
+
+        // Tröskel: Över 0.45 leende = varning & kryss
+        if (smileValue >= 0.45) {
+            if (!isSmilingTriggered) {
+                isSmilingTriggered = true;
+                smileStrikes++;
+                AudioEngine.playBoooop(); // 🔊 Spelar BÖÖÖÖP vid överträdelse
+
+                if (smileStrikes >= 3) {
+                    gameState = "GAMEOVER";
+                    AudioEngine.playBuzzer();
+                }
+            }
+        } else if (smileValue < 0.25) {
+            // Nollställs först när spelaren återställt ett neutralt stenansikte
+            isSmilingTriggered = false;
+        }
+    }
+});
+let cameraErrorKey = null; // Håller koll på aktivt fel
+
+async function initCamera() {
+    cameraErrorKey = null;
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: { width: 640, height: 480, frameRate: { ideal: 30 } },
+            audio: false
+        });
+        video.srcObject = stream;
+        await video.play();
+
+        const camera = new Camera(video, {
+            onFrame: async () => {
+                await faceMesh.send({ image: video });
+            },
+            width: 640,
+            height: 480
+        });
+        camera.start();
+
+        cameraReady = true;
+        gameState = "CALIBRATING";
+        calibrationFrames = 0;
+        calibrationSamples = [];
+        smileStrikes = 0;
+    } catch (err) {
+        // 🎯 Fånga specifika webbläsarfel:
+        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+            cameraErrorKey = "ERR_PERMISSION_DENIED";
+        } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+            cameraErrorKey = "ERR_NOT_FOUND";
+        } else if (err.name === 'NotSupportedError' || err.name === 'OverconstrainedError') {
+            cameraErrorKey = "ERR_NOT_SUPPORTED";
+        } else {
+            cameraErrorKey = "ERR_GENERAL"; // T.ex. NotReadableError (upptagen av Zoom/Discord)
+        }
+
+        gameState = "CAMERA_ERROR";
+        AudioEngine.playBuzzer();
+    }
+}
+
+// =========================================================================
+// 🎮 STYRNING & INPUT
+// =========================================================================
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'l' || e.key === 'L') {
+        toggleLanguage();
+        return;
+    }
+
+    if (e.key === 'Enter') {
+        // Enter får INTE starta kameran automatiskt utan knappen måste klickas!
+        if (gameState === "GAMEOVER") {
+            gameState = "CALIBRATING";
+            calibrationFrames = 0;
+            calibrationSamples = [];
+            smileStrikes = 0;
+            smileValue = 0;
+        }
+    }
+});
+
+window.addEventListener('mousedown', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const cx = (e.clientX - rect.left) * (canvas.width / rect.width);
+    const cy = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+    // Klick på språkkontroller uppe till höger
+    if (cx >= 710 && cx <= 746 && cy >= 12 && cy <= 36) { toggleLanguage('sv'); return; }
+    if (cx >= 754 && cx <= 790 && cy >= 12 && cy <= 36) { toggleLanguage('en'); return; }
+
+    if (gameState === "CAMERA_ERROR") {
+        const btnW = 320, btnH = 48;
+        const btnX = (canvas.width - btnW) / 2;
+        const btnY = 360;
+
+        if (cx >= btnX && cx <= btnX + btnW && cy >= btnY && cy <= btnY + btnH) {
+            initCamera();
+        }
+        return;
+    }
+
+    // Klick på knappen "Aktivera kamera" vid start
+    if (gameState === "NO_CAMERA") {
+        const btnW = 340, btnH = 50;
+        const btnX = (canvas.width - btnW) / 2;
+        const btnY = 360;
+
+        // Kontrollera att klicket sker inuti knappens koordinater
+        if (cx >= btnX && cx <= btnX + btnW && cy >= btnY && cy <= btnY + btnH) {
+            initCamera();
+        }
+        return;
+    } else if (gameState === "GAMEOVER") {
+        gameState = "CALIBRATING";
+        calibrationFrames = 0;
+        calibrationSamples = [];
+        smileStrikes = 0;
+        smileValue = 0;
+    }
+});
+
+// =========================================================================
+// 🔄 RENDER & HUVUDLOOP
+// =========================================================================
+function update() {
+    if (gameState === "PLAYING") {
+        surviveFrames++;
+
+        // Byt distraktion var 2.5 sekund
+        distractorTimer++;
+        if (distractorTimer >= 150) {
+            distractorTimer = 0;
+            distractorIndex = Math.floor(Math.random() * DISTRACTORS.length);
+        }
+    }
+}
+
+function render() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // 1. RITA WEBCAM-FEED I HÖGRA NEDRE HÖRNET (SPEGLAD)
+    if (cameraReady && video.readyState >= 2) {
+        ctx.save();
+        const feedW = 200, feedH = 150;
+        const feedX = canvas.width - feedW - 20;
+        const feedY = canvas.height - feedH - 20;
+
+        ctx.translate(feedX + feedW, feedY);
+        ctx.scale(-1, 1);
+        ctx.drawImage(video, 0, 0, feedW, feedH);
+        ctx.restore();
+
+        ctx.strokeStyle = smileValue > 0.3 ? "#ff1744" : "#00ffcc";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(canvas.width - feedW - 20, canvas.height - feedH - 20, feedW, feedH);
+
+        // Varning om ansikte saknas i rutan
+        if (!faceDetected && (gameState === "PLAYING" || gameState === "CALIBRATING")) {
+            ctx.fillStyle = "rgba(255, 23, 68, 0.85)";
+            ctx.fillRect(canvas.width - feedW - 20, canvas.height - feedH - 20, feedW, 30);
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "bold 10px monospace";
+            ctx.textAlign = "center";
+            ctx.fillText(t("noFace"), canvas.width - feedW / 2 - 20, canvas.height - feedH);
+        }
+
+        // 🔴 BLINKANDE "● REC"-INDIKATOR I VIDEORUTAN
+        const isRecBlink = Math.floor(Date.now() / 500) % 2 === 0;
+        if (isRecBlink) {
+            ctx.save();
+            // Röd inspelningsprick
+            ctx.fillStyle = "#ff1744";
+            ctx.beginPath();
+            ctx.arc(feedX + 16, feedY + 16, 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Text REC bredvid
+            ctx.font = "bold 12px monospace";
+            ctx.textAlign = "left";
+            ctx.fillText("REC", feedX + 26, feedY + 20);
+            ctx.restore();
+        }
+    }
+
+    // 2. FLAGGOR UPPE I HÖRNET
+    drawSwedishFlag(ctx, 710, 12, 36, 24);
+    drawBritishFlag(ctx, 754, 12, 36, 24);
+
+    // 3. STATUSHANTERING
+    if (gameState === "NO_CAMERA") {
+        ctx.fillStyle = "rgba(6, 7, 10, 0.96)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#ff1744";
+        ctx.font = "bold 26px 'Courier New', monospace";
+        ctx.fillText(t("title"), canvas.width / 2, 140);
+
+        ctx.fillStyle = "#ffd600";
+        ctx.font = "bold 16px monospace";
+        ctx.fillText(t("reqCam"), canvas.width / 2, 230);
+
+        ctx.fillStyle = "#e2e8f0";
+        ctx.font = "13px monospace";
+        ctx.fillText("Ansiktsigenkänning körs lokalt för att detektera minsta leende.", canvas.width / 2, 270);
+        ctx.fillText("Ingen video sparas eller skickas iväg.", canvas.width / 2, 295);
+
+        // 📷 FYSISK AKTIVERINGSKNAPP
+        const btnW = 340, btnH = 50;
+        const btnX = (canvas.width - btnW) / 2;
+        const btnY = 360;
+
+        ctx.fillStyle = "#ff1744";
+        ctx.fillRect(btnX, btnY, btnW, btnH);
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 2.5;
+        ctx.strokeRect(btnX, btnY, btnW, btnH);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 16px monospace";
+        ctx.fillText(t("camBtn"), canvas.width / 2, btnY + 31);
+    }
+    else if (gameState === "CAMERA_ERROR") {
+        ctx.fillStyle = "rgba(10, 2, 8, 0.96)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Pulserande röd ram
+        const isPulse = Math.floor(Date.now() / 200) % 2 === 0;
+        ctx.strokeStyle = isPulse ? "#ff1744" : "#ffd600";
+        ctx.lineWidth = 4;
+        ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+
+        const pack = I18N_TEXTS[currentLang][cameraErrorKey] || I18N_TEXTS[currentLang].ERR_GENERAL;
+
+        ctx.textAlign = "center";
+
+        // Rubrik
+        ctx.fillStyle = "#ff1744";
+        ctx.font = "bold 24px 'Courier New', monospace";
+        ctx.fillText(pack.title, canvas.width / 2, 110);
+
+        // Dialog-box
+        const boxW = 680, boxH = 170;
+        const boxX = (canvas.width - boxW) / 2;
+        const boxY = 150;
+
+        ctx.fillStyle = "rgba(22, 10, 26, 0.9)";
+        ctx.fillRect(boxX, boxY, boxW, boxH);
+        ctx.strokeStyle = "#ff1744";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(boxX, boxY, boxW, boxH);
+
+        // Radbryt den roliga förklaringen
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 13px monospace";
+        const words = pack.desc.split(' ');
+        let line = '';
+        let textY = boxY + 45;
+        for (let n = 0; n < words.length; n++) {
+            let testLine = line + words[n] + ' ';
+            if (ctx.measureText(testLine).width > boxW - 40 && n > 0) {
+                ctx.fillText(line, canvas.width / 2, textY);
+                line = words[n] + ' ';
+                textY += 22;
+            } else {
+                line = testLine;
+            }
+        }
+        ctx.fillText(line, canvas.width / 2, textY);
+
+        // Åtgärdsrad
+        ctx.fillStyle = "#ffd600";
+        ctx.font = "bold 12px monospace";
+        ctx.fillText(pack.action, canvas.width / 2, boxY + 140);
+
+        // "Försök igen"-knapp
+        const btnW = 320, btnH = 48;
+        const btnX = (canvas.width - btnW) / 2;
+        const btnY = 360;
+
+        ctx.fillStyle = "#ff1744";
+        ctx.fillRect(btnX, btnY, btnW, btnH);
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(btnX, btnY, btnW, btnH);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 13px monospace";
+        ctx.fillText(currentLang === 'sv' ? "🔄 FÖRSÖK IGEN" : "🔄 RETRY ACCESS", canvas.width / 2, btnY + 29);
+    }
+    else if (gameState === "CALIBRATING") {
+        ctx.fillStyle = "rgba(6, 7, 10, 0.88)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#00ffcc";
+        ctx.font = "bold 20px monospace";
+        ctx.fillText(t("calibrating"), canvas.width / 2, 220);
+
+        // Kalibreringsmätare
+        const pct = calibrationFrames / 60;
+        ctx.fillStyle = "#1e293b";
+        ctx.fillRect(canvas.width / 2 - 150, 270, 300, 20);
+        ctx.fillStyle = "#00ffcc";
+        ctx.fillRect(canvas.width / 2 - 150, 270, 300 * pct, 20);
+        ctx.strokeStyle = "#ffffff";
+        ctx.strokeRect(canvas.width / 2 - 150, 270, 300, 20);
+    } 
+    else if (gameState === "PLAYING") {
+        ctx.textAlign = "center";
+
+        // Rubrik & Tid
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 18px monospace";
+        ctx.fillText(t("title"), canvas.width / 2, 60);
+
+        const secs = (surviveFrames / 60).toFixed(1);
+        ctx.fillStyle = "#ffd600";
+        ctx.font = "bold 32px 'Courier New', monospace";
+        ctx.fillText(`${secs} s`, canvas.width / 2, 110);
+
+        // Stor dynamisk Leende-mätare
+        const barW = 460, barH = 34;
+        const barX = (canvas.width - barW) / 2;
+        const barY = 160;
+
+        ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+        ctx.fillRect(barX, barY, barW, barH);
+
+        // Färgskala från Grön -> Gul -> Röd
+        const meterFill = Math.min(1.0, smileValue / 0.45);
+        ctx.fillStyle = meterFill > 0.75 ? "#ff1744" : (meterFill > 0.45 ? "#ffd600" : "#00ffcc");
+        ctx.fillRect(barX, barY, barW * meterFill, barH);
+
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(barX, barY, barW, barH);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 13px monospace";
+        ctx.fillText(`${t("smileMeter")} ${(meterFill * 100).toFixed(0)}%`, canvas.width / 2, barY + 22);
+
+        // Varningstext om man närmar sig gränsen
+        if (meterFill > 0.6) {
+            ctx.fillStyle = "#ff1744";
+            ctx.font = "bold 20px monospace";
+            ctx.fillText(t("danger"), canvas.width / 2, 230);
+        }
+
+        // =========================================================================
+        // ❌ VARNINGSRUTA MED 3 KRYSS (STRIKES)
+        // =========================================================================
+        const strikeBoxW = 220;
+        const strikeBoxH = 50;
+        const strikeBoxX = (canvas.width - strikeBoxW) / 2;
+        const strikeBoxY = 205;
+
+        ctx.fillStyle = "rgba(10, 10, 18, 0.9)";
+        ctx.fillRect(strikeBoxX, strikeBoxY, strikeBoxW, strikeBoxH);
+        ctx.strokeStyle = smileStrikes > 0 ? "#ff1744" : "#ffffff";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(strikeBoxX, strikeBoxY, strikeBoxW, strikeBoxH);
+
+        // Rita 3 fack med kryss
+        for (let i = 0; i < 3; i++) {
+            const crossX = strikeBoxX + 38 + (i * 72);
+            const crossY = strikeBoxY + 34;
+
+            ctx.save();
+            ctx.textAlign = "center";
+            ctx.font = "bold 28px monospace";
+
+            if (i < smileStrikes) {
+                // Rött aktivt kryss med blink-effekt
+                ctx.fillStyle = "#ff1744";
+                ctx.fillText("❌", crossX, crossY);
+            } else {
+                // Tom grå platshållare
+                ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
+                ctx.fillText("—", crossX, crossY - 4);
+            }
+            ctx.restore();
+        }
+
+        // Distraktionsruta som visar slumpade roliga meningar
+        ctx.fillStyle = "rgba(30, 41, 59, 0.85)";
+        ctx.fillRect(barX, 290, barW, 90);
+        ctx.strokeStyle = "#ffeb3b";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(barX, 290, barW, 90);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 14px monospace";
+        ctx.fillText(DISTRACTORS[distractorIndex], canvas.width / 2, 342);
+    } 
+    else if (gameState === "GAMEOVER") {
+        ctx.fillStyle = "rgba(15, 2, 5, 0.95)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#ff1744";
+        ctx.font = "bold 32px 'Courier New', monospace";
+        ctx.fillText(t("gameover"), canvas.width / 2, 190);
+
+        const secs = (surviveFrames / 60).toFixed(1);
+        ctx.fillStyle = "#ffd600";
+        ctx.font = "bold 20px monospace";
+        ctx.fillText(t("score") + `${secs} sekunder`, canvas.width / 2, 250);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 13px monospace";
+        ctx.fillText(t("restart"), canvas.width / 2, 340);
+    }
+}
+
+function mainLoop() {
+    update();
+    render();
+    requestAnimationFrame(mainLoop);
+}
+requestAnimationFrame(mainLoop);
+</script>
+</body>
+</html>

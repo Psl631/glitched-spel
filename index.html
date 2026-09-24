@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="doc-title">Assemblys webbspels-hubb! // THE BOSS HQ</title>
+    <title id="doc-title">Station 24s webbspels-hubb! // THE BOSS HQ</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -289,16 +289,17 @@
         
         <div class="lang-selector">
             <button class="lang-btn" onclick="setLanguage('sv')">SV</button>
+            <button class="lang-btn" onclick="setLanguage('no')">NO</button>
             <button class="lang-btn" onclick="setLanguage('en')">EN</button>
             <button class="lang-btn" onclick="setLanguage('fi')">FI</button>
         </div>
 
         <div class="logo-container">
-            <img src="glitched.png" alt="Assembly Logo" class="assembly-logo">
+            <img src="glitched.png" alt="Station 24 Logo" class="assembly-logo">
         </div>
 
         <div class="terminal-header" style="text-align: center; margin-bottom: 40px;">
-            <h1 class="terminal-title" data-i18n="mainTitle">Assemblys webbspels-hubb!</h1>
+            <h1 class="terminal-title" data-i18n="mainTitle">Station 24s webbspels-hubb!</h1>
             <div class="hub-subtitle" data-i18n="hubSubtitle" style="font-family: 'Montserrat', sans-serif; font-size: 1.05rem; color: #b3a0c9; line-height: 1.6; max-width: 800px; margin: 15px auto 0 auto; font-weight: normal; text-transform: none; letter-spacing: 0.5px;">
             </div>
         </div>
@@ -328,7 +329,7 @@
                             font-size: 0.75rem;
                             animation: pulse 1.5s infinite;
                             font-weight: bold;
-                        ">OFFICIELLT FESTIVALSPEL</span>
+                        ">OFFICIELLT SPEL</span>
                     </div>
                     <div class="lang-tag lang-en" data-i18n="langEnAvail">🌐 English version available</div>
                     
@@ -336,7 +337,7 @@
                     </div>
                     
                     <div style="margin-bottom: 15px; font-family: 'Montserrat', sans-serif;">
-                        <a href="https://www.assembly.org/" target="_blank" data-i18n="visitAssembly" style="
+                        <a href="#" target="_blank" data-i18n="visitStation" style="
                             color: var(--assembly-cyan); 
                             text-decoration: underline; 
                             font-weight: bold; 
@@ -345,7 +346,7 @@
                             align-items: center;
                             gap: 5px;
                         ">
-                            🔗 Besök festivalens hemsida (assembly.org)
+                            🔗 Besök Station 24
                         </a>
                     </div>
 
@@ -357,10 +358,75 @@
                 </div>
             </div>
 
+            <!-- DERBY DASH -->
+            <div class="game-card">
+                <div>
+                    <a href="derby_dash.html" class="nav-link" data-i18n="derbyTitle">> DERBY DASH</a>
+                    <div class="lang-tag lang-scan" data-i18n="langScanAvail">🇩🇰 🇳🇴 🇸🇪 Skandinavisk version tillgänglig</div>
+                    <div data-i18n="derbyDesc" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
+                    </div>
+                    <div class="meta-info"><span data-i18n="lblDiff">Svårighet</span>: <span class="tag-diff diff-medium" data-i18n="diffMedium">Medium</span> | <span data-i18n="lblAge">Åldersrek</span>: All Ages</div>
+                </div>
+                <div class="card-sensory-warning" data-i18n="derbySensory">
+                </div>
+            </div>
+
+            <!-- TRIVIA QUIZ -->
+            <div class="game-card">
+                <div>
+                    <a href="trivia_quiz.html" class="nav-link" data-i18n="triviaTitle">> TRIVIA QUIZ</a>
+                    <div class="lang-tag lang-scan" data-i18n="langScanAvail">🇩🇰 🇳🇴 🇸🇪 Skandinavisk version tillgänglig</div>
+                    <div data-i18n="triviaDesc" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
+                    </div>
+                    <div class="meta-info"><span data-i18n="lblDiff">Svårighet</span>: <span class="tag-diff diff-easy" data-i18n="diffEasy">Lätt</span> | <span data-i18n="lblAge">Åldersrek</span>: 7+</div>
+                </div>
+                <div class="card-sensory-warning" data-i18n="triviaSensory">
+                </div>
+            </div>
+
+            <!-- RETRO SHOOTER -->
+            <div class="game-card high-intensity">
+                <div>
+                    <a href="tba/nytt-spel/retro_shooter.html" class="nav-link" data-i18n="shooterTitle">> RETRO SHOOTER</a>
+                    <div class="lang-tag lang-en" data-i18n="langEnAvail">🌐 English version available</div>
+                    <div data-i18n="shooterDesc" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #ffcccc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
+                    </div>
+                    <div class="meta-info"><span data-i18n="lblDiff">Svårighet</span>: <span class="tag-diff diff-hard" data-i18n="diffHard">Svår</span> | <span data-i18n="lblAge">Åldersrek</span>: 10+</div>
+                </div>
+                <div class="card-sensory-warning severe" data-i18n="shooterSensory">
+                </div>
+            </div>
+
+            <!-- MEGA ARCADE (SV ONLY) -->
+            <div class="game-card">
+                <div>
+                    <a href="tba/nytt-spel/index.html" class="nav-link" data-i18n="megaTitle">> STATION 24s MEGA ARCADE</a>
+                    <div class="lang-tag lang-scan" data-i18n="langSvOnly" style="background: rgba(255, 204, 0, 0.15); border: 1px solid #ffcc00; color: #ffcc00;">🇸🇪 Endast på svenska</div>
+                    <div data-i18n="megaDesc" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
+                    </div>
+                    <div class="meta-info"><span data-i18n="lblDiff">Svårighet</span>: <span class="tag-diff diff-medium" data-i18n="diffMedium">Medium</span> | <span data-i18n="lblAge">Åldersrek</span>: All Ages</div>
+                </div>
+                <div class="card-sensory-warning" data-i18n="megaSensory">
+                </div>
+            </div>
+
+            <!-- PVP ARENA -->
+            <div class="game-card high-intensity">
+                <div>
+                    <a href="tba/nytt-spel/pvp_arena.html" class="nav-link" data-i18n="pvpTitle">> STATION 24s PVP ARENA</a>
+                    <div class="lang-tag lang-en" data-i18n="langEnAvail">🌐 English version available</div>
+                    <div data-i18n="pvpDesc" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #ffcccc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
+                    </div>
+                    <div class="meta-info"><span data-i18n="lblDiff">Svårighet</span>: <span class="tag-diff diff-hard" data-i18n="diffHard">Svår</span> | <span data-i18n="lblAge">Åldersrek</span>: 10+</div>
+                </div>
+                <div class="card-sensory-warning severe" data-i18n="pvpSensory">
+                </div>
+            </div>
+
             <!-- QUIZ -->
             <div class="game-card">
                 <div>
-                    <a href="lanbit_quiz/index.html" class="nav-link" data-i18n="quizTitle">> ASSEMBLYs OFFICIELLA QUIZ</a>
+                    <a href="lanbit_quiz/index.html" class="nav-link" data-i18n="quizTitle">> STATION 24s OFFICIELLA QUIZ</a>
                     <div class="lang-tag lang-en" data-i18n="langEnAvail">🌐 English version available</div>
                     <div data-i18n="quizDesc" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
                     </div>
@@ -373,7 +439,7 @@
             <!-- HÄNGA GUBBE -->
             <div class="game-card">
                 <div>
-                    <a href="lanbit hänga gubbe/index.html" class="nav-link" data-i18n="hangmanTitle">> ASSEMBLYs HÄNGA GUBBE</a>
+                    <a href="lanbit hänga gubbe/index.html" class="nav-link" data-i18n="hangmanTitle">> STATION 24s HÄNGA GUBBE</a>
                     <div class="lang-tag lang-scan" data-i18n="langScanAvail">🇩🇰 🇳🇴 🇸🇪 Skandinavisk version tillgänglig</div>
                     <div data-i18n="hangmanDesc" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
                     </div>
@@ -386,7 +452,7 @@
             <!-- BASE DEFENSE -->
             <div class="game-card">
                 <div>
-                    <a href="The%20Boss%20-%20Base%20Defense/index3.html" class="nav-link" data-i18n="baseDefTitle">> ASSEMBLYs BASE DEFENSE</a>
+                    <a href="The%20Boss%20-%20Base%20Defense/index3.html" class="nav-link" data-i18n="baseDefTitle">> STATION 24s BASE DEFENSE</a>
                     <div class="lang-tag lang-scan" data-i18n="langScanAvail">🇩🇰 🇳🇴 🇸🇪 Skandinavisk version tillgänglig</div>
                     <div data-i18n="baseDefDesc" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
                     </div>
@@ -399,7 +465,7 @@
             <!-- BASE DEFENSE BOSS -->
             <div class="game-card high-intensity">
                 <div>
-                    <a href="The%20Boss%20-%20Base%20Defense/base_defense_boss2.html" class="nav-link" data-i18n="bossTitle">> ASSEMBLYs BASE DEFENSE BOSS</a>
+                    <a href="The%20Boss%20-%20Base%20Defense/base_defense_boss2.html" class="nav-link" data-i18n="bossTitle">> STATION 24s BASE DEFENSE BOSS</a>
                     <div data-i18n="bossDesc" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #ffcccc; margin: 8px 0 16px 0; line-height: 1.5; font-weight: normal;">
                     </div>
                     <div class="meta-info"><span data-i18n="lblDiff">Svårighet</span>: <span class="tag-diff diff-hard" data-i18n="diffHard">Svår</span> | <span data-i18n="lblAge">Åldersrek</span>: 10+</div>
@@ -411,7 +477,7 @@
             <!-- MATH MAYHEM -->
             <div class="game-card">
                 <div>
-                    <a href="lanbit_math-mayhem/index_sv.html" class="nav-link" data-i18n="mathTitle">> ASSEMBLYs MATH MAYHEM</a>
+                    <a href="lanbit_math-mayhem/index_sv.html" class="nav-link" data-i18n="mathTitle">> STATION 24s MATH MAYHEM</a>
                     <div class="lang-tag lang-en" data-i18n="langEnAvail">🌐 English version available</div>
                     <div data-i18n="mathDesc" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
                     </div>
@@ -424,7 +490,7 @@
             <!-- AIM TRAINER -->
             <div class="game-card">
                 <div>
-                    <a href="lanbit_aimtrainer/index.html" class="nav-link" data-i18n="aimTitle">> ASSEMBLYs AIM TRAINER</a>
+                    <a href="lanbit_aimtrainer/index.html" class="nav-link" data-i18n="aimTitle">> STATION 24s AIM TRAINER</a>
                     <div data-i18n="aimDesc" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 8px 0 16px 0; line-height: 1.5; font-weight: normal;">
                     </div>
                     <div class="meta-info"><span data-i18n="lblDiff">Svårighet</span>: <span class="tag-diff diff-medium" data-i18n="diffMedium">Medium</span> | <span data-i18n="lblAge">Åldersrek</span>: 7+</div>
@@ -436,7 +502,7 @@
             <!-- CYBER-SANITIZER -->
             <div class="game-card">
                 <div>
-                    <a href="lanbit_antivirus/index2.html" class="nav-link" data-i18n="cyberTitle">> ASSEMBLYs CYBER-SANITIZER</a>
+                    <a href="lanbit_antivirus/index2.html" class="nav-link" data-i18n="cyberTitle">> STATION 24s CYBER-SANITIZER</a>
                     <div data-i18n="cyberDesc" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 8px 0 16px 0; line-height: 1.5; font-weight: normal;">
                     </div>
                     <div class="meta-info"><span data-i18n="lblDiff">Svårighet</span>: <span class="tag-diff diff-easy" data-i18n="diffEasy">Lätt</span> | <span data-i18n="lblAge">Åldersrek</span>: 7+</div>
@@ -448,7 +514,7 @@
             <!-- REAKTIONSSPEL -->
             <div class="game-card">
                 <div>
-                    <a href="lanbit_reaktionsspel/index2.html" class="nav-link" data-i18n="reactionTitle">> ASSEMBLYs REAKTIONSSPEL</a>
+                    <a href="lanbit_reaktionsspel/index2.html" class="nav-link" data-i18n="reactionTitle">> STATION 24s REAKTIONSSPEL</a>
                     <div class="lang-tag lang-scan" data-i18n="langScanAvail">🇩🇰 🇳🇴 🇸🇪 Skandinavisk version tillgänglig</div>
                     <div data-i18n="reactionDesc" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
                     </div>
@@ -461,7 +527,7 @@
             <!-- KEYBOARD WARRIOR -->
             <div class="game-card">
                 <div>
-                    <a href="keyboard warrior/index_II.html" class="nav-link" data-i18n="kwTitle">> ASSEMBLYs KEYBOARD WARRIOR</a>
+                    <a href="keyboard warrior/index_II.html" class="nav-link" data-i18n="kwTitle">> STATION 24s KEYBOARD WARRIOR</a>
                     <div data-i18n="kwDesc" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 8px 0 16px 0; line-height: 1.5; font-weight: normal;">
                     </div>
                     <div class="meta-info"><span data-i18n="lblDiff">Svårighet</span>: <span class="tag-diff diff-hard" data-i18n="diffHard">Svår</span> | <span data-i18n="lblAge">Åldersrek</span>: 10+</div>
@@ -473,7 +539,7 @@
             <!-- MEMORY -->
             <div class="game-card">
                 <div>
-                    <a href="lanbit_memory/index.html" class="nav-link" data-i18n="memoryTitle">> ASSEMBLYs MEMORY</a>
+                    <a href="lanbit_memory/index.html" class="nav-link" data-i18n="memoryTitle">> STATION 24s MEMORY</a>
                     <div class="lang-tag lang-en" data-i18n="langEnAvail">🌐 English version available</div>
                     <div data-i18n="memoryDesc" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 5px 0 16px 0; line-height: 1.5; font-weight: normal;">
                     </div>
@@ -486,7 +552,7 @@
             <!-- SPAM-KLICKER -->
             <div class="game-card">
                 <div>
-                    <a href="lanbit_spamklicker/index.html" class="nav-link" data-i18n="spamTitle">> ASSEMBLYs SPAM-KLICKER</a>
+                    <a href="lanbit_spamklicker/index.html" class="nav-link" data-i18n="spamTitle">> STATION 24s SPAM-KLICKER</a>
                     <div data-i18n="spamDesc" style="font-family: 'Montserrat', sans-serif; font-size: 0.95rem; color: #e0dcdc; margin: 8px 0 16px 0; line-height: 1.5; font-weight: normal;">
                     </div>
                     <div class="meta-info"><span data-i18n="lblDiff">Svårighet</span>: <span class="tag-diff diff-medium" data-i18n="diffMedium">Medium</span> | <span data-i18n="lblAge">Åldersrek</span>: 10+</div>
@@ -502,7 +568,7 @@
         </div>
 
         <div class="footer">
-            SYSTEM STATUS: ONLINE | OPERATOR: PSL631 | VENUE: MESSUKESKUS HALL 6<br>
+            SYSTEM STATUS: ONLINE | OPERATOR: PSL631 | VENUE: STATION 24 HQ<br>
             <a href="https://docs.google.com/document/d/1BbmSSWbVqmaiJwH5_fYP_SVQXu5zeGI94bjoaPfJ_jo/edit?usp=sharing" target="_blank" data-i18n="tourneyInfo">Turneringsinformation</a>
         </div>
     </div> 
@@ -510,14 +576,21 @@
     <script>
         const translations = {
             sv: {
-                docTitle: "Assemblys webbspels-hubb! // THE BOSS HQ",
-                mainTitle: "Assemblys webbspels-hubb!",
-                hubSubtitle: "Välkommen till Assemblys officiella arkadkommandocentral på Messukeskus 2026! Här har vi samlat våra specialutvecklade festivalspel, designade för att sätta dina reflexer, din hårdvarukunskap, din logik och dina snabbskrivningsfingrar på ultimat prov. Välj en modul nedan, dominera highscore-listan och visa mässgolvet vad du går för!",
-                qwertyBadge: "OFFICIELLT FESTIVALSPEL",
+                docTitle: "Station 24s webbspels-hubb! // THE BOSS HQ",
+                mainTitle: "Station 24s webbspels-hubb!",
+                hubSubtitle: "Välkommen till Station 24s officiella arkadkommandocentral! Här har vi samlat våra specialutvecklade spel, designade för att sätta dina reflexer, din hårdvarukunskap, din logik och dina snabbskrivningsfingrar på ultimat prov. Välj en modul nedan, dominera highscore-listan och visa vad du går för!",
+                qwertyBadge: "OFFICIELLT SPEL",
                 langEnAvail: "🌐 English version available",
                 langScanAvail: "🇩🇰 🇳🇴 🇸🇪 Skandinavisk version tillgänglig",
-                qwertyDesc: "Det här är <b>festivalens officiella webbspel</b> där man kan vinna fina priser om man lyckas hålla maskoten QWERTY vid liv till minst ett visst antal poäng! Skydda QWERTY från elaka virus- och fiendeattacker genom att skjuta på fienderna som invaderar QWERTY!",
-                visitAssembly: "🔗 Besök festivalens hemsida (assembly.org)",
+                langSvOnly: "🇸🇪 Endast på svenska",
+                megaTitle: "> STATION 24s MEGA ARCADE",
+                megaDesc: "Den ultimata samlingen av retroarkadspel och minispel i ett och samma paket! (Obs: Finns endast på svenska).",
+                megaSensory: "<b>Sensorisk profil:</b> Varierande retroeffekter beroende på arkadläge. Låg till måttlig visuell intensitet.",
+                pvpTitle: "> STATION 24s PVP ARENA",
+                pvpDesc: "Utmana dina motståndare i realtidsdueller! Blixtsnabb action där reaktionsförmåga och precision avgör vem som tar hem segern.",
+                pvpSensory: "<b>🚨 SENSORISK RISK:</b> Snabba kamerarörelser, intensiva projektileffekter och blinkande träffindikatorer.",
+                qwertyDesc: "Det här är <b>Station 24s officiella webbspel</b> där man kan vinna fina priser om man lyckas hålla maskoten QWERTY vid liv till minst ett visst antal poäng! Skydda QWERTY från elaka virus- och fiendeattacker genom att skjuta på fienderna som invaderar QWERTY!",
+                visitStation: "🔗 Besök Station 24",
                 lblDiff: "Svårighet",
                 lblAge: "Åldersrek",
                 lblPrize: "Prischans",
@@ -528,52 +601,140 @@
                 diffHard: "Svår",
                 diffExtreme: "EXTREM (3D)",
                 qwertySensory: "<b>🚨 SENSORISK RISK:</b> Fullt stroboskop-inferno, skakande 3D-kamera, intensiva <b>laserstrålar</b> samt dämpade effekter vid giftdimma. Använd [S] på tangentbordet för nödstopp!",
-                quizTitle: "> ASSEMBLYs OFFICIELLA QUIZ",
-                quizDesc: "Svara på kluriga frågor och testa dina IT- och gaming-kunskaper i Assemblys egna quiz!",
+                derbyTitle: "> DERBY DASH",
+                derbyDesc: "Ett fartfyllt retro-derby och racingspel! Tävla mot klockan och motståndarna, navigera genom kurvorna och ta hem segern i högsta fart.",
+                derbySensory: "<b>Sensorisk profil:</b> Snabba rörelser och hastighetsillusioner. Inga skarpa blixtar.",
+                triviaTitle: "> TRIVIA QUIZ",
+                triviaDesc: "Testa dina allmänbildnings- och popkulturkunskaper i Station 24s stora frågesport! Svara rätt under tidspress.",
+                triviaSensory: "<b>Sensorisk profil:</b> Textbaserat gränssnitt med mjuka övergångar och diskreta ljudnotiser.",
+                shooterTitle: "> RETRO SHOOTER",
+                shooterDesc: "Klassisk arkad-shoot 'em up i sann 80-talsanda! Förgör inkommande vågor av fiendeskepp och undvik projektiler.",
+                shooterSensory: "<b>🚨 SENSORISK RISK:</b> Innehåller snabba partikeleffekter, frekvent projektileld och blinkande explosioner.",
+                quizTitle: "> STATION 24s OFFICIELLA QUIZ",
+                quizDesc: "Svara på kluriga frågor och testa dina IT- och gaming-kunskaper i Station 24s egna quiz!",
                 quizSensory: "<b>Sensorisk profil:</b> Texttungt. Inga rörliga ljus, men innehåller skarpa ljudeffekter med ett ljust \"pling\" vid rätt svar och ett högt \"BZZZZT\"-ljud vid fel.",
-                hangmanTitle: "> ASSEMBLYs HÄNGA GUBBE",
-                hangmanDesc: "Det klassiska ordspelet i officiell festival-tappning. Gissa rätt bokstäver innan du blir hängd!",
+                hangmanTitle: "> STATION 24s HÄNGA GUBBE",
+                hangmanDesc: "Det klassiska ordspelet i officiell tappning. Gissa rätt bokstäver innan du blir hängd!",
                 hangmanSensory: "<b>Sensorisk profil:</b> Statiskt UI. Låg visual och auditorisk stress.",
-                baseDefTitle: "> ASSEMBLYs BASE DEFENSE",
-                baseDefDesc: "Försvara Assembly-basen mot vågor av fientliga rymdskepp med ditt officiella försvarstorn!",
+                baseDefTitle: "> STATION 24s BASE DEFENSE",
+                baseDefDesc: "Försvara basen mot vågor av fientliga rymdskepp med ditt officiella försvarstorn!",
                 baseDefSensory: "<b>Sensorisk profil:</b> Innehåller snabba stroboskopeffekter, blinkande ljusblixtar och retropartiklar vid explosioner samt linjära spårskott.",
-                bossTitle: "> ASSEMBLYs BASE DEFENSE BOSS",
-                bossDesc: "Slutstriden i Assembly-basen! Ta dig an den gigantiska moderskepps-bossen i en intensiv uppgörelse.",
+                bossTitle: "> STATION 24s BASE DEFENSE BOSS",
+                bossDesc: "Slutstriden! Ta dig an den gigantiska moderskepps-bossen i en intensiv uppgörelse.",
                 bossSensory: "<b>🚨 SENSORISK RISK:</b> Innehåller kraftfulla stroboskopeffekter, intensiva <b>lasereffekter</b>, blinkande bosssköldar och ihållande ljusblixtar vid träff.",
-                mathTitle: "> ASSEMBLYs MATH MAYHEM",
-                mathDesc: "Officiell huvudräkning under extrem tidspress! Lös mattetalen innan varningsklockan slår noll. Men se upp för plötsliga alarm som ska snoozas!",
+                mathTitle: "> STATION 24s MATH MAYHEM",
+                mathDesc: "Huvudräkning under extrem tidspress! Lös mattetalen innan varningsklockan slår noll. Se upp för plötsliga alarm som ska snoozas!",
                 mathSensory: "<b>Sensorisk profil:</b> Hög tidspress med pulserande varningsklockor.",
-                aimTitle: "> ASSEMBLYs AIM TRAINER",
-                aimDesc: "Pricka målen så snabbt du kan. Assemblys officiella uppvärmning för FPS- och e-sportproffs!",
+                aimTitle: "> STATION 24s AIM TRAINER",
+                aimDesc: "Pricka målen så snabbt du kan. Den officiella uppvärmningen för FPS- och e-sportproffs!",
                 aimSensory: "<b>Sensorisk profil:</b> Snabba målvandringar och rörliga mikromönster.",
-                cyberTitle: "> ASSEMBLYs CYBER-SANITIZER",
-                cyberDesc: "Fånga snälla filer och rensa bort virus i ett flytande, snabbt samlarspel signerat Assembly.",
+                cyberTitle: "> STATION 24s CYBER-SANITIZER",
+                cyberDesc: "Fånga snälla filer och rensa bort virus i ett flytande, snabbt samlarspel signerat Station 24.",
                 cyberSensory: "<b>Sensorisk profil:</b> Glidande rörelsemönster med mjuka färgövergångar.",
-                reactionTitle: "> ASSEMBLYs REAKTIONSSPEL",
+                reactionTitle: "> STATION 24s REAKTIONSSPEL",
                 reactionDesc: "Håll musen redo! Officiellt reflextest där du klickar så fort skärmen växlar färg.",
                 reactionSensory: "<b>Sensorisk profil:</b> Plötsliga, skarpa färgskiften (ex. rött till grönt) över hela skärmytan.",
-                kwTitle: "> ASSEMBLYs KEYBOARD WARRIOR",
-                kwDesc: "Skriv eller dö! Hammer-knappa in Assembly-orden på tangentbordet innan de faller i botten.",
+                kwTitle: "> STATION 24s KEYBOARD WARRIOR",
+                kwDesc: "Skriv eller dö! Hammer-knappa in orden på tangentbordet innan de faller i botten.",
                 kwSensory: "<b>Sensorisk profil:</b> Mycket hög fysisk klickfrekvens, text som rör sig snabbt nedåt.",
-                memoryTitle: "> ASSEMBLYs MEMORY",
-                memoryDesc: "Hitta matchande festival-par och testa ditt fotografiska minne i lugn och ro.",
+                memoryTitle: "> STATION 24s MEMORY",
+                memoryDesc: "Hitta matchande par och testa ditt fotografiska minne i lugn och ro.",
                 memorySensory: "<b>Sensorisk profil:</b> Lugnt gränssnitt med repeterande bildmönster.",
-                spamTitle: "> ASSEMBLYs SPAM-KLICKER",
-                spamDesc: "Ren klick-hastighet! Hur många gånger hinner du spamma Assembly-knappen innan tiden tar slut?",
+                spamTitle: "> STATION 24s SPAM-KLICKER",
+                spamDesc: "Ren klick-hastighet! Hur många gånger hinner du spamma knappen innan tiden tar slut?",
                 spamSensory: "<b>Sensorisk profil:</b> Snabba talförändringar och repetitiva, mekaniska klickljud.",
                 overallWarnTitle: "⚠️ OVERALL SENSORISK VARNING & INFORMATION",
-                overallWarnText: "Vissa av webbläsarspelen i denna terminal (särskilt Qwerty Defense och Base Defense Boss) innehåller snabba 3D-rörelser, intensiva ljusfrekvenser, lasereffekter och stroboskopeffekter. Om du upplever obehag, visuell stress eller sensorisk överbelastning, tryck på [S] på tangentbordet för akut nödstopp, eller kontakta Assembly Crew i montern för assistans.",
+                overallWarnText: "Vissa av webbläsarspelen i denna terminal (särskilt Qwerty Defense, Retro Shooter och Base Defense Boss) innehåller snabba 3D-rörelser, intensiva ljusfrekvenser, lasereffekter och stroboskopeffekter. Om du upplever obehag, visuell stress eller sensorisk överbelastning, tryck på [S] på tangentbordet för akut nödstopp, eller kontakta crew för assistans.",
                 tourneyInfo: "Turneringsinformation"
             },
+            no: {
+                docTitle: "Station 24s nettspill-hub! // THE BOSS HQ",
+                mainTitle: "Station 24s nettspill-hub!",
+                hubSubtitle: "Velkommen til Station 24s offisielle arkade-kommandosentral! Her har vi samlet våre spesialutviklede spill, designet for å sette refleksene dine, maskinvarekunnskapen, logikken og hurtigskrivingsfingrene dine på den ultimate prøven. Velg en modul nedenfor, dominer topplisten og vis hva du er god for!",
+                qwertyBadge: "OFFISIELT SPILL",
+                langEnAvail: "🌐 English version available",
+                langScanAvail: "🇩🇰 🇳🇴 🇸🇪 Skandinavisk versjon tilgjengelig",
+                langSvOnly: "🇸🇪 Kun på svensk",
+                megaTitle: "> STATION 24s MEGA ARCADE",
+                megaDesc: "Den ultimate samlingen av retro-arkadespill og minispill i én og samme pakke! (Merk: Kun tilgjengelig på svensk).",
+                megaSensory: "<b>Sensorisk profil:</b> Varierende retroeffekter avhengig av spillmodus. Lav til moderat visuell intensitet.",
+                pvpTitle: "> STATION 24s PVP ARENA",
+                pvpDesc: "Utfordre dine motstandere i sanntidsdueller! Lynrask action hvor reaksjonsevne og presisjon avgjør hvem som vinner.",
+                pvpSensory: "<b>🚨 SENSORISK RISIKO:</b> Raske kamerabevegelser, intense prosjektileffekter og blinkende treffindikatorer.",
+                qwertyDesc: "Dette er <b>Station 24s offisielle nettspill</b> hvor man kan vinne flotte premier hvis man klarer å holde maskoten QWERTY i live opp til en bestemt poengsum! Beskytt QWERTY mot ondsinnede virus og fiendtlige angrep ved å skyte ned inntrengerne!",
+                visitStation: "🔗 Besøk Station 24",
+                lblDiff: "Vanskelighetsgrad",
+                lblAge: "Aldersanbefaling",
+                lblPrize: "Premiesjanse",
+                canAdjust: "kan justeres",
+                yesUpper: "JA! 🎁",
+                diffEasy: "Lett",
+                diffMedium: "Middels",
+                diffHard: "Vanskelig",
+                diffExtreme: "EKSTREM (3D)",
+                qwertySensory: "<b>🚨 SENSORISK RISIKO:</b> Fullt stroboskop-inferno, ristende 3D-kamera, intense <b>laserstråler</b> samt dempede effekter ved gifttåke. Trykk [S] på tastaturet for nødstopp!",
+                derbyTitle: "> DERBY DASH",
+                derbyDesc: "Et fartsfylt retro-derby og racingspill! Konkurrer mot klokken og motstanderne, manøvrer gjennom svingene og stikk av med seieren i toppfart.",
+                derbySensory: "<b>Sensorisk profil:</b> Raske bevegelser og fartsillusjoner. Ingen skarpe lysglimt.",
+                triviaTitle: "> TRIVIA QUIZ",
+                triviaDesc: "Test allmennkunnskapen og popkulturkunnskapene dine i Station 24s store spørrekonkurranse! Svar riktig under tidspress.",
+                triviaSensory: "<b>Sensorisk profil:</b> Tekstbasert grensesnitt med myke overganger og diskrete lydvarsler.",
+                shooterTitle: "> RETRO SHOOTER",
+                shooterDesc: "Klassisk arkade-shoot 'em up i ekte 80-tallsånd! Utslett bølger av fiendtlige romskip og unngå prosjektiler.",
+                shooterSensory: "<b>🚨 SENSORISK RISIKO:</b> Inneholder raske partikkeleffekter, hyppig prosjektilild og blinkende eksplosjoner.",
+                quizTitle: "> STATION 24s OFFISIELLE QUIZ",
+                quizDesc: "Svar på lure spørsmål og test dine IT- og gaming-kunnskaper i Station 24s egen quiz!",
+                quizSensory: "<b>Sensorisk profil:</b> Mye tekst. Ingen bevegelige lys, men inneholder skarpe lydeffekter med et lyst \"pling\" ved riktig svar og en høy \"BZZZZT\"-lyd ved feil.",
+                hangmanTitle: "> STATION 24s HANGMAN",
+                hangmanDesc: "Det klassiske ordspillet i offisiell drakt. Gjett riktige bokstaver før du blir hengt!",
+                hangmanSensory: "<b>Sensorisk profil:</b> Statisk brukergrensesnitt. Lav visuell og auditiv belastning.",
+                baseDefTitle: "> STATION 24s BASE DEFENSE",
+                baseDefDesc: "Forsvar basen mot bølger av fiendtlige romskip med ditt offisielle forsvarstårn!",
+                baseDefSensory: "<b>Sensorisk profil:</b> Inneholder raske stroboskopeffekter, lysglimt og retropartikler ved eksplosjoner samt sporlys.",
+                bossTitle: "> STATION 24s BASE DEFENSE BOSS",
+                bossDesc: "Sluttkampen! Ta opp kampen mot det gigantiske moderskipet i et intenst oppgjør.",
+                bossSensory: "<b>🚨 SENSORISK RISIKO:</b> Inneholder kraftige stroboskopeffekter, intense <b>lasereffekter</b>, blinkende bosskjold og vedvarende lysglimt ved treff.",
+                mathTitle: "> STATION 24s MATH MAYHEM",
+                mathDesc: "Hovedregning under ekstremt tidspress! Løs mattestykkene før alarmklokken slår null. Pass opp for plutselige alarmer som må pauses!",
+                mathSensory: "<b>Sensorisk profil:</b> Høyt tidspress med pulserende varselklokker.",
+                aimTitle: "> STATION 24s AIM TRAINER",
+                aimDesc: "Treff målene så raskt du kan. Den offisielle oppvarmingen for FPS- og e-sportutøvere!",
+                aimSensory: "<b>Sensorisk profil:</b> Raske målbevegelser og mikromønstre.",
+                cyberTitle: "> STATION 24s CYBER-SANITIZER",
+                cyberDesc: "Fang trygge filer og rens vekk virus i et smidig, raskt samlespill signert Station 24.",
+                cyberSensory: "<b>Sensorisk profil:</b> Glidende bevegelsesmønstre med myke fargeoverganger.",
+                reactionTitle: "> STATION 24s REAKSJONSSPILL",
+                reactionDesc: "Hold musen klar! Offisiell reflekstest hvor du klikker så fort skjermen skifter farge.",
+                reactionSensory: "<b>Sensorisk profil:</b> Plutselige, skarpe fargeskifter (f.eks. rødt til grønt) over hele skjermen.",
+                kwTitle: "> STATION 24s KEYBOARD WARRIOR",
+                kwDesc: "Skriv eller tap! Hamre inn ordene på tastaturet før de treffer bunnen.",
+                kwSensory: "<b>Sensorisk profil:</b> Svært høy fysisk klikkefrekvens, tekst som faller raskt nedover.",
+                memoryTitle: "> STATION 24s MEMORY",
+                memoryDesc: "Finn matchende par og test ditt fotografiske minne i fred og ro.",
+                memorySensory: "<b>Sensorisk profil:</b> Rolig grensesnitt med repeterende bildemønstre.",
+                spamTitle: "> STATION 24s SPAM-KLIKKER",
+                spamDesc: "Ren klikkehastighet! Hvor mange ganger rekker du å spamme knappen før tiden er ute?",
+                spamSensory: "<b>Sensorisk profil:</b> Raske tallendringer og repetitive, mekaniske klikkelyder.",
+                overallWarnTitle: "⚠️ GENERELL SENSORISK ADVARSEL & INFORMASJON",
+                overallWarnText: "Enkelte av nettleserspillene i denne terminalen (spesielt Qwerty Defense, Retro Shooter og Base Defense Boss) inneholder raske 3D-bevegelser, intense lysfrekvenser, lasereffekter og stroboskopeffekter. Hvis du opplever ubehag, visuelt stress eller sensorisk overbelastning, trykk på [S] på tastaturet for øyeblikkelig nødstopp, eller kontakt crew for assistanse.",
+                tourneyInfo: "Turneringsinformasjon"
+            },
             en: {
-                docTitle: "Assembly Web Games Hub! // THE BOSS HQ",
-                mainTitle: "Assembly Web Games Hub!",
-                hubSubtitle: "Welcome to Assembly's official arcade command center at Messukeskus 2026! Here we have gathered our custom festival games, designed to put your reflexes, hardware knowledge, logic, and speed-typing fingers to the ultimate test. Select a module below, dominate the high score leaderboard, and show the expo floor what you've got!",
-                qwertyBadge: "OFFICIAL FESTIVAL GAME",
+                docTitle: "Station 24 Web Games Hub! // THE BOSS HQ",
+                mainTitle: "Station 24 Web Games Hub!",
+                hubSubtitle: "Welcome to Station 24's official arcade command center! Here we have gathered our custom games, designed to put your reflexes, hardware knowledge, logic, and speed-typing fingers to the ultimate test. Select a module below, dominate the high score leaderboard, and show what you've got!",
+                qwertyBadge: "OFFICIAL GAME",
                 langEnAvail: "🌐 English version available",
                 langScanAvail: "🇩🇰 🇳🇴 🇸🇪 Scandinavian version available",
-                qwertyDesc: "This is the <b>official festival game</b> where you can win great prizes if you manage to keep the mascot QWERTY alive to reach a target score! Protect QWERTY from malicious virus and enemy attacks by shooting down invaders!",
-                visitAssembly: "🔗 Visit festival website (assembly.org)",
+                langSvOnly: "🇸🇪 Swedish only",
+                megaTitle: "> STATION 24'S MEGA ARCADE",
+                megaDesc: "The ultimate collection of retro arcade games and mini-games in a single package! (Note: Available in Swedish only).",
+                megaSensory: "<b>Sensory Profile:</b> Varied retro effects depending on arcade mode. Low to moderate visual intensity.",
+                pvpTitle: "> STATION 24'S PVP ARENA",
+                pvpDesc: "Challenge your rivals in real-time duels! Lightning-fast action where split-second reaction times and precision decide the victor.",
+                pvpSensory: "<b>🚨 SENSORY WARNING:</b> Fast camera movements, intense projectile effects, and flashing impact indicators.",
+                qwertyDesc: "This is <b>Station 24's official web game</b> where you can win great prizes if you manage to keep the mascot QWERTY alive to reach a target score! Protect QWERTY from malicious virus and enemy attacks by shooting down invaders!",
+                visitStation: "🔗 Visit Station 24",
                 lblDiff: "Difficulty",
                 lblAge: "Age Rec",
                 lblPrize: "Prizes",
@@ -584,52 +745,68 @@
                 diffHard: "Hard",
                 diffExtreme: "EXTREME (3D)",
                 qwertySensory: "<b>🚨 SENSORY WARNING:</b> Full strobe inferno, shaking 3D camera, intense <b>laser beams</b>, and poison fog effects. Press [S] on your keyboard for emergency stop!",
-                quizTitle: "> ASSEMBLY'S OFFICIAL QUIZ",
-                quizDesc: "Answer tricky questions and test your IT and gaming knowledge in Assembly's official quiz!",
+                derbyTitle: "> DERBY DASH",
+                derbyDesc: "A high-octane retro derby and racing game! Race against the clock and rivals, drift around tight corners, and claim victory at full throttle.",
+                derbySensory: "<b>Sensory Profile:</b> Fast motion and speed illusions. No harsh strobe flashes.",
+                triviaTitle: "> TRIVIA QUIZ",
+                triviaDesc: "Test your general knowledge and pop culture prowess in Station 24's ultimate quiz! Answer correctly under time pressure.",
+                triviaSensory: "<b>Sensory Profile:</b> Text-based UI with gentle transitions and discrete sound cues.",
+                shooterTitle: "> RETRO SHOOTER",
+                shooterDesc: "Classic arcade shoot 'em up in pure 80s style! Annihilate waves of enemy spaceships and dodge bullets.",
+                shooterSensory: "<b>🚨 SENSORY WARNING:</b> Contains fast particle effects, frequent projectile fire, and flashing explosions.",
+                quizTitle: "> STATION 24'S OFFICIAL QUIZ",
+                quizDesc: "Answer tricky questions and test your IT and gaming knowledge in Station 24's official quiz!",
                 quizSensory: "<b>Sensory Profile:</b> Text-heavy. No moving lights, but features sharp sound effects with a bright 'ding' for correct answers and a loud 'BZZZZT' for errors.",
-                hangmanTitle: "> ASSEMBLY'S HANGMAN",
-                hangmanDesc: "The classic word game in official festival style. Guess the correct letters before you're hanged!",
+                hangmanTitle: "> STATION 24'S HANGMAN",
+                hangmanDesc: "The classic word game in official style. Guess the correct letters before you're hanged!",
                 hangmanSensory: "<b>Sensory Profile:</b> Static UI. Low visual and auditory stress.",
-                baseDefTitle: "> ASSEMBLY'S BASE DEFENSE",
-                baseDefDesc: "Defend the Assembly base against waves of hostile starships with your official defense turret!",
+                baseDefTitle: "> STATION 24'S BASE DEFENSE",
+                baseDefDesc: "Defend the base against waves of hostile starships with your official defense turret!",
                 baseDefSensory: "<b>Sensory Profile:</b> Features fast strobe effects, flashing muzzle flashes, retro particle explosions, and tracer fire.",
-                bossTitle: "> ASSEMBLY'S BASE DEFENSE BOSS",
-                bossDesc: "The final battle at the Assembly base! Take on the gigantic mothership boss in an intense showdown.",
+                bossTitle: "> STATION 24'S BASE DEFENSE BOSS",
+                bossDesc: "The final battle! Take on the gigantic mothership boss in an intense showdown.",
                 bossSensory: "<b>🚨 SENSORY WARNING:</b> Contains powerful strobe effects, intense <b>laser visuals</b>, flashing boss shields, and persistent impact flashes.",
-                mathTitle: "> ASSEMBLY'S MATH MAYHEM",
-                mathDesc: "Official mental math under extreme time pressure! Solve equations before the alarm reaches zero. Watch out for sudden alarms to snooze!",
+                mathTitle: "> STATION 24'S MATH MAYHEM",
+                mathDesc: "Mental math under extreme time pressure! Solve equations before the alarm reaches zero. Watch out for sudden alarms to snooze!",
                 mathSensory: "<b>Sensory Profile:</b> High time pressure with pulsing warning alarms.",
-                aimTitle: "> ASSEMBLY'S AIM TRAINER",
-                aimDesc: "Hit the targets as fast as you can. Assembly's official warm-up for FPS and esports pros!",
+                aimTitle: "> STATION 24'S AIM TRAINER",
+                aimDesc: "Hit the targets as fast as you can. Station 24's official warm-up for FPS and esports pros!",
                 aimSensory: "<b>Sensory Profile:</b> Fast target motion and moving micro-patterns.",
-                cyberTitle: "> ASSEMBLY'S CYBER-SANITIZER",
-                cyberDesc: "Catch clean files and purge viruses in a smooth, fast collection game created by Assembly.",
+                cyberTitle: "> STATION 24'S CYBER-SANITIZER",
+                cyberDesc: "Catch clean files and purge viruses in a smooth, fast collection game created by Station 24.",
                 cyberSensory: "<b>Sensory Profile:</b> Smooth movement patterns with soft color transitions.",
-                reactionTitle: "> ASSEMBLY'S REACTION GAME",
+                reactionTitle: "> STATION 24'S REACTION GAME",
                 reactionDesc: "Keep your mouse ready! Official reflex test where you click as soon as the screen changes color.",
                 reactionSensory: "<b>Sensory Profile:</b> Sudden, sharp color shifts (e.g. red to green) across the entire screen.",
-                kwTitle: "> ASSEMBLY'S KEYBOARD WARRIOR",
-                kwDesc: "Type or die! Hammer out Assembly words on your keyboard before they hit the bottom.",
+                kwTitle: "> STATION 24'S KEYBOARD WARRIOR",
+                kwDesc: "Type or die! Hammer out words on your keyboard before they hit the bottom.",
                 kwSensory: "<b>Sensory Profile:</b> Very high physical clicking frequency, fast downward scrolling text.",
-                memoryTitle: "> ASSEMBLY'S MEMORY",
-                memoryDesc: "Match festival pairs and test your photographic memory at your own pace.",
+                memoryTitle: "> STATION 24'S MEMORY",
+                memoryDesc: "Match pairs and test your photographic memory at your own pace.",
                 memorySensory: "<b>Sensory Profile:</b> Calm interface with repeating image patterns.",
-                spamTitle: "> ASSEMBLY'S SPAM CLICKER",
-                spamDesc: "Pure clicking speed! How many times can you spam the Assembly button before time runs out?",
+                spamTitle: "> STATION 24'S SPAM CLICKER",
+                spamDesc: "Pure clicking speed! How many times can you spam the button before time runs out?",
                 spamSensory: "<b>Sensory Profile:</b> Fast digit changes and repetitive mechanical click sounds.",
                 overallWarnTitle: "⚠️ OVERALL SENSORY WARNING & INFORMATION",
-                overallWarnText: "Some browser games in this terminal (especially Qwerty Defense and Base Defense Boss) contain fast 3D movements, intense light frequencies, laser effects, and strobe lighting. If you experience discomfort, visual strain, or sensory overload, press [S] on your keyboard for emergency stop, or contact Assembly Crew at the booth for assistance.",
+                overallWarnText: "Some browser games in this terminal (especially Qwerty Defense, Retro Shooter, and Base Defense Boss) contain fast 3D movements, intense light frequencies, laser effects, and strobe lighting. If you experience discomfort, visual strain, or sensory overload, press [S] on your keyboard for emergency stop, or contact crew for assistance.",
                 tourneyInfo: "Tournament Information"
             },
             fi: {
-                docTitle: "Assembly verkkopelikeskus! // THE BOSS HQ",
-                mainTitle: "Assemblyn verkkopelikeskus!",
-                hubSubtitle: "Tervetuloa Assemblyn viralliseen arkadikomentokeskukseen Messukeskuksessa 2026! Tänne olemme koonneet erikoiskehitetyt festivaalipelimme, jotka laittavat reaktiosi, laitteistotietoutesi, logiikkasi ja kirjoitusnopeutesi äärimmäiseen testiin. Valitse moduuli alta, hallitse hi-score-listaa ja näytä messulattialle taitosi!",
-                qwertyBadge: "VIRALLINEN FESTIVAALIPELI",
+                docTitle: "Station 24 verkkopelikeskus! // THE BOSS HQ",
+                mainTitle: "Station 24n verkkopelikeskus!",
+                hubSubtitle: "Tervetuloa Station 24n viralliseen arkadikomentokeskukseen! Tänne olemme koonneet erikoiskehitetyt pelimme, jotka laittavat reaktiosi, laitteistotietoutesi, logiikkasi ja kirjoitusnopeutesi äärimmäiseen testiin. Valitse moduuli alta, hallitse hi-score-listaa ja näytä taitosi!",
+                qwertyBadge: "VIRALLINEN PELI",
                 langEnAvail: "🌐 Englanninkielinen versio saatavilla",
                 langScanAvail: "🇩🇰 🇳🇴 🇸🇪 Skandinaavinen versio saatavilla",
-                qwertyDesc: "Tämä on <b>festivaalin virallinen verkkopeli</b>, jossa voit voittaa hienoja palkintoja pitämällä QWERTY-maskotin hengissä tiettyyn pistemäärään asti! Suojele QWERTYä viruksilta ja vihollishyökkäyksiltä ampumalla tunkeutujat!",
-                visitAssembly: "🔗 Vieraile festivaalin kotisivuilla (assembly.org)",
+                langSvOnly: "🇸🇪 Vain ruotsiksi",
+                megaTitle: "> STATION 24n MEGA ARCADE",
+                megaDesc: "Kattava kokoelma retroarkadia ja minipelejä yhdessä paketissa! (Huom: Saatavilla vain ruotsiksi).",
+                megaSensory: "<b>Aistiprofiili:</b> Vaihtelevia retroefektejä pelitilan mukaan. Matala tai kohtuullinen visuaalinen kuormitus.",
+                pvpTitle: "> STATION 24n PVP ARENA",
+                pvpDesc: "Haasta vastustajasi reaaliaikaisiin kaksintaisteluihin! Salamannopeaa toimintaa, jossa reaktionopeus ja tarkkuus ratkaisevat voittajan.",
+                pvpSensory: "<b>🚨 AISTIVAROITUS:</b> Nopeita kameranliikkeitä, voimakkaita ammusefektejä ja vilkkuvia osumailmaisimia.",
+                qwertyDesc: "Tämä on <b>Station 24n virallinen verkkopeli</b>, jossa voit voittaa hienoja palkintoja pitämällä QWERTY-maskotin hengissä tiettyyn pistemäärään asti! Suojele QWERTYä viruksilta ja vihollishyökkäyksiltä ampumalla tunkeutujat!",
+                visitStation: "🔗 Vieraile Station 24 -sivustolla",
                 lblDiff: "Vaikeustaso",
                 lblAge: "Ikäsuositus",
                 lblPrize: "Palkinnot",
@@ -640,47 +817,57 @@
                 diffHard: "Vaikea",
                 diffExtreme: "ÄÄRIMMÄINEN (3D)",
                 qwertySensory: "<b>🚨 AISTIVAROITUS:</b> Täysi vilkkuvalo-inferno, tärisevä 3D-kamera, voimakkaat <b>lasersäteet</b> sekä myrkkysumuefektit. Paina näppäimistön [S]-näppäintä hätäpysäytykseen!",
-                quizTitle: "> ASSEMBLYn VIRALLINEN TIETOKILPAILU",
-                quizDesc: "Vastaa kiperiin kysymyksiin ja testaa IT- sekä peli tietämyksesi Assemblyn omassa tietokilpailussa!",
+                derbyTitle: "> DERBY DASH",
+                derbyDesc: "Vauhdikas retro-derby ja ajopeli! Kisaa kelloa ja kilpailijoita vastaan ja aja voittoon täydellä vauhdilla.",
+                derbySensory: "<b>Aistiprofiili:</b> Nopeaa liikettä ja nopeusilluusioita. Ei voimakkaita valovälähdyksiä.",
+                triviaTitle: "> TRIVIA QUIZ",
+                triviaDesc: "Testaa yleistietosi ja popkulttuuritietämyksesi Station 24n suuressa visailussa aikapaineen alla!",
+                triviaSensory: "<b>Aistiprofiili:</b> Tekstipohjainen käyttöliittymä pehmeillä siirtymillä ja hillityillä äänimerkeillä.",
+                shooterTitle: "> RETRO SHOOTER",
+                shooterDesc: "Klassinen 80-luvun tyylinen arkaderäiskintä! Tuhoa vihollisalusten aallot ja väistele ammuksia.",
+                shooterSensory: "<b>🚨 AISTIVAROITUS:</b> Sisältää nopeita partikkeliefektejä, jatkuvaa ammustulitusta ja vilkkuvia räjähdyksiä.",
+                quizTitle: "> STATION 24n VIRALLINEN TIETOKILPAILU",
+                quizDesc: "Vastaa kiperiin kysymyksiin ja testaa IT- sekä peli tietämyksesi Station 24n omassa tietokilpailussa!",
                 quizSensory: "<b>Aistiprofiili:</b> Tekstipainotteinen. Ei liikkuvia valoja, mutta sisältää teräviä äänitehosteita (oikeasta vastauksesta kirkas merkkiääni, väärästä kova 'BZZZZT').",
-                hangmanTitle: "> ASSEMBLYn HIRSIPUU",
-                hangmanDesc: "Klassinen sanapeli virallisessa festivaaliasussa. Arvaa oikeat kirjaimet ennen kuin joudut hirtetyksi!",
+                hangmanTitle: "> STATION 24n HIRSIPUU",
+                hangmanDesc: "Klassinen sanapeli virallisessa asussa. Arvaa oikeat kirjaimet ennen kuin joudut hirtetyksi!",
                 hangmanSensory: "<b>Aistiprofiili:</b> Staattinen käyttöliittymä. Matala visuaalinen ja auditiivinen rasitus.",
-                baseDefTitle: "> ASSEMBLYn BASE DEFENSE",
-                baseDefDesc: "Puolusta Assembly-tukikohtaa vihollisen avaruusaluksilta virallisella puolustustornillasi!",
+                baseDefTitle: "> STATION 24n BASE DEFENSE",
+                baseDefDesc: "Puolusta tukikohtaa vihollisen avaruusaluksilta virallisella puolustustornillasi!",
                 baseDefSensory: "<b>Aistiprofiili:</b> Sisältää nopeita strobo-efektejä, vilkkuvia valovälähdyksiä ja räjähdyspartikkeleita.",
-                bossTitle: "> ASSEMBLYn BASE DEFENSE BOSS",
-                bossDesc: "Lopputaistelu Assembly-tukikohdassa! Ota mittaa jättimäisestä emoaluspomosta intensiivisessä taistelussa.",
+                bossTitle: "> STATION 24n BASE DEFENSE BOSS",
+                bossDesc: "Lopputaistelu! Ota mittaa jättimäisestä emoaluspomosta intensiivisessä taistelussa.",
                 bossSensory: "<b>🚨 AISTIVAROITUS:</b> Sisältää voimakkaita strobo-efektejä, intensiivisiä <b>laserefektejä</b>, vilkkuvia pomosuojia ja toistuvia valovälähdyksiä.",
-                mathTitle: "> ASSEMBLYn MATH MAYHEM",
-                mathDesc: "Virallinen päässälasku äärimmäisessä aikapaineessa! Ratkaise laskutoimitukset ennen kuin hälytyskello lyö nollaa. Varo äkillisiä hälytyksiä!",
+                mathTitle: "> STATION 24n MATH MAYHEM",
+                mathDesc: "Päässälasku äärimmäisessä aikapaineessa! Ratkaise laskutoimitukset ennen kuin hälytyskello lyö nollaa. Varo äkillisiä hälytyksiä!",
                 mathSensory: "<b>Aistiprofiili:</b> Korkea aikapaine ja sykkivät varoituskellot.",
-                aimTitle: "> ASSEMBLYn AIM TRAINER",
-                aimDesc: "Osu kohteisiin niin nopeasti kuin pystyt. Assemblyn virallinen lämmittely FPS- ja e-urheiluammattilaisille!",
+                aimTitle: "> STATION 24n AIM TRAINER",
+                aimDesc: "Osu kohteisiin niin nopeasti kuin pystyt. Virallinen lämmittely FPS- ja e-urheiluammattilaisille!",
                 aimSensory: "<b>Aistiprofiili:</b> Nopeasti liikkuvia kohteita ja mikrokuvioita.",
-                cyberTitle: "> ASSEMBLYn CYBER-SANITIZER",
-                cyberDesc: "Kerää turvallisia tiedostoja ja puhdista virukset sujuvassa keräilypelissä.",
+                cyberTitle: "> STATION 24n CYBER-SANITIZER",
+                cyberDesc: "Kerää turvallisia tiedostoja ja puhdista virukset sujuvassa Station 24 -keräilypelissä.",
                 cyberSensory: "<b>Aistiprofiili:</b> Pehmeät liikemallit ja värisiirtymät.",
-                reactionTitle: "> ASSEMBLYn REAKTIOPELI",
+                reactionTitle: "> STATION 24n REAKTIOPELI",
                 reactionDesc: "Pidä hiiri valmiina! Virallinen reaktiotesti, jossa klikkaat heti kun näytön väri vaihtuu.",
                 reactionSensory: "<b>Aistiprofiili:</b> Äkillisiä, teräviä värimuutoksia koko näytön alueella.",
-                kwTitle: "> ASSEMBLYn KEYBOARD WARRIOR",
-                kwDesc: "Kirjoita tai häviä! Naputa Assembly-sanat näppäimistöllä ennen kuin ne putoavat pohjaan.",
+                kwTitle: "> STATION 24n KEYBOARD WARRIOR",
+                kwDesc: "Kirjoita tai häviä! Naputa sanat näppäimistöllä ennen kuin ne putoavat pohjaan.",
                 kwSensory: "<b>Aistiprofiili:</b> Erittäin korkea naputtelutahti, nopeasti alaspäin liikuva teksti.",
-                memoryTitle: "> ASSEMBLYn MEMORY",
+                memoryTitle: "> STATION 24n MEMORY",
                 memoryDesc: "Etsi parit ja testaa valokuvamuistiasi rauhallisessa muistipelissä.",
                 memorySensory: "<b>Aistiprofiili:</b> Rauhallinen käyttöliittymä ja toistuvat kuvakuvioinnit.",
-                spamTitle: "> ASSEMBLYn SPÄMMIKLIKKERI",
-                spamDesc: "Puhdasta klikkausnopeutta! Kuinka monta kertaa ehdit spämmätä Assembly-painiketta ennen ajan päättymistä?",
+                spamTitle: "> STATION 24n SPÄMMIKLIKKERI",
+                spamDesc: "Puhdasta klikkausnopeutta! Kuinka monta kertaa ehdit spämmätä painiketta ennen ajan päättymistä?",
                 spamSensory: "<b>Aistiprofiili:</b> Nopeasti muuttuvat numerot ja toistuvat mekaaniset klikkausäänet.",
                 overallWarnTitle: "⚠️ YLEINEN AISTIVAROITUS JA TIEDOTE",
-                overallWarnText: "Jotkin tämän päätteen verkkoselainpeleistä (erityisesti Qwerty Defense ja Base Defense Boss) sisältävät nopeaa 3D-liikettä, voimakkaita valotaajuuksia, laserefektejä ja vilkkuvaloa. Jos koet epämukavuutta, visuaalista rasitusta tai aistiylikuormitusta, paina näppäimistön [S]-näppäintä hätäpysäytykseen tai ota yhteyttä Assembly Crewiin osastolla.",
+                overallWarnText: "Jotkin tämän päätteen verkkoselainpeleistä (erityisesti Qwerty Defense, Retro Shooter ja Base Defense Boss) sisältävät nopeaa 3D-liikettä, voimakkaita valotaajuuksia, laserefektejä ja vilkkuvaloa. Jos koet epämukavuutta, visuaalista rasitusta tai aistiylikuormitusta, paina näppäimistön [S]-näppäintä hätäpysäytykseen tai ota yhteyttä miehistöön.",
                 tourneyInfo: "Turnaustiedot"
             }
         };
 
         function getInitialLanguage() {
             const browserLang = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+            if (browserLang.startsWith('no') || browserLang.startsWith('nb') || browserLang.startsWith('nn')) return 'no';
             if (browserLang.startsWith('sv')) return 'sv';
             if (browserLang.startsWith('fi')) return 'fi';
             return 'en';

@@ -1,0 +1,3704 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
+    <title>PVP Battle Arena - Tournament Edition</title>
+    <script>// =========================================================================
+// 🛑 ENHETS- & WEBBLÄSARSPÄRR MED ANIMERADE VEKTORSKÄRMAR
+// =========================================================================
+(function() {
+    var ua = (navigator.userAgent || navigator.vendor || window.opera || "").toLowerCase();
+
+    // 1. KONTROLLERA ENHETSTYPER
+    var isSmartTV = /smart-tv|smarttv|googletv|appletv|hbbtv|pov_tv|netcast.tv|viera/i.test(ua);
+    var isCar = /tesla|automotive|carplay|android auto|polestar|mbux|infotainment|ivi|carbrowser|qtcarbrowser/i.test(ua);
+    var isTablet = /ipad|tablet|(android(?!.*mobile))/i.test(ua) || (navigator.maxTouchPoints > 1 && /macintosh/i.test(ua));
+    var isMobile = !isTablet && /android|webos|iphone|ipod|blackberry|iemobile|opera mini|mobile/i.test(ua);
+
+    // Konsoler (med separat hantering av äldre vs nya)
+    var isLegacyConsole = /playstation 3|playstation portable|psp|psvita|wii\b/i.test(ua);
+    var isModernConsole = /playstation 5|ps5|xbox series|nintendo switch/i.test(ua);
+    var isMidConsole = /playstation 4|xbox one|wii u/i.test(ua);
+
+    // 2. KONTROLLERA WEBBLÄSARE OCH VERSIONER
+    var isIE = /msie|trident/i.test(ua);
+    var isAndroidStock = /android/i.test(ua) && /version\/[0-9.]+/i.test(ua) && !/chrome/i.test(ua);
+
+    // 💻 OPERATIVSYSTEM & BÄRBARA ENHETER
+    var isLinux = /linux/i.test(ua) && !/android/i.test(ua) && !/cros/i.test(ua);
+    var isChromeOS = /cros/i.test(ua);
+    var isHandheldPC = /steamdeck|rog ally|legion go|ayaneo|gpd win|switch/i.test(ua);
+    var isEdgeHTML = /edge\/\d+/i.test(ua);
+
+    // Windows före 10 (NT 5.x = XP, 6.0 = Vista, 6.1 = 7, 6.2/6.3 = 8/8.1)
+    var isLegacyWindows = /windows nt (5\.|6\.[0-3])/i.test(ua);
+
+    // Mac äldre än de 2 nyaste (macOS 15 Sequoia och 16 är de senaste; äldre än 15 spärras)
+    var isLegacyMac = false;
+    if (/macintosh|mac os x/i.test(ua) && !isTablet) {
+        var macMatch = ua.match(/mac os x (\d+)[_.](\d+)/i);
+        if (macMatch) {
+            var macMajor = parseInt(macMatch[1], 10);
+            var macMinor = parseInt(macMatch[2], 10);
+            if (macMajor < 15 && !(macMajor === 10 && macMinor >= 16)) {
+                isLegacyMac = true;
+            }
+        }
+    }
+    
+    // Versionsparsning
+    function getMajorVer(regex) {
+        var m = ua.match(regex);
+        return m ? parseInt(m[1], 10) : 0;
+    }
+
+    var isChrome = /chrome/i.test(ua) && !/edg\//i.test(ua) && !/opr\//i.test(ua);
+    var isSafari = /safari/i.test(ua) && !isChrome && !/edg\//i.test(ua) && !/android/i.test(ua);
+    var isFirefox = /firefox/i.test(ua);
+    var isEdge = /edg\//i.test(ua);
+
+    var chromeVer = isChrome ? getMajorVer(/chrome\/(\d+)/i) : 0;
+    var safariVer = isSafari ? getMajorVer(/version\/(\d+)/i) : 0;
+    var firefoxVer = isFirefox ? getMajorVer(/firefox\/(\d+)/i) : 0;
+    var edgeVer = isEdge ? getMajorVer(/edg\/(\d+)/i) : 0;
+
+    // Kräver absolut senaste versionerna (tröskel för "inte allra senaste")
+    var isOldSafari = isSafari && safariVer < 17;
+    var isOutdatedBrowser = (isChrome && chromeVer < 125) || 
+                            (isFirefox && firefoxVer < 126) || 
+                            (isEdge && edgeVer < 125) || 
+                            (isSafari && safariVer < 18);
+
+    // 3. FASTSTÄLL KATEGORI
+    var blockType = null;
+    var title = "";
+    var message = "";
+    var subText = "";
+
+    // 🦖 INTERNET EXPLORER
+    if (isIE) {
+        blockType = "IE";
+        title = "🦖 GRAVSTEN: INTERNET EXPLORER DOG 2022!";
+        message = "Oj oj oj! Försöker du starta ett modernt arkadspel i en webbläsare från förra århundradet?! Internet Explorer orkar knappt rita en cirkel och somnade in för evigt år 2022.";
+        subText = "Starta Chrome, Firefox eller Edge på en modern dator!";
+    }
+    // 📱 ANDROID STOCK-WEBBLÄSARE
+    else if (isAndroidStock) {
+        blockType = "ANDROID_STOCK";
+        title = "📱 FÖRÅLDRAD ANDROID-LÄSARE!";
+        message = "Den gamla inbyggda jordglobs-webbläsaren orkar inte med Canvas-animationer eller ljud! Den hackar som en trasig gräsklippare.";
+        subText = "Byt till en modern dator med mus och tangentbord!";
+    }
+    // 🍏 GAMMAL SAFARI
+    else if (isOldSafari) {
+        blockType = "OLD_SAFARI";
+        title = "🍏 FÖRÅLDRAD SAFARI DETEKTERAD!";
+        message = "Din Safari-version är för gammal för WebRTC, stereoljud och hårdvaruacceleration. Äpplet har blivit för brunt för att spela arkad!";
+        subText = "Uppdatera macOS eller öppna spelet i en modern PC-webbläsare!";
+    }
+    // 🚗 BILSKÄRM
+    else if (isCar) {
+        blockType = "CAR";
+        title = "🚗 VARNING! BILSKÄRMEN ÄR INGEN SPELSKÄRM!";
+        message = "Sitter du i bilen och försöker väja för minor och skjuta lasrar mitt i trafiken?! Håll båda händerna på ratten och ögonen på vägen innan du krockar med en lyktstolpe!";
+        subText = "Kör hem, parkera säkert och spela framför skrivbordet istället!";
+    }
+    // 📺 SMART-TV
+    else if (isSmartTV) {
+        blockType = "TV";
+        title = "📺 HUR HADE DU TÄNKT SPELA MED FJÄRRKONTROLLEN?!";
+        message = "Sitter du i soffan med TV-fjärren och tror du är proffs?! Hur ska det gå till: Styra gubben med piltangenterna, skjuta med OK-knappen och ladda om med 'BACK'?!";
+        subText = "Upp ur soffan! Sätt dig vid ett riktigt skrivbord med mus och tangentbord!";
+    }
+    // 🐧 LINUX (PINGVINEN STÖDS EJ)
+    else if (isLinux) {
+        blockType = "LINUX_PINGVIN";
+        title = "🐧 LINUX: PINGVINEN STÖDS EJ!";
+        message = "BWAHAHAHA! Sitter du och knappar sudo apt-get i terminalen?! Pingvinen får stanna på Sydpolen! Spelet är inte byggt för öppna Linux-kärnor eller experimentella drivrutiner.";
+        subText = "Starta en vanlig Windows- eller Mac-dator om du vill spela!";
+    }
+    // 💻 CHROMEBOOK (SKOLDATOR SPÄRRAD)
+    else if (isChromeOS) {
+        blockType = "CHROMEBOOK";
+        title = "💻 SKOLDATOR SPÄRRAD: GÖR LÄXORNA FÖRST!";
+        message = "Stopp där! Det där är en liten Chromebook byggd för skolarbeten, glosförhör och matteläxor, inte för tung arkadaction! Gör färdigt läxorna och ät ett mellanmål!";
+        subText = "Stäng skoldatorn och starta en riktig speldator efter skolan!";
+    }
+    // 🎮 BÄRBARA SPELENHETER (STEAM DECK, ROG ALLY M.FL.)
+    else if (isHandheldPC) {
+        blockType = "HANDHELD_PC";
+        title = "🎮 BÄRBAR SPELENHET STOPPAD!";
+        message = "Försöker du spela arkad på en liten bärbar handdator med små fläktar som blåser varmluft i knäet?! Den lilla skärmen och de inbyggda styrspakarna är inte godkända här!";
+        subText = "Koppla upp dig mot en stor datorskärm med riktig mus!";
+    }
+    // 🌐 GAMLA EDGE (EDGEHTML)
+    else if (isEdgeHTML) {
+        blockType = "EDGE_HTML";
+        title = "🌐 GAMLA EDGEHTML HAR GÅTT I PENSION!";
+        message = "Haha! Du hittade den gamla Edge-motorn som Microsoft glömde kvar på vinden och övergav för länge sedan! Den orkar knappt blåsa såpbubblor, än mindre rita moderna effekter.";
+        subText = "Uppdatera till moderna Chromium-Edge genast!";
+    }
+    // 🪟 WINDOWS FÖRE 10 (XP, VISTA, 7, 8, 8.1)
+    else if (isLegacyWindows) {
+        blockType = "WIN_OLD";
+        title = "🪟 DET DÄR ÄR ETT WINDOWS-FOSSIL!";
+        message = "GRAAAHR! Sitter du på Windows 7, 8 eller uråldriga XP?! Det systemet är så dammigt att våra monster tror att det är en dinosauriekompis från ett museum!";
+        subText = "Uppgradera datorn till Windows 10 eller 11!";
+    }
+    // 🍏 MAC FÖRE DE 2 NYASTE
+    else if (isLegacyMac) {
+        blockType = "MAC_OLD";
+        title = "🍏 DIN MAC ÄR FÖR GAMMAL FÖR DETTA!";
+        message = "Oj oj oj! Ditt macOS ligger för långt bak i tiden och saknar de senaste två versionernas grafik- och ljudrutiner! Den här gamla maskinen orkar inte med farten.";
+        subText = "Uppdatera din Mac till en av de två nyaste macOS-versionerna!";
+    }
+    // 🎮 ÄLDRE KONSOL (PS3 / PSP)
+    else if (isLegacyConsole) {
+        blockType = "CONSOLE_RETRO";
+        title = "💀 PS3 / PSP?! ÄR DU FULLKOMLIGT TOKIG?!";
+        message = "Försöker du köra 60 FPS WebRTC-arenastrider genom webbläsaren på en PlayStation 3 eller PSP från 2006?! Konsolen kokar, fläkten låter som ett jetplan och minnet tog slut för 15 år sedan!";
+        subText = "Stäng webbläsaren omedelbart innan konsolen smälter ihop till plastmos!";
+    }
+    // 🎮 MODERN KONSOL (PS5 / XBOX SERIES)
+    else if (isModernConsole || isMidConsole) {
+        blockType = "CONSOLE_MODERN";
+        title = "🎮 STARTA ETT RIKTIGT KONSOLSPEL!";
+        message = "Du har en modern konsol för tusentals kronor och ändå smyger du in via konsolens gömda text-webbläsare?! Webbläsaren har ingen muspekare eller tangentbordsstöd här.";
+        subText = "Hoppa ur konsolens webbläsare och starta ett konsolspel, eller gå till en PC!";
+    }
+    // 📱 MOBILTELEFON
+    else if (isMobile) {
+        blockType = "MOBILE";
+        title = "📱 INGET TOUCH-STÖD – SÄTT DIG VID EN PC!";
+        message = "Spelet stödjer inte touchskärmar! Att styra med tummarna på en hal 6-tumsskärm gör att fingrarna täcker hela skärmen och du dör på två sekunder.";
+        subText = "Sätt dig vid en dator med mus, handkontroll eller tangentbord!";
+    }
+    // 🐸 SURFPLATTA / IPAD
+    else if (isTablet) {
+        blockType = "TABLET";
+        title = "🐸 SURFPLATTOR HAR NOLL TOUCH-STÖD!";
+        message = "En jättestor iPad gör inte saken bättre! Spelet kräver millimeterprecision via datormus eller speldosa, inte flottiga handflator som klappar på glasrutan.";
+        subText = "Koppla in en dator med fysiska knappar och spela som folk!";
+    }
+    // 🔄 INTE ALLRA SENASTE WEBBLÄSAREN
+    else if (isOutdatedBrowser) {
+        blockType = "UPDATE_BROWSER";
+        title = "🔄 UPPDATERA DIN WEBBLÄSARE!";
+        message = "Du kör inte den allra senaste versionen av din webbläsare! Spelet kräver de nyaste Canvas-, WebRTC- och ljudoptimeringarna för att inte hacka.";
+        subText = "Klicka på webbläsarens inställningar och uppdatera till senaste versionen!";
+    }
+
+    // Om godkänd modern datorwebbläsare: släpp igenom!
+    if (!blockType) return;
+
+    // 4. BLOCKERA OCH RITA SKÄRMEN PÅ CANVAS
+    window.addEventListener('DOMContentLoaded', function() {
+        document.body.innerHTML = "";
+        document.body.style.margin = "0";
+        document.body.style.background = "#05060a";
+        document.body.style.overflow = "hidden";
+
+        var blockCanvas = document.createElement('canvas');
+        blockCanvas.width = window.innerWidth;
+        blockCanvas.height = window.innerHeight;
+        blockCanvas.style.display = "block";
+        document.body.appendChild(blockCanvas);
+
+        var bCtx = blockCanvas.getContext('2d');
+        var t = 0;
+
+        function renderEnforcerLoop() {
+            t += 0.04;
+            bCtx.clearRect(0, 0, blockCanvas.width, blockCanvas.height);
+
+            // Mörk bakgrund med rött varningsmönster
+            bCtx.fillStyle = "#07080f";
+            bCtx.fillRect(0, 0, blockCanvas.width, blockCanvas.height);
+
+            // Varningsram
+            var isRed = Math.floor(t * 2) % 2 === 0;
+            bCtx.strokeStyle = isRed ? "#ff1744" : "#ffd600";
+            bCtx.lineWidth = 6;
+            bCtx.strokeRect(20, 20, blockCanvas.width - 40, blockCanvas.height - 40);
+
+            var cx = blockCanvas.width / 2;
+            var cy = blockCanvas.height / 2 - 40;
+
+            // ==================== 🎨 VEKTORANIMATIONER ====================
+            bCtx.save();
+            bCtx.translate(cx, cy);
+
+            switch(blockType) {
+                // 🦖 1. GRAVSTEN & KROSSAT IE
+                case "IE": {
+                    // Gravsten
+                    bCtx.fillStyle = "#475569";
+                    bCtx.beginPath();
+                    bCtx.arc(0, -20, 45, Math.PI, 0);
+                    bCtx.lineTo(45, 60);
+                    bCtx.lineTo(-45, 60);
+                    bCtx.closePath();
+                    bCtx.fill();
+                    bCtx.strokeStyle = "#1e293b";
+                    bCtx.lineWidth = 3;
+                    bCtx.stroke();
+
+                    bCtx.fillStyle = "#ff1744";
+                    bCtx.font = "bold 18px monospace";
+                    bCtx.textAlign = "center";
+                    bCtx.fillText("R.I.P", 0, 5);
+                    bCtx.fillStyle = "#cbd5e1";
+                    bCtx.font = "bold 11px monospace";
+                    bCtx.fillText("1995-2022", 0, 28);
+
+                    // Svävande spök-ikon
+                    var floatY = Math.sin(t * 2) * 8;
+                    bCtx.strokeStyle = "#00a2ff";
+                    bCtx.lineWidth = 4;
+                    bCtx.beginPath();
+                    bCtx.arc(80, -30 + floatY, 20, 0, Math.PI * 2);
+                    bCtx.stroke();
+                    // Rött förbudskryss
+                    bCtx.strokeStyle = "#ff1744";
+                    bCtx.lineWidth = 4;
+                    bCtx.beginPath();
+                    bCtx.moveTo(65, -45 + floatY); bCtx.lineTo(95, -15 + floatY);
+                    bCtx.stroke();
+                    break;
+                }
+
+                // 📱 2. MOBIL / SURFPLATTA (KLADDIGT FINGERÖVERDRAG)
+                case "MOBILE":
+                case "TABLET":
+                case "ANDROID_STOCK": {
+                    var w = blockType === "TABLET" ? 120 : 70;
+                    var h = blockType === "TABLET" ? 90 : 130;
+
+                    // Telefonchassi
+                    bCtx.fillStyle = "#1e293b";
+                    bCtx.fillRect(-w/2, -h/2, w, h);
+                    bCtx.strokeStyle = "#00ffcc";
+                    bCtx.lineWidth = 3;
+                    bCtx.strokeRect(-w/2, -h/2, w, h);
+
+                    // Skärm
+                    bCtx.fillStyle = "#090d16";
+                    bCtx.fillRect(-w/2 + 6, -h/2 + 10, w - 12, h - 20);
+
+                    // Pekande finger med pulserande pekcirkel som skakar
+                    var fx = Math.sin(t * 3) * (w / 3);
+                    var fy = Math.cos(t * 3) * (h / 3);
+
+                    bCtx.fillStyle = "rgba(255, 23, 68, 0.4)";
+                    bCtx.beginPath();
+                    bCtx.arc(fx, fy, 16 + Math.sin(t * 6) * 4, 0, Math.PI * 2);
+                    bCtx.fill();
+
+                    // Rött kryss över handen
+                    bCtx.strokeStyle = "#ff1744";
+                    bCtx.lineWidth = 5;
+                    bCtx.beginPath();
+                    bCtx.moveTo(-35, -35); bCtx.lineTo(35, 35);
+                    bCtx.moveTo(35, -35); bCtx.lineTo(-35, 35);
+                    bCtx.stroke();
+                    break;
+                }
+
+                // 🐧 8. LINUX PINGVIN MED FÖRBUDSMÄRKE
+                case "LINUX_PINGVIN": {
+                    // Pingvinkropp
+                    bCtx.fillStyle = "#0f172a";
+                    bCtx.beginPath();
+                    bCtx.ellipse(0, 5, 34, 45, 0, 0, Math.PI * 2);
+                    bCtx.fill();
+                    // Vit mage
+                    bCtx.fillStyle = "#ffffff";
+                    bCtx.beginPath();
+                    bCtx.ellipse(0, 10, 20, 32, 0, 0, Math.PI * 2);
+                    bCtx.fill();
+                    // Näbb & fötter
+                    bCtx.fillStyle = "#f59e0b";
+                    bCtx.fillRect(-6, -18, 12, 7);
+                    bCtx.fillRect(-22, 45, 16, 7);
+                    bCtx.fillRect(6, 45, 16, 7);
+                    // Rött förbudskryss
+                    bCtx.strokeStyle = "#ff1744";
+                    bCtx.lineWidth = 6;
+                    bCtx.beginPath();
+                    bCtx.arc(0, 5, 48, 0, Math.PI * 2);
+                    bCtx.moveTo(-34, -29); bCtx.lineTo(34, 39);
+                    bCtx.stroke();
+                    break;
+                }
+
+                // 💻 9. CHROMEBOOK / BÄRBAR ENHET MED LÄXBOK
+                case "CHROMEBOOK":
+                case "HANDHELD_PC": {
+                    // Skoldator / Konsolskal
+                    bCtx.fillStyle = "#1e293b";
+                    bCtx.fillRect(-55, -35, 110, 65);
+                    bCtx.strokeStyle = "#ffeb3b";
+                    bCtx.lineWidth = 3;
+                    bCtx.strokeRect(-55, -35, 110, 65);
+                    // Skärm med varning
+                    bCtx.fillStyle = "#090d16";
+                    bCtx.fillRect(-47, -27, 94, 49);
+                    bCtx.fillStyle = "#ff1744";
+                    bCtx.font = "bold 18px monospace";
+                    bCtx.textAlign = "center";
+                    bCtx.fillText("LÄXOR!", 0, 5);
+                    // Tangentbord nedfällt
+                    bCtx.fillStyle = "#334155";
+                    bCtx.fillRect(-65, 33, 130, 10);
+                    break;
+                }
+
+                // 🪟 10. GAMMALT WINDOWS / EDGEHTML / GAMMAL MAC
+                case "EDGE_HTML":
+                case "WIN_OLD":
+                case "MAC_OLD": {
+                    // Dammig låda / skärm som skakar
+                    var shake = Math.sin(t * 8) * 3;
+                    bCtx.fillStyle = "#1e293b";
+                    bCtx.fillRect(-50 + shake, -40, 100, 75);
+                    bCtx.strokeStyle = "#ff1744";
+                    bCtx.lineWidth = 4;
+                    bCtx.strokeRect(-50 + shake, -40, 100, 75);
+                    // Dödskalleskärm / Fossil
+                    bCtx.fillStyle = "#ff1744";
+                    bCtx.font = "bold 26px monospace";
+                    bCtx.textAlign = "center";
+                    bCtx.fillText("☠️", shake, 8);
+                    break;
+                }
+
+                // 🚗 3. BILSKÄRM & RATT
+                case "CAR": {
+                    // Skärm i instrumentbrädan
+                    bCtx.fillStyle = "#0f172a";
+                    bCtx.fillRect(-90, -50, 180, 100);
+                    bCtx.strokeStyle = "#f59e0b";
+                    bCtx.lineWidth = 4;
+                    bCtx.strokeRect(-90, -50, 180, 100);
+
+                    // Hastighetsmätare som skakar
+                    bCtx.strokeStyle = "#ff1744";
+                    bCtx.lineWidth = 3;
+                    bCtx.beginPath();
+                    bCtx.arc(0, 0, 32, Math.PI, 0);
+                    bCtx.stroke();
+
+                    // Roterande visare
+                    var needleAngle = Math.PI + (Math.sin(t * 4) + 1) * (Math.PI / 2);
+                    bCtx.beginPath();
+                    bCtx.moveTo(0, 0);
+                    bCtx.lineTo(Math.cos(needleAngle) * 28, Math.sin(needleAngle) * 28);
+                    bCtx.stroke();
+
+                    // Varningstriangel
+                    bCtx.fillStyle = "#ffd600";
+                    bCtx.beginPath();
+                    bCtx.moveTo(0, -38); bCtx.lineTo(14, -16); bCtx.lineTo(-14, -16);
+                    bCtx.closePath();
+                    bCtx.fill();
+                    break;
+                }
+
+                // 📺 4. SMART-TV & FJÄRRKONTROLL
+                case "TV": {
+                    // TV-ram
+                    bCtx.fillStyle = "#1e293b";
+                    bCtx.fillRect(-100, -60, 140, 90);
+                    bCtx.strokeStyle = "#38bdf8";
+                    bCtx.lineWidth = 3;
+                    bCtx.strokeRect(-100, -60, 140, 90);
+
+                    // Fjärrkontroll bredvid med blinkande OK-knapp
+                    bCtx.fillStyle = "#0f172a";
+                    bCtx.fillRect(60, -55, 36, 100);
+                    bCtx.strokeStyle = "#ffffff";
+                    bCtx.lineWidth = 2;
+                    bCtx.strokeRect(60, -55, 36, 100);
+
+                    // Piltangenter & OK-knapp på dosan
+                    bCtx.fillStyle = (Math.floor(t * 3) % 2 === 0) ? "#ff1744" : "#ffd600";
+                    bCtx.beginPath();
+                    bCtx.arc(78, -15, 9, 0, Math.PI * 2);
+                    bCtx.fill();
+
+                    bCtx.fillStyle = "#000000";
+                    bCtx.font = "bold 8px sans-serif";
+                    bCtx.textAlign = "center";
+                    bCtx.fillText("OK", 78, -12);
+
+                    // Rött förbudstecken
+                    bCtx.strokeStyle = "#ff1744";
+                    bCtx.lineWidth = 4;
+                    bCtx.beginPath();
+                    bCtx.arc(78, -15, 18, 0, Math.PI * 2);
+                    bCtx.moveTo(65, -28); bCtx.lineTo(91, -2);
+                    bCtx.stroke();
+                    break;
+                }
+
+                // 💀 5. RETRO KONSOL (PS3 / PSP RÖK & ELD)
+                case "CONSOLE_RETRO": {
+                    // Rökpelare
+                    for (var i = 0; i < 6; i++) {
+                        var smokeY = -40 - (i * 12) - (Math.sin(t * 3 + i) * 6);
+                        var smokeX = Math.sin(t * 2 + i) * 18;
+                        bCtx.fillStyle = "rgba(239, 68, 68, 0.4)";
+                        bCtx.beginPath();
+                        bCtx.arc(smokeX, smokeY, 10 + i * 2, 0, Math.PI * 2);
+                        bCtx.fill();
+                    }
+
+                    // Konsol-chassi
+                    bCtx.fillStyle = "#09090b";
+                    bCtx.fillRect(-70, -10, 140, 45);
+                    bCtx.strokeStyle = "#ff1744";
+                    bCtx.lineWidth = 3;
+                    bCtx.strokeRect(-70, -10, 140, 45);
+
+                    bCtx.fillStyle = "#ff1744";
+                    bCtx.font = "bold 14px monospace";
+                    bCtx.textAlign = "center";
+                    bCtx.fillText("OVERHEAT: 99°C", 0, 18);
+                    break;
+                }
+
+                // 🎮 6. MODERN KONSOL
+                case "CONSOLE_MODERN": {
+                    // Handkontroll
+                    bCtx.fillStyle = "#ffffff";
+                    bCtx.beginPath();
+                    bCtx.arc(-30, 0, 26, 0, Math.PI * 2);
+                    bCtx.arc(30, 0, 26, 0, Math.PI * 2);
+                    bCtx.fill();
+                    bCtx.fillRect(-30, -15, 60, 30);
+
+                    // Spakar
+                    bCtx.fillStyle = "#334155";
+                    bCtx.beginPath();
+                    bCtx.arc(-15, 8, 8, 0, Math.PI * 2);
+                    bCtx.arc(15, 8, 8, 0, Math.PI * 2);
+                    bCtx.fill();
+
+                    // Rött förbudskors
+                    bCtx.strokeStyle = "#ff1744";
+                    bCtx.lineWidth = 5;
+                    bCtx.beginPath();
+                    bCtx.moveTo(-45, -35); bCtx.lineTo(45, 35);
+                    bCtx.moveTo(45, -35); bCtx.lineTo(-45, 35);
+                    bCtx.stroke();
+                    break;
+                }
+
+                // 🔄 7. UPPDATERA WEBBLÄSAREN (SNURRANDE KUGGHJUL/PIL)
+                case "UPDATE_BROWSER":
+                case "OLD_SAFARI": {
+                    var rotAngle = t * 2;
+                    bCtx.rotate(rotAngle);
+                    bCtx.strokeStyle = "#00ffcc";
+                    bCtx.lineWidth = 6;
+                    bCtx.beginPath();
+                    bCtx.arc(0, 0, 38, 0, 1.5 * Math.PI);
+                    bCtx.stroke();
+
+                    // Pilspets
+                    bCtx.fillStyle = "#ffd600";
+                    bCtx.beginPath();
+                    bCtx.moveTo(38, -6);
+                    bCtx.lineTo(48, 12);
+                    bCtx.lineTo(28, 12);
+                    bCtx.closePath();
+                    bCtx.fill();
+                    break;
+                }
+            }
+            bCtx.restore();
+
+            // ==================== 📝 TEXT & MEDDELANDEN ====================
+            bCtx.textAlign = "center";
+
+            // Huvudrubrik
+            bCtx.fillStyle = "#ff1744";
+            bCtx.font = "bold 24px 'Courier New', monospace";
+            bCtx.fillText(title, cx, cy + 90);
+
+            // Barnvänlig förklaringsruta
+            var boxW = Math.min(680, blockCanvas.width - 60);
+            var boxX = (blockCanvas.width - boxW) / 2;
+            var boxY = cy + 120;
+
+            bCtx.fillStyle = "rgba(15, 23, 42, 0.9)";
+            bCtx.fillRect(boxX, boxY, boxW, 85);
+            bCtx.strokeStyle = "#ffd600";
+            bCtx.lineWidth = 2;
+            bCtx.strokeRect(boxX, boxY, boxW, 85);
+
+            bCtx.fillStyle = "#ffffff";
+            bCtx.font = "bold 13px 'Courier New', monospace";
+
+            // Radbryt texten automatiskt
+            var words = message.split(' ');
+            var line = '';
+            var lineY = boxY + 28;
+            for (var n = 0; n < words.length; n++) {
+                var testLine = line + words[n] + ' ';
+                var metrics = bCtx.measureText(testLine);
+                if (metrics.width > boxW - 30 && n > 0) {
+                    bCtx.fillText(line, cx, lineY);
+                    line = words[n] + ' ';
+                    lineY += 20;
+                } else {
+                    line = testLine;
+                }
+            }
+            bCtx.fillText(line, cx, lineY);
+
+            // Hjälp / Lösning
+            bCtx.fillStyle = "#00ffcc";
+            bCtx.font = "bold 14px 'Courier New', monospace";
+            bCtx.fillText(subText, cx, cy + 240);
+
+            requestAnimationFrame(renderEnforcerLoop);
+        }
+
+        renderEnforcerLoop();
+    });
+
+    // Avbryt resten av spelets körning
+    throw new Error("System blocked: Incompatible device or browser (" + blockType + ")");
+})();</script>
+    <!-- PeerJS för P2P onlineläge utan serverinstallation[cite: 2] -->
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <style>
+        * { box-sizing: border-box; user-select: none; }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #06070a;
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        #game-container {
+            position: relative;
+            border: 4px solid #00ffcc;
+            box-shadow: 0 0 35px rgba(0, 255, 204, 0.4);
+            width: 800px;
+            height: 600px;
+            background: #000;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background-color: #0c0d14;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+</div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+// =========================================================================
+// 🌐 I18N LOKALISERING (SVENSKA & ENGELSKA)
+// =========================================================================
+const I18N_TEXTS = {
+    sv: {
+        title: "⚔️ 2D PVP BATTLE ARENA",
+        subTitle: "Turneringsutgåva med Power-ups & AI",
+        modeLocal: "1. LOKALT LÄGE (1-4 SPELARE / BOTTAR)",
+        modeCpu: "2. PLAYER VS CPU (TRÄNING)",
+        modeOnline: "3. ONLINELÄGE (P2P WEBRTC)",
+        startMatch: "▶ TRYCK ENTER FÖR ATT STARTA ◀",
+        players: "ANTAL SPELARE: ",
+        cpuDiffTitle: "BOT-SVÅRIGHET: ",
+        controlsP1: "P1: WASD + MUS (RÖTT SIKTE VID TRÄFFPUNKT)",
+        controlsP2: "P2: PILTANGENTER + ENTER (SKJUT)",
+        controlsP3P4: "P3/P4: HANDKONTROLLER (VÄNSTER SPAK + A/R2)",
+        hp: "HP",
+        winner: "🏆 VINNARE AV RUNDAN: ",
+        draw: "OAVGJORT! ALLA BLEV ELIMINERADE!",
+        restartPrompt: "[ ENTER: SPELA IGEN | ESC: MENY ]",
+        hostRoom: "SKAPA RUM (HOST) [H]",
+        joinRoom: "ANSLUT TILL RUM (CLIENT) [J]",
+        onlineHostTitle: "🌐 DITT P2P RUMS-ID:",
+        onlineClientTitle: "🔑 ANGE HOSTMASKINENS RUMS-ID:",
+        nukeWarning: "☢️ ATOMBOMB EXPLODERADE! OMEDELBAR DÖD!",
+        starActive: "⭐ ODÖDLIG!",
+        bombDrop: "💣 BOMB PLACERAD!"
+    },
+    en: {
+        title: "⚔️ 2D PVP BATTLE ARENA",
+        subTitle: "Tournament Edition with Power-ups & AI",
+        modeLocal: "1. LOCAL MODE (1-4 PLAYERS / BOTS)",
+        modeCpu: "2. PLAYER VS CPU (TRAINING)",
+        modeOnline: "3. ONLINE MODE (P2P WEBRTC)",
+        startMatch: "▶ PRESS ENTER TO START ◀",
+        players: "PLAYER COUNT: ",
+        cpuDiffTitle: "BOT DIFFICULTY: ",
+        controlsP1: "P1: WASD + MOUSE (CROSSHAIR TURNS RED ON TARGET)",
+        controlsP2: "P2: ARROW KEYS + ENTER (SHOOT)",
+        controlsP3P4: "P3/P4: GAMEPADS (LEFT STICK + A/R2)",
+        hp: "HP",
+        winner: "🏆 ROUND WINNER: ",
+        draw: "DRAW! ALL PLAYERS ELIMINATED!",
+        restartPrompt: "[ ENTER: PLAY AGAIN | ESC: MENU ]",
+        hostRoom: "HOST ROOM [H]",
+        joinRoom: "JOIN ROOM [J]",
+        onlineHostTitle: "🌐 YOUR P2P ROOM ID:",
+        onlineClientTitle: "🔑 ENTER HOST ROOM ID:",
+        nukeWarning: "☢️ NUKE DETONATED! INSTANT DEATH!",
+        starActive: "⭐ INVINCIBLE!",
+        bombDrop: "💣 BOMB DEPLOYED!"
+    }
+};
+
+let currentLang = localStorage.getItem('pvp_arena_lang') || 'sv';
+
+function t(key) {
+    return (I18N_TEXTS[currentLang] && I18N_TEXTS[currentLang][key]) ? I18N_TEXTS[currentLang][key] : key;
+}
+
+function toggleLanguage(target) {
+    currentLang = target || (currentLang === 'sv' ? 'en' : 'sv');
+    localStorage.setItem('pvp_arena_lang', currentLang);
+}
+
+// =========================================================================
+// 🤖 9-GRADIG CPU-SVÅRIGHETSKALA MED NAMN (1 LÄTTAST -> 9 SVÅRAST)
+// =========================================================================
+const CPU_DIFFICULTIES = [
+    { level: 1, name: "1 (Novis)",       speedMult: 0.55, aimAccuracy: 0.45, shootChance: 0.02, dodgeChance: 0.00 },
+    { level: 2, name: "2 (Träningsbot)", speedMult: 0.65, aimAccuracy: 0.55, shootChance: 0.03, dodgeChance: 0.01 },
+    { level: 3, name: "3 (Kadett)",      speedMult: 0.75, aimAccuracy: 0.65, shootChance: 0.04, dodgeChance: 0.02 },
+    { level: 4, name: "4 (Vakt)",        speedMult: 0.85, aimAccuracy: 0.75, shootChance: 0.05, dodgeChance: 0.04 },
+    { level: 5, name: "5 (Krigare)",     speedMult: 0.95, aimAccuracy: 0.85, shootChance: 0.06, dodgeChance: 0.06 },
+    { level: 6, name: "6 (Veteran)",     speedMult: 1.05, aimAccuracy: 0.92, shootChance: 0.07, dodgeChance: 0.09 },
+    { level: 7, name: "7 (Elit)",        speedMult: 1.15, aimAccuracy: 0.96, shootChance: 0.09, dodgeChance: 0.13 },
+    { level: 8, name: "8 (Mästare)",     speedMult: 1.25, aimAccuracy: 0.99, shootChance: 0.11, dodgeChance: 0.18 },
+    { level: 9, name: "9 (Terminator)",  speedMult: 1.40, aimAccuracy: 1.00, shootChance: 0.14, dodgeChance: 0.25 }
+];
+
+let selectedCpuDiffIdx = 3; // Standard: Nivå 4 (Vakt)
+
+// =========================================================================
+// 🎨 VEKTORRITADE FLAGGOR (SVERIGE & ENGLAND) PÅ CANVAS
+// =========================================================================
+function drawSwedishFlag(ctx, x, y, w, h) {
+    ctx.save();
+    ctx.fillStyle = "#006aa7";
+    ctx.fillRect(x, y, w, h);
+    ctx.fillStyle = "#fecc00";
+    ctx.fillRect(x + w * 0.31, y, w * 0.16, h);
+    ctx.fillRect(x, y + h * 0.38, w, h * 0.24);
+    ctx.strokeStyle = currentLang === 'sv' ? "#00ffcc" : "#ffffff";
+    ctx.lineWidth = currentLang === 'sv' ? 2 : 1;
+    ctx.strokeRect(x, y, w, h);
+    ctx.restore();
+}
+
+function drawBritishFlag(ctx, x, y, w, h) {
+    ctx.save();
+    ctx.fillStyle = "#012169";
+    ctx.fillRect(x, y, w, h);
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = h * 0.26;
+    ctx.beginPath();
+    ctx.moveTo(x, y); ctx.lineTo(x + w, y + h);
+    ctx.moveTo(x + w, y); ctx.lineTo(x, y + h);
+    ctx.stroke();
+    ctx.strokeStyle = "#c8102e";
+    ctx.lineWidth = h * 0.12;
+    ctx.beginPath();
+    ctx.moveTo(x, y); ctx.lineTo(x + w, y + h);
+    ctx.moveTo(x + w, y); ctx.lineTo(x, y + h);
+    ctx.stroke();
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(x + w * 0.38, y, w * 0.24, h);
+    ctx.fillRect(x, y + h * 0.35, w, h * 0.30);
+    ctx.fillStyle = "#c8102e";
+    ctx.fillRect(x + w * 0.42, y, w * 0.16, h);
+    ctx.fillRect(x, y + h * 0.40, w, h * 0.20);
+    ctx.strokeStyle = currentLang === 'en' ? "#00ffcc" : "#ffffff";
+    ctx.lineWidth = currentLang === 'en' ? 2 : 1;
+    ctx.strokeRect(x, y, w, h);
+    ctx.restore();
+}
+
+// =========================================================================
+// 📺 STATUSSCREENS: ANIMERADE SKÄRMAR FÖR NÄTVERK & STATUS
+// =========================================================================
+const StatusScreens = (function() {
+    let animFrame = 0;
+
+    return {
+        // Ritar en specifik animerad vektorillustration centrerad på (cx, cy)
+        drawIllustration: function(ctx, type, cx, cy) {
+            animFrame += 0.05;
+            ctx.save();
+            ctx.translate(cx, cy);
+
+            switch(type) {
+                // 🌐 1. ANSLUTER: Roterande glob med longitud-ellipser och signalringar
+                case "CONNECTING": {
+                    let r = 38;
+                    let rot = (animFrame * 0.8) % (Math.PI * 2);
+
+                    // Yttre pulserande signalringar
+                    let pulse = (Math.sin(animFrame * 2) + 1) * 6;
+                    ctx.strokeStyle = "rgba(0, 255, 204, 0.35)";
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, r + 8 + pulse, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    // Huvudglob
+                    ctx.fillStyle = "#0a192f";
+                    ctx.beginPath();
+                    ctx.arc(0, 0, r, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.strokeStyle = "#00ffcc";
+                    ctx.lineWidth = 2.5;
+                    ctx.stroke();
+
+                    // Ekvator och latituder
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.moveTo(-r, 0); ctx.lineTo(r, 0);
+                    ctx.moveTo(-r * 0.86, -r * 0.5); ctx.lineTo(r * 0.86, -r * 0.5);
+                    ctx.moveTo(-r * 0.86, r * 0.5); ctx.lineTo(r * 0.86, r * 0.5);
+                    ctx.stroke();
+
+                    // Roterande longitudlinjer (projicerade ellipser)
+                    for (let offset = 0; offset < 3; offset++) {
+                        let phase = rot + (offset * Math.PI / 3);
+                        let wRatio = Math.cos(phase);
+                        ctx.beginPath();
+                        ctx.ellipse(0, 0, Math.max(0.1, Math.abs(wRatio) * r), r, 0, 0, Math.PI * 2);
+                        ctx.stroke();
+                    }
+                    break;
+                }
+
+                // ⏳ 2. LOADING: Roterande timglas med rinnande sand
+                case "LOADING": {
+                    let rotCycle = Math.floor(animFrame * 0.5);
+                    let smoothRot = (animFrame * 0.5 % Math.PI);
+                    // Roterar 180 grader med jämna mellanrum
+                    let isFlipping = (animFrame * 0.5 % Math.PI) > 2.5;
+                    let currentAngle = isFlipping ? (smoothRot - 2.5) * (Math.PI / (Math.PI - 2.5)) : 0;
+
+                    ctx.rotate(currentAngle);
+
+                    // Glashölje
+                    ctx.strokeStyle = "#ffeb3b";
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.moveTo(-24, -32); ctx.lineTo(24, -32); // Övre ram
+                    ctx.lineTo(4, 0);   ctx.lineTo(24, 32);  // Nedre högra
+                    ctx.lineTo(-24, 32); ctx.lineTo(-4, 0);  // Nedre vänstra
+                    ctx.closePath();
+                    ctx.stroke();
+
+                    // Sand i övre kammaren (minskar)
+                    let sandLevel = (Math.sin(animFrame) + 1) * 0.5; // 0.0 - 1.0
+                    ctx.fillStyle = "#ffd600";
+                    ctx.beginPath();
+                    ctx.moveTo(-16 * sandLevel, -24 + (1 - sandLevel) * 16);
+                    ctx.lineTo(16 * sandLevel, -24 + (1 - sandLevel) * 16);
+                    ctx.lineTo(2, -2);
+                    ctx.lineTo(-2, -2);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Sandstråle i mitten
+                    ctx.strokeStyle = "#ffd600";
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(0, -2); ctx.lineTo(0, 20);
+                    ctx.stroke();
+
+                    // Sandhög i botten (ökar)
+                    ctx.beginPath();
+                    ctx.moveTo(-18, 30);
+                    ctx.lineTo(18, 30);
+                    ctx.lineTo(0, 16 + (1 - sandLevel) * 10);
+                    ctx.closePath();
+                    ctx.fill();
+                    break;
+                }
+
+                // 🛰️ 3. ANSLUTNING MISSLYCKADES: Kraschad satellit med rök och eldgnistor
+                case "CONN_FAILED": {
+                    // Satellitchassi (snedställt och sprucket)
+                    ctx.rotate(0.4);
+                    ctx.fillStyle = "#334155";
+                    ctx.fillRect(-18, -18, 36, 36);
+                    ctx.strokeStyle = "#ff1744";
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(-18, -18, 36, 36);
+
+                    // Brutna solpaneler
+                    ctx.fillStyle = "#0284c7";
+                    ctx.fillRect(-52, -10, 28, 20);
+                    ctx.strokeRect(-52, -10, 28, 20);
+
+                    // Höger brutna panel hänger snett
+                    ctx.save();
+                    ctx.translate(24, 0);
+                    ctx.rotate(0.6 + Math.sin(animFrame * 3) * 0.1);
+                    ctx.fillRect(0, -10, 28, 20);
+                    ctx.strokeRect(0, -10, 28, 20);
+                    ctx.restore();
+
+                    // Parabolantenn med spricka
+                    ctx.strokeStyle = "#e2e8f0";
+                    ctx.beginPath();
+                    ctx.arc(0, -26, 14, 0.2 * Math.PI, 0.8 * Math.PI);
+                    ctx.stroke();
+
+                    // Blixtrande eld- och rökpartiklar
+                    for (let i = 0; i < 5; i++) {
+                        let sparkX = (Math.sin(animFrame * 5 + i) * 22);
+                        let sparkY = -15 - (i * 6) - (Math.cos(animFrame * 4 + i) * 8);
+                        ctx.fillStyle = i % 2 === 0 ? "#ff1744" : "#ffeb3b";
+                        ctx.fillRect(sparkX, sparkY, 4, 4);
+                    }
+                    break;
+                }
+
+                // 🔌 4. INGEN INTERNETANSLUTNING: Avhuggen TP-kabel med elektriska gnistor
+                case "NO_INTERNET": {
+                    let sparkOffset = Math.sin(animFrame * 15) * 4;
+
+                    // Vänster kabelända (blå)
+                    ctx.fillStyle = "#00a2ff";
+                    ctx.fillRect(-65, -8, 38, 16);
+                    // Blottade koppartrådar Vänster
+                    ctx.fillStyle = "#ff5722"; ctx.fillRect(-27, -6, 8, 3);
+                    ctx.fillStyle = "#00ffcc"; ctx.fillRect(-27, -1, 8, 3);
+                    ctx.fillStyle = "#ffeb3b"; ctx.fillRect(-27, 4, 8, 3);
+
+                    // Höger kabelända
+                    ctx.fillStyle = "#00a2ff";
+                    ctx.fillRect(27, -8, 38, 16);
+                    // Blottade koppartrådar Höger
+                    ctx.fillStyle = "#ff5722"; ctx.fillRect(19, -6, 8, 3);
+                    ctx.fillStyle = "#00ffcc"; ctx.fillRect(19, -1, 8, 3);
+                    ctx.fillStyle = "#ffeb3b"; ctx.fillRect(19, 4, 8, 3);
+
+                    // Elektriska blixtar i glappet
+                    ctx.strokeStyle = "#ffeb3b";
+                    ctx.lineWidth = 2.5;
+                    ctx.beginPath();
+                    ctx.moveTo(-19, -4);
+                    ctx.lineTo(-6, 8 + sparkOffset);
+                    ctx.lineTo(6, -8 + sparkOffset);
+                    ctx.lineTo(19, 4);
+                    ctx.stroke();
+
+                    ctx.fillStyle = "#ff1744";
+                    ctx.font = "bold 13px monospace";
+                    ctx.textAlign = "center";
+                    ctx.fillText("✕ OFFLINE", 0, 38);
+                    break;
+                }
+
+                // 🐌 5. TIMEOUT: Långsam snigel med laggande Wi-Fi-bågar
+                case "TIMEOUT": {
+                    // Snigelskal (neon-orange spiral)
+                    ctx.fillStyle = "#ea580c";
+                    ctx.beginPath();
+                    ctx.arc(-8, -4, 22, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.strokeStyle = "#fed7aa";
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.arc(-8, -4, 14, 0, 1.4 * Math.PI);
+                    ctx.stroke();
+
+                    // Snigelkropp som rör sig långsamt fram och tillbaka
+                    let crawl = Math.sin(animFrame * 1.5) * 3;
+                    ctx.fillStyle = "#84cc16";
+                    ctx.beginPath();
+                    ctx.ellipse(8 + crawl, 12, 34, 9, 0, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Horn med ögon
+                    ctx.strokeStyle = "#84cc16";
+                    ctx.lineWidth = 2.5;
+                    ctx.beginPath();
+                    ctx.moveTo(28 + crawl, 8);  ctx.lineTo(38 + crawl, -8);
+                    ctx.moveTo(32 + crawl, 8);  ctx.lineTo(44 + crawl, -4);
+                    ctx.stroke();
+
+                    ctx.fillStyle = "#ffffff";
+                    ctx.beginPath();
+                    ctx.arc(38 + crawl, -8, 3, 0, Math.PI * 2);
+                    ctx.arc(44 + crawl, -4, 3, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Svaga röda Wi-Fi-vågor som blinkar/laggar
+                    let waveAlpha = (Math.sin(animFrame * 3) + 1) * 0.5;
+                    ctx.strokeStyle = `rgba(255, 23, 68, ${waveAlpha})`;
+                    ctx.lineWidth = 2.5;
+                    ctx.beginPath();
+                    ctx.arc(0, -32, 10, 1.2 * Math.PI, 1.8 * Math.PI);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(0, -32, 18, 1.2 * Math.PI, 1.8 * Math.PI);
+                    ctx.stroke();
+                    break;
+                }
+
+                // 🏆 6. VINST: Pokal med roterande stjärnor och ljussken
+                case "VICTORY": {
+                    // Guldsken
+                    let glow = (Math.sin(animFrame * 3) + 1) * 5;
+                    ctx.fillStyle = "rgba(255, 214, 0, 0.15)";
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 48 + glow, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Pokalens skål
+                    ctx.fillStyle = "#ffd600";
+                    ctx.beginPath();
+                    ctx.moveTo(-24, -32); ctx.lineTo(24, -32);
+                    ctx.lineTo(16, 6);   ctx.lineTo(0, 18); ctx.lineTo(-16, 6);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Handtag
+                    ctx.strokeStyle = "#f59e0b";
+                    ctx.lineWidth = 3.5;
+                    ctx.beginPath();
+                    ctx.arc(-22, -12, 10, 0.5 * Math.PI, 1.5 * Math.PI);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(22, -12, 10, -0.5 * Math.PI, 0.5 * Math.PI);
+                    ctx.stroke();
+
+                    // Bas / Piedestal
+                    ctx.fillStyle = "#334155";
+                    ctx.fillRect(-18, 22, 36, 12);
+                    ctx.fillRect(-26, 34, 52, 6);
+                    break;
+                }
+
+                // 💀 7. FÖRLUST: Krossad dödskalle med kryssögon
+                case "DEFEAT": {
+                    ctx.fillStyle = "#e2e8f0";
+                    // Huvudskål
+                    ctx.beginPath();
+                    ctx.arc(0, -10, 26, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Käkparti
+                    ctx.fillRect(-14, 8, 28, 16);
+
+                    // Svarta kryssögon
+                    ctx.strokeStyle = "#0f172a";
+                    ctx.lineWidth = 3;
+                    // Vänster kryss
+                    ctx.beginPath();
+                    ctx.moveTo(-14, -14); ctx.lineTo(-6, -6);
+                    ctx.moveTo(-6, -14); ctx.lineTo(-14, -6);
+                    // Höger kryss
+                    ctx.moveTo(6, -14); ctx.lineTo(14, -6);
+                    ctx.moveTo(14, -14); ctx.lineTo(6, -6);
+                    ctx.stroke();
+
+                    // Näshåla
+                    ctx.fillStyle = "#0f172a";
+                    ctx.beginPath();
+                    ctx.moveTo(0, -2); ctx.lineTo(-4, 4); ctx.lineTo(4, 4);
+                    ctx.closePath();
+                    ctx.fill();
+                    break;
+                }
+            }
+
+            ctx.restore();
+        },
+
+        // Renderar hela modal-skärmen ovanpå spelet
+        renderOverlay: function(ctx, canvas, screenState, title, subText) {
+            ctx.save();
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+            // Mörk halvtransparent bakgrundstoning
+            ctx.fillStyle = "rgba(6, 7, 12, 0.92)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            let boxW = 460;
+            let boxH = 250;
+            let boxX = (canvas.width - boxW) / 2;
+            let boxY = (canvas.height - boxH) / 2;
+
+            // Färgkodning av ram baserat på status
+            let isError = (screenState === "CONN_FAILED" || screenState === "NO_INTERNET" || screenState === "TIMEOUT" || screenState === "DEFEAT");
+            let strokeColor = isError ? "#ff1744" : (screenState === "VICTORY" ? "#ffd600" : "#00ffcc");
+
+            ctx.fillStyle = "#10141e";
+            ctx.fillRect(boxX, boxY, boxW, boxH);
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 3;
+            ctx.strokeRect(boxX, boxY, boxW, boxH);
+
+            // Rita animationen i boxens centrum
+            this.drawIllustration(ctx, screenState, canvas.width / 2, boxY + 80);
+
+            // Rubrik
+            ctx.textAlign = "center";
+            ctx.fillStyle = strokeColor;
+            ctx.font = "bold 16px 'Courier New', monospace";
+            ctx.fillText(title, canvas.width / 2, boxY + 160);
+
+            // Brödtext / Hjälptext
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "12px 'Courier New', monospace";
+            ctx.fillText(subText, canvas.width / 2, boxY + 190);
+
+            // Tangentguide
+            ctx.fillStyle = "#888888";
+            ctx.font = "10px monospace";
+            ctx.fillText("[ ESC: AVBRYT / TILLBAKA ]", canvas.width / 2, boxY + 225);
+
+            ctx.restore();
+        }
+    };
+})();
+
+// =========================================================================
+// 🔊 LJUDMOTOR
+// =========================================================================
+const SoundEngine = {
+    play: function(file, vol) {
+        try {
+            let a = new Audio(file);
+            a.volume = vol || 0.5;
+            a.play().catch(() => {});
+        } catch(e) {}
+    },
+    laser: function() { this.play('step.wav', 0.4); },
+    hit: function() { this.play('boooop.mp3', 0.6); },
+    win: function() { this.play('pling.mp3', 0.8); },
+    nuke: function() { this.play('car_crash_loud.wav', 1.0); },
+    powerup: function() { this.play('pling.mp3', 0.6); }
+};
+
+let currentScreenState = "NONE"; // "NONE", "CONNECTING", "LOADING", "CONN_FAILED", "NO_INTERNET", "TIMEOUT", "VICTORY", "DEFEAT"
+let screenMessageTitle = "";
+let screenMessageSub = "";
+// Matchtimer (60 sekunder i 60 FPS)
+let matchTimer = 3600; 
+const MATCH_DURATION = 3600;
+// 🧙‍♂️ Kamek bildresurs & Tävlingsläge
+const kamekImage = new Image();
+kamekImage.src = 'kamek.jfif';
+
+let isTournamentMode = true; // Sätts till true om turnering körs (spärrar paus)
+
+// 📡 Telia Hårdvaru- & Nätverksresurs
+const teliaImage = new Image();
+teliaImage.src = 'telia.png';
+
+// =========================================================================
+// 🧙‍♂️ KAMEK ANTI-CHEAT: PVP ARENA TOURNAMENT EDITION
+// =========================================================================
+const PvpAntiCheat = (function() {
+    let isLocked = false;
+    let lockReasonKey = "";
+    let clickTimestamps = [];
+    let lastActivityTime = Date.now();
+    let keyHoldFrames = {};
+    let tournamentPauseAttempts = 0;
+
+    const VIOLATIONS = {
+        sv: {
+            banner: "🛑 KAMEK SPÄRRADE MATCHEN! 🛑",
+            subTitle: "OFFICIELLT ANTI-FUSK PROTOKOLL AKTIVERAT",
+            prompt: "[ KLICKA MED MUSEN FÖR ATT STARTA OM SPELET ]",
+            DEVTOOLS: {
+                title: "INSPEKTERA / UTVECKLARVERKTYG (F12)",
+                desc: "🧙‍♂️ KAMEK: 'Nyehehehe! Trodde du att du kunde ändra dina HP-värden eller kika på källkoden i konsolen?! I den här arenan råder strikt förbud mot F12 och konsolkommandon!'",
+                rule: "Regelbrott: Ändring av variabler och DOM-manipulation är förbjudet."
+            },
+            AUTOCLICKER: {
+                title: "AUTOKLICKER / SNABBKLICK-SKRIPT DETEKTERAT",
+                desc: "🧙‍♂️ KAMEK: 'Nyehehehe! Över 22 musklick på under en sekund?! Du är varken en kulspruta eller en robot! Inga externa klickprogram tillåts här!'",
+                rule: "Regelbrott: Klickfrekvens överskrider tillåten mänsklig kapacitet."
+            },
+            TURBO_MACRO: {
+                title: "TURBO / NEDTEJPAD KNAPP (MAKRO)",
+                desc: "🧙‍♂️ KAMEK: 'Nyehehehe! Du har hållit nere skjut- eller attackknappen i flera sekunder i sträck! Har du tejpat fast fingret eller använder du ett turbo-makro?!'",
+                rule: "Regelbrott: Kontinuerlig trigger-holding utan paus är otillåtet."
+            },
+            AFK: {
+                title: "AFK / SPELAREN HAR LÄMNAT MATCHEN",
+                desc: "🧙‍♂️ KAMEK: 'Nyehehehe! Ingen rörelse eller klick på över 20 sekunder! Gick du och hämtade fika mitt under brinnande strid?! Matchen avbruten!'",
+                rule: "Regelbrott: Passivitet och matchfördröjning diskvalificerar arenan."
+            },
+            TOURNAMENT_PAUSE: {
+                title: "OTILLÅTET PAUSFÖRSÖK I TÄVLINGSLÄGE",
+                desc: "🧙‍♂️ KAMEK: 'Nyehehehe! Det finns ingen pausknapp i finalen! Du försökte avbryta matchen mitt under motståndarens attack!'",
+                rule: "Regelbrott: Paus är permanent spärrad under pågående tävling."
+            },
+            TRACKPAD: {
+                title: "STYRPLATTA DETEKTERAD (EJ FÖR GAMING!)",
+                desc: "🧙‍♂️ KAMEK: 'Nyehehehe! Står du och smeker datorns styrplatta med ett flottigt pekfinger?! En laptop-pekplatta är till för kontorsarbete och att scrolla recept, INTE för gaming! Att spela arkad med pekplatta är dömt att misslyckas!'",
+                rule: "Regel & Rekommendation: Använd en riktig datormus med sladd eller koppla in en godkänd handkontroll!"
+            },
+            TAB_SWITCH: {
+                title: "FLIKBYTE / BAKGRUNDSLÄGE DETEKTERAT",
+                desc: "🧙‍♂️ KAMEK: 'Nyehehehe! Smög du iväg till en annan flik för att undvika att ta skada?! När du lämnar fönstret låses portarna direkt!'",
+                rule: "Regelbrott: Fönstret måste förbli aktivt under hela rundan."
+            }
+        },
+        en: {
+            banner: "🛑 KAMEK LOCKED THE MATCH! 🛑",
+            subTitle: "OFFICIAL ANTI-CHEAT PROTOCOL TRIGGERED",
+            prompt: "[ CLICK ANYWHERE WITH MOUSE TO RESTART ]",
+            DEVTOOLS: {
+                title: "INSPECT / DEVTOOLS DETECTED (F12)",
+                desc: "🧙‍♂️ KAMEK: 'Nyehehehe! Did you really think you could alter your HP or peek at the console source code?! F12 and debugger tools are strictly forbidden!'",
+                rule: "Violation: Variable tampering and DOM injection are prohibited."
+            },
+            AUTOCLICKER: {
+                title: "AUTOCLICKER / RAPID-FIRE SCRIPT DETECTED",
+                desc: "🧙‍♂️ KAMEK: 'Nyehehehe! Over 22 clicks in less than a second?! You are not a machine gun! No external clicking scripts allowed in my arena!'",
+                rule: "Violation: Click frequency exceeds maximum allowed human limits."
+            },
+            TURBO_MACRO: {
+                title: "TURBO / TAPED-DOWN TRIGGER (MACRO)",
+                desc: "🧙‍♂️ KAMEK: 'Nyehehehe! You held the shoot or attack button non-stop for several seconds! Did you tape your button down or use a turbo macro?!'",
+                rule: "Violation: Uninterrupted continuous trigger holding is disallowed."
+            },
+            AFK: {
+                title: "AFK / INACTIVITY TIMEOUT",
+                desc: "🧙‍♂️ KAMEK: 'Nyehehehe! Zero movement or clicks for over 20 seconds! Did you take a nap mid-fight?! Match terminated!'",
+                rule: "Violation: Passivity and match stalling causes disqualification."
+            },
+            TOURNAMENT_PAUSE: {
+                title: "ILLEGAL PAUSE ATTEMPT IN TOURNAMENT",
+                desc: "🧙‍♂️ KAMEK: 'Nyehehehe! There are no coffee breaks in tournament mode! You attempted to pause right as your opponent attacked!'",
+                rule: "Violation: Pausing is disabled during official tournament play."
+            },
+            TRACKPAD: {
+                title: "LAPTOP TRACKPAD DETECTED (NOT FOR GAMING!)",
+                desc: "🧙‍♂️ KAMEK: 'Nyehehehe! Are you stroking your laptop's trackpad with a greasy finger?! A trackpad is meant for spreadsheets and browsing recipes, NOT for gaming! Playing an arcade shooter on a touchpad is pure madness!'",
+                rule: "Rule & Recommendation: Use a proper wired gaming mouse or plug in a supported gamepad!"
+            },
+            TAB_SWITCH: {
+                title: "TAB SWITCH / WINDOW BLUR DETECTED",
+                desc: "🧙‍♂️ KAMEK: 'Nyehehehe! Did you tab away to another window to freeze the action?! Leaving the arena locks the match instantly!'",
+                rule: "Violation: Arena focus must remain active throughout the round."
+            }
+        }
+    };
+
+    function resetAFK() {
+        lastActivityTime = Date.now();
+    }
+
+    // 1. F12 & DevTools-kombinationer
+    window.addEventListener('keydown', function(e) {
+        resetAFK();
+        if (e.key === 'F12' || e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C'))) {
+            e.preventDefault();
+            PvpAntiCheat.lock("DEVTOOLS");
+        }
+
+        // Tävlingspaus-kontroll
+        if ((e.key === 'Escape' || e.key === 'p' || e.key === 'P') && gameState === "PLAYING" && isTournamentMode) {
+            e.preventDefault();
+            tournamentPauseAttempts++;
+            if (tournamentPauseAttempts >= 2) {
+                PvpAntiCheat.lock("TOURNAMENT_PAUSE");
+            }
+        }
+
+        // Turbo/Makro-kontroll för tangenter
+        if (gameState === "PLAYING") {
+            keyHoldFrames[e.code] = (keyHoldFrames[e.code] || 0) + 1;
+            if (keyHoldFrames[e.code] > 180) { // Nedtryckt i över 3 sekunder oavbrutet
+                PvpAntiCheat.lock("TURBO_MACRO");
+            }
+        }
+    });
+
+    window.addEventListener('keyup', function(e) {
+        keyHoldFrames[e.code] = 0;
+    });
+
+    // 2. Flikbyte
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden && gameState === "PLAYING") {
+            PvpAntiCheat.lock("TAB_SWITCH");
+        }
+    });
+
+    // 3. Autoklicker & Mus-aktivitet
+    window.addEventListener('mousemove', resetAFK);
+    window.addEventListener('mousedown', function(e) {
+        resetAFK();
+        if (gameState === "PLAYING" && e.button === 0) {
+            const now = performance.now();
+            clickTimestamps.push(now);
+            clickTimestamps = clickTimestamps.filter(t => now - t < 1000);
+
+            if (clickTimestamps.length > 22) {
+                PvpAntiCheat.lock("AUTOCLICKER");
+            }
+        }
+    });
+
+    // 4. AFK-kontroll (20 sekunder utan livstecken i match)
+    setInterval(function() {
+        if (!isLocked && gameState === "PLAYING" && (Date.now() - lastActivityTime > 20000)) {
+            PvpAntiCheat.lock("AFK");
+        }
+    }, 1000);
+
+    // 5. DETEKTERA STYRPLATTA VIA HJUL- OCH SCROLLGESTER
+    window.addEventListener('wheel', function(e) {
+        resetAFK();
+        if (gameState !== "PLAYING") return;
+
+        // Fysiska mushjul skickar fasta heltalssteg (oftast 100 eller 120 utan decimaler och deltaX === 0)
+        // Laptop-styrplattor skickar små kontinuerliga flyttal och tvådimensionella rörelser (deltaX !== 0)
+        var isFractional = !Number.isInteger(e.deltaY) || !Number.isInteger(e.deltaX);
+        var isSmallDelta = Math.abs(e.deltaY) > 0 && Math.abs(e.deltaY) < 40;
+        var hasHorizontalScroll = Math.abs(e.deltaX) > 0;
+
+        if ((isFractional || isSmallDelta || hasHorizontalScroll) && e.deltaMode === 0) {
+            PvpAntiCheat.lock("TRACKPAD");
+        }
+    }, { passive: true });
+
+    // 6. DETEKTERA STYRPLATTANS TAP-TO-CLICK & SMÅTOUCH VIA POINTEREVENTS
+    window.addEventListener('pointerdown', function(e) {
+        resetAFK();
+        if (gameState !== "PLAYING") return;
+
+        // Känner av tryckkänslighet eller touch-genererade mushändelser från laptops
+        if (e.pointerType === "touch" || (e.pointerType === "mouse" && e.width > 0 && e.width !== 1 && e.height !== 1)) {
+            PvpAntiCheat.lock("TRACKPAD");
+        }
+    });
+
+    return {
+        lock: function(reasonKey) {
+            if (isLocked) return;
+            isLocked = true;
+            lockReasonKey = reasonKey || "DEVTOOLS";
+
+            // Spela upp Kamek-ljudet
+            try {
+                const kamekAudio = new Audio('kamek.mp3');
+                kamekAudio.volume = 1.0;
+                kamekAudio.play().catch(() => {});
+            } catch (e) {}
+
+            // Klick startar om spelet rent
+            window.addEventListener('mousedown', function() {
+                if (isLocked) window.location.reload();
+            }, { once: true });
+        },
+
+        isTriggered: function() {
+            return isLocked;
+        },
+
+        drawLockScreen: function(ctx, canvas) {
+            if (!isLocked) return;
+
+            const lang = (currentLang === 'en') ? 'en' : 'sv';
+            const pack = VIOLATIONS[lang];
+            const item = pack[lockReasonKey] || pack.DEVTOOLS;
+
+            ctx.save();
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+            // Mörk lila bakgrund
+            ctx.fillStyle = "rgba(10, 2, 22, 0.98)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Dubbel varningsram (Gul/Röd puls)
+            const isPulse = Math.floor(Date.now() / 200) % 2 === 0;
+            ctx.strokeStyle = isPulse ? "#ff1744" : "#ffd600";
+            ctx.lineWidth = 5;
+            ctx.strokeRect(16, 16, canvas.width - 32, canvas.height - 32);
+
+            ctx.textAlign = "center";
+
+            // Huvudrubrik
+            ctx.fillStyle = isPulse ? "#ffd600" : "#ff1744";
+            ctx.font = "bold 24px 'Courier New', monospace";
+            ctx.fillText(pack.banner, canvas.width / 2, 55);
+
+            ctx.fillStyle = "#38bdf8";
+            ctx.font = "bold 12px monospace";
+            ctx.fillText(pack.subTitle, canvas.width / 2, 80);
+
+            // Rita Kamek-bilden (kamek.jfif) centrerad
+            const imgW = 120;
+            const imgH = 120;
+            const imgX = canvas.width / 2 - imgW / 2;
+            const imgY = 95;
+
+            if (kamekImage.complete && kamekImage.naturalWidth > 0) {
+                ctx.drawImage(kamekImage, imgX, imgY, imgW, imgH);
+                ctx.strokeStyle = "#ffd600";
+                ctx.lineWidth = 3;
+                ctx.strokeRect(imgX, imgY, imgW, imgH);
+            } else {
+                // Fallback om bildfilen laddar långsamt
+                ctx.font = "70px sans-serif";
+                ctx.fillText("🧙‍♂️", canvas.width / 2, 175);
+            }
+
+            // Box för regelöverträdelse
+            const boxW = 680;
+            const boxH = 190;
+            const boxX = (canvas.width - boxW) / 2;
+            const boxY = 230;
+
+            ctx.fillStyle = "rgba(22, 15, 38, 0.9)";
+            ctx.fillRect(boxX, boxY, boxW, boxH);
+            ctx.strokeStyle = "#ff1744";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(boxX, boxY, boxW, boxH);
+
+            // Förseelserubrik
+            ctx.fillStyle = "#ff1744";
+            ctx.font = "bold 15px 'Courier New', monospace";
+            ctx.fillText("⚠️ " + item.title, canvas.width / 2, boxY + 30);
+
+            // Kameks hån
+            ctx.fillStyle = "#ffd600";
+            ctx.font = "bold 12px monospace";
+
+            // Automatisk radbrytning för dialogen
+            const words = item.desc.split(' ');
+            let line = '';
+            let textY = boxY + 62;
+            for (let n = 0; n < words.length; n++) {
+                let testLine = line + words[n] + ' ';
+                let metrics = ctx.measureText(testLine);
+                if (metrics.width > boxW - 40 && n > 0) {
+                    ctx.fillText(line, canvas.width / 2, textY);
+                    line = words[n] + ' ';
+                    textY += 20;
+                } else {
+                    line = testLine;
+                }
+            }
+            ctx.fillText(line, canvas.width / 2, textY);
+
+            // Förklaring av regeln
+            ctx.fillStyle = "#00ffcc";
+            ctx.font = "bold 12px monospace";
+            ctx.fillText(item.rule, canvas.width / 2, boxY + 155);
+
+            // Omstartsknapp
+            ctx.fillStyle = "#22c55e";
+            ctx.fillRect(canvas.width / 2 - 190, canvas.height - 75, 380, 42);
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(canvas.width / 2 - 190, canvas.height - 75, 380, 42);
+
+            ctx.fillStyle = "#000000";
+            ctx.font = "bold 13px monospace";
+            ctx.fillText(pack.prompt, canvas.width / 2, canvas.height - 49);
+
+            ctx.restore();
+        }
+    };
+})();
+// =========================================================================
+// 📡 TELIA ADVANCED HARDWARE & NETWORK MONITOR (UTÖKAD UTGÅVA)
+// =========================================================================
+const HardwareMonitor = (function() {
+    let isHardBlocked = false;
+    let blockReasonKey = "";
+    let selectedDialogueIdx = 0;
+
+    // HUD-mätvärden
+    let currentFps = 60;
+    let currentPing = 20;
+    let currentCpuLoadEst = 15;
+    let ramUsageMB = 0;
+
+    // Varningsflaggor & historik
+    let activeWarning = null;
+    let frameTimestamps = [];
+    let frameDeltas = [];
+    let lastFrameTime = performance.now();
+    let pingHistory = [];
+    let packetLossCount = 0;
+
+    // --- UTÖKAD DIALOG- & REGLERINGSBANK (SVENSKA & ENGELSKA) ---
+    const HARDWARE_RULES = {
+        sv: {
+            banner: "📡 TELIA HÅRDVARU- & NÄTVERKSSPÄRR 📡",
+            subTitle: "SYSTEM- ELLER UPPKOPPLINGSKRAV EJ UPPFYLLDA",
+            prompt: "[ KLICKA FÖR ATT STARTA OM OCH KÖRA NY DIAGNOSTIK ]",
+            CRITICAL_FPS: {
+                title: "KRITISKT LÅG BILDHASTIGHET (< 20 FPS)",
+                dialogues: [
+                    "📡 TELIA SUPPORT: 'Hallå där! Våra sensorer visar att datorn hackar som ett diabildsspel från 1982! Du tappar bildrutor snabbare än en trasig projektor!'",
+                    "👾 GÖRAN: 'Det här är en 60 FPS arkadturnering, inte en långsam serietidning! Stäng alla dina tunga program!'",
+                    "📡 NÄTVERKSVAKT: 'Extrem processorstrypning upptäckt. Webbläsaren hinner inte med fysikberäkningarna, vilket förstör synkroniseringen för motståndaren!'"
+                ],
+                action: "Åtgärd: Stäng bakgrundsappar, uppdatera grafikdrivrutiner eller byt dator!"
+            },
+            THERMAL_THROTTLE: {
+                title: "TERMISK STRYPNING / PLÖTSLIGT FPS-FALL",
+                dialogues: [
+                    "📡 TELIA TEKNIKER: 'Oj oj oj! Processorn kokar förmodligen över! Bildfrekvensen störtdök med över 50 % på bara en sekund!'",
+                    "👾 GÖRAN: 'Känn på undersidan av datorn! Kan du steka ett ägg där?! Fläktarna orkar inte kyla maskinen!'",
+                    "📡 NÄTVERKSVAKT: 'Datorn tvingar ner klockfrekvensen för att inte smälta. Arenan pausas av säkerhetsskäl!'"
+                ],
+                action: "Åtgärd: Rensa fläktarna från damm, ställ datorn på en hård yta eller koppla in kylning!"
+            },
+            LOW_CORES: {
+                title: "FÖR FÅ PROCESSORKÄRNOR (< 4 KÄRNOR)",
+                dialogues: [
+                    "📡 TELIA TEKNIKER: 'Detektorn rapporterar endast 2 logiska processorkärnor! Det är som att dra ett tåg med en trampcykel!'",
+                    "👾 GÖRAN: 'Vi kräver minst 4 trådar för att köra fysik, ljud, rendering och P2P-nätverk samtidigt!'"
+                ],
+                action: "Åtgärd: Starta spelet på en modern fyrkärnig processor!"
+            },
+            LOW_REFRESH_RATE: {
+                title: "LÅG UPPDATERINGSFREKVENS PÅ SKÄRMEN (< 50 HZ)",
+                dialogues: [
+                    "📡 TELIA TEKNIKER: 'Skärmen rapporterar under 50 Hz! Bildvisningen är för trög för en tävlingsinriktad arkadmatch!'",
+                    "👾 GÖRAN: 'Har du ställt in skärmen på strömsparläge?! Ställ in minst 60 Hz i Windows eller macOS skärminställningar!'"
+                ],
+                action: "Åtgärd: Ändra bildskärmens inställningar till 60 Hz eller högre!"
+            },
+            AUDIO_UNDERRUN: {
+                title: "LJUDKORT ELLER SAMPLINGSHASTIGHET SPÄRRAD",
+                dialogues: [
+                    "📡 TELIA SUPPORT: 'Ljudkortet misslyckades med att hålla 44.1 kHz buffert eller orsakade ljudfördröjning!'",
+                    "👾 GÖRAN: 'Spelets ljudeffekter och stereopositionering kräver en stabil ljudkanal utan sprakande buffertlagg!'"
+                ],
+                action: "Åtgärd: Kontrollera standardljudenheten i operativsystemet och uppdatera ljuddrivrutinen!"
+            },
+            CRITICAL_PING: {
+                title: "EXTREMT HÖG PING / LATENS (> 280 MS)",
+                dialogues: [
+                    "📡 TELIA NÄTVERK: 'P2P-signalen tar en hel evighet på sig att nå fram! Med 300 ms fördröjning hinner motståndaren skjuta dig innan du ens ser kulan!'",
+                    "👾 GÖRAN: 'Kör du internet via satellit från en ubåt på havets botten?! Hög ping godkänns inte i tävling!'",
+                    "📡 TELIA TEKNIKER: 'Fiber eller stabil kabel krävs. Din trådlösa länk är för ostabil för att duellera!'"
+                ],
+                action: "Åtgärd: Koppla in en Ethernet-kabel direkt i routern och stäng alla nedladdningar!"
+            },
+            JITTER_SPIKE: {
+                title: "INSTABIL NÄTVERKSJITTER (LATENSKAST)",
+                dialogues: [
+                    "📡 TELIA TEKNIKER: 'Ping-mätaren hoppar vilt från 20 ms upp till 250 ms! Nätverket skakar som en skottkärra på en grusväg!'",
+                    "👾 GÖRAN: 'Ojämn latens är värre än hög ping! Skotten teleporterar fram och tillbaka!'"
+                ],
+                action: "Åtgärd: Se till att ingen på nätverket laddar ner stora filer eller strömmar 4K-video!"
+            },
+            PACKET_LOSS: {
+                title: "ALLVARLIG PAKETFÖRLUST DETEKTERAD",
+                dialogues: [
+                    "📡 TELIA DRIFT: 'Flera P2P-datapaket försvann rakt ut i tomma intet! Det finns hål i din anslutning!'",
+                    "👾 GÖRAN: 'Kopplingen tappar information! Vi kan inte fortsätta matchen när hälften av paketen försvinner!'"
+                ],
+                action: "Åtgärd: Starta om din router eller kontrollera eventuella nätverksglapp!"
+            },
+            RAM_LEAK: {
+                title: "KRITISKT MINNESLÄCKAGE (> 1.2 GB HEAP)",
+                dialogues: [
+                    "📡 TELIA DIAGNOSTIK: 'Webbläsarens minnesallokering skenar i höjden! Över 1.2 GB minne slukas!'",
+                    "👾 GÖRAN: 'Har du 400 öppna flikar i bakgrunden?! Webbläsaren riskerar att krascha hela operativsystemet!'"
+                ],
+                action: "Åtgärd: Stäng onödiga flikar och starta om webbläsaren!"
+            },
+            LOW_RAM: {
+                title: "FÖR LITE ARBETSMINNE (< 4 GB)",
+                dialogues: [
+                    "📡 TELIA MASKINVARA: 'Enheten har under 4 GB RAM tillgängligt! Minnet är för snålt tilltaget för WebRTC och grafikbuffertar!'",
+                    "👾 GÖRAN: 'Det här spelet behöver svängrum i minnet för att flyta utan hackningar!'"
+                ],
+                action: "Åtgärd: Uppgradera datorns RAM-minne!"
+            },
+            INTEGRATED_GPU: {
+                title: "INTEGRERAD GRAFIKKRETS (IGPU) DETEKTERAD",
+                dialogues: [
+                    "📡 TELIA GRAFIKSKYDD: 'Systemet körs på en integrerad Intel-krets utan dedikerat videominne (VRAM)!'",
+                    "👾 GÖRAN: 'Integrerad grafik delar minne med processorn och orsakar bildtaktstapp i turneringen!'"
+                ],
+                action: "Åtgärd: Se till att webbläsaren körs via datorns dedikerade grafikkort (Nvidia eller AMD)!"
+            },
+            CRITICAL_BATTERY: {
+                title: "KRITISK BATTERINIVÅ (< 15%)",
+                dialogues: [
+                    "📡 TELIA STRÖMVAKT: 'Batteriet är nere på kritiska 15 % och laddsladden saknas!'",
+                    "👾 GÖRAN: 'Datorn tvingar ner hårdvaran i energisparläge vilket dödar bildfrekvensen! Sätt i kontakten!'"
+                ],
+                action: "Åtgärd: Sätt i strömkabeln i vägguttaget omedelbart!"
+            }
+        },
+        en: {
+            banner: "📡 TELIA HARDWARE & NETWORK BLOCK 📡",
+            subTitle: "SYSTEM OR CONNECTION CRITERIA NOT MET",
+            prompt: "[ CLICK TO RESTART AND RUN FRESH DIAGNOSTICS ]",
+            CRITICAL_FPS: {
+                title: "CRITICAL LOW FRAME RATE (< 20 FPS)",
+                dialogues: [
+                    "📡 TELIA SUPPORT: 'Hello! Our sensors indicate your frame rate has dropped like a 1982 slideshow!'",
+                    "👾 GÖRAN: 'This is a 60 FPS competitive arcade tournament, not a slow comic book! Close your heavy programs!'",
+                    "📡 NETWORK GUARD: 'Severe CPU bottleneck detected. Physics cannot keep sync with your peer!'"
+                ],
+                action: "Action: Close demanding background software or switch to a faster PC!"
+            },
+            THERMAL_THROTTLE: {
+                title: "THERMAL THROTTLE / SUDDEN FPS DROP",
+                dialogues: [
+                    "📡 TELIA TECH: 'Whoa! Your processor is likely overheating! Frame rate dropped by over 50% in one second!'",
+                    "👾 GÖRAN: 'Can you fry an egg on your laptop right now?! Your fans cannot keep up!'",
+                    "📡 NETWORK GUARD: 'The OS throttled clock speed to prevent physical damage. Match terminated!'"
+                ],
+                action: "Action: Clean fans from dust, use a cooling pad, or lower ambient temperature!"
+            },
+            LOW_CORES: {
+                title: "INSUFFICIENT CPU CORES (< 4 LOGICAL CORES)",
+                dialogues: [
+                    "📡 TELIA TECH: 'Only 2 logical threads reported! Running rendering, physics, audio and P2P requires at least 4 cores!'",
+                    "👾 GÖRAN: 'Upgrade to a modern quad-core machine to enter the tournament!'"
+                ],
+                action: "Action: Launch the game on a modern quad-core CPU!"
+            },
+            LOW_REFRESH_RATE: {
+                title: "LOW DISPLAY REFRESH RATE (< 50 HZ)",
+                dialogues: [
+                    "📡 TELIA TECH: 'Your display refresh rate is under 50 Hz! Motion clarity is insufficient for fast combat!'",
+                    "👾 GÖRAN: 'Did you leave battery saver on?! Set your monitor refresh rate to 60 Hz or higher!'"
+                ],
+                action: "Action: Set your monitor refresh rate to 60 Hz or higher in display settings!"
+            },
+            AUDIO_UNDERRUN: {
+                title: "AUDIO DRIVER BUFFER UNDERRUN",
+                dialogues: [
+                    "📡 TELIA SUPPORT: 'Audio device failed to hold a 44.1 kHz buffer or suffered large sample delay!'",
+                    "👾 GÖRAN: 'Arcade stereo positioning requires a stable audio channel without buffer cracks!'"
+                ],
+                action: "Action: Verify default audio device settings and update sound drivers!"
+            },
+            CRITICAL_PING: {
+                title: "EXTREME HIGH PING / LATENCY (> 280 MS)",
+                dialogues: [
+                    "📡 TELIA NETWORK: 'Your P2P packet travels forever! At 300 ms your peer eliminates you before you see the shot!'",
+                    "👾 GÖRAN: 'Are you running internet through a submarine satellite?! High ping is banned in tournaments!'",
+                    "📡 TELIA TECH: 'Fiber or high-speed broadband required. Your wireless link is dropping out!'"
+                ],
+                action: "Action: Connect via a direct Ethernet cable and stop background downloads!"
+            },
+            JITTER_SPIKE: {
+                title: "UNSTABLE NETWORK JITTER (PING SPIKES)",
+                dialogues: [
+                    "📡 TELIA TECH: 'Ping is wildly jumping between 20 ms and 250 ms! Network stability is shot!'",
+                    "👾 GÖRAN: 'Unstable latency is worse than steady lag! Bullets teleport erratically!'"
+                ],
+                action: "Action: Ensure no other devices on your LAN are uploading or streaming 4K video!"
+            },
+            PACKET_LOSS: {
+                title: "SEVERE PACKET LOSS DETECTED",
+                dialogues: [
+                    "📡 TELIA OPS: 'Consecutive P2P data packets were dropped in transit! Massive connection hole!'",
+                    "👾 GÖRAN: 'We cannot continue the match when half your bullets evaporate into thin air!'"
+                ],
+                action: "Action: Reboot your modem/router or inspect physical cables!"
+            },
+            RAM_LEAK: {
+                title: "CRITICAL MEMORY OVERFLOW (> 1.2 GB HEAP)",
+                dialogues: [
+                    "📡 TELIA DIAGNOSTICS: 'Browser heap size skyrocketed past 1.2 GB of allocated memory!'",
+                    "👾 GÖRAN: 'Do you have 400 tabs running in background?! Your system is about to crash!'"
+                ],
+                action: "Action: Close unused tabs and restart your web browser!"
+            },
+            LOW_RAM: {
+                title: "INSUFFICIENT RAM (< 4 GB)",
+                dialogues: [
+                    "📡 TELIA HARDWARE: 'Under 4 GB RAM available! Too low for WebRTC streaming and canvas buffers!'",
+                    "👾 GÖRAN: 'Arcade duels need memory breathing room to avoid severe stutters!'"
+                ],
+                action: "Action: Upgrade your computer RAM!"
+            },
+            INTEGRATED_GPU: {
+                title: "INTEGRATED GRAPHICS (IGPU) DETECTED",
+                dialogues: [
+                    "📡 TELIA SHIELD: 'System runs on slow integrated Intel graphics sharing system memory!'",
+                    "👾 GÖRAN: 'Shared VRAM causes stuttering during high particle explosions!'"
+                ],
+                action: "Action: Ensure your browser is set to run with dedicated graphics (Nvidia/AMD)!"
+            },
+            CRITICAL_BATTERY: {
+                title: "CRITICAL BATTERY LEVEL (< 15%)",
+                dialogues: [
+                    "📡 TELIA POWER: 'Battery dropped to 15% and power cord is disconnected!'",
+                    "👾 GÖRAN: 'The OS will drastically downclock the CPU to save power! Plug it in!'"
+                ],
+                action: "Action: Connect your charger to the wall outlet immediately!"
+            }
+        }
+    };
+
+    // =========================================================================
+    // 🔍 INITIALA HÅRDVARUANALYSER
+    // =========================================================================
+
+    // 1. Processorkärnor
+    if (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4) {
+        setTimeout(() => HardwareMonitor.block("LOW_CORES"), 400);
+    }
+
+    // 2. RAM-minne
+    if (navigator.deviceMemory && navigator.deviceMemory < 4) {
+        setTimeout(() => HardwareMonitor.block("LOW_RAM"), 500);
+    }
+
+    // 3. Integrerad grafik via WebGL
+    try {
+        let glCanvas = document.createElement('canvas');
+        let gl = glCanvas.getContext('webgl') || glCanvas.getContext('experimental-webgl');
+        if (gl) {
+            let dbg = gl.getExtension('WEBGL_debug_renderer_info');
+            if (dbg) {
+                let renderer = (gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) || "").toLowerCase();
+                if (/intel.*(hd|uhd|iris|graphics)|mesa.*intel|software rasterizer|llvmpipe/i.test(renderer)) {
+                    setTimeout(() => HardwareMonitor.block("INTEGRATED_GPU"), 600);
+                }
+            }
+        }
+    } catch(e) {}
+
+    // 4. Ljudkortsanalys (Web Audio API)
+    try {
+        let AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) {
+            let actx = new AudioCtx();
+            if (actx.sampleRate < 44100) {
+                setTimeout(() => HardwareMonitor.block("AUDIO_UNDERRUN"), 700);
+            }
+            actx.close().catch(() => {});
+        }
+    } catch(e) {}
+
+    // 5. Batteri & Laddarkontroll
+    if (navigator.getBattery) {
+        navigator.getBattery().then(b => {
+            function testBattery() {
+                if (!b.charging) {
+                    if (b.level <= 0.15) {
+                        HardwareMonitor.block("CRITICAL_BATTERY");
+                    } else if (b.level < 0.35) {
+                        HardwareMonitor.triggerWarning(
+                            currentLang === 'sv' ? "LÅG BATTERINIVÅ (<35%)" : "LOW BATTERY (<35%)",
+                            currentLang === 'sv' ? "Koppla in laddaren för att förhindra CPU-strypning!" : "Plug in charger to prevent CPU throttling!",
+                            200, "BAT"
+                        );
+                    }
+                }
+            }
+            testBattery();
+            b.addEventListener('levelchange', testBattery);
+            b.addEventListener('chargingchange', testBattery);
+        }).catch(() => {});
+    }
+
+    return {
+        // =========================================================================
+        // 🔄 KONTROLL PER BILDRUTA (FPS, DROPS, VÄRME, MINNE)
+        // =========================================================================
+        updateMetrics: function() {
+            if (isHardBlocked) return;
+
+            let now = performance.now();
+            let delta = now - lastFrameTime;
+            lastFrameTime = now;
+
+            frameDeltas.push(delta);
+            if (frameDeltas.length > 60) frameDeltas.shift();
+
+            frameTimestamps.push(now);
+            frameTimestamps = frameTimestamps.filter(t => now - t <= 1000);
+            let prevFps = currentFps;
+            currentFps = frameTimestamps.length;
+
+            // CPU Load uppskattning
+            let loadRatio = Math.min(100, Math.round((delta / 16.6) * 45));
+            currentCpuLoadEst = Math.round(currentCpuLoadEst * 0.85 + loadRatio * 0.15);
+
+            // Minneskontroll
+            if (window.performance && window.performance.memory) {
+                ramUsageMB = Math.round(window.performance.memory.usedJSHeapSize / (1024 * 1024));
+                if (ramUsageMB > 1200) {
+                    this.block("RAM_LEAK");
+                    return;
+                }
+            }
+
+            // Termisk strypning: FPS störtdyker med >50% inom 1 sekund
+            if (prevFps >= 50 && currentFps <= 24 && frameTimestamps.length >= 20) {
+                this.block("THERMAL_THROTTLE");
+                return;
+            }
+
+            // Kritiskt låg FPS
+            if (currentFps < 20 && frameTimestamps.length >= 25) {
+                this.block("CRITICAL_FPS");
+            } else if (currentFps < 42 && currentFps > 0) {
+                this.triggerWarning(
+                    currentLang === 'sv' ? "VARNING: LÅG FPS" : "WARNING: LOW FPS",
+                    currentLang === 'sv' ? `Bildfrekvensen sjunker (${currentFps} FPS)! Stäng bakgrundsappar!` : `Frame rate dropping (${currentFps} FPS)! Close apps!`,
+                    120, "FPS"
+                );
+            }
+
+            // Varningstimer nedräkning
+            if (activeWarning) {
+                activeWarning.timer--;
+                if (activeWarning.timer <= 0) activeWarning = null;
+            }
+        },
+
+        // =========================================================================
+        // 🌐 NÄTVERKSRAPPORTERING (PING, JITTER, PAKETFÖRLUST)
+        // =========================================================================
+        reportPing: function(ms, success = true) {
+            if (!success) {
+                packetLossCount++;
+                if (packetLossCount >= 3) {
+                    this.block("PACKET_LOSS");
+                }
+                return;
+            }
+
+            packetLossCount = 0;
+            currentPing = Math.round(ms);
+            pingHistory.push(currentPing);
+            if (pingHistory.length > 8) pingHistory.shift();
+
+            // Mät latensjitter (hopp > 140 ms mellan senaste pings)
+            if (pingHistory.length >= 4) {
+                let minP = Math.min(...pingHistory);
+                let maxP = Math.max(...pingHistory);
+                if (maxP - minP > 140) {
+                    this.triggerWarning(
+                        currentLang === 'sv' ? "VARNING: INSTABIL NÄTVERKSJITTER" : "WARNING: UNSTABLE JITTER",
+                        currentLang === 'sv' ? `Ping varierar mellan ${minP} och ${maxP} ms!` : `Ping swings between ${minP} and ${maxP} ms!`,
+                        160, "JITTER"
+                    );
+                    if (maxP - minP > 230) {
+                        this.block("JITTER_SPIKE");
+                        return;
+                    }
+                }
+            }
+
+            // Kritiskt hög ping
+            if (currentPing > 280) {
+                this.block("CRITICAL_PING");
+            } else if (currentPing > 135) {
+                this.triggerWarning(
+                    currentLang === 'sv' ? "VARNING: HÖG LATENS" : "WARNING: HIGH LATENCY",
+                    currentLang === 'sv' ? `Svarstid är ${currentPing} ms. Undvik Wi-Fi!` : `Latency is ${currentPing} ms. Avoid Wi-Fi!`,
+                    150, "PING"
+                );
+            }
+        },
+
+        triggerWarning: function(title, desc, duration = 180, type = "GEN") {
+            if (isHardBlocked) return;
+            if (!activeWarning || activeWarning.timer < 35) {
+                activeWarning = { title, desc, timer: duration, type };
+                try {
+                    let a = new Audio('boooop.mp3');
+                    a.volume = 0.35;
+                    a.play().catch(() => {});
+                } catch(e) {}
+            }
+        },
+
+        block: function(reasonKey) {
+            if (isHardBlocked) return;
+            isHardBlocked = true;
+            blockReasonKey = reasonKey;
+
+            // Slumpa fram dialog bland tillgängliga alternativ
+            let lang = (typeof currentLang !== 'undefined' && currentLang === 'en') ? 'en' : 'sv';
+            let pack = HARDWARE_RULES[lang];
+            let item = pack[blockReasonKey] || pack.CRITICAL_FPS;
+            selectedDialogueIdx = Math.floor(Math.random() * item.dialogues.length);
+
+            try {
+                let a = new Audio('windows_error.mp3');
+                a.volume = 0.9;
+                a.play().catch(() => {});
+            } catch(e) {}
+
+            window.addEventListener('mousedown', function() {
+                if (isHardBlocked) window.location.reload();
+            }, { once: true });
+        },
+
+        isBlocked: function() {
+            return isHardBlocked;
+        },
+
+        // =========================================================================
+        // 📊 RITA METRIC-HUD (FPS, PING, CPU, RAM) OCH FLYTANDE GULA VARNINGAR
+        // =========================================================================
+        drawHUD: function(ctx, canvas) {
+            if (isHardBlocked) return;
+
+            ctx.save();
+            let startX = 14;
+            let startY = 14;
+
+            function getColor(val, warnThresh, critThresh, invert = false) {
+                if (!invert) {
+                    if (val >= critThresh) return "#ff1744";
+                    if (val >= warnThresh) return "#ffd600";
+                    return "#00ffcc";
+                } else {
+                    if (val <= critThresh) return "#ff1744";
+                    if (val <= warnThresh) return "#ffd600";
+                    return "#00ffcc";
+                }
+            }
+
+            let fpsColor = getColor(currentFps, 42, 22, true);
+            let pingColor = getColor(currentPing, 130, 260, false);
+            let cpuColor = getColor(currentCpuLoadEst, 65, 88, false);
+
+            ctx.fillStyle = "rgba(6, 9, 18, 0.88)";
+            ctx.fillRect(startX, startY, 215, 48);
+            ctx.strokeStyle = "rgba(0, 255, 204, 0.3)";
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(startX, startY, 215, 48);
+
+            ctx.font = "bold 11px monospace";
+            ctx.textAlign = "left";
+
+            // FPS
+            ctx.fillStyle = "#ffffff";
+            ctx.fillText("FPS: ", startX + 8, startY + 18);
+            ctx.fillStyle = fpsColor;
+            ctx.fillText(currentFps, startX + 42, startY + 18);
+
+            // PING
+            ctx.fillStyle = "#ffffff";
+            ctx.fillText("PING: ", startX + 78, startY + 18);
+            ctx.fillStyle = pingColor;
+            ctx.fillText(currentPing + "ms", startX + 118, startY + 18);
+
+            // CPU
+            ctx.fillStyle = "#ffffff";
+            ctx.fillText("CPU: ", startX + 8, startY + 38);
+            ctx.fillStyle = cpuColor;
+            ctx.fillText(currentCpuLoadEst + "%", startX + 42, startY + 38);
+
+            // RAM
+            ctx.fillStyle = "#ffffff";
+            ctx.fillText("RAM: ", startX + 78, startY + 38);
+            ctx.fillStyle = ramUsageMB > 800 ? "#ffd600" : "#00ffcc";
+            ctx.fillText((ramUsageMB > 0 ? ramUsageMB + "MB" : "OK"), startX + 118, startY + 38);
+
+            // ⚠️ Flytande varningsruta vid dåliga värden
+            if (activeWarning && activeWarning.timer > 0) {
+                let boxW = 500;
+                let boxH = 52;
+                let boxX = (canvas.width - boxW) / 2;
+                let boxY = 64;
+
+                let pulse = Math.floor(Date.now() / 150) % 2 === 0;
+                ctx.fillStyle = "rgba(22, 16, 4, 0.95)";
+                ctx.fillRect(boxX, boxY, boxW, boxH);
+                ctx.strokeStyle = pulse ? "#ffd600" : "#ff9100";
+                ctx.lineWidth = 2.5;
+                ctx.strokeRect(boxX, boxY, boxW, boxH);
+
+                ctx.textAlign = "center";
+                ctx.fillStyle = "#ffd600";
+                ctx.font = "bold 13px 'Courier New', monospace";
+                ctx.fillText("⚠️ " + activeWarning.title, canvas.width / 2, boxY + 21);
+
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "11px monospace";
+                ctx.fillText(activeWarning.desc, canvas.width / 2, boxY + 40);
+            }
+
+            ctx.restore();
+        },
+
+        // =========================================================================
+        // 🛑 TELIA FULLSKÄRMSSPÄRR MED TELIA.JFIF OCH SLUMPADE DIALOGER
+        // =========================================================================
+        drawOverlay: function(ctx, canvas) {
+            if (!isHardBlocked) return;
+
+            let lang = (typeof currentLang !== 'undefined' && currentLang === 'en') ? 'en' : 'sv';
+            let pack = HARDWARE_RULES[lang];
+            let item = pack[blockReasonKey] || pack.CRITICAL_FPS;
+            let dialogueText = item.dialogues[selectedDialogueIdx] || item.dialogues[0];
+
+            ctx.save();
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+            // Mörk Telia-bakgrund
+            ctx.fillStyle = "rgba(8, 3, 22, 0.98)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Pulserande ram
+            let pulse = Math.floor(Date.now() / 200) % 2 === 0;
+            ctx.strokeStyle = pulse ? "#ff1744" : "#9900ee";
+            ctx.lineWidth = 5;
+            ctx.strokeRect(16, 16, canvas.width - 32, canvas.height - 32);
+
+            ctx.textAlign = "center";
+            ctx.fillStyle = pulse ? "#ffd600" : "#ff1744";
+            ctx.font = "bold 22px 'Courier New', monospace";
+            ctx.fillText(pack.banner, canvas.width / 2, 55);
+
+            ctx.fillStyle = "#38bdf8";
+            ctx.font = "bold 12px monospace";
+            ctx.fillText(pack.subTitle, canvas.width / 2, 80);
+
+            // Rita telia.jfif
+            let imgW = 120, imgH = 120;
+            let imgX = canvas.width / 2 - imgW / 2;
+            let imgY = 95;
+
+            if (teliaImage.complete && teliaImage.naturalWidth > 0) {
+                ctx.drawImage(teliaImage, imgX, imgY, imgW, imgH);
+                ctx.strokeStyle = "#9900ee";
+                ctx.lineWidth = 3;
+                ctx.strokeRect(imgX, imgY, imgW, imgH);
+            } else {
+                ctx.font = "65px sans-serif";
+                ctx.fillText("📡", canvas.width / 2, 175);
+            }
+
+            // Dialog- & förklaringsruta
+            let boxW = 700, boxH = 190;
+            let boxX = (canvas.width - boxW) / 2;
+            let boxY = 230;
+
+            ctx.fillStyle = "rgba(24, 10, 48, 0.92)";
+            ctx.fillRect(boxX, boxY, boxW, boxH);
+            ctx.strokeStyle = "#ff1744";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(boxX, boxY, boxW, boxH);
+
+            ctx.fillStyle = "#ff1744";
+            ctx.font = "bold 15px 'Courier New', monospace";
+            ctx.fillText("🛑 " + item.title, canvas.width / 2, boxY + 30);
+
+            // Automatisk radbrytning av vald dialog
+            ctx.fillStyle = "#e2e8f0";
+            ctx.font = "bold 12px monospace";
+            let words = dialogueText.split(' ');
+            let line = '';
+            let textY = boxY + 65;
+            for (let n = 0; n < words.length; n++) {
+                let testLine = line + words[n] + ' ';
+                if (ctx.measureText(testLine).width > boxW - 40 && n > 0) {
+                    ctx.fillText(line, canvas.width / 2, textY);
+                    line = words[n] + ' ';
+                    textY += 20;
+                } else {
+                    line = testLine;
+                }
+            }
+            ctx.fillText(line, canvas.width / 2, textY);
+
+            ctx.fillStyle = "#ffd600";
+            ctx.font = "bold 12px monospace";
+            ctx.fillText(item.action, canvas.width / 2, boxY + 155);
+
+            // Omstartsknapp
+            ctx.fillStyle = "#9900ee";
+            ctx.fillRect(canvas.width / 2 - 190, canvas.height - 75, 380, 42);
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(canvas.width / 2 - 190, canvas.height - 75, 380, 42);
+
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "bold 12px monospace";
+            ctx.fillText(pack.prompt, canvas.width / 2, canvas.height - 49);
+
+            ctx.restore();
+        }
+    };
+})();
+
+// =========================================================================
+// 🌭 BILTEMA USB-SPÄRR – UNIKA HÅN FRÅN KUNDSERVICE & KÖRV-AVDELNINGEN
+// =========================================================================
+const UsbEnforcer = (function() {
+    let isUsbBlocked = false;
+    let blockedCategoryKey = "GENERIC_JUNK";
+    let rawDeviceName = "Okänd USB-gadget";
+
+    const biltemaImg = new Image();
+    biltemaImg.src = 'biltema.jfif';
+
+    // --- BILTEMA KUNDSERVICE DIALOG- OCH HÅNBANK ---
+    const BILTEMA_MOCKS = {
+        sv: {
+            banner: "🌭 BILTEMA KUNDSERVICE & HÅRDVARUKONTROLL 🌭",
+            prompt: "[ KOPPLA UR SKRÄPET OCH KLICKA FÖR ATT STARTA OM ]",
+            deviceLabel: "Detekterad Biltema-kandidat: ",
+            
+            // 1. Racingratt, pedaler, växelspak
+            WHEEL_PEDALS: {
+                dept: "🛠️ BILTEMA BILVERKSTAD & BILVÅRD",
+                title: "RACINGRATT, PEDALSTÄLL & HANDBROMS DETEKTERAD!",
+                dialogue: "KUNDSERVICE: 'Hörru Fartdåren! Sitter du och trampar på en koppling och rycker i en spak med Biltema-växelknopp för att styra en liten pixelgubbe?! Det här är ingen EPA-traktor på parkeringen! Ut på E4:an med dig eller styr med piltangenterna som en civiliserad människa!'",
+                action: "Åtgärd: Lås in ratten i skuffen och köp en burk 5-56 istället!"
+            },
+
+            // 2. Flygsimulator (HOTAS, roder, joystick)
+            FLIGHT_HOTAS: {
+                dept: "✈️ BILTEMA BÅT & FRITID",
+                title: "FLYGSPAKAR (HOTAS) & RODERTRAMPOR DETEKTERADE!",
+                dialogue: "KUNDSERVICE: 'Mayday, mayday! Varuhuschefen slår larm! Tror du att du ska nödlanda ett tvåmotorigt sjöflygplan på hylla 14?! Det är en 2D-arkadskjutare! Att ha dubbla gasreglage och fotpedaler under skrivbordet är ren idioti!'",
+                action: "Åtgärd: Landa skrivbordsflygplanet och koppla in en hederlig mus!"
+            },
+
+            // 3. Muggvärmare, kylare, termoelektriska prylar
+            CUP_WARMER: {
+                dept: "🌭 BILTEMA KAFÉ & KÖRV-AVDELNING",
+                title: "USB-MUGGVÄRMARE / KAFFEPRYL SPÄRRAD!",
+                dialogue: "KÖRV-PERSONALEN: 'Men snälla nån! Försöker du hålla kaffet varmt genom att suga ut 5 volt från moderkortet?! Kaffet smakar bränd kabelstam och moderkortet kokar! Vill du ha varm dryck går du till caféet och köper kaffe och körv för en tia!'",
+                action: "Åtgärd: Dra ur muggvärmaren innan du bränner säkringarna i hela kvarteret!"
+            },
+
+            // 4. USB-fläktar, LED-lampor, skrivbordsbelysning
+            USB_FAN_LIGHT: {
+                dept: "💡 BILTEMA EL & BELYSNING",
+                title: "USB-FLÄKT / DISKOLAMPA / JULGRAN STOPPAD!",
+                dialogue: "KUNDSERVICE: 'Stopp ett tag! Du har tryckt in en liten plastfläkt på svanhals som vibrerar sönder skrivbordet och sprider bullsmulor rakt in i fläktintaget! Den drar tjuvström och kyler absolut ingenting!'",
+                action: "Åtgärd: Öppna ett fönster och stäng av discobelysningen!"
+            },
+
+            // 5. Streckkodsläsare, kassa-utrustning
+            BARCODE_SCANNER: {
+                dept: "🛒 BILTEMA SNABB-KASSA & LAGER",
+                title: "STRECKKODSLÄSARE / INVENTERINGSPISTOL!",
+                dialogue: "KASSA-LEDAREN: 'PIP! 731000... Hörru! Har du snott en laserscanner från självskanningen?! Du kan inte stå och blippa streckkoder på tändstift och spolarvätska för att få obegränsat med skott i matchen! Lämna tillbaka scannern genast!'",
+                action: "Åtgärd: Lämna tillbaka inventeringspistolen till kundtjänst!"
+            },
+
+            // 6. BadUSB, Rubber Ducky, makrostift
+            HACKING_DONGLE: {
+                dept: "🚨 BILTEMA CENTRAL BEVAKNING & LARM",
+                title: "HACKING-STICKA (BADUSB / RUBBER DUCKY) PLOMBERAD!",
+                dialogue: "BEVAKNINGEN: 'LARMET GÅR! Trodde du att du var en Hollywood-hacker som kunde smyga in ett tangentbordsinjektions-skript?! Våra larmdetektorer slog till på 3 millisekunder! Vi har skickat väktarna mot din position!'",
+                action: "Åtgärd: Dra ut sabotage-dongeln innan rökmaskinen i taket utlöses!"
+            },
+
+            // 7. MIDI-synth, musikinstrument
+            MIDI_MUSIC: {
+                dept: "📻 BILTEMA BILSTEREO & LJUD",
+                title: "MIDI-KEYBOARD / SYNTHESIZER BLOCKERAD!",
+                dialogue: "KUNDSERVICE: 'Vad i hela... Sitter du och spelar en trudelutt på ett elpiano mitt under slutstriden?! Det här är ingen talangjakt i varuhuset! Tangenterna kan inte binda laserkanoner!'",
+                action: "Åtgärd: Stäng av konserten och plugga in en handkontroll!"
+            },
+
+            // 8. Övriga obskyra USB-prylar
+            GENERIC_JUNK: {
+                dept: "📦 BILTEMA FYNDHÖRNA & REKLAMATION",
+                title: "EJ GODKÄNT SKRÄP I USB-PORTEN!",
+                dialogue: "KUNDSERVICE: 'Hörru! Vad tusan är det där för hittepå-pryl från fyndlådan du tryckt in i datorn?! Här i arenan godkänns ENDAST hederlig datormus, tangentbord eller officiell handkontroll! Dra ur skräpet innan vi rullar ut spikmattan!'",
+                action: "Åtgärd: Koppla ur apparaten och ät en körv i lugn och ro!"
+            }
+        },
+
+        en: {
+            banner: "🌭 BILTEMA CUSTOMER SERVICE & HARDWARE AUDIT 🌭",
+            prompt: "[ UNPLUG THE JUNK AND CLICK TO RESTART ]",
+            deviceLabel: "Detected Biltema candidate: ",
+
+            WHEEL_PEDALS: {
+                dept: "🛠️ BILTEMA AUTO WORKSHOP & DETAILING",
+                title: "RACING WHEEL, PEDALS & HANDBRAKE DETECTED!",
+                dialogue: "CUSTOMER SUPPORT: 'Hey Speed Demon! Are you depressing a clutch pedal and violently shifting gears with a custom knob just to steer a tiny 2D circle?! This is not a beat-up station wagon in our parking lot! Drive on the highway or use a keyboard like a civilized human!'",
+                action: "Action: Lock the steering wheel in your car trunk and buy some rust remover instead!"
+            },
+
+            FLIGHT_HOTAS: {
+                dept: "✈️ BILTEMA MARINE & LEISURE",
+                title: "FLIGHT SIMULATOR YOKE, THROTTLE & RUDDER BLOCKED!",
+                dialogue: "CUSTOMER SUPPORT: 'Mayday, mayday! The store manager is sounding the alarm! Did you think you were crash-landing a twin-engine seaplane into Aisle 14?! This is a 2D arena shooter! Having twin throttles and rudder pedals under your desk is pure nonsense!'",
+                action: "Action: Land your desk fighter jet and plug in a normal mouse!"
+            },
+
+            CUP_WARMER: {
+                dept: "🌭 BILTEMA CAFÉ & HOTDOG PATROL",
+                title: "USB CUP WARMER / HEATER BLOCKED!",
+                dialogue: "HOTDOG DEPT: 'Are you kidding us?! You are drawing 5 volts from your motherboard to warm cold coffee?! Your coffee tastes like burnt insulation and the USB bus is frying! If you want a hot beverage, walk to our café and buy coffee and a hotdog for 10 bucks!'",
+                action: "Action: Unplug the cup warmer before you blow a circuit breaker!"
+            },
+
+            USB_FAN_LIGHT: {
+                dept: "💡 BILTEMA ELECTRICAL & LIGHTING",
+                title: "USB GOOSENECK FAN / DISCO LIGHT BLOCKED!",
+                dialogue: "CUSTOMER SUPPORT: 'Hold it right there! You plugged in a cheap flexible fan that vibrates your entire desk and blows crumbs right into your intake fans! It causes voltage drops and cools absolutely nothing!'",
+                action: "Action: Open a window and turn off the desktop disco lights!"
+            },
+
+            BARCODE_SCANNER: {
+                dept: "🛒 BILTEMA INVENTORY & CHECKOUT",
+                title: "SUPERMARKET POS BARCODE SCANNER DETECTED!",
+                dialogue: "HEAD CASHIER: 'BEEP! Did you swipe a handheld laser scanner from the self-checkout?! Scanning barcodes on spark plugs and wiper fluid will not grant you infinite ammunition or free health! Return the scanner immediately!'",
+                action: "Action: Hand the scanner back to customer service!'",
+            },
+
+            HACKING_DONGLE: {
+                dept: "🚨 BILTEMA CENTRAL SECURITY & SURVEILLANCE",
+                title: "KEYSTROKE INJECTOR (BADUSB / RUBBER DUCKY) QUARANTINED!",
+                dialogue: "SECURITY HQ: 'ALARM TRIGGERED! Did you imagine yourself as a cyber-infiltrator injecting keystroke scripts?! Our perimeter defenses reacted in 3 milliseconds! Security guards have been dispatched to your location!'",
+                action: "Action: Pull the sabotage dongle before the fire suppression system activates!"
+            },
+
+            MIDI_MUSIC: {
+                dept: "📻 BILTEMA CAR AUDIO & SOUND",
+                title: "MIDI SYNTHESIZER / KEYBOARD BLOCKED!",
+                dialogue: "CUSTOMER SUPPORT: 'What in the world... Are you playing a Mozart piano concerto in the middle of a gunfight?! This is an arcade tournament, not an open-mic audition at the store entrance!'",
+                action: "Action: End the concert and plug in an approved gamepad!"
+            },
+
+            GENERIC_JUNK: {
+                dept: "📦 BILTEMA BARGAIN BIN & RETURNS",
+                title: "UNAPPROVED USB HARDWARE BLOCKED!",
+                dialogue: "CUSTOMER SUPPORT: 'Hold up! What kind of flea-market junk did you just shove into the USB slot?! Only standard mice, keyboards, and official gamepads are permitted in this arena! Unplug the weird gadget immediately!'",
+                action: "Action: Unplug the junk and enjoy a cheap hotdog in peace!"
+            }
+        }
+    };
+
+    // =========================================================================
+    // 🔍 KATEGORISERING AV INKOPPLADE USB- & HID-ENHETER
+    // =========================================================================
+    function categorizeDevice(name) {
+        const s = (name || "").toLowerCase();
+
+        // 1. Godkänd hårdvara (släpps igenom)
+        const isApprovedMouseKb = /keyboard|mouse|mus|tangentbord|hid-compliant mouse|hid-compliant keyboard/i.test(s);
+        const isApprovedGamepad = /xbox|playstation|dualsense|dualshock|nintendo|switch pro|standard gamepad|x-box/i.test(s);
+        const isSuspicious = /wheel|pedal|hotas|flight|yoke|throttle|shifter|scanner|fan|warmer|heater|coffee|mug|ducky|badusb|macro|midi|synth|piano/i.test(s);
+
+        if ((isApprovedMouseKb || isApprovedGamepad) && !isSuspicious) {
+            return null; // Godkänd!
+        }
+
+        // 2. Kategorisera felaktig enhet för specifikt hån
+        if (/wheel|pedal|g29|g920|t300|thrustmaster|fanatec|shifter|handbrake/i.test(s)) {
+            return "WHEEL_PEDALS";
+        }
+        if (/hotas|flight|yoke|throttle|rudder|saitek|warthog|x52|x56|joystick/i.test(s)) {
+            return "FLIGHT_HOTAS";
+        }
+        if (/warmer|heater|coffee|mug|cup|termo/i.test(s)) {
+            return "CUP_WARMER";
+        }
+        if (/fan|cooler|light|lamp|disco|tree|led/i.test(s)) {
+            return "USB_FAN_LIGHT";
+        }
+        if (/barcode|scanner|pos\b|honeywell|zebra|datalogic/i.test(s)) {
+            return "BARCODE_SCANNER";
+        }
+        if (/ducky|badusb|injector|teensy|flipper/i.test(s)) {
+            return "HACKING_DONGLE";
+        }
+        if (/midi|synth|piano|keystation|yamaha|casio|korg|akai/i.test(s)) {
+            return "MIDI_MUSIC";
+        }
+
+        return "GENERIC_JUNK";
+    }
+
+    // 1. WebUSB Connect Listener
+    if (navigator.usb) {
+        navigator.usb.addEventListener('connect', (event) => {
+            const devName = event.device.productName || event.device.manufacturerName || "Okänd USB-gadget";
+            const category = categorizeDevice(devName);
+            if (category) {
+                triggerBlock(category, devName);
+            }
+        });
+    }
+
+    // 2. WebHID Connect Listener
+    if (navigator.hid) {
+        navigator.hid.addEventListener('connect', (event) => {
+            const devName = event.device.productName || "Okänd HID-enhet";
+            const category = categorizeDevice(devName);
+            if (category) {
+                triggerBlock(category, devName);
+            }
+        });
+    }
+
+    // 3. Spärra olämpliga Gamepads kontinuerligt
+    function auditConnectedGamepads() {
+        if (!navigator.getGamepads || isUsbBlocked) return;
+        const gamepads = navigator.getGamepads();
+        for (let i = 0; i < gamepads.length; i++) {
+            const gp = gamepads[i];
+            if (!gp || !gp.connected) continue;
+            const category = categorizeDevice(gp.id);
+            if (category) {
+                triggerBlock(category, gp.id);
+                return;
+            }
+        }
+    }
+    setInterval(auditConnectedGamepads, 1200);
+
+    // 4. Detektera BadUSB & Streckkodsläsare via extrem tangenthastighet
+    let burstKeys = [];
+    window.addEventListener('keydown', function(e) {
+        if (isUsbBlocked) return;
+        const now = performance.now();
+        burstKeys.push(now);
+        burstKeys = burstKeys.filter(t => now - t < 120);
+
+        if (burstKeys.length > 12) {
+            if (e.key === 'Enter') {
+                triggerBlock("BARCODE_SCANNER", "Streckkodsläsare / POS-scanner");
+            } else {
+                triggerBlock("HACKING_DONGLE", "USB Keystroke Injector / Rubber Ducky");
+            }
+        }
+    });
+
+    function triggerBlock(categoryKey, deviceName) {
+        if (isUsbBlocked) return;
+        isUsbBlocked = true;
+        blockedCategoryKey = categoryKey;
+        rawDeviceName = deviceName || "Okänd USB-pryl";
+
+        try {
+            const a = new Audio('windows_error.mp3');
+            a.volume = 0.9;
+            a.play().catch(() => {});
+        } catch (e) {}
+
+        window.addEventListener('mousedown', function() {
+            if (isUsbBlocked) window.location.reload();
+        }, { once: true });
+    }
+
+    return {
+        // Kör UsbEnforcer.simulate("CUP_WARMER") i konsolen för att testa
+        simulate: function(categoryKey, customName) {
+            triggerBlock(categoryKey || "GENERIC_JUNK", customName || "Test-enhet");
+        },
+
+        isBlocked: function() {
+            return isUsbBlocked;
+        },
+
+        // =========================================================================
+        // 🎨 RITA BILTEMA FULLSKÄRMSSPÄRR PÅ CANVAS
+        // =========================================================================
+        drawOverlay: function(ctx, canvas) {
+            if (!isUsbBlocked) return;
+
+            const lang = (typeof currentLang !== 'undefined' && currentLang === 'en') ? 'en' : 'sv';
+            const pack = BILTEMA_MOCKS[lang];
+            const item = pack[blockedCategoryKey] || pack.GENERIC_JUNK;
+
+            ctx.save();
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+            // Biltema-blå djup bakgrund
+            ctx.fillStyle = "rgba(4, 16, 44, 0.98)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Varningsram i Biltema-blått & gult
+            const isPulse = Math.floor(Date.now() / 200) % 2 === 0;
+            ctx.strokeStyle = isPulse ? "#2563eb" : "#ffd600";
+            ctx.lineWidth = 6;
+            ctx.strokeRect(16, 16, canvas.width - 32, canvas.height - 32);
+
+            ctx.textAlign = "center";
+
+            // Avdelningsetikett & Banner
+            ctx.fillStyle = "#38bdf8";
+            ctx.font = "bold 13px monospace";
+            ctx.fillText(item.dept, canvas.width / 2, 46);
+
+            ctx.fillStyle = isPulse ? "#ffd600" : "#ff1744";
+            ctx.font = "bold 20px 'Courier New', monospace";
+            ctx.fillText(pack.banner, canvas.width / 2, 70);
+
+            // 🌭 BILTEMA-LOGGA (biltema.jfif)
+            const imgW = 145, imgH = 90;
+            const imgX = canvas.width / 2 - imgW / 2;
+            const imgY = 82;
+
+            if (biltemaImg.complete && biltemaImg.naturalWidth > 0) {
+                ctx.drawImage(biltemaImg, imgX, imgY, imgW, imgH);
+                ctx.strokeStyle = "#2563eb";
+                ctx.lineWidth = 3;
+                ctx.strokeRect(imgX, imgY, imgW, imgH);
+            } else {
+                ctx.fillStyle = "#0284c7";
+                ctx.fillRect(imgX, imgY, imgW, imgH);
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "bold 22px sans-serif";
+                ctx.fillText("BILTEMA", canvas.width / 2, imgY + 54);
+            }
+
+            // Huvudbox för hånet
+            const boxW = 710, boxH = 210;
+            const boxX = (canvas.width - boxW) / 2;
+            const boxY = 186;
+
+            ctx.fillStyle = "rgba(8, 22, 60, 0.95)";
+            ctx.fillRect(boxX, boxY, boxW, boxH);
+            ctx.strokeStyle = "#38bdf8";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(boxX, boxY, boxW, boxH);
+
+            // Rubrik för prylen
+            ctx.fillStyle = "#ff1744";
+            ctx.font = "bold 14px 'Courier New', monospace";
+            ctx.fillText("⚠️ " + item.title, canvas.width / 2, boxY + 26);
+
+            ctx.fillStyle = "#ffd600";
+            ctx.font = "bold 11px monospace";
+            ctx.fillText(pack.deviceLabel + `"${rawDeviceName}"`, canvas.width / 2, boxY + 44);
+
+            // Dialogtext med automatisk radbrytning
+            ctx.fillStyle = "#e2e8f0";
+            ctx.font = "bold 12px monospace";
+            const words = item.dialogue.split(' ');
+            let line = '';
+            let textY = boxY + 74;
+            for (let n = 0; n < words.length; n++) {
+                let testLine = line + words[n] + ' ';
+                if (ctx.measureText(testLine).width > boxW - 40 && n > 0) {
+                    ctx.fillText(line, canvas.width / 2, textY);
+                    line = words[n] + ' ';
+                    textY += 19;
+                } else {
+                    line = testLine;
+                }
+            }
+            ctx.fillText(line, canvas.width / 2, textY);
+
+            // Åtgärd / Körv-tips
+            ctx.fillStyle = "#38bdf8";
+            ctx.font = "bold 12px monospace";
+            ctx.fillText(item.action, canvas.width / 2, boxY + 188);
+
+            // Återställningsknapp
+            ctx.fillStyle = "#2563eb";
+            ctx.fillRect(canvas.width / 2 - 195, canvas.height - 68, 390, 42);
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(canvas.width / 2 - 195, canvas.height - 68, 390, 42);
+
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "bold 12px monospace";
+            ctx.fillText(pack.prompt, canvas.width / 2, canvas.height - 42);
+
+            ctx.restore();
+        }
+    };
+})();
+// =========================================================================
+// 🌐 ONLINEMOTOR MED PEERJS (P2P WEBRTC)
+// =========================================================================
+const OnlineEngine = {
+    peer: null,
+    conn: null,
+    peerId: "",
+    isHost: false,
+    isConnected: false,
+    state: "NONE",
+
+    initHost: function() {
+    if (!navigator.onLine) {
+        currentScreenState = "NO_INTERNET";
+        screenMessageTitle = currentLang === 'sv' ? "INGEN INTERNETANSLUTNING" : "NO INTERNET CONNECTION";
+        screenMessageSub = currentLang === 'sv' ? "Kontrollera nätverkskabeln eller Wi-Fi!" : "Check network cable or Wi-Fi!";
+        return;
+    }
+
+    this.isHost = true;
+    currentScreenState = "CONNECTING";
+    screenMessageTitle = currentLang === 'sv' ? "SKAPAR P2P-RUM..." : "CREATING P2P ROOM...";
+    screenMessageSub = currentLang === 'sv' ? "Väntar på PeerJS-servern..." : "Waiting for PeerJS server...";
+
+    this.peer = new Peer();
+    
+    // Timeout efter 8 sekunder om ingen anslutning sker
+    let connTimeout = setTimeout(() => {
+        if (!this.isConnected) {
+            currentScreenState = "TIMEOUT";
+            screenMessageTitle = currentLang === 'sv' ? "ANSLUTNINGEN TOG FÖR LÅNG TID" : "CONNECTION TIMED OUT";
+            screenMessageSub = currentLang === 'sv' ? "Signalen svarade inte i tid." : "The signal did not respond in time.";
+        }
+    }, 8000);
+
+    this.peer.on('open', (id) => {
+        this.peerId = id;
+        screenMessageTitle = currentLang === 'sv' ? "VÄNTAR PÅ MOTSTÅNDARE..." : "WAITING FOR OPPONENT...";
+        screenMessageSub = `RUMS-ID: ${id}`;
+    });
+
+    this.peer.on('connection', (c) => {
+        clearTimeout(connTimeout);
+        this.conn = c;
+        this.setupConnection();
+    });
+
+    this.peer.on('error', () => {
+        clearTimeout(connTimeout);
+        currentScreenState = "CONN_FAILED";
+        screenMessageTitle = currentLang === 'sv' ? "ANSLUTNING MISSLYCKADES" : "CONNECTION FAILED";
+        screenMessageSub = currentLang === 'sv' ? "Kunde inte upprätta P2P-sessionen." : "Could not establish P2P session.";
+    });
+},
+
+    initJoin: function(targetId) {
+    if (!navigator.onLine) {
+        currentScreenState = "NO_INTERNET";
+        screenMessageTitle = currentLang === 'sv' ? "INGEN INTERNETANSLUTNING" : "NO INTERNET CONNECTION";
+        screenMessageSub = currentLang === 'sv' ? "Nätverksanslutning saknas." : "No network connection.";
+        return;
+    }
+
+    this.isHost = false;
+    currentScreenState = "CONNECTING";
+    screenMessageTitle = currentLang === 'sv' ? "ANSLUTER TILL HOST..." : "CONNECTING TO HOST...";
+    screenMessageSub = currentLang === 'sv' ? `Söker rum: ${targetId}` : `Searching room: ${targetId}`;
+
+    let joinTimeout = setTimeout(() => {
+        if (!this.isConnected) {
+            currentScreenState = "TIMEOUT";
+            screenMessageTitle = currentLang === 'sv' ? "TIMEOUT: INGET SVAR" : "TIMEOUT: NO RESPONSE";
+            screenMessageSub = currentLang === 'sv' ? "Kontrollera rums-ID och brandvägg." : "Check room ID and firewall.";
+        }
+    }, 7000);
+
+    this.peer = new Peer();
+    this.peer.on('open', () => {
+        this.conn = this.peer.connect(targetId);
+        this.setupConnection();
+    });
+
+    this.peer.on('error', () => {
+        clearTimeout(joinTimeout);
+        currentScreenState = "CONN_FAILED";
+        screenMessageTitle = currentLang === 'sv' ? "ANSLUTNING MISSLYCKADES" : "CONNECTION FAILED";
+        screenMessageSub = currentLang === 'sv' ? "Kunde inte hitta motståndarens rum." : "Could not find opponent's room.";
+    });
+},
+
+    setupConnection: function() {
+        setInterval(function() {
+        if (OnlineEngine.isConnected && OnlineEngine.conn && OnlineEngine.conn.open) {
+            var pingStart = performance.now();
+            OnlineEngine.send({ type: 'PING_PROBE', sent: pingStart });
+        }
+    }, 2000);
+        this.conn.on('open', () => {
+            this.isConnected = true;
+            startMatch('ONLINE');
+        });
+        this.conn.on('data', (data) => {
+            if (data.type === 'STATE' && !this.isHost) {
+                applyOnlineState(data.payload);
+            } else if (data.type === 'INPUT' && this.isHost) {
+                handleClientInput(data.payload);
+            }
+            if (data.type === 'PING_PROBE') {
+        OnlineEngine.send({ type: 'PONG_REPLY', sent: data.sent });
+        let pingTimeout = setTimeout(() => {
+        HardwareMonitor.reportPing(999, false);
+    }, 1200);
+    } else if (data.type === 'PONG_REPLY') {
+        var rtt = performance.now() - data.sent;
+        clearTimeout(pingTimeout);
+    HardwareMonitor.reportPing(rtt, true);
+    }
+        });
+    },
+
+    send: function(msg) {
+        if (this.conn && this.conn.open) {
+            this.conn.send(msg);
+        }
+    }
+};
+
+// =========================================================================
+// ⚔️ SPELARKLASS, HÄLSA & KRAFT-UPPDATERINGAR
+// =========================================================================
+let gameState = "MENU";
+let gameMode = "LOCAL";
+let totalPlayers = 2;
+let winnerText = "";
+let screenShakeTimer = 0;
+let nukeFlashTimer = 0;
+
+const PLAYER_COLORS = ["#00ffcc", "#ff1744", "#ffd600", "#c084fc"];
+
+class Player {
+    constructor(id, x, y, color, isCpu = false) {
+        this.id = id;
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.isCpu = isCpu;
+        this.radius = 16;
+        this.vx = 0;
+        this.vy = 0;
+        this.baseSpeed = 3.8;
+        this.hp = 100;
+        this.maxHp = 100;
+        this.aimAngle = 0;
+        this.shootCooldown = 0;
+        this.alive = true;
+        this.invulnerableTimer = 0; // Stjärna
+        this.speedBoostTimer = 0;
+        this.isCrosshairRed = false;
+        this.meleeCooldown = 0;
+        this.meleeSwingTimer = 0;
+        this.maxHp = 150; // Ökad bashälsa för längre och intensivare matcher
+        this.hp = 150;
+        this.freezeTimer = 0;   // Blir helt fastfrusen
+        this.poisonTimer = 0;   // Tickar skada över tid
+        this.confuseTimer = 0;  // Inverterar styrning och sikte
+        this.meleeHitboxRadius = 42;
+    }
+
+    update(arenaWidth, arenaHeight, obstacles, allPlayers) {
+        if (!this.alive) return;
+        if (this.shootCooldown > 0) this.shootCooldown--;
+        if (this.invulnerableTimer > 0) this.invulnerableTimer--;
+        if (this.speedBoostTimer > 0) this.speedBoostTimer--;
+        if (this.shootCooldown > 0) this.shootCooldown--;
+        if (this.meleeCooldown > 0) this.meleeCooldown--;
+        if (this.meleeSwingTimer > 0) this.meleeSwingTimer--;
+
+        // 🧪 Gift-effekt: Tickar skada var 30:e frame (0.5 sek)
+        if (this.poisonTimer > 0) {
+            this.poisonTimer--;
+            if (this.poisonTimer % 30 === 0) {
+                this.takeDamage(6);
+                for (let k = 0; k < 3; k++) {
+                    particles.push({
+                        x: this.x, y: this.y,
+                        vx: (Math.random() - 0.5) * 3,
+                        vy: (Math.random() - 0.5) * 3,
+                        color: "#22c55e",
+                        life: 15
+                    });
+                }
+            }
+        }
+
+        if (this.confuseTimer > 0) this.confuseTimer--;
+
+        // 🧊 Frys-effekt: Kan varken gå eller skjuta medan timern tickar
+        if (this.freezeTimer > 0) {
+            this.freezeTimer--;
+            this.vx = 0;
+            this.vy = 0;
+            return; // Spelaren står helt stilla under isen
+        }
+
+        let currentSpeed = this.baseSpeed * (this.speedBoostTimer > 0 ? 1.5 : 1.0);
+
+        if (this.isCpu) {
+            this.updateCpu(allPlayers, obstacles, currentSpeed);
+        }
+
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vx *= 0.85;
+        this.vy *= 0.85;
+
+        // Ytterväggar
+        this.x = Math.max(this.radius + 15, Math.min(arenaWidth - this.radius - 15, this.x));
+        this.y = Math.max(this.radius + 15, Math.min(arenaHeight - this.radius - 15, this.y));
+
+        // Hinder
+        obstacles.forEach(obs => {
+            if (this.x + this.radius > obs.x && this.x - this.radius < obs.x + obs.w &&
+                this.y + this.radius > obs.y && this.y - this.radius < obs.y + obs.h) {
+                this.x -= this.vx * 1.4;
+                this.y -= this.vy * 1.4;
+            }
+        });
+    }
+
+    updateCpu(allPlayers, obstacles, currentSpeed) {
+        let diff = CPU_DIFFICULTIES[selectedCpuDiffIdx];
+        let target = null;
+        let minDist = 9999;
+
+        allPlayers.forEach(p => {
+            if (p.id !== this.id && p.alive) {
+                let d = Math.hypot(p.x - this.x, p.y - this.y);
+                if (d < minDist) {
+                    minDist = d;
+                    target = p;
+                }
+            }
+        });
+
+        if (target) {
+            let dx = target.x - this.x;
+            let dy = target.y - this.y;
+            let idealAngle = Math.atan2(dy, dx);
+
+            // Precision baserad på svårighet
+            let inaccuracy = (1 - diff.aimAccuracy) * (Math.random() - 0.5) * 1.2;
+            this.aimAngle = idealAngle + inaccuracy;
+
+            let step = currentSpeed * diff.speedMult * 0.35;
+            if (minDist > 160) {
+                this.vx += Math.cos(this.aimAngle) * step;
+                this.vy += Math.sin(this.aimAngle) * step;
+            } else if (minDist < 90) {
+                this.vx -= Math.cos(this.aimAngle) * step;
+                this.vy -= Math.sin(this.aimAngle) * step;
+            }
+
+            // Ducka för kulor
+            if (Math.random() < diff.dodgeChance) {
+                this.vx += (Math.random() - 0.5) * 4;
+                this.vy += (Math.random() - 0.5) * 4;
+            }
+
+            if (this.shootCooldown <= 0 && Math.random() < diff.shootChance) {
+                shootBullet(this);
+            }
+        }
+    }
+
+    takeDamage(dmg) {
+        if (!this.alive || this.invulnerableTimer > 0) return;
+        this.hp = Math.max(0, this.hp - dmg);
+        SoundEngine.hit();
+
+        if (this.hp <= 0) {
+            this.alive = false;
+            for (let k = 0; k < 18; k++) {
+                particles.push({
+                    x: this.x, y: this.y,
+                    vx: (Math.random() - 0.5) * 8,
+                    vy: (Math.random() - 0.5) * 8,
+                    color: this.color,
+                    life: 30
+                });
+            }
+        }
+    }
+
+    draw(ctx) {
+        if (!this.alive) return;
+
+        ctx.save();
+        ctx.translate(this.x, this.y);
+
+        // Odödlig stjärneffekt (blinkande gyllene aura)
+        if (this.invulnerableTimer > 0) {
+            ctx.strokeStyle = Math.floor(Date.now() / 60) % 2 === 0 ? "#ffd600" : "#ffffff";
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.arc(0, 0, this.radius + 6, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        // Rita närstridsattack / sving
+        if (this.meleeSwingTimer > 0) {
+            ctx.save();
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.arc(0, 0, this.radius + 18, -0.6, 0.6);
+            ctx.stroke();
+
+            ctx.strokeStyle = this.color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, this.radius + 22, -0.8, 0.8);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        // 🧊 Isblock om spelaren är fryst
+        if (this.freezeTimer > 0) {
+            ctx.fillStyle = "rgba(56, 189, 248, 0.45)";
+            ctx.strokeStyle = "#38bdf8";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(-this.radius - 4, -this.radius - 4, (this.radius + 4) * 2, (this.radius + 4) * 2);
+            ctx.fillRect(-this.radius - 4, -this.radius - 4, (this.radius + 4) * 2, (this.radius + 4) * 2);
+        }
+
+        // 🧪 Grön gift-aura
+        if (this.poisonTimer > 0) {
+            ctx.strokeStyle = "#22c55e";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, this.radius + 4, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        // 🌀 Förvirrings-spiral
+        if (this.confuseTimer > 0) {
+            ctx.strokeStyle = "#a855f7";
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(0, -this.radius - 18, 6, 0, Math.PI * 1.6);
+            ctx.stroke();
+        }
+
+        // Kropp
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Pipa
+        ctx.rotate(this.aimAngle);
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(this.radius - 2, -3, 11, 6);
+        ctx.restore();
+
+        // 🟢 HÄLSOMÄTARE (HP-BAR) OVANFÖR SPELAREN
+        let barW = 38;
+        let barH = 5;
+        let barX = this.x - barW / 2;
+        let barY = this.y - this.radius - 12;
+
+        ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
+        ctx.fillRect(barX, barY, barW, barH);
+
+        let hpPercent = this.hp / this.maxHp;
+        ctx.fillStyle = hpPercent > 0.5 ? "#00ffcc" : (hpPercent > 0.25 ? "#ffd600" : "#ff1744");
+        ctx.fillRect(barX, barY, barW * hpPercent, barH);
+
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(barX, barY, barW, barH);
+
+        // Namnetikett
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 9px monospace";
+        ctx.textAlign = "center";
+        let label = (this.isCpu ? "CPU " : "P") + (this.id + 1);
+        ctx.fillText(label, this.x, barY - 3);
+    }
+}
+
+// =========================================================================
+// 🎁 POWER-UPS (BOMBER, HJÄRTAN, NUKE, STJÄRNA, SPEED)
+// =========================================================================
+let powerUps = [];
+let bombs = [];
+const POWERUP_TYPES = [
+    { type: "HEART", symbol: "❤️", color: "#ff1744", label: "+40 HP" },
+    { type: "BOMB_DROP", symbol: "💣", color: "#f59e0b", label: "BOMB" },
+    { type: "STAR", symbol: "⭐", color: "#ffd600", label: "ODÖDLIG" },
+    { type: "NUKE", symbol: "☢️", color: "#ff0055", label: "NUKE!" },
+    { type: "SPEED", symbol: "⚡", color: "#00ffcc", label: "FART" },
+    { type: "FREEZE_ENEMY", symbol: "🧊", color: "#38bdf8", label: "FRYS FIENDER" },
+    { type: "POISON_ENEMY", symbol: "🧪", color: "#22c55e", label: "FÖRGIFTA FIENDER" },
+    { type: "CONFUSE_ENEMY", symbol: "🌀", color: "#a855f7", label: "FÖRVIRRA FIENDER" }
+];
+
+function spawnPowerUp() {
+    if (powerUps.length >= 4) return;
+    let chosen = POWERUP_TYPES[Math.floor(Math.random() * POWERUP_TYPES.length)];
+    powerUps.push({
+        x: 60 + Math.random() * (canvas.width - 120),
+        y: 60 + Math.random() * (canvas.height - 120),
+        radius: 15,
+        type: chosen.type,
+        symbol: chosen.symbol,
+        color: chosen.color,
+        pulse: 0
+    });
+}
+
+function applyPowerUp(player, pUp) {
+    SoundEngine.powerup();
+
+    if (pUp.type === "HEART") {
+        player.hp = Math.min(player.maxHp, player.hp + 40);
+    } else if (pUp.type === "STAR") {
+        player.invulnerableTimer = 360; // 6 sekunder
+    } else if (pUp.type === "SPEED") {
+        player.speedBoostTimer = 300;
+    } else if (pUp.type === "BOMB_DROP") {
+        bombs.push({
+            x: player.x,
+            y: player.y,
+            timer: 90, // 1.5 sekunder
+            radius: 75,
+            ownerId: player.id
+        });
+    } else if (pUp.type === "NUKE") {
+        // ☢️ NUKE FÅR MAN INTE GÅ IN I – DEN SOM RÖR DEN DÖR OMEDELBART!
+        nukeFlashTimer = 35;
+        screenShakeTimer = 25;
+        SoundEngine.nuke();
+        player.takeDamage(9999);
+    } else if (pUp.type === "MEGA_HP") { // 💖 1. MEGA-HÄLSA (Ökar maxhälsa och helar fullt)
+        player.maxHp = 200; // Tillfälligt utökad hälsa (Overheal)
+        player.hp = player.maxHp;
+    }
+    // 🧊 2. FRYS ALLA MOTSTÅNDARE (Låser fast dem i 2.5 sekunder)
+    else if (pUp.type === "FREEZE_ENEMY") {
+        players.forEach(target => {
+            if (target.id !== player.id && target.alive && target.invulnerableTimer <= 0) {
+                target.freezeTimer = 150; // 2.5 sekunder vid 60fps
+            }
+        });
+    }
+    // 🧪 3. FÖRGIFTA ALLA MOTSTÅNDARE (Skada över tid i 4 sekunder)
+    else if (pUp.type === "POISON_ENEMY") {
+        players.forEach(target => {
+            if (target.id !== player.id && target.alive && target.invulnerableTimer <= 0) {
+                target.poisonTimer = 240; // 4 sekunder
+            }
+        });
+    }
+    // 🌀 4. FÖRVIRRA MOTSTÅNDARE (Inverterar motståndarnas sikte och kontroller)
+    else if (pUp.type === "CONFUSE_ENEMY") {
+        players.forEach(target => {
+            if (target.id !== player.id && target.alive && target.invulnerableTimer <= 0) {
+                target.confuseTimer = 240; // 4 sekunder
+            }
+        });
+    }
+}
+
+// Skott & Hinder
+let bullets = [];
+let particles = [];
+let obstacles = [
+    { x: 170, y: 140, w: 40, h: 130 },
+    { x: 590, y: 140, w: 40, h: 130 },
+    { x: 170, y: 330, w: 40, h: 130 },
+    { x: 590, y: 330, w: 40, h: 130 },
+    { x: 360, y: 260, w: 80, h: 80 }
+];
+let players = [];
+
+function shootBullet(player) {
+    if (player.shootCooldown > 0 || !player.alive) return;
+    player.shootCooldown = 16;
+
+    let bx = player.x + Math.cos(player.aimAngle) * (player.radius + 6);
+    let by = player.y + Math.sin(player.aimAngle) * (player.radius + 6);
+
+    bullets.push({
+        x: bx,
+        y: by,
+        vx: Math.cos(player.aimAngle) * 10,
+        vy: Math.sin(player.aimAngle) * 10,
+        ownerId: player.id,
+        color: player.color,
+        damage: 25,
+        life: 60
+    });
+
+    SoundEngine.laser();
+}
+
+function meleeAttack(player) {
+    if (!player.alive || player.meleeCooldown > 0) return;
+    player.meleeCooldown = 25;   // Cooldown mellan slag
+    player.meleeSwingTimer = 12; // Hur länge slageffekten syns
+
+    SoundEngine.hit();
+
+    // Riktning för slaget framför spelaren
+    let hitX = player.x + Math.cos(player.aimAngle) * 28;
+    let hitY = player.y + Math.sin(player.aimAngle) * 28;
+
+    // Gnistor vid sving
+    for (let k = 0; k < 6; k++) {
+        particles.push({
+            x: hitX, y: hitY,
+            vx: Math.cos(player.aimAngle + (Math.random() - 0.5)) * 5,
+            vy: Math.sin(player.aimAngle + (Math.random() - 0.5)) * 5,
+            color: "#ffffff",
+            life: 12
+        });
+    }
+
+    // Träffkoll mot motståndare i närstridszonen
+    players.forEach(target => {
+        if (target.alive && target.id !== player.id) {
+            let dist = Math.hypot(hitX - target.x, hitY - target.y);
+            if (dist <= player.meleeHitboxRadius) {
+                target.takeDamage(40); // 40 skada per närstridsträff
+
+                // Knockback-effekt (knuffas bakåt av slaget)
+                target.vx += Math.cos(player.aimAngle) * 8;
+                target.vy += Math.sin(player.aimAngle) * 8;
+
+                if (typeof screenShakeTimer !== 'undefined') screenShakeTimer = 6;
+            }
+        }
+    });
+}
+
+function startMatch(mode) {
+    gameMode = mode;
+    gameState = "PLAYING";
+    matchTimer = MATCH_DURATION;
+    bullets = [];
+    bombs = [];
+    powerUps = [];
+    particles = [];
+    players = [];
+    screenShakeTimer = 0;
+    nukeFlashTimer = 0;
+
+    const spawns = [
+        { x: 70, y: 70 },
+        { x: 730, y: 530 },
+        { x: 730, y: 70 },
+        { x: 70, y: 530 }
+    ];
+
+    for (let i = 0; i < totalPlayers; i++) {
+        let isCpu = (mode === "CPU" && i > 0);
+        players.push(new Player(i, spawns[i].x, spawns[i].y, PLAYER_COLORS[i], isCpu));
+    }
+}
+
+function applyOnlineState(payload) {
+    payload.players.forEach((pData, idx) => {
+        if (players[idx]) {
+            players[idx].x = pData.x;
+            players[idx].y = pData.y;
+            players[idx].aimAngle = pData.aimAngle;
+            players[idx].hp = pData.hp;
+            players[idx].alive = pData.alive;
+        }
+    });
+    bullets = payload.bullets;
+}
+
+function handleClientInput(input) {
+    if (players[1] && players[1].alive) {
+        players[1].vx += input.dx * players[1].baseSpeed * 0.35;
+        players[1].vy += input.dy * players[1].baseSpeed * 0.35;
+        players[1].aimAngle = input.aimAngle;
+        if (input.shoot) shootBullet(players[1]);
+    }
+}
+
+// =========================================================================
+// 🎮 STYRNING, SIKTEN & TANGENTBORDSKONTROLLER
+// =========================================================================
+const keys = {};
+let mouseX = 400, mouseY = 300;
+
+window.addEventListener('keydown', (e) => {
+    keys[e.code] = true;
+    if (e.key === 'Escape') {
+        if (currentScreenState !== "NONE") {
+            currentScreenState = "NONE";
+            gameState = "MENU";
+            return;
+        }
+    }
+
+    if (e.key === 'l' || e.key === 'L') {
+        toggleLanguage();
+        return;
+    }
+
+    if (gameState === "MENU") {
+        if (e.key === '1') { totalPlayers = 2; startMatch('LOCAL'); }
+        if (e.key === '2') { totalPlayers = 2; startMatch('CPU'); }
+        if (e.key === '3') { gameState = "ONLINE_MENU"; }
+
+        // Ändra antal spelare
+        if (e.key === 'ArrowRight') totalPlayers = Math.min(4, totalPlayers + 1);
+        if (e.key === 'ArrowLeft') totalPlayers = Math.max(2, totalPlayers - 1);
+
+        // Ändra bot-svårighet (1-9) med siffertangenter eller W/S
+        if (e.key >= '1' && e.key <= '9') {
+            selectedCpuDiffIdx = parseInt(e.key) - 1;
+        }
+        if (e.key === 'w' || e.key === 'W') selectedCpuDiffIdx = Math.min(8, selectedCpuDiffIdx + 1);
+        if (e.key === 's' || e.key === 'S') selectedCpuDiffIdx = Math.max(0, selectedCpuDiffIdx - 1);
+
+        if (e.key === 'Enter') startMatch('LOCAL');
+    } else if (gameState === "ONLINE_MENU") {
+        if (e.key === 'h' || e.key === 'H') OnlineEngine.initHost();
+        if (e.key === 'j' || e.key === 'J') {
+            let target = prompt(t("onlineClientTitle"));
+            if (target) OnlineEngine.initJoin(target.trim());
+        }
+        if (e.key === 'Escape') gameState = "MENU";
+    } else if (gameState === "GAMEOVER") {
+        if (e.key === 'Enter') startMatch(gameMode);
+        if (e.key === 'Escape') gameState = "MENU";
+    }
+    
+});
+
+window.addEventListener('keyup', (e) => keys[e.code] = false);
+
+window.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+    mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
+});
+
+window.addEventListener('mousedown', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const cx = (e.clientX - rect.left) * (canvas.width / rect.width);
+    const cy = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+    // Klick på flaggorna i högra hörnet
+    if (cx >= 710 && cx <= 746 && cy >= 12 && cy <= 36) { toggleLanguage('sv'); return; }
+    if (cx >= 754 && cx <= 790 && cy >= 12 && cy <= 36) { toggleLanguage('en'); return; }
+
+    if (gameState === "PLAYING" && players[0] && players[0].alive) {
+        shootBullet(players[0]);
+    }
+});
+
+function pollGamepads() {
+    if (!navigator.getGamepads) return;
+    const gamepads = navigator.getGamepads();
+
+    for (let i = 0; i < gamepads.length; i++) {
+        const gp = gamepads[i];
+        if (!gp || !gp.connected) continue;
+
+        let playerIdx = 2 + i;
+        if (totalPlayers === 2 && i === 0) playerIdx = 1;
+
+        let p = players[playerIdx];
+        if (!p || !p.alive) continue;
+
+        let ax = Math.abs(gp.axes[0]) > 0.2 ? gp.axes[0] : 0;
+        let ay = Math.abs(gp.axes[1]) > 0.2 ? gp.axes[1] : 0;
+        p.vx += ax * p.baseSpeed * 0.35;
+        p.vy += ay * p.baseSpeed * 0.35;
+
+        let rAx = gp.axes.length >= 4 && Math.abs(gp.axes[2]) > 0.25 ? gp.axes[2] : ax;
+        let rAy = gp.axes.length >= 4 && Math.abs(gp.axes[3]) > 0.25 ? gp.axes[3] : ay;
+        if (Math.abs(rAx) > 0.2 || Math.abs(rAy) > 0.2) {
+            p.aimAngle = Math.atan2(rAy, rAx);
+        }
+
+        // Skjut med A (0) eller R2 (7)
+        if (gp.buttons[0]?.pressed || gp.buttons[7]?.pressed) {
+            shootBullet(p);
+        }
+
+        // 🥊 NÄRSTRIDSATTACK: X / Fyrkant (knappindex 2)
+        if (gp.buttons[2]?.pressed) {
+            meleeAttack(p);
+        }
+    }
+}
+
+function processInputs() {
+    if (gameState !== "PLAYING") return;
+
+    // --- P1 (TANGENTBORD + MUS) ---
+    if (players[0] && players[0].alive) {
+        let p = players[0];
+        let mult = p.confuseTimer > 0 ? -1 : 1; // 👈 Inverterar riktningen
+        if (keys['KeyW']) p.vy -= p.baseSpeed * 0.3;
+        if (keys['KeyS']) p.vy += p.baseSpeed * 0.3;
+        if (keys['KeyA']) p.vx -= p.baseSpeed * 0.3;
+        if (keys['KeyD']) p.vx += p.baseSpeed * 0.3;
+        if (keys['Space']) shootBullet(players[0]);
+        if (keys['KeyE'] || keys['KeyF']) meleeAttack(players[0]); // P1 Melee
+
+        let targetAim = Math.atan2(mouseY - p.y, mouseX - p.x);
+        p.aimAngle = p.confuseTimer > 0 ? targetAim + Math.PI : targetAim; // Bakvänt sikte
+        
+
+        // 🎯 SIKTESKONTROLL: BLIR RÖTT OM MAN SIKTAR PÅ EN MOTSTÅNDARE
+        p.isCrosshairRed = false;
+        players.forEach(other => {
+            if (other.id !== p.id && other.alive) {
+                let distToAim = Math.hypot(mouseX - other.x, mouseY - other.y);
+                if (distToAim <= other.radius + 8) {
+                    p.isCrosshairRed = true;
+                }
+            }
+        });
+    }
+
+    // --- P2 (LOKAL) ---
+    if (players[1] && players[1].alive && gameMode === "LOCAL") {
+        let p = players[1];
+        let moved = false;
+        let dx = 0, dy = 0;
+        if (keys['ArrowUp']) { p.vy -= p.baseSpeed * 0.3; dy = -1; moved = true; }
+        if (keys['ArrowDown']) { p.vy += p.baseSpeed * 0.3; dy = 1; moved = true; }
+        if (keys['ArrowLeft']) { p.vx -= p.baseSpeed * 0.3; dx = -1; moved = true; }
+        if (keys['ArrowRight']) { p.vx += p.baseSpeed * 0.3; dx = 1; moved = true; }
+
+        if (moved) p.aimAngle = Math.atan2(dy, dx);
+        if (keys['Enter']) shootBullet(players[1]);
+        if (keys['Numpad0'] || keys['KeyK']) meleeAttack(players[1]); // P2 Melee
+    }
+
+    // --- P2 (ONLINE CLIENT) ---
+    if (gameMode === "ONLINE" && !OnlineEngine.isHost) {
+        let dx = 0, dy = 0;
+        if (keys['KeyW'] || keys['ArrowUp']) dy -= 1;
+        if (keys['KeyS'] || keys['ArrowDown']) dy += 1;
+        if (keys['KeyA'] || keys['ArrowLeft']) dx -= 1;
+        if (keys['KeyD'] || keys['ArrowRight']) dx += 1;
+
+        OnlineEngine.send({
+            type: 'INPUT',
+            payload: {
+                dx: dx,
+                dy: dy,
+                aimAngle: Math.atan2(mouseY - 300, mouseX - 400),
+                shoot: Boolean(keys['Space'] || keys['Enter'])
+            }
+        });
+    }
+
+    pollGamepads();
+}
+
+// =========================================================================
+// 🔄 HUVUDLOOP & FYSIK
+// =========================================================================
+function update() {
+    // 📡 Mät bildrutedelta för att upptäcka CPU-strypning/drops
+    HardwareMonitor.updateMetrics();
+
+    if (HardwareMonitor.isBlocked()) return;
+    if (PvpAntiCheat.isTriggered()) return;
+    if (gameState !== "PLAYING") return;
+
+    processInputs();
+
+    // Spawna power-ups slumpmässigt
+    if (Math.random() < 0.006) {
+        spawnPowerUp();
+    }
+
+    // Räkna ner timern under pågående match
+    if (matchTimer > 0) {
+        matchTimer--;
+    } else {
+        // Tiden är slut! Korar vinnaren baserat på högst HP
+        gameState = "GAMEOVER";
+        SoundEngine.win();
+
+        let p1 = players[0];
+        let p2 = players[1];
+
+        if (p1 && p2) {
+            if (p1.hp > p2.hp) {
+                winnerText = t("winner") + "PLAYER 1 (" + p1.hp + " HP)";
+            } else if (p2.hp > p1.hp) {
+                let p2Name = p2.isCpu ? "CPU" : "PLAYER 2";
+                winnerText = t("winner") + p2Name + " (" + p2.hp + " HP)";
+            } else {
+                winnerText = "DRAW! (" + p1.hp + " HP LIKA)";
+            }
+        } else {
+            winnerText = "DRAW!";
+        }
+        return;
+    }
+
+    // Skärmskak & Nuke Flash
+    if (screenShakeTimer > 0) screenShakeTimer--;
+    if (nukeFlashTimer > 0) nukeFlashTimer--;
+
+    // Spelaruppdatering
+    players.forEach(p => p.update(canvas.width, canvas.height, obstacles, players));
+
+    // Power-up upplockning
+    for (let i = powerUps.length - 1; i >= 0; i--) {
+        let pUp = powerUps[i];
+        pUp.pulse += 0.05;
+
+        players.forEach(p => {
+            if (p.alive) {
+                let dist = Math.hypot(p.x - pUp.x, p.y - pUp.y);
+                if (dist < p.radius + pUp.radius) {
+                    applyPowerUp(p, pUp);
+                    powerUps.splice(i, 1);
+                }
+            }
+        });
+    }
+
+    // Bombtimer och explosioner
+    for (let i = bombs.length - 1; i >= 0; i--) {
+        let b = bombs[i];
+        b.timer--;
+        if (b.timer <= 0) {
+            // Bomben detonerar
+            SoundEngine.hit();
+            screenShakeTimer = 12;
+
+            for (let k = 0; k < 25; k++) {
+                particles.push({
+                    x: b.x, y: b.y,
+                    vx: (Math.random() - 0.5) * 10,
+                    vy: (Math.random() - 0.5) * 10,
+                    color: "#f59e0b",
+                    life: 25
+                });
+            }
+
+            players.forEach(p => {
+                if (p.alive) {
+                    let d = Math.hypot(p.x - b.x, p.y - b.y);
+                    if (d <= b.radius) {
+                        p.takeDamage(55);
+                    }
+                }
+            });
+
+            bombs.splice(i, 1);
+        }
+    }
+
+    // Kulor
+    for (let i = bullets.length - 1; i >= 0; i--) {
+        let b = bullets[i];
+        b.x += b.vx;
+        b.y += b.vy;
+        b.life--;
+
+        obstacles.forEach(obs => {
+            if (b.x > obs.x && b.x < obs.x + obs.w && b.y > obs.y && b.y < obs.y + obs.h) {
+                b.life = 0;
+            }
+        });
+
+        players.forEach(p => {
+            if (p.alive && p.id !== b.ownerId) {
+                let dist = Math.hypot(p.x - b.x, p.y - b.y);
+                if (dist < p.radius + 4) {
+                    p.takeDamage(b.damage);
+                    b.life = 0;
+                }
+            }
+        });
+
+        if (b.life <= 0 || b.x < 0 || b.x > canvas.width || b.y < 0 || b.y > canvas.height) {
+            bullets.splice(i, 1);
+        }
+    }
+
+    // Partiklar
+    for (let i = particles.length - 1; i >= 0; i--) {
+        let p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life--;
+        if (p.life <= 0) particles.splice(i, 1);
+    }
+
+    // Slutkontroll
+    // Kontrollera om matchen är över
+    let alivePlayers = players.filter(p => p.alive);
+    if (alivePlayers.length <= 1) {
+        gameState = "GAMEOVER";
+        SoundEngine.win();
+
+        let isP1Winner = (alivePlayers.length === 1 && alivePlayers[0].id === 0);
+
+        if (alivePlayers.length === 1) {
+            let winLabel = (alivePlayers[0].isCpu ? "CPU " : "PLAYER ") + (alivePlayers[0].id + 1);
+            winnerText = t("winner") + winLabel;
+            // Visa vinst-pokal om P1 vann, annars dödskalle (förlust)
+            currentScreenState = isP1Winner ? "VICTORY" : "DEFEAT";
+        } else {
+            winnerText = t("draw");
+            currentScreenState = "DEFEAT";
+        }
+
+        screenMessageTitle = winnerText;
+        screenMessageSub = t("restartPrompt");
+    }
+
+    // Online synk
+    if (gameMode === "ONLINE" && OnlineEngine.isHost && OnlineEngine.isConnected) {
+        OnlineEngine.send({
+            type: 'STATE',
+            payload: {
+                players: players.map(p => ({ x: p.x, y: p.y, aimAngle: p.aimAngle, hp: p.hp, alive: p.alive })),
+                bullets: bullets
+            }
+        });
+    }
+}
+
+// =========================================================================
+// 🎨 RENDERING (SIKTEN, HUD, ARENA & EFFEKTER)
+// =========================================================================
+function render() {
+    ctx.save();
+
+    // Skärmskakeffekt vid detonationer
+    if (screenShakeTimer > 0) {
+        let sx = (Math.random() - 0.5) * screenShakeTimer * 1.5;
+        let sy = (Math.random() - 0.5) * screenShakeTimer * 1.5;
+        ctx.translate(sx, sy);
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Rutnät
+    ctx.strokeStyle = "rgba(0, 255, 204, 0.12)";
+    ctx.lineWidth = 1;
+    for (let x = 0; x < canvas.width; x += 40) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+    }
+    for (let y = 0; y < canvas.height; y += 40) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+    }
+
+    // Hinder
+    ctx.fillStyle = "#161b26";
+    ctx.strokeStyle = "#38bdf8";
+    ctx.lineWidth = 2;
+    obstacles.forEach(obs => {
+        ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+        ctx.strokeRect(obs.x, obs.y, obs.w, obs.h);
+    });
+
+    // Rita Power-ups och Nuke-fara
+    powerUps.forEach(pUp => {
+        let r = pUp.radius + Math.sin(pUp.pulse) * 2;
+
+        if (pUp.type === "NUKE") {
+            // Varningsfält runt Nuke så man ser att man inte får gå in i den
+            ctx.fillStyle = "rgba(255, 0, 85, 0.25)";
+            ctx.beginPath();
+            ctx.arc(pUp.x, pUp.y, r + 8, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = Math.floor(Date.now() / 100) % 2 === 0 ? "#ff0055" : "#ffd600";
+            ctx.lineWidth = 2.5;
+        } else {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+            ctx.strokeStyle = pUp.color;
+            ctx.lineWidth = 2;
+        }
+
+        ctx.beginPath();
+        ctx.arc(pUp.x, pUp.y, r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.font = "16px sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(pUp.symbol, pUp.x, pUp.y);
+    });
+
+    // Rita Bomber
+    bombs.forEach(b => {
+        let flash = Math.floor(b.timer / 8) % 2 === 0;
+        ctx.fillStyle = flash ? "#ff1744" : "#111111";
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, 14, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = "#ffd600";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.font = "14px sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("💣", b.x, b.y);
+    });
+
+    // Skott
+    bullets.forEach(b => {
+        ctx.fillStyle = b.color;
+        ctx.shadowColor = b.color;
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+    });
+
+    // Partiklar
+    particles.forEach(p => {
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, 3, 3);
+    });
+
+    // Spelare
+    players.forEach(p => p.draw(ctx));
+
+    // 🎯 DYNAMISKT SIKTE FÖR P1 (GRÖNT -> RÖTT NÄR MAN SIKTAR PÅ EN FIENDE)
+    if (gameState === "PLAYING" && players[0] && players[0].alive) {
+        let crossColor = players[0].isCrosshairRed ? "#ff1744" : "#00ffcc";
+        ctx.save();
+        ctx.strokeStyle = crossColor;
+        ctx.lineWidth = 2;
+
+        // Yttre cirkel
+        ctx.beginPath();
+        ctx.arc(mouseX, mouseY, 12, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Kors
+        ctx.beginPath();
+        ctx.moveTo(mouseX - 18, mouseY); ctx.lineTo(mouseX + 18, mouseY);
+        ctx.moveTo(mouseX, mouseY - 18); ctx.lineTo(mouseX, mouseY + 18);
+        ctx.stroke();
+
+        // Mittpunkt
+        ctx.fillStyle = crossColor;
+        ctx.beginPath();
+        ctx.arc(mouseX, mouseY, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+
+    // ☢️ NUKE VIT BLIXT
+    if (nukeFlashTimer > 0) {
+        ctx.fillStyle = `rgba(255, 255, 255, ${nukeFlashTimer / 35})`;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // Flaggor
+    drawSwedishFlag(ctx, 710, 12, 36, 24);
+    drawBritishFlag(ctx, 754, 12, 36, 24);
+
+    // =========================================================================
+    // 🏆 TOPP-HUD: TIMER & STORA HÄLSOMÄTARE (LUCKIEST GUY)
+    // =========================================================================
+    if (gameState === "PLAYING" && players.length >= 2) {
+        ctx.save();
+
+        let p1 = players[0];
+        let p2 = players[1];
+        let centerX = canvas.width / 2;
+        let barWidth = 260;
+        let barHeight = 22;
+        let topY = 16;
+
+        // 1. VÄNSTER HÄLSOMÄTARE: SPELARE 1
+        let p1Pct = Math.max(0, p1.hp / p1.maxHp);
+        ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
+        ctx.fillRect(centerX - 55 - barWidth, topY, barWidth, barHeight);
+
+        // Fyllning från höger mot mitten
+        ctx.fillStyle = p1Pct > 0.5 ? "#00ffcc" : (p1Pct > 0.25 ? "#ffd600" : "#ff1744");
+        ctx.fillRect(centerX - 55 - (barWidth * p1Pct), topY, barWidth * p1Pct, barHeight);
+
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 2.5;
+        ctx.strokeRect(centerX - 55 - barWidth, topY, barWidth, barHeight);
+
+        // P1 Namn & HP-text
+        ctx.font = "18px 'Luckiest Guy', cursive";
+        ctx.fillStyle = "#ffffff";
+        ctx.textAlign = "left";
+        ctx.fillText("P1: " + Math.ceil(p1.hp) + " HP", centerX - 50 - barWidth, topY + barHeight - 4);
+
+        // 2. HÖGER HÄLSOMÄTARE: SPELARE 2 / CPU
+        let p2Pct = Math.max(0, p2.hp / p2.maxHp);
+        ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
+        ctx.fillRect(centerX + 55, topY, barWidth, barHeight);
+
+        // Fyllning från mitten mot höger
+        ctx.fillStyle = p2Pct > 0.5 ? "#ff1744" : (p2Pct > 0.25 ? "#ffd600" : "#ff0055");
+        ctx.fillRect(centerX + 55, topY, barWidth * p2Pct, barHeight);
+
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 2.5;
+        ctx.strokeRect(centerX + 55, topY, barWidth, barHeight);
+
+        // P2/CPU Namn & HP-text
+        ctx.font = "18px 'Luckiest Guy', cursive";
+        ctx.fillStyle = "#ffffff";
+        ctx.textAlign = "right";
+        let p2Title = (p2.isCpu ? "CPU: " : "P2: ") + Math.ceil(p2.hp) + " HP";
+        ctx.fillText(p2Title, centerX + 50 + barWidth, topY + barHeight - 4);
+
+        // 3. CENTRERAD MATCHTIMER
+        let secondsLeft = Math.ceil(matchTimer / 60);
+        let timerBoxW = 75;
+        let timerBoxH = 40;
+
+        ctx.fillStyle = "#0c0d14";
+        ctx.fillRect(centerX - timerBoxW / 2, topY - 8, timerBoxW, timerBoxH);
+
+        // Röd pulserande ram när det är mindre än 10 sekunder kvar
+        let isCriticalTime = secondsLeft <= 10;
+        ctx.strokeStyle = isCriticalTime ? (Math.floor(Date.now() / 150) % 2 === 0 ? "#ff1744" : "#ffd600") : "#00ffcc";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(centerX - timerBoxW / 2, topY - 8, timerBoxW, timerBoxH);
+
+        ctx.font = "30px 'Luckiest Guy', cursive";
+        ctx.fillStyle = isCriticalTime ? "#ff1744" : "#ffeb3b";
+        ctx.textAlign = "center";
+        ctx.fillText(secondsLeft, centerX, topY + 23);
+
+        ctx.restore();
+    }
+
+    // =========================================================================
+    // 🖥️ MENYER & OVERLAYS
+    // =========================================================================
+    if (gameState === "MENU") {
+        ctx.fillStyle = "rgba(6, 7, 10, 0.94)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#ffeb3b";
+        ctx.font = "bold 26px 'Courier New', monospace";
+        ctx.fillText(t("title"), canvas.width / 2, 75);
+
+        ctx.fillStyle = "#38bdf8";
+        ctx.font = "13px monospace";
+        ctx.fillText(t("subTitle"), canvas.width / 2, 105);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 15px monospace";
+        ctx.fillText(`${t("players")} [ ◄ ${totalPlayers}P ► ]`, canvas.width / 2, 155);
+
+        // 🤖 CPU Svårighetsväljare (1-9)
+        let curDiff = CPU_DIFFICULTIES[selectedCpuDiffIdx];
+        ctx.fillStyle = "#facc15";
+        ctx.font = "bold 13px monospace";
+        ctx.fillText(`${t("cpuDiffTitle")} [ ◄ Nivå ${curDiff.name} ► ] (Välj med W/S eller 1-9)`, canvas.width / 2, 195);
+
+        ctx.fillStyle = "#00ffcc";
+        ctx.font = "14px monospace";
+        ctx.fillText(t("modeLocal"), canvas.width / 2, 250);
+        ctx.fillText(t("modeCpu"), canvas.width / 2, 285);
+        ctx.fillText(t("modeOnline"), canvas.width / 2, 320);
+
+        ctx.fillStyle = "#aaaaaa";
+        ctx.font = "11px monospace";
+        ctx.fillText(t("controlsP1"), canvas.width / 2, 395);
+        ctx.fillText(t("controlsP2"), canvas.width / 2, 420);
+        ctx.fillText(t("controlsP3P4"), canvas.width / 2, 445);
+
+        ctx.fillStyle = "#22c55e";
+        ctx.font = "bold 16px monospace";
+        ctx.fillText(t("startMatch"), canvas.width / 2, 515);
+    } else if (gameState === "ONLINE_MENU") {
+        ctx.fillStyle = "rgba(6, 7, 10, 0.95)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#00ffcc";
+        ctx.font = "bold 24px monospace";
+        ctx.fillText("🌐 P2P WEBRTC ONLINELÄGE", canvas.width / 2, 100);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "14px monospace";
+        ctx.fillText(t("hostRoom"), canvas.width / 2, 180);
+        ctx.fillText(t("joinRoom"), canvas.width / 2, 220);
+
+        if (OnlineEngine.state === "HOSTING") {
+            ctx.fillStyle = "#ffeb3b";
+            ctx.font = "bold 15px monospace";
+            ctx.fillText(t("onlineHostTitle"), canvas.width / 2, 300);
+            ctx.fillStyle = "#00ffcc";
+            ctx.font = "bold 18px monospace";
+            ctx.fillText(OnlineEngine.peerId || t("waitingPeer"), canvas.width / 2, 335);
+        }
+
+        ctx.fillStyle = "#888888";
+        ctx.font = "12px monospace";
+        ctx.fillText("[ESC: TILLBAKA TILL HUVUDMENY]", canvas.width / 2, 500);
+    } else if (gameState === "GAMEOVER") {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.88)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#ffd600";
+        ctx.font = "bold 28px monospace";
+        ctx.fillText(winnerText, canvas.width / 2, canvas.height / 2 - 20);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "14px monospace";
+        ctx.fillText(t("restartPrompt"), canvas.width / 2, canvas.height / 2 + 40);
+    }
+
+    ctx.restore();
+
+    if (currentScreenState !== "NONE") {
+        StatusScreens.renderOverlay(ctx, canvas, currentScreenState, screenMessageTitle, screenMessageSub);
+    }
+    HardwareMonitor.drawHUD(ctx, canvas);
+
+    if (PvpAntiCheat.isTriggered()) {
+        PvpAntiCheat.drawLockScreen(ctx, canvas);
+    }
+    HardwareMonitor.drawOverlay(ctx, canvas);
+    
+}
+
+function mainLoop() {
+    update();
+    render();
+    requestAnimationFrame(mainLoop);
+}
+
+requestAnimationFrame(mainLoop);
+</script>
+</body>
+</html>

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="sv">
+<html lang="no">
 <head>
     <meta charset="UTF-8">
-    <title>Station 24 - Memory Kaos</title>
+    <title>Station 24 - Memorykaos</title>
     <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
 <script>
 // --- TOTAL BLOCKERING FÖR INTERNET EXPLORER ---
@@ -16,9 +16,9 @@
         var h = "";
         h += '<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#8b0000;color:#fff;z-index:999999;display:block;text-align:center;padding-top:100px;font-family:sans-serif;">';
         h += '<h1 style="font-size:50px;color:#ffcc00;">⚠ STOPP! ⚠</h1>';
-        h += '<p style="font-size:24px;">DIN WEBBLÄSARE STÖDS EJ.</p>';
-        h += '<p style="max-width:600px;margin:20px auto;">Station 24 kräver en modern webbläsare som Chrome, Edge eller Firefox för att fungera korrekt och säkert.</p>';
-        h += '<div style="margin-top:50px;font-weight:bold;color:#ffaa00;">SECURITY CREW: Psl631 nekar åtkomst.</div>';
+        h += '<p style="font-size:24px;">NETTLESEREN DIN STØTTES IKKE.</p>';
+        h += '<p style="max-width:600px;margin:20px auto;">Station 24 krever en moderne nettleser som Chrome, Edge eller Firefox for å fungere korrekt og sikkert.</p>';
+        h += '<div style="margin-top:50px;font-weight:bold;color:#ffaa00;">SECURITY CREW: Psl631 nekter tilgang.</div>';
         h += '</div>';
         
         // document.write är det enda som kan stoppa IE i tid
@@ -133,16 +133,16 @@
             SYSTEM ERROR: NO BRAIN FOUND
         </h1>
         <p style="font-size: 24px; margin-top: 30px; color: #fff; max-width: 800px;">
-            DU FÖRSÖKER KÖRA STATION 24 UTAN JAVASCRIPT? <br>
-            DET ÄR SOM ATT FÖRSÖKA SPELA SUPER MARIO UTAN KONTROLL.
+            PRØVER DU Å KJØRE STATION 24 UTEN JAVASCRIPT? <br>
+            DET ER SOM Å PRØVE Å SPILLE SUPER MARIO UTEN KONTROLLER.
         </p>
         <div style="background: #330000; padding: 20px; margin-top: 20px; border-radius: 10px;">
             <p style="color: #ffaa00; font-weight: bold;">
-                AKTIVERA JAVASCRIPT OCH LADDA OM SIDAN, ANNARS KAN DU GÅ OCH LÄGGA DIG.
+                AKTIVER JAVASCRIPT OG LAST INN SIDEN PÅ NYTT, ELLERS KAN DU LIKE GJERNE GÅ OG LEGGE DEG.
             </p>
         </div>
         <p style="margin-top: 50px; opacity: 0.5;">
-            LOGG: Security-Crew Psl631 har nekat din åtkomst.
+            LOGG: Security-Crew Psl631 har nektet deg tilgang.
         </p>
     </div>
 </noscript>
@@ -166,13 +166,13 @@
 
     if (isIE) {
         reason = "INTERNET_EXPLORER_GRAVSKÄNDNING";
-        mockery = "Internet Explorer har gått i graven. Vänligen byt till en annan webbläsare! Allvarligt talat, Operatör PSL631 kan praktiskt taget höra ditt 56k-modem skrika av smärta.";
+        mockery = "Internet Explorer er død og begravet. Bytt til en annen nettleser! Seriøst, operatør PSL631 kan nesten høre 56k-modemet ditt skrike av smerte.";
     } else if (isOldEdge) {
         reason = "LEGACY_EDGE_SKROTAD";
-        mockery = "Kör du gamla Edge? Den där webbläsaren dog snabbare än en Goomba under en känga! Installera en webbläsare med en riktig motor (Chromium) innan Kamek förvandlar din dator till ett askfat.";
+        mockery = "Bruker du gamle Edge? Den nettleseren døde raskere enn en Goomba under en støvel! Installer en nettleser med en ordentlig motor (Chromium) før Kamek forvandler PC-en din til et askebeger.";
     } else if (isOldSafari) {
         reason = "STENÅLDERS_SAFARI";
-        mockery = "Din Safari-version är så gammal att den fortfarande tror att Steve Jobs lever. Uppdatera din frukt eller bli raderad!";
+        mockery = "Safari-versjonen din er så gammel at den fortsatt tror Steve Jobs lever. Oppdater frukten din, ellers blir du slettet!";
     }
 
     // 2. HÅRDVARU-KONTROLL (Enheter som ej stödjs)
@@ -184,28 +184,28 @@
 
     if (isVR) {
         reason = "VR_CYKLOP_DETEKTERAD";
-        mockery = "Ta av dig cyklopögonen! Man kan inte spela memory i 3D när man ser ut som en förvirrad dykare. Station 24 kräver en platt skärm och en riktig mus!";
+        mockery = "Ta av deg dykkerbrillene! Man kan ikke spille memory i 3D når man ser ut som en forvirret dykker. Station 24 krever en flat skjerm og en ordentlig mus!";
     } else if (isWatch) {
         reason = "MIKRO_ENHET_UPPTÄCKT";
-        mockery = "En smartklocka?! Din skärm är mindre än Kameks tånagel. Försök inte ens infiltrera matrisen med en handledsmanick!";
+        mockery = "En smartklokke?! Skjermen din er mindre enn Kameks tånegl. Ikke prøv å infiltrere matrisen med en dings på håndleddet!";
     } else if (isSmartHome) {
         reason = "SOFFPOTATIS_ANOMALI";
-        mockery = "Din TV/Smart-enhet är inte en godkänd kommandocentral! Att rensa virus med en fjärrkontroll är som att äta soppa med gaffel.";
+        mockery = "TV-en/smartenheten din er ikke en godkjent kommandosentral! Å rydde virus med en fjernkontroll er som å spise suppe med en gaffel.";
     }else if (ua.indexOf("tesla") > -1 || ua.indexOf("carbrowser") > -1) {
         reason = "RULLANDE_TRAFIKFARA";
-        mockery = "SLÅ AV MOTORN! Skärmen på din Tesla är inte en godkänd spelskärm. Händerna på ratten innan du krockar in i stordatormatrisen!";
+        mockery = "SLÅ AV MOTOREN! Skjermen i Teslaen din er ikke en godkjent spillskjerm. Hendene på rattet før du krasjer inn i stormatrisen!";
     } else if (ua.indexOf("smarttv") > -1 || ua.indexOf("tizen") > -1 || ua.indexOf("web0s") > -1) {
         reason = "SOFFPOTATIS_ANOMALI";
-        mockery = "Soffan är inte en godkänd kommandocentral! Gå upp och hämta en riktig terminal!";
+        mockery = "Sofaen er ikke en godkjent kommandosentral! Reis deg og hent en ordentlig terminal!";
     } else if (ua.indexOf("playstation") > -1 || ua.indexOf("xbox") > -1 || ua.indexOf("nintendo") > -1) {
         reason = "KONSOL_BONDE";
-        mockery = "Gå tillbaka till din handkontroll och din auto-aim, din lilla konsol-bonde! Station 24 kräver mekanisk precision.";
+        mockery = "Gå tilbake til håndkontrollen og auto-aimen din, lille konsollbonde! Station 24 krever mekanisk presisjon.";
     } else if (isTablet) {
         reason = "KLADDIGA_FINGRAR";
-        mockery = "Sluta kladda på skärmen! En padda är en leksak. Station 24 Protocol kräver en riktig mus!";
+        mockery = "Slutt å kladde på skjermen! Et nettbrett er et leketøy. Station 24 Protocol krever en ordentlig mus!";
     } else if (isMobile) {
         reason = "MOBIL_TERMINAL";
-        mockery = "Din skärm är för liten för den här nivån av intelligens. Station 24 är inte ett mobilspel för Goombas!";
+        mockery = "Skjermen din er for liten for dette intelligensnivået. Station 24 er ikke et mobilspill for Goombaer!";
     }
 
     // 3. OS-KONTROLL (Elite Versions Only)
@@ -215,12 +215,12 @@
 
     if (isChromeOS) {
         reason = "CHROME_OS_SKROTAT";
-        mockery = "En Chromebook? Det är som att försöka vinna ett Formel 1-lopp med en trampbil. Kamek accepterar endast riktiga operativsystem!";
+        mockery = "En Chromebook? Det er som å prøve å vinne et Formel 1-løp med en tråbil. Kamek godtar bare ordentlige operativsystemer!";
     } else if (isWindows) {
         var winVer = parseFloat(ua.split("windows nt ")[1]);
         if (winVer < 10.0) {
             reason = "WINDOWS_FOSSIL";
-            mockery = "Windows " + (winVer < 6.2 ? "7" : "8") + "? Din dator hör hemma på ett museum, inte i Station 24!";
+            mockery = "Windows " + (winVer < 6.2 ? "7" : "8") + "? Datamaskinen din hører hjemme på et museum, ikke i Station 24!";
         }
     } else if (isMac) {
         var macVerMatch = ua.match(/mac os x (\d+)[_.](\d+)/);
@@ -228,7 +228,7 @@
             var major = parseInt(macVerMatch[1]);
             if (major < 15) {
                 reason = "RUTTEN_FRUKT";
-                mockery = "macOS " + major + "? Sequoia (15.0) är minimum för att exekvera dessa algoritmer. Uppdatera eller bli raderad!";
+                mockery = "macOS " + major + "? Sequoia (15.0) er minimum for å kjøre disse algoritmene. Oppdater eller bli slettet!";
             }
         }
     }
@@ -239,9 +239,9 @@
         window.onload = function() {
             var h = '<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#1a0000;color:#fff;z-index:9999999;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:40px;font-family:Arial, sans-serif;border:15px double #ff0000;box-sizing:border-box;">';
             h += '<img src="kamek.jfif" style="width:180px;border-radius:30px;border:5px solid #ffcc00;margin-bottom:20px;filter:drop-shadow(0 0 15px #ff0000);">';
-            h += '<h1 style="font-size:42px;color:#ff0000;margin:10px 0;font-weight:900;">[ ÅTKOMST NEKAD ]</h1>';
+            h += '<h1 style="font-size:42px;color:#ff0000;margin:10px 0;font-weight:900;">[ TILGANG NEKTET ]</h1>';
             h += '<div style="background:rgba(0,0,0,0.4);padding:40px;border-radius:30px;max-width:800px;border:2px solid #ffcc00;">';
-            h += '<p style="font-size:26px;color:#ffcc00;margin-bottom:20px;font-weight:bold;">Kamek hånar din utrustning:</p>';
+            h += '<p style="font-size:26px;color:#ffcc00;margin-bottom:20px;font-weight:bold;">Kamek gjør narr av utstyret ditt:</p>';
             h += '<p style="font-size:32px;line-height:1.4;font-style:italic;">"' + mockery + '"</p>';
             h += '</div>';
             h += '<p style="margin-top:50px;opacity:0.5;font-family:monospace;">SYSTEM_ERROR: ' + reason + '</p></div>';
@@ -256,36 +256,36 @@
     <h1>STATION 24 - MEMORY</h1>
     
     <div class="guide-box">
-        <h2>REGLER & LÄGEN</h2>
+        <h2>REGLER OG MODUSER</h2>
         <div class="mode-grid">
             <div class="casual-info">
                 <strong style="color:#00ff00">CASUAL</strong><br>
-                • mm.ss.cc (Räknar uppåt)[cite: 2, 4]<br>
-                • Kamek är ett vanligt PAR[cite: 2, 4]<br>
-                • Ingen tidspress - bara träning!<br>
-                • Vinn guldmynt!
+                • mm.ss.cc (Teller oppover)[cite: 2, 4]<br>
+                • Kamek er et vanlig PAR[cite: 2, 4]<br>
+                • Ingen tidspress – bare trening!<br>
+                • Vinn gullmynten!
             </div>
             <div class="classic-info">
                 <strong style="color:#ff3300">CLASSIC</strong><br>
-                • Timer (Nedåt)[cite: 2, 4]<br>
-                • Fällor: Kamek, Bowser & NUKE[cite: 3]<br>
-                • Vinn stjärnvinsten!
+                • Nedtellende timer[cite: 2, 4]<br>
+                • Feller: Kamek, Bowser og NUKE[cite: 3]<br>
+                • Vinn stjernepremien!
             </div>
         </div>
         <div class="how-to-play">
-            <strong style="color:#ffcc00">VARNING:</strong> I Extrem-läget kan du hitta <strong>NUKE</strong>. Den nollställer dina drag och stjäl 20 sekunder![cite: 3]
+            <strong style="color:#ffcc00">ADVARSEL:</strong> I Ekstrem-modus kan du finne <strong>NUKE</strong>. Den nullstiller trekkene dine og stjeler 20 sekunder![cite: 3]
         </div>
     </div>
 
-    <input type="text" id="player-name" placeholder="SKRIV DITT NAMN..."> <button onclick="toggleInstructions(true)" style="background: #00ccff; color: white; cursor: pointer; width: 80%; margin-bottom: 20px;">
-    📖 LÄS SPELINSTRUKTIONER
-</button> <button class="open-settings-btn" onclick="openMediaPopup()">🎥 INSTÄLLNINGAR</button> <button class="open-settings-btn" onclick="window.location='index2.html'">IN ENGLISH</button> <button class="open-settings-btn" onclick="window.location='index3.html'">SUOMEKSI</button>
+    <input type="text" id="player-name" placeholder="SKRIV NAVNET DITT..."> <button onclick="toggleInstructions(true)" style="background: #00ccff; color: white; cursor: pointer; width: 80%; margin-bottom: 20px;">
+    📖 LES SPILLINSTRUKSJONENE
+</button> <button class="open-settings-btn" onclick="openMediaPopup()">🎥 INNSTILLINGER</button> <button class="open-settings-btn" onclick="window.location='index.html'">PÅ SVENSK</button> <button class="open-settings-btn" onclick="window.location='index2.html'">ENGLISH</button> <button class="open-settings-btn" onclick="window.location='index3.html'">SUOMEKSI</button>
 <div id="media-modal-overlay" class="modal-overlay">
     <div class="setup-box popup-content">
         <button class="close-popup" onclick="closeMediaPopup()">X</button>
         
         <h1>MEDIA-KONTROLL</h1>
-        <p>Aktivera hårdvara för turneringen:</p>
+        <p>Aktiver maskinvare for turneringen:</p>
         
         <div class="toggle-container">
             <button id="toggle-cam" class="btn-toggle btn-off" onclick="toggleMediaState('cam')">
@@ -297,7 +297,7 @@
             </button>
         </div>
 
-        <button class="btn-start-game" onclick="confirmAndStart()">SPARA & AKTIVERA</button>
+        <button class="btn-start-game" onclick="confirmAndStart()">LAGRE OG AKTIVER</button>
     </div>
 </div>
 <style>
@@ -411,7 +411,7 @@
 var configCam = false;
 var configMic = false;
 
-// 1. VÄXLA MELLAN PÅ/AV
+// 1. VEKSLE MELLOM PÅ/AV
 function toggleMediaState(type) {
     if (type === 'cam') {
         configCam = !configCam;
@@ -443,7 +443,7 @@ function closeMediaPopup() {
 // Uppdaterad confirmAndStart som även stänger fönstret
 async function confirmAndStart() {
     if (!configCam && !configMic) {
-        if (!confirm("Ingen media vald. Fortsätt ändå?")) return;
+        if (!confirm("Ingen medieenhet er valgt. Fortsette likevel?")) return;
     }
 
     // Startar kameran/micken (från din universella modul)
@@ -461,88 +461,88 @@ async function confirmAndStart() {
         
         <span onclick="toggleInstructions(false)" style="float:right; font-size:45px; cursor:pointer; color:#8b0000; font-weight:bold; line-height: 30px;">&times;</span>
         
-        <h2 style="color:#000; text-align:center; font-size: 28px; border-bottom: 4px solid #ffcc00; padding-bottom: 10px; margin-top: 0; text-transform: uppercase;">Hur spelar jag Lanbit Memory?</h2>
+        <h2 style="color:#000; text-align:center; font-size: 28px; border-bottom: 4px solid #ffcc00; padding-bottom: 10px; margin-top: 0; text-transform: uppercase;">Hvordan spiller jeg Lanbit Memory?</h2>
         
         <div style="font-size: 16px;">
             <!-- SEKTION: HUR SPELET FUNGERAR -->
             <section style="background: #f0f8ff; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #007bff;">
 
-<h2 style="color: var(--gold); font-family: 'Luckiest Guy';">🧠 MINNES-SANERING</h2>
+<h2 style="color: var(--gold); font-family: 'Luckiest Guy';">🧠 MINNERENSING</h2>
     <div style="background: rgba(0, 204, 255, 0.1); border: 2px solid #00ccff; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-        <strong>🧠 SENSORISK PROFIL:</strong> Låg belastning. Inga blinkande ljus. Kräver hög visuell fixering och mönsterigenkänning.
+        <strong>🧠 SENSORISK PROFIL:</strong> Lav belastning. Ingen blinkende lys. Krever sterk visuell fokusering og mønstergjenkjenning.
     </div>
     <ul style="text-align: left; line-height: 1.4;">
-        <li><strong>Mål:</strong> Hitta alla 16 par bland de 32 dolda korten.</li>
-        <li><strong>Regel:</strong> Du kan bara vända två kort åt gången.</li>
-        <li><strong>Vinstkriterium:</strong> Snabbast tid. (Lägst antal drag är tiebreaker).</li>
+        <li><strong>Mål:</strong> Finn alle 16 par blant de 32 skjulte kortene.</li>
+        <li><strong>Regel:</strong> Du kan bare snu to kort om gangen.</li>
+        <li><strong>Vinnerkriterium:</strong> Raskeste tid. (Færrest trekk er tiebreaker).</li>
     </ul>
-    <p style="font-style: italic; color: #00ccff;">"Mitt arkiv är rörigt. Sortera upp det... om du kommer ihåg var du lade filerna!"</p>
+    <p style="font-style: italic; color: #00ccff;">"Arkivet mitt er rotete. Rydd det opp ... hvis du husker hvor du la filene!"</p>
 
-                <h3 style="margin-top: 0; color: #007bff;">🎮 SÅ FUNGERAR DET</h3>
-                <p><strong>1. Skriv ditt namn:</strong> Börja med att registrera ditt alias för topplistan.</p>
-                <p><strong>2. Vänd kort:</strong> Alla kort har en <strong>Lanbit-logga</strong> på baksidan. Klicka på en logga för att se bilden.</p>
-                <p><strong>3. Hitta par:</strong> Klicka på ett andra kort. Är bilderna lika stannar de uppvända. Är de olika vänds de tillbaka efter en sekund.</p>
+                <h3 style="margin-top: 0; color: #007bff;">🎮 SLIK FUNGERER DET</h3>
+                <p><strong>1. Skriv navnet ditt:</strong> Begynn med å registrere aliaset ditt på topplisten.</p>
+                <p><strong>2. Snu kort:</strong> Alle kort har en <strong>Lanbit-logga</strong> på baksiden. Klikk på en logo for å se bildet.</p>
+                <p><strong>3. Finn par:</strong> Klikk på et kort til. Hvis bildene er like, blir de liggende med bildet opp. Hvis de er ulike, snus de tilbake etter ett sekund.</p>
             </section>
 
             <!-- SEKTION: SKILLNADER MELLAN REGLERNA -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <section style="border: 2px solid #28a745; padding: 15px; border-radius: 10px;">
-                    <h3 style="color: #28a745; margin-top: 0;">🟦 CASUAL (Träning)</h3>
+                    <h3 style="color: #28a745; margin-top: 0;">🟦 CASUAL (Trening)</h3>
                     <ul style="padding-left: 20px;">
-                        <li><strong>Tid:</strong> Räknar <strong>uppåt</strong> från 00.00.00.</li>
-                        <li><strong>Fällor:</strong> Inga. Kamek fungerar som ett vanligt par.</li>
-                        <li><strong>Mål:</strong> Snabbast tid vinner turneringen!</li>
-                        <li><strong>Guldmynt:</strong> Vinn ett om du får betyget "BÄST!"[cite: 1].</li>
+                        <li><strong>Tid:</strong> Teller <strong>opp</strong> fra 00.00.00.</li>
+                        <li><strong>Feller:</strong> Ingen. Kamek fungerer som et vanlig par.</li>
+                        <li><strong>Mål:</strong> Raskeste tid vinner turneringen!</li>
+                        <li><strong>Gullmynt:</strong> Vinn ett hvis du får karakteren "BEST!"[cite: 1].</li>
                     </ul>
                 </section>
 
                 <section style="border: 2px solid #dc3545; padding: 15px; border-radius: 10px;">
-                    <h3 style="color: #dc3545; margin-top: 0;">🟥 CLASSIC (Utmaning)</h3>
+                    <h3 style="color: #dc3545; margin-top: 0;">🟥 CLASSIC (Utfordring)</h3>
                     <ul style="padding-left: 20px;">
-                        <li><strong>Tid:</strong> Räknar <strong>nedåt</strong> (Timer). Tar tiden slut förlorar du.</li>
-                        <li><strong>Bonus:</strong> Varje rätt par ger <strong>+5 sekunder</strong>[cite: 1].</li>
-                        <li><strong>Fällor:</strong> Kamek blandar om, Bowser drar tid, och NUKE är katastrof!</li>
-                        <li><strong>Stjärna:</strong> Vinn stjärnan på EXTREME[cite: 1]!</li>
+                        <li><strong>Tid:</strong> Teller <strong>ner</strong> (Timer). Når tiden går ut, taper du.</li>
+                        <li><strong>Bonus:</strong> Hvert riktig par gir <strong>+5 sekunder</strong>[cite: 1].</li>
+                        <li><strong>Feller:</strong> Kamek blandar om, Bowser drar tid, och NUKE är katastrof!</li>
+                        <li><strong>Stjerne:</strong> Vinn stjernen på EXTREME[cite: 1]!</li>
                     </ul>
                 </section>
             </div>
 
             <!-- SEKTION: SÄKERHET -->
             <div style="background: #fff3cd; padding: 15px; border-radius: 10px; margin-top: 20px; border-left: 8px solid #ffcc00; font-size: 14px;">
-                <strong>SÄKERHET:</strong> Security Crew <strong>Psl631</strong> övervakar stationen. Inget fusk (F12/Högerklick/Blur) – Kamek låser spelet direkt och skrattar åt dig med <code>kamek.mp3</code>[cite: 1]!
+                <strong>SIKKERHET:</strong> Security Crew <strong>Psl631</strong> overvåker stasjonen. Ingen juks (F12/Högerklick/Blur) – Kamek låser spillet med én gang og ler av deg med <code>kamek.mp3</code>[cite: 1]!
             </div>
         </div>
         
-        <button onclick="toggleInstructions(false)" style="background:#28a745; color:white; width:100%; margin-top: 20px; padding: 15px; font-size: 20px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; font-family: Arial, sans-serif;">JAG FÖRSTÅR, STARTA SPELET!</button>
+        <button onclick="toggleInstructions(false)" style="background:#28a745; color:white; width:100%; margin-top: 20px; padding: 15px; font-size: 20px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; font-family: Arial, sans-serif;">JEG FORSTÅR, START SPILLET!</button>
     </div>
 </div>
     <br>
     <select id="difficulty">
-        <option value="16">LÄTT (16 KORT)</option>
-        <option value="24">MEDEL (24 KORT)</option>
-        <option value="32">SVÅR (32 KORT + KAMEK)</option>
-        <option value="48">HARDCORE (48 KORT + ALLT)</option>
-        <option value="64">EXTREM (64 KORT + NUKE)</option>
+        <option value="16">LETT (16 KORT)</option>
+        <option value="24">MIDDELS (24 KORT)</option>
+        <option value="32">VANSKELIG (32 KORT + KAMEK)</option>
+        <option value="48">HARDCORE (48 KORT + ALT)</option>
+        <option value="64">EKSTREM (64 KORT + NUKE)</option>
     </select>
     <br>
-    <button class="btn-casual" onclick="prepareGame('casual')">STARTA CASUAL</button>
-    <button class="btn-classic" onclick="prepareGame('classic')">STARTA CLASSIC</button>
+    <button class="btn-casual" onclick="prepareGame('casual')">START CASUAL</button>
+    <button class="btn-classic" onclick="prepareGame('classic')">START CLASSIC</button>
 <div id="leaderboard-container" style="margin-top: 20px; border-top: 2px solid #ffcc00; padding-top: 10px;">
-    <h3>🏆 TOPPLISTA (CASUAL)</h3>
+    <h3>🏆 TOPPLISTE (CASUAL)</h3>
     <table id="leaderboard-table" style="width: 100%; font-size: 18px; border-collapse: collapse;">
         <thead>
             <tr style="color: #ffcc00;">
                 <th>POS</th>
-                <th>NAMN</th>
+                <th>NAVN</th>
                 <th>TID</th>
-                <th>DRAG</th>
+                <th>TREKK</th>
             </tr>
         </thead>
         <tbody id="leaderboard-body">
             <!-- Här hamnar poängen via JavaScript -->
         </tbody>
     </table>
-    <button onclick="clearLeaderboard()" style="font-size: 12px; background: red; color: white; margin-top: 10px;">RENSA LISTA</button>
+    <button onclick="clearLeaderboard()" style="font-size: 12px; background: red; color: white; margin-top: 10px;">TØM LISTEN</button>
 </div>
 
 </div>
@@ -557,8 +557,8 @@ async function confirmAndStart() {
 
 <div id="game-container">
     <div id="stats-text" style="font-size: 28px; margin-bottom: 15px;">
-        SPELARE: <span id="display-name"></span> | 
-        DRAG: <span id="display-moves">0</span> | 
+        SPILLER: <span id="display-name"></span> | 
+        TREKK: <span id="display-moves">0</span> | 
         TID: <span id="timer">00.00.00</span>
     </div>
     <div id="game-board"></div>
@@ -571,7 +571,7 @@ async function confirmAndStart() {
 
 /* --- LEADERBOARD LOGIK --- */
 
-// Laddar och visar listan när sidan startar
+// Laster och viser listen når siden starter
 window.onload = function() {
     displayLeaderboard();
 };
@@ -593,7 +593,7 @@ function displayLeaderboard() {
     });
 }
 
-// Funktion för att visa eller dölja instruktionerna
+// Funksjon för att visa eller dölja instruktionerna
 function toggleInstructions(show) {
     var modal = document.getElementById('instructions-modal');
     modal.style.display = show ? 'block' : 'none';
@@ -624,7 +624,7 @@ function saveCasualScore(name, time, moves) {
 }
 
 function clearLeaderboard() {
-    if(confirm("Vill du verkligen rensa topplistan för Casual?")) {
+    if(confirm("Vill du verkligen rensa topplisten för Casual?")) {
         localStorage.removeItem('casualScores');
         displayLeaderboard();
     }
@@ -659,9 +659,9 @@ function triggerKamekLock(reason) {
             <img src="kamek.jfif" alt="Kamek" style="width: 250px; height: 250px; object-fit: contain;">
         </div>
         <h1 style="font-size: clamp(40px, 8vw, 60px); margin-top: 20px;">HIII-HEEE-HEEE!</h1>
-        <p style="font-size: 30px; color: white; max-width: 800px;">FÖRSÖKTE DU JUST FUSKA, ${currentPlayerName ? currentPlayerName.toUpperCase() : 'FUSKARE'}?</p>
+        <p style="font-size: 30px; color: white; max-width: 800px;">PRØVDE DU NETTOPP Å JUKSE, ${currentPlayerName ? currentPlayerName.toUpperCase() : 'JUKSER'}?</p>
         <p style="font-size: 24px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; max-width: 600px;">${reason}</p>
-        <button onclick="location.reload()" style="background: #ffcc00; color: black; padding: 20px 40px; margin: 30px 0; border-radius: 15px; cursor: pointer; font-size: 24px; border: none; font-family: 'Luckiest Guy', cursive;">FÖRLÅT MIG KAMEK...</button>
+        <button onclick="location.reload()" style="background: #ffcc00; color: black; padding: 20px 40px; margin: 30px 0; border-radius: 15px; cursor: pointer; font-size: 24px; border: none; font-family: 'Luckiest Guy', cursive;">TILGI MEG, KAMEK...</button>
         <div style="height: 20px;"></div> <!-- Extra space i botten -->
     `;
     
@@ -674,13 +674,13 @@ function triggerKamekLock(reason) {
 // Blockera fuskförsök
 document.addEventListener('contextmenu', e => {
     e.preventDefault();
-    triggerKamekLock("HÖGERKLICK ÄR FÖRBJUDET PÅ STATION 24!");
+    triggerKamekLock("HØYREKLIKK ER FORBUDT PÅ STATION 24!");
 });
 
 document.addEventListener('keydown', e => {
     if (e.key === "F12" || (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J" || e.key === "C")) || (e.ctrlKey && e.key === "U")) {
         e.preventDefault();
-        triggerKamekLock("FÖRSÖK INTE TITTA BAKOM KULISSERNA!");
+        triggerKamekLock("IKKE PRØV Å SE BAK KULISSENE!");
     }
 });
 
@@ -688,7 +688,7 @@ document.addEventListener('keydown', e => {
 window.addEventListener('wheel', (e) => {
     // Kollar om scroll-värdet inte är ett heltal eller om delta-värdet är för litet, vilket indikerar en trackpad
     if (timerInterval && (!Number.isInteger(e.deltaY) || (Math.abs(e.deltaY) > 0 && Math.abs(e.deltaY) < 20))) {
-        triggerKamekLock("Sluta smeka din laptop! Använd en riktig datormus för Station 24 Protocol. Kamek accepterar endast mekanisk precision!");
+        triggerKamekLock("Slutt å stryke på styreflaten! Bruk en ordentlig datamus til Station 24 Protocol. Kamek godtar bare mekanisk presisjon!");
     }
 }, { passive: false });
 
@@ -712,15 +712,15 @@ function createToastContainer() {
 }
 
 // Nätverksstatus
-window.addEventListener('offline', () => showToast("⚠️ INTERNET BRUTET! KAN EJ ANSLUTA TILL SERVER.", "#ff0000"));
-window.addEventListener('online', () => showToast("✅ ANSLUTNING ÅTERSTÄLLD.", "#00ff00"));
+window.addEventListener('offline', () => showToast("⚠️ INTERNETTET ER BRUTT! KAN IKKE KOBLE TIL SERVEREN.", "#ff0000"));
+window.addEventListener('online', () => showToast("✅ TILKOBLING GJENOPPRETTET.", "#00ff00"));
 
 // Batteri & Ström
 if ('getBattery' in navigator) {
     navigator.getBattery().then(battery => {
         const updateBattery = () => {
             if (!battery.charging) {
-                showToast("🔋 VARNING: LÅGT BATTERI! SPELET ANVÄNDER RESERVSTRÖM.", "#ffaa00");
+                showToast("🔋 ADVARSEL: LAVT BATTERI! SPILLET BRUKER RESERVESTRØM.", "#ffaa00");
             }
         };
         battery.addEventListener('levelchange', updateBattery);
@@ -732,7 +732,7 @@ if ('getBattery' in navigator) {
     navigator.getBattery().then(battery => {
         battery.addEventListener('levelchange', () => {
             if (battery.level <= 0.1) {
-                triggerKamekLock("🚨 KRITISK STRÖMNIVÅ! VÄNLIGEN LADDA DIN ENHET!");
+                triggerKamekLock("🚨 KRITISK STRØMNIVÅ! VENNLIGST LAD ENHETEN DIN!");
             }
         });
     });
@@ -742,14 +742,14 @@ if ('getBattery' in navigator) {
 window.addEventListener('load', () => {
     const loadTime = window.performance.timing.domContentLoadedEventEnd - window.performance.timing.navigationStart;
     if (loadTime > 3000) {
-        showToast("🐌 LÅNGSAM SERVER-RESPONS. KOLLA LAN-KABELN!", "#ffaa00");
+        showToast("🐌 LANGSOM SERVERRESPONS. SJEKK LAN-KABELEN!", "#ffaa00");
     }
 });
 
 // AdBlock-check
 async function checkAdBlock() {
     const test = new Request('https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js', { method: 'HEAD', mode: 'no-cors' });
-    fetch(test).catch(() => showToast("🚫 ADBLOCK DETEKTERAD: VISSA FUNKTIONER KAN STÖRAS.", "#ff3300"));
+    fetch(test).catch(() => showToast("🚫 ADBLOCK OPPDAGET: NOEN FUNKSJONER KAN BLI FORSTYRRET.", "#ff3300"));
 }
 window.addEventListener('load', checkAdBlock);
 
@@ -757,13 +757,13 @@ window.addEventListener('load', checkAdBlock);
 
 // 1. Monitorera WebGL/Grafik (Kritiskt för laggfritt spel)
 if (!window.WebGLRenderingContext) {
-    showToast("⚠️ DIN WEBBLÄSARE HAR SVAGT GRAFIKSTÖD. SPELET KAN LAGGA!", "#ff3300");
+    showToast("⚠️ NETTLESEREN DIN HAR SVAK GRAFIKKSTØTTE. SPILLET KAN LAGGE!", "#ff3300");
 }
 
 // 2. Skärmupplösnings-check (Viktigt för 64-korts Extrem)
 function checkResolution() {
     if (window.innerWidth < 1100 && parseInt(document.getElementById('difficulty').value) >= 48) {
-        showToast("📱 VARNING: LÅG UPPLÖSNING! SVÅRT ATT SE ALLA 64 KORT.", "#ffcc00");
+        showToast("📱 ADVARSEL: LAV OPPLØSNING! DET ER VANSKELIG Å SE ALLE 64 KORT.", "#ffcc00");
     }
 }
 window.addEventListener('resize', checkResolution);
@@ -774,16 +774,16 @@ document.onmousemove = () => idleTime = 0;
 setInterval(() => {
     idleTime++;
     if (idleTime === 1) { // Efter 5 minuters inaktivitet
-        showToast("💤 HALLÅ? ÄR DU KVAR? SESSIONEN GÅR SNART UT.", "#00ccff");
+        showToast("💤 HALLO? ER DU DER? ØKTEN UTLØPER SNART.", "#00ccff");
     }
 }, 300000);
 
 // 4. Prestanda-check (RAM/Minne)
 if ('deviceMemory' in navigator) {
     if (navigator.deviceMemory < 4) {
-        showToast("💾 LÅGT RAM-MINNE DETEKTERAT. STÄNG ANDRA FLIKAR!", "#ffaa00");
+        showToast("💾 LITE RAM-MINNE OPPDAGET. LUKK ANDRE FANER!", "#ffaa00");
     } else if (navigator.deviceMemory < 2) {
-        triggerKamekLock("💾 FÖR LÅGT RAM-MINNE DETEKTERAT. STÄNG ANDRA FLIKAR!");
+        triggerKamekLock("💾 FOR LITE RAM-MINNE. LUKK ANDRE FANER!");
     }
 }
 
@@ -793,7 +793,7 @@ try {
     localStorage.setItem(testKey, testKey);
     localStorage.removeItem(testKey);
 } catch (e) {
-    showToast("💾 VARNING: DIN WEBBLÄSARE KAN INTE SPARA TOPPLISTAN!", "#ff0000");
+    showToast("💾 ADVARSEL: NETTLESEREN DIN KAN IKKE LAGRE TOPPLISTEN!", "#ff0000");
 }
 
 // --- BLUR-LOGIK (FOKUSFÖRLUST) ---
@@ -801,11 +801,11 @@ let blurTimeout;
 
 window.addEventListener('blur', () => {
     // Visa en varnings-toast direkt när fokus tappas
-    showToast("🔍 SPELET HAR TAPPAT FOKUS! ÅTERVÄND INOM 5 SEKUNDER...", "#ffcc00");
+    showToast("🔍 SPILLET HAR MISTET FOKUS! KOM TILBAKE INNEN 5 SEKUNDER...", "#ffcc00");
     
     // Starta timern för Kamek-låset
     blurTimeout = setTimeout(() => {
-        triggerKamekLock("DU VAR BORTA FÖR LÄNGE! FÖRSÖKTE DU KOLLA UPP SVAREN?");
+        triggerKamekLock("DU VAR BORTE FOR LENGE! PRØVDE DU Å SLÅ OPP SVARENE?");
     }, 5000); // 5 sekunder
 });
 
@@ -813,7 +813,7 @@ window.addEventListener('focus', () => {
     // Om spelaren hinner tillbaka, avbryt låset
     if (blurTimeout) {
         clearTimeout(blurTimeout);
-        showToast("✅ FOKUS ÅTERSTÄLLT. SPELET FORTSÄTTER.", "#00ff00");
+        showToast("✅ FOKUS GJENOPPRETTET. SPILLET FORTSETTER.", "#00ff00");
     }
 });
 let idleTimer;
@@ -830,12 +830,12 @@ function resetIdleTimers() {
 
     // STEG 1: Visa varning efter 30 sekunder utan action[cite: 2]
     idleTimer = setTimeout(() => {
-        showToast("💤 HALLÅ? TURNERINGEN VÄNTAR INTE! AGERA INNAN KAMEK LÅSER SPELET.", "#ffaa00");
+        showToast("💤 HALLO? TURNERINGEN VENTER IKKE! GJØR NOE FØR KAMEK LÅSER SPILLET.", "#ffaa00");
     }, 30000); 
 
     // STEG 2: Kamek låser spelet efter 60 sekunder (30 sekunder efter varningen)
     lockTimer = setTimeout(() => {
-        triggerKamekLock("USER TIMEOUT: DU VAR INAKTIV FÖR LÄNGE!");
+        triggerKamekLock("BRUKERTIDSAVBRUDD: DU VAR INAKTIV FOR LENGE!");
     }, 60000);
 }
 
@@ -849,7 +849,7 @@ document.addEventListener('mousemove', resetIdleTimers);
 // 1. Monitorera Web Audio (Om ljudet inte kan spelas)
 window.addEventListener('click', () => {
     if (AudioContext.state === 'suspended') {
-        showToast("🔊 LJUDET ÄR AVSTÄNGT! KLICKA PÅ SKÄRMEN FÖR ATT AKTIVERA.", "#ffaa00");
+        showToast("🔊 LYDEN ER AV! KLIKK PÅ SKJERMEN FOR Å AKTIVERE.", "#ffaa00");
     }
 }, { once: true });
 
@@ -859,7 +859,7 @@ function checkPerformance() {
     let now = performance.now();
     let delta = now - lastFrameTime;
     if (delta > 100) { // Om en frame tar mer än 100ms (lagg)
-        showToast("🐢 PRESTANDA-DROP DETEKTERAT! STÄNG BAKGRUNDSPROGRAM.", "#ff3300");
+        showToast("🐢 YTELSESFALL OPPDAGET! LUKK BAKGRUNNSPROGRAMMER.", "#ff3300");
     }
     lastFrameTime = now;
     if (!isProcessing) requestAnimationFrame(checkPerformance);
@@ -871,7 +871,7 @@ function checkShiftTime() {
     const now = new Date();
     const hours = now.getHours();
     if (hours >= 8 && hours < 16) {
-        showToast("🛡️ SÄKERHETS-CREW PASS AKTIVT: ÖVERVAKA TOPPLISTAN.", "#00ccff");
+        showToast("🛡️ SIKKERHETSCREW-VAKT AKTIV: OVERVÅK TOPPLISTEN.", "#00ccff");
     }
 }
 setInterval(checkShiftTime, 1800000); // Kolla var 30:e minut
@@ -879,7 +879,7 @@ setInterval(checkShiftTime, 1800000); // Kolla var 30:e minut
 // 4. Varning för Full Cache (Kan påverka laddning av bilder)
 if (window.performance && window.performance.memory) {
     if (window.performance.memory.usedJSHeapSize > window.performance.memory.jsHeapSizeLimit * 0.8) {
-        showToast("💾 VARNING: WEBBLÄSARENS MINNE ÄR NÄSTAN FULLT!", "#ff0000");
+        showToast("💾 ADVARSEL: NETTLESERENS MINNE ER NESTEN FULLT!", "#ff0000");
     }
 }
 
@@ -893,7 +893,7 @@ setInterval(async () => {
         await fetch('https://www.google.com/generate_204', { mode: 'no-cors' });
         const latency = Date.now() - start;
         if (latency > 200) {
-            showToast(`📡 HÖG LATENS (${latency}ms): KOLLA LAN-KABELN!`, "#ffaa00");
+            showToast(`📡 HØY LATENS (${latency}ms): SJEKK LAN-KABELEN!`, "#ffaa00");
         }
     } catch (e) {
         // Hanteras redan av offline-eventet
@@ -901,14 +901,14 @@ setInterval(async () => {
 }, 30000); // Kolla var 30:e sekund
 // 7. Kontroll av Cookies/Tredjepartslagring
 if (!navigator.cookieEnabled) {
-    showToast("🍪 COOKIES ÄR AVSTÄNGDA! TOPPLISTAN KOMMER INTE SPARA.", "#ff3300");
+    showToast("🍪 INFORMASJONSKAPSLER ER SLÅTT AV! TOPPLISTEN VIL IKKE LAGRES.", "#ff3300");
 }
 // 2. Anti-Time-Cheat (Om någon ändrar systemklockan)
 let lastTick = Date.now();
 setInterval(() => {
     const now = Date.now();
     if (Math.abs(now - lastTick - 1000) > 2000) {
-        triggerKamekLock("FÖRSÖKTE DU JUST MANIPULERA TIDEN?");
+        triggerKamekLock("PRØVDE DU Å MANIPULERE TIDEN?");
     }
     lastTick = now;
 }, 1000);
@@ -919,10 +919,10 @@ document.addEventListener('click', () => {
     clickCount++;
     setTimeout(() => clickCount--, 1000);
     if (clickCount > 5) { // Mer än 5 klick per sekund
-        showToast("☝️ LUGNA NER DIG! AUTOCLICKER ÄR FÖRBJUDET.", "#ff0000");
+        showToast("☝️ RO DEG NED! AUTOCLICKER ER FORBUDT.", "#ff0000");
         clickCount = 0;
     } else if (clickCount > 15) { // Mer än 15 klick per sekund
-        triggerKamekLock("AUTOCLICKER UPPTÄCKT!", "#ff0000");
+        triggerKamekLock("AUTOCLICKER OPPDAGET!", "#ff0000");
         clickCount = 0;
     }
 });
@@ -930,9 +930,9 @@ document.addEventListener('click', () => {
 // 4. Kontroll av flik-synlighet (Om man gömmer spelet)
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
-        showToast("👻 SPELET KÖRS I BAKGRUNDEN. PAUSAR PROCESSER...", "#00ccff");
+        showToast("👻 SPILLET KJØRER I BAKGRUNNEN. PAUSER PROSESSER...", "#00ccff");
     } else {
-        showToast("👀 VÄLKOMMEN TILLBAKA!", "#00ff00");
+        showToast("👀 VELKOMMEN TILBAKE!", "#00ff00");
     }
 });
 
@@ -941,7 +941,7 @@ function checkStorageQuota() {
     if (navigator.storage && navigator.storage.estimate) {
         navigator.storage.estimate().then(estimate => {
             if (estimate.usage / estimate.quota > 0.9) {
-                showToast("💾 VARNING: LAGRINGSUTRYMMET ÄR NÄSTAN FULLT!", "#ff3300");
+                showToast("💾 ADVARSEL: LAGRINGSPLASSEN ER NESTEN FULL!", "#ff3300");
             }
         });
     }
@@ -951,7 +951,7 @@ checkStorageQuota();
 // 6. Felhantering för bilder (Om t.ex. kamek.jfif saknas)
 window.addEventListener('error', (e) => {
     if (e.target.tagName === 'IMG') {
-        showToast(`🖼️ KUNDE INTE LADDA BILD: ${e.target.src.split('/').pop()}`, "#ff0000");
+        showToast(`🖼️ KUNNE IKKE LASTE INN BILDE: ${e.target.src.split('/').pop()}`, "#ff0000");
     }
 }, true);
 
@@ -966,7 +966,7 @@ function formatCasualTime(ms) {
 
 function prepareGame(mode) {
     selectedMode = mode;
-    currentPlayerName = document.getElementById('player-name').value.trim() || "Gäst";
+    currentPlayerName = document.getElementById('player-name').value.trim() || "Gjest";
     document.getElementById('start-screen').style.display = 'none';
     const cd = document.getElementById('countdown');
     cd.style.display = 'block';
@@ -1115,13 +1115,13 @@ function endGame(won) {
 
     let res;
     if (!won && selectedMode === 'classic') {
-        res = {t:"USELT", s:"mk64_loser.wav", msg:"MK64 LOSER - GÅ OCH LÄGG DIG![cite: 3]"};
+        res = {t:"ELENDIG", s:"mk64_loser.wav", msg:"MK64-TAPER – GÅ OG LEGG DEG![cite: 3]"};
     } else {
-        if (eff < 2.0) res = {t:"BÄST!", s:"yay.mp3", msg:"LEGENDARISKT! GULDMYNTET ÄR DITT![cite: 3]"};
-        else if (eff < 2.5) res = {t:"BRA!", s:"pling.mp3", msg:"HELT OK, MEN KAN DU BÄTTRE?[cite: 3]"};
-        else if (eff < 3.0) res = {t:"MEDEL", s:"boooop.mp3", msg:"VAR DET DÄR ALLT DU HADE?[cite: 3]"};
-        else if (eff < 4.0) res = {t:"DÅLIGT", s:"sad_trombone.mp3", msg:"SÄMRE ÄN EN GOOMBA![cite: 3]"};
-        else res = {t:"USELT", s:"mk64_loser.wav", msg:"TOTALT USELT - AVGÅ![cite: 3]"};
+        if (eff < 2.0) res = {t:"BEST!", s:"yay.mp3", msg:"LEGENDARISK! GULLMYNTET ER DITT![cite: 3]"};
+        else if (eff < 2.5) res = {t:"BRA!", s:"pling.mp3", msg:"HELT OK, MEN KAN DU BEDRE?[cite: 3]"};
+        else if (eff < 3.0) res = {t:"MIDDELS", s:"boooop.mp3", msg:"VAR DET ALT DU HADDE?[cite: 3]"};
+        else if (eff < 4.0) res = {t:"DÅRLIG", s:"sad_trombone.mp3", msg:"DÅRLIGERE ENN EN GOOMBA![cite: 3]"};
+        else res = {t:"ELENDIG", s:"mk64_loser.wav", msg:"TOTALT ELENDIGT – GI OPP![cite: 3]"};
     }
     
     playAudio(res.s);
@@ -1138,7 +1138,7 @@ function playAudio(f) { new Audio(f).play().catch(()=>{}); }
         <video id="kamek-video" autoplay playsinline muted></video>
         <div id="kamek-cam-off">
             <img src="kamek.jfif" onerror="this.src='https://via.placeholder.com/60?text=KAMEK'">
-            <p>KAMERA AVSTÄNGD</p>
+            <p>KAMERA SLÅTT AV</p>
         </div>
     </div>
 
@@ -1212,9 +1212,9 @@ async function initKamekMedia(useCam, useMic) {
             setupKamekEar();
         }
 
-        kamekToast("✅ SYSTEMET ÄR LIVE");
+        kamekToast("✅ SYSTEMET ER LIVE");
     } catch (e) {
-        kamekToast("❌ ÅTKOMST NEKAD ELLER INGEN ENHET");
+        kamekToast("❌ TILGANG NEKTET ELLER INGEN ENHET");
     }
 }
 
@@ -1248,7 +1248,7 @@ function setupKamekEar() {
         const txt = e.results[e.results.length-1][0].transcript.toLowerCase();
         if (kamekForbidden.some(w => txt.includes(w))) {
             kamekStrikes++;
-            if (kamekStrikes < 3) kamekToast("⚠️ VARNING #" + kamekStrikes + ": STÄDA MUNNEN!");
+            if (kamekStrikes < 3) kamekToast("⚠️ ADVARSEL #" + kamekStrikes + ": VASK MUNNEN DIN!");
             else kamekPurpleLockdown();
         }
     };
@@ -1269,11 +1269,11 @@ function kamekPurpleLockdown() {
             <img src="kamek.jfif" style="width:150px;border:5px solid #ffcc00;border-radius:50%;box-shadow:0 0 30px #8200ff;">
             <h1 style="font-family:'Luckiest Guy';font-size:50px;color:#ffcc00;margin:20px 0;">LÅST AV KAMEK</h1>
             <div style="background:rgba(0,0,0,0.5);padding:30px;border-radius:20px;border:1px dashed #8200ff;">
-                <p style="font-size:35px;font-style:italic;">"Svordomar tillåts inte."</p>
+                <p style="font-size:35px;font-style:italic;">"Banning er ikke tillatt."</p>
             </div>
             <p style="margin-top:40px;color:#8200ff;font-family:monospace;font-weight:bold;">SYSTEM_ERROR: TOXIC_OPERATOR_DETECTED</p>
-            <p style="color:red;font-weight:bold;font-size:24px;">RESULTAT: 0 POÄNG REGISTRERADE</p>
-            <button onclick="location.reload()" style="margin-top:20px;padding:10px 30px;font-family:'Luckiest Guy';cursor:pointer;background:#ffcc00;border:none;border-radius:10px;">FÖRSÖK IGEN</button>
+            <p style="color:red;font-weight:bold;font-size:24px;">RESULTAT: 0 POENG REGISTRERT</p>
+            <button onclick="location.reload()" style="margin-top:20px;padding:10px 30px;font-family:'Luckiest Guy';cursor:pointer;background:#ffcc00;border:none;border-radius:10px;">PRØV IGJEN</button>
         </div>`;
 }
 </script>
@@ -1447,14 +1447,14 @@ const uiImg = document.getElementById('boombox-img');
 const uiCross = document.getElementById('status-cross');
 const uiInfo = document.getElementById('track-info');
 
-// Funktion för att slumpa och starta musik
+// Funksjon för att slumpa och starta musik
 function playRandomTrack() {
     const randomIdx = Math.floor(Math.random() * KAMEK_TRACKS.length);
     const trackName = KAMEK_TRACKS[randomIdx];
     jukebox.src = trackName;
     
     jukebox.play().then(() => {
-        uiInfo.innerText = "SPELAR: " + trackName.replace('.mp3', '').toUpperCase();
+        uiInfo.innerText = "Spiller: " + trackName.replace('.mp3', '').toUpperCase();
         uiInfo.style.display = 'block';
         setTimeout(() => { uiInfo.style.display = 'none'; }, 3000);
     }).catch(err => console.log("Interaktion krävs"));

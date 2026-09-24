@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frogger Arcade</title>
+    <style>
+        * { box-sizing: border-box; user-select: none; }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #050805;
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        #game-container {
+            position: relative;
+            border: 4px solid #4caf50;
+            box-shadow: 0 0 30px rgba(76, 175, 80, 0.4);
+            width: 640px;
+            height: 480px;
+            background: #000;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background-color: #0b140b;
+        }
+    </style>
+    <!-- Delade moduler -->
+    <script src="i18n.js"></script>
+    <script src="arcade_core.js"></script>
+</head>
+<body>
+
+<div id="game-container">
+    <canvas id="gameCanvas" width="640" height="480"></canvas>
+</div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+// =========================================================================
+// 🔊 FELSÄKRAD LJUDMOTOR (FALLBACK OM ARCADE_CORE.JS SAKNAS)
+// =========================================================================
+if (typeof ArcadeAudio === 'undefined') {
+    window.ArcadeAudio = {
+        volSFX: parseInt(localStorage.getItem('arcade_vol_sfx') || "80", 10),
+        soundEnabled: true,
+
+        playSFX: function(file, baseVol) {
+            if (!this.soundEnabled) return;
+            try {
+                var a = new Audio(file);
+                var vol = Math.max(0, Math.min(1, (this.volSFX / 100) * (baseVol || 1.0)));
+                a.volume = vol;
+                a.play().catch(function() {});
+            } catch (e) {}
+        }
+    };
+}
+
+// =========================================================================
+// 🌐 I18N-LEXIKON FÖR FROGGER (SVENSKA & ENGELSKA)
+// =========================================================================
+const FROGGER_TEXTS = {
+    sv: {
+        title: "🐸 FROGGER ARCADE",
+        instructions: "Hoppa över vägen och floden upp till de tre näckrosorna!",
+        startBtn: "[ TRYCK ENTER / MELLANSLAG FÖR ATT STARTA ]",
+        score: "POÄNG",
+        lives: "LIV",
+        frogsLeft: "GRODOR KVAR",
+        homeReached: "MÅL NÅTT! +200P",
+        waterDeath: "PLASK! Grodan sjönk som en sten!",
+        carDeath: "SPLATT! Påkörd av trafiken!",
+        gameOver: "GAME OVER",
+        victory: "🎉 ALLA GRODOR I MÅL! SEGER! 🎉",
+        restart: "[ TRYCK ENTER FÖR ATT SPELA IGEN ]",
+        backToHub: "[ESC: Tillbaka till arkadhallen | L: Byt språk]"
+    },
+    en: {
+        title: "🐸 FROGGER ARCADE",
+        instructions: "Cross the highway and the river to reach the 3 lily pads!",
+        startBtn: "[ PRESS ENTER / SPACE TO START ]",
+        score: "SCORE",
+        lives: "LIVES",
+        frogsLeft: "FROGS LEFT",
+        homeReached: "GOAL REACHED! +200P",
+        waterDeath: "SPLASH! The frog sank like a stone!",
+        carDeath: "SPLAT! Run over by traffic!",
+        gameOver: "GAME OVER",
+        victory: "🎉 ALL FROGS SAVED! VICTORY! 🎉",
+        restart: "[ PRESS ENTER TO PLAY AGAIN ]",
+        backToHub: "[ESC: Back to Arcade Hub | L: Change language]"
+    }
+};
+
+function fT(key) {
+    let curLang = (typeof I18n !== 'undefined' && I18n.current) ? I18n.current : 'sv';
+    if (!FROGGER_TEXTS[curLang]) curLang = 'sv';
+    return FROGGER_TEXTS[curLang][key] || key;
+}
+
+// =========================================================================
+// 🧙‍♂️ KAMEK ANTI-CHEAT (SVENSKA & ENGLISH)
+// =========================================================================
+const KamekAntiCheat = (function() {
+    let isLocked = false;
+    let lockKey = "";
+    let clickTimes = [];
+    let lastActivityTime = Date.now();
+    let tournamentPauseStrikes = 0;
+    let isMouseDown = false;
+    let mouseDownFrames = 0;
+
+    // --- SPRÅKBANK FÖR HÅN & FÖRKLARINGAR ---
+    const MOCKS = {
+        sv: {
+            title: "🛑 HOPPSAN! KAMEK SPÄRRADE SPELET! 🛑",
+            clickPrompt: "KLICKA VAR SOM HELST FÖR ATT STARTA OM",
+            F12_DEVTOOLS: {
+                header: "🍪 KIKAR DU EFTER KAKOR I KONSOLEN?!",
+                text: "🧙‍♂️ KAMEK: 'Nyehehehe! Du öppnade inspektorn via F12! Det finns inga hemliga chokladkakor i källkoden, bara Kamek-magi som krossar ditt fusk!'",//[cite: 3],
+                sub: "👾 GÖRAN: 'Stäng utvecklarverktygen och spela hederligt!'"//[cite: 3]
+            },
+            TAB_SWITCH: {
+                header: "👀 SMÖG DU IVÄG TILL EN ANNAN FLIK?!",
+                text: "🧙‍♂️ KAMEK: 'Nyehehehe! Byter du flik mitt under striden?! Trodde du att tiden skulle stanna medan du smygsurfade?!'",//[cite: 3],
+                sub: "👾 GÖRAN: 'Håll ögonen på spelplanen så kör vi igen!'"//[cite: 3]
+            },
+            AFK_IDLE: {
+                header: "😴 TOG DU EN TUPPLUR MITT I MATCHEN?!",
+                text: "🧙‍♂️ KAMEK: 'Nyehehehe! Pekaren har inte rört sig på evigheter! Gick du och hämtade saft eller somnade du över skrivbordet?!'",//[cite: 3],
+                sub: "👾 GÖRAN: 'Vakna upp din sömntuta! Monstren väntar inte!'"
+            },
+            TRACKPAD: {
+                header: "💻 STYRPLATTA PÅ EN ARKADSKJUTARE?!",
+                text: "🧙‍♂️ KAMEK: 'Nyehehehe! Använd musen, inte datorns pekplatta! Att gnugga med pekfingret på laptopen är som att spela fotboll i gummistövlar!'",//[cite: 3],
+                sub: "👾 GÖRAN: 'Koppla in en hederlig datormus med sladd!'"//[cite: 3]
+            },
+            TOURNAMENT_PAUSE: {
+                header: "🚫 PAUSSPAM I TURNERINGEN!",
+                text: "🧙‍♂️ KAMEK: 'Nyehehehe! Ingen fikapaus mitt i finalen! Du försökte pausa tre gånger i ett pauslåst tävlingsläge!'",//[cite: 3],
+                sub: "👾 GÖRAN: 'Diskvalificerad! I turneringar spelar man hela rundan utan stopp!'"
+            },
+            RESIZE: {
+                header: "📐 KRYMPTE DU PRECIS HELA SKÄRMEN?!",
+                text: "🧙‍♂️ KAMEK: 'Nyehehehe! Försöker du göra fönstret pyttelitet för att träffa lättare?! Vi bor inte i ett dockskåp!'",//[cite: 3],
+                sub: "👾 GÖRAN: 'Återställ full skärmstorlek om du vill leka med oss!'"//[cite: 3]
+            },
+            HELD_BUTTON: {
+                header: "🧸 HAR DU EN TEJPRULLE PÅ KNAPPEN?!",
+                text: "🧙‍♂️ KAMEK: 'Nyehehehe! Du har hållit ned avtryckaren oavbrutet i flera sekunder! Har du tejpat fast fingret?!'",//[cite: 3],
+                sub: "👾 GÖRAN: 'Släpp knappen och klicka i takt istället!'"//[cite: 3]
+            },
+            AUTOCLICKER: {
+                header: "⚡ HAR DU KOPPLAT IN EN HACKSPETT?!",
+                text: "🧙‍♂️ KAMEK: 'Nyehehehe! Över tjugo klick i sekunden! Inga robotmotorer eller snabbklicksprogram i min borg!'",//[cite: 3],
+                sub: "👾 GÖRAN: 'Mänskliga fingrar klarar inte den farten. Gör om, gör rätt!'"
+            }
+        },
+        en: {
+            title: "🛑 OOPS! KAMEK LOCKED THE GAME! 🛑",
+            clickPrompt: "CLICK ANYWHERE TO RESTART",
+            F12_DEVTOOLS: {
+                header: "🍪 SNOOPING FOR COOKIES IN THE CONSOLE?!",
+                text: "🧙‍♂️ KAMEK: 'Nyehehehe! You pressed F12 to inspect the code! There are no secret chocolate chip cookies in devtools, only Kamek magic crushing your cheat!'",
+                sub: "👾 GÖRAN: 'Close the developer tools and play fair!'"
+            },
+            TAB_SWITCH: {
+                header: "👀 SNEAKING OFF TO ANOTHER BROWSER TAB?!",
+                text: "🧙‍♂️ KAMEK: 'Nyehehehe! Tab-switching in the middle of a battle?! Did you think time would freeze while you browsed away?!'",
+                sub: "👾 GÖRAN: 'Keep your eyes on the game screen! Let's go again!'"
+            },
+            AFK_IDLE: {
+                header: "😴 TAKING A NAP MID-MATCH?!",
+                text: "🧙‍♂️ KAMEK: 'Nyehehehe! Your cursor hasn't moved in ages! Did you go get juice or fell asleep right on your keyboard?!'",
+                sub: "👾 GÖRAN: 'Wake up sleepyhead! Monsters won't wait for you!'"
+            },
+            TRACKPAD: {
+                header: "💻 A TRACKPAD ON AN ARCADE SHOOTER?!",
+                text: "🧙‍♂️ KAMEK: 'Nyehehehe! Use the mouse, not your laptop trackpad! Rubbing a finger on a trackpad is like playing soccer in rain boots!'",
+                sub: "👾 GÖRAN: 'Plug in a proper wired gaming mouse!'"
+            },
+            TOURNAMENT_PAUSE: {
+                header: "🚫 PAUSE SPAM IN TOURNAMENT MODE!",
+                text: "🧙‍♂️ KAMEK: 'Nyehehehe! No coffee breaks during the grand finals! You tried to pause 3 times in a locked tournament!'",
+                sub: "👾 GÖRAN: 'Disqualified! In tournament mode, you play through without pausing!'"
+            },
+            RESIZE: {
+                header: "📐 SHRINKING THE WINDOW TO CHEAT?!",
+                text: "🧙‍♂️ KAMEK: 'Nyehehehe! Did you shrink the browser window to make targets easier to hit?! We don't live in a dollhouse!'",
+                sub: "👾 GÖRAN: 'Restore the window to full size to play with us!'"
+            },
+            HELD_BUTTON: {
+                header: "🧸 IS THERE TAPE STUCK ON YOUR TRIGGER?!",
+                text: "🧙‍♂️ KAMEK: 'Nyehehehe! Holding down the shoot button for 20 seconds straight?! Did you tape your finger to the mouse?!'",
+                sub: "👾 GÖRAN: 'Release the button and click with rhythm instead!'"
+            },
+            AUTOCLICKER: {
+                header: "⚡ DID YOU HIRE A WOODPECKER?!",
+                text: "🧙‍♂️ KAMEK: 'Nyehehehe! Over twenty clicks in a single second! No macros or auto-clicker scripts allowed in my lair!'",
+                sub: "👾 GÖRAN: 'Human hands can't click that fast. Play fair!'"
+            }
+        }
+    };
+
+    function getLang() {
+        let lang = (typeof I18n !== 'undefined' && I18n.current) ? I18n.current : localStorage.getItem('arcade_global_lang');
+        return (lang === 'en') ? 'en' : 'sv';
+    }
+
+    function resetAFK() {
+        lastActivityTime = Date.now();
+    }
+
+    // --- 🕵️‍♂️ SENSORER ---
+
+    // 1. F12 & Inspektera (Tangentbord)
+    window.addEventListener('keydown', function(e) {
+        resetAFK();
+        if (e.key === 'F12' || e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C'))) {
+            e.preventDefault();
+            KamekAntiCheat.lock("F12_DEVTOOLS");
+        }
+    });
+
+    // 2. Flikbyte (Visibility Change)//[cite: 3]
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            KamekAntiCheat.lock("TAB_SWITCH");
+        }
+    });
+
+    // 3. Pekplatta vs Mus (Laptophjul / Trackpad-scroll)//[cite: 3]
+    window.addEventListener('wheel', function(e) {
+        resetAFK();
+        // Trackpads skickar små, kontinuerliga fraktioner i deltaY samt deltaX//[cite: 3]
+        const isTrackpad = Math.abs(e.deltaY) < 50 && (e.deltaX !== 0 || !Number.isInteger(e.deltaY));//[cite: 3]
+        if (isTrackpad) {
+            KamekAntiCheat.lock("TRACKPAD");
+        }
+    }, { passive: true });
+
+    // 4. Fönsterförminskning under match//[cite: 3]
+    window.addEventListener('resize', function() {
+        KamekAntiCheat.lock("RESIZE");
+    });
+
+    // 5. AFK-timer (15 sekunder inaktivitet)//[cite: 3]
+    window.addEventListener('mousemove', resetAFK);
+    window.addEventListener('mousedown', function(e) {
+        resetAFK();
+        if (e.button === 0) {
+            isMouseDown = true;
+            KamekAntiCheat.checkAutoclicker();
+        }
+    });
+    window.addEventListener('mouseup', function(e) {
+        resetAFK();
+        if (e.button === 0) {
+            isMouseDown = false;
+            mouseDownFrames = 0;
+        }
+    });
+
+    setInterval(function() {
+        if (!isLocked && (Date.now() - lastActivityTime > 15000)) {//[cite: 3]
+            KamekAntiCheat.lock("AFK_IDLE");
+        }
+    }, 1000);
+
+    return {
+        // Kontrollera om knappen hålls nedtryckt för länge (tejp/makro)
+        checkHeldTrigger: function() {
+            if (isMouseDown) {
+                mouseDownFrames++;
+                if (mouseDownFrames > 250) { // ~4 sekunder oavbrutet nedtryckt
+                    mouseDownFrames = 0;
+                    this.lock("HELD_BUTTON");
+                }
+            } else {
+                mouseDownFrames = 0;
+            }
+        },
+
+        // Autoclicker-koll (> 20 klick på 1 sekund)//[cite: 3]
+        checkAutoclicker: function() {
+            const now = performance.now();
+            clickTimes.push(now);
+            clickTimes = clickTimes.filter(t => now - t < 1000);
+            if (clickTimes.length > 20) {//[cite: 3]
+                this.lock("AUTOCLICKER");
+                return true;
+            }
+            return false;
+        },
+
+        // Paus-kontroll i turnering
+        registerTournamentPause: function() {
+            tournamentPauseStrikes++;
+            if (typeof ArcadeAudio !== 'undefined') ArcadeAudio.playSFX('windows_error.mp3', 0.8);
+            if (tournamentPauseStrikes >= 3) {//[cite: 3]
+                this.lock("TOURNAMENT_PAUSE");
+            }
+        },
+
+        // Huvudlåsning
+        lock: function(reasonKey) {
+            if (isLocked) return;
+            isLocked = true;
+            lockKey = reasonKey || "F12_DEVTOOLS";
+
+            // Spela Kamek-ljud//[cite: 3]
+            if (typeof ArcadeAudio !== 'undefined') {
+                ArcadeAudio.playSFX('kamek.mp3', 1.0);
+            } else {
+                new Audio('kamek.mp3').play().catch(() => {});
+            }
+
+            const canvas = document.querySelector('canvas');
+            if (canvas && canvas.getContext) {
+                const ctx = canvas.getContext('2d');
+                const lang = getLang();
+                const pack = MOCKS[lang];
+                const mock = pack[lockKey] || pack.F12_DEVTOOLS;
+
+                ctx.save();
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+                // Mörk lila Kamek-bakgrund
+                ctx.fillStyle = "rgba(10, 2, 20, 0.98)";//[cite: 3]
+                ctx.fillRect(0, 0, canvas.width, canvas.height);//[cite: 3]
+
+                // Gul varningsram//[cite: 3]
+                ctx.strokeStyle = "#ffeb3b";//[cite: 3]
+                ctx.lineWidth = 4;//[cite: 3]
+                ctx.strokeRect(16, 16, canvas.width - 32, canvas.height - 32);//[cite: 3]
+
+                // Rubrik & Kamek-avatar
+                ctx.textAlign = "center";
+                ctx.fillStyle = "#ffeb3b";//[cite: 3]
+                ctx.font = "bold 20px monospace";
+                ctx.fillText(pack.title, canvas.width / 2, 50);
+
+                ctx.font = "44px sans-serif";
+                ctx.fillText("🧙‍♂️ 👾", canvas.width / 2, 105);
+
+                ctx.fillStyle = "#ff1744";//[cite: 3]
+                ctx.font = "bold 15px monospace";
+                ctx.fillText(mock.header, canvas.width / 2, 145);
+
+                // Håntexter
+                ctx.fillStyle = "#ffd600";//[cite: 3]
+                ctx.font = "bold 12px sans-serif";
+                ctx.fillText(mock.text, canvas.width / 2, 190);
+
+                ctx.fillStyle = "#00ffcc";//[cite: 3]
+                ctx.font = "bold 12px sans-serif";
+                ctx.fillText(mock.sub, canvas.width / 2, 225);
+
+                // Grön omstartsknapp
+                ctx.fillStyle = "#22c55e";//[cite: 3]
+                ctx.fillRect(canvas.width / 2 - 140, canvas.height - 70, 280, 40);
+                ctx.strokeStyle = "#ffffff";//[cite: 3]
+                ctx.lineWidth = 2;//[cite: 3]
+                ctx.strokeRect(canvas.width / 2 - 140, canvas.height - 70, 280, 40);
+
+                ctx.fillStyle = "#000000";//[cite: 2]
+                ctx.font = "bold 12px monospace";
+                ctx.fillText(pack.clickPrompt, canvas.width / 2, canvas.height - 45);
+
+                ctx.restore();
+            }
+
+            // Klick laddar om spelet rent//[cite: 3]
+            window.addEventListener('mousedown', function() {
+                if (isLocked) window.location.reload();//[cite: 3]
+            }, { once: true });
+        },
+
+        isTriggered: function() {
+            return isLocked;
+        }
+    };
+})();
+
+// =========================================================================
+// 🎮 SPELVARIABLER & LOGIK
+// =========================================================================
+const GRID_SIZE = 32;
+let score = 0;
+let lives = 3;
+let currentLang = 'sv';
+let isGameOver = false;
+let isVictory = false;
+let showStartScreen = true;
+let deathMessage = "";
+
+// Grodans position och rutnätsmått
+let frog = { x: 304, y: 416, size: 24, startX: 304, startY: 416 };
+
+// Målrutorna (3 stycken näckrosor längst upp)
+let homes = [
+    { x: 128, y: 32, w: 48, h: 32, occupied: false },
+    { x: 296, y: 32, w: 48, h: 32, occupied: false },
+    { x: 464, y: 32, w: 48, h: 32, occupied: false }
+];
+
+// Vägtrafik (Bilar och lastbilar)
+let trafficLanes = [
+    { y: 384, speed: -2.0, len: 40, color: "#facc15", cars: [{ x: 100 }, { x: 320 }, { x: 500 }] },
+    { y: 352, speed: 2.8,  len: 36, color: "#f43f5e", cars: [{ x: 50 }, { x: 280 }] },
+    { y: 320, speed: -3.5, len: 55, color: "#38bdf8", cars: [{ x: 200 }, { x: 450 }] },
+    { y: 288, speed: 1.8,  len: 65, color: "#fb923c", cars: [{ x: 0 }, { x: 250 }, { x: 480 }] }
+];
+
+// Vattendrag (Flytande trästockar och sköldpaddor)//[cite: 2]
+let riverLanes = [
+    { y: 192, speed: 1.8,  w: 110, color: "#854d0e", items: [{ x: 40 }, { x: 260 }, { x: 480 }] },
+    { y: 160, speed: -2.4, w: 90,  color: "#a16207", items: [{ x: 120 }, { x: 360 }] },
+    { y: 128, speed: 3.2,  w: 130, color: "#854d0e", items: [{ x: 60 }, { x: 380 }] },
+    { y: 96,  speed: -1.6, w: 85,  color: "#a16207", items: [{ x: 20 }, { x: 220 }, { x: 440 }] },
+    { y: 64,  speed: 2.2,  w: 100, color: "#854d0e", items: [{ x: 100 }, { x: 320 }, { x: 520 }] }
+];
+
+function resetFrog() {
+    frog.x = frog.startX;
+    frog.y = frog.startY;
+}
+
+function fullReset() {
+    score = 0;
+    lives = 3;
+    isGameOver = false;
+    isVictory = false;
+    showStartScreen = false;
+    homes.forEach(h => h.occupied = false);
+    resetFrog();
+}
+
+function killFrog(cause) {
+    lives--;
+    if (cause === "CAR") {
+        deathMessage = fT("carDeath");
+        ArcadeAudio.playSFX('car_crash.mp3', 0.8);////[cite: 2]
+    } else {
+        deathMessage = fT("waterDeath");
+        ArcadeAudio.playSFX('splash.wav', 0.8);////[cite: 2]
+    }
+
+    if (lives <= 0) {
+        isGameOver = true;
+        ArcadeAudio.playSFX('f6_sad_trombone.mp3', 1.0);////[cite: 2]
+    } else {
+        resetFrog();
+    }
+}
+
+// =========================================================================
+// ⌨️ STYRNING: TANGENTBORD, DANS-MATTA & MENYKNAPPAR
+// =========================================================================
+window.addEventListener('keydown', function(e) {
+    // 1. ESC återgår alltid till Arkadhallen
+    if (e.key === 'Escape') {
+        window.location.href = "arcade_hub.html";
+        return;
+    }
+
+    // 2. Växla språk direkt med L
+    if (e.key === 'l' || e.key === 'L') {
+        if (typeof I18n !== 'undefined') I18n.toggleLanguage();
+        return;
+    }
+
+    // 3. Startskärm / Game Over omstart
+    if (showStartScreen || isGameOver || isVictory) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            fullReset();
+            ArcadeAudio.playSFX('step.wav', 0.5);////[cite: 2]
+        }
+        return;
+    }
+
+    if (KamekAntiCheat.isTriggered()) return;
+
+    // 4. Grodhopp (WASD eller Piltangenter)//[cite: 2]
+    let moved = false;
+    if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+        if (frog.y - GRID_SIZE >= 32) { frog.y -= GRID_SIZE; score += 10; moved = true; }
+    } else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
+        if (frog.y + GRID_SIZE <= canvas.height - GRID_SIZE) { frog.y += GRID_SIZE; moved = true; }
+    } else if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+        if (frog.x - GRID_SIZE >= 0) { frog.x -= GRID_SIZE; moved = true; }
+    } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+        if (frog.x + GRID_SIZE <= canvas.width - GRID_SIZE) { frog.x += GRID_SIZE; moved = true; }
+    }
+
+    if (moved) {
+        ArcadeAudio.playSFX('step.wav', 0.4);////[cite: 2]
+    }
+});
+
+// Autoclicker-skydd vid upprepade musknäpp
+canvas.addEventListener('mousedown', function() {
+    KamekAntiCheat.checkAutoclicker();
+});
+
+// =========================================================================
+// 🔄 HUVUDLOOP & FYSIK
+// =========================================================================
+function update() {
+    if (showStartScreen || isGameOver || isVictory || KamekAntiCheat.isTriggered()) return;
+
+    // Flytta biltrafik
+    trafficLanes.forEach(lane => {
+        lane.cars.forEach(car => {
+            car.x += lane.speed;
+            if (lane.speed > 0 && car.x > canvas.width) car.x = -lane.len;
+            if (lane.speed < 0 && car.x < -lane.len) car.x = canvas.width;
+
+            // Krockkollision med bil//[cite: 2]
+            if (frog.y === lane.y) {
+                if (frog.x + frog.size > car.x && frog.x < car.x + lane.len) {
+                    killFrog("CAR");
+                }
+            }
+        });
+    });
+
+    // Flytta trästockar och beräkna flytkraft
+    let onLog = false;
+    if (frog.y >= 64 && frog.y <= 192) {
+        let currentLane = riverLanes.find(l => l.y === frog.y);
+        if (currentLane) {
+            currentLane.items.forEach(log => {
+                if (frog.x + frog.size * 0.7 > log.x && frog.x + frog.size * 0.3 < log.x + currentLane.w) {
+                    onLog = true;
+                    frog.x += currentLane.speed; // Grodan åker med stocken
+                }
+            });
+
+            // Drunkna i vattnet om man inte står på en stock//[cite: 2]
+            if (!onLog) {
+                killFrog("WATER");
+                return;
+            }
+
+            // Åka utanför skärmen med en stock
+            if (frog.x < 0 || frog.x > canvas.width - frog.size) {
+                killFrog("WATER");
+                return;
+            }
+        }
+    }
+
+    // Flytta stockarna i banorna
+    riverLanes.forEach(lane => {
+        lane.items.forEach(log => {
+            log.x += lane.speed;
+            if (lane.speed > 0 && log.x > canvas.width) log.x = -lane.w;
+            if (lane.speed < 0 && log.x < -lane.w) log.x = canvas.width;
+        });
+    });
+
+    // Kontrollera om grodan nått näckrosorna i målzonen//[cite: 2]
+    if (frog.y === 32) {
+        let reachedHome = false;
+        homes.forEach(home => {
+            if (!home.occupied && Math.abs(frog.x - (home.x + 12)) <= 18) {
+                home.occupied = true;
+                score += 200;
+                reachedHome = true;
+                ArcadeAudio.playSFX('pling.mp3', 0.8);////[cite: 2]
+                resetFrog();
+            }
+        });
+
+        if (!reachedHome) {
+            // Hoppade i väggen eller i en redan upptagen näckros
+            killFrog("WATER");
+        } else {
+            // Kontrollera om alla tre grodor har räddats
+            if (homes.every(h => h.occupied)) {
+                isVictory = true;
+                ArcadeAudio.playSFX('pling.mp3', 1.0);////[cite: 2]
+            }
+        }
+    }
+}
+
+// =========================================================================
+// 🎨 RENDERING
+// =========================================================================
+function render() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // 1. Bakgrundszoner
+    // Flod (Blå)
+    ctx.fillStyle = "#0284c7";
+    ctx.fillRect(0, 64, canvas.width, 160);
+
+    // Väg (Asfalt/Mörkgrå)
+    ctx.fillStyle = "#1e293b";
+    ctx.fillRect(0, 288, canvas.width, 128);
+
+    // Vägmarkeringar (Streckad gul linje)
+    ctx.strokeStyle = "#eab308";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([16, 16]);
+    ctx.beginPath();
+    ctx.moveTo(0, 352); ctx.lineTo(canvas.width, 352);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Trottoarer / Säker zon (Lila/Mörkgrön)
+    ctx.fillStyle = "#166534";
+    ctx.fillRect(0, 0, canvas.width, 64);
+    ctx.fillRect(0, 224, canvas.width, 64);
+    ctx.fillRect(0, 416, canvas.width, 64);
+
+    // 2. Målzon / Näckrosor
+    homes.forEach(home => {
+        ctx.fillStyle = home.occupied ? "#22c55e" : "#0f766e";
+        ctx.beginPath();
+        ctx.arc(home.x + 24, home.y + 16, 20, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        if (home.occupied) {
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "18px sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("🐸", home.x + 24, home.y + 22);
+        }
+    });
+
+    // 3. Trästockar
+    riverLanes.forEach(lane => {
+        lane.items.forEach(log => {
+            ctx.fillStyle = lane.color;
+            ctx.fillRect(log.x, lane.y + 4, lane.w, 24);
+            ctx.strokeStyle = "#451a03";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(log.x, lane.y + 4, lane.w, 24);
+        });
+    });
+
+    // 4. Biltrafik
+    trafficLanes.forEach(lane => {
+        lane.cars.forEach(car => {
+            ctx.fillStyle = lane.color;
+            ctx.fillRect(car.x, lane.y + 4, lane.len, 24);
+            ctx.fillStyle = "#ffffff";
+            // Bilrutor
+            let frontX = lane.speed > 0 ? car.x + lane.len - 8 : car.x + 2;
+            ctx.fillRect(frontX, lane.y + 7, 6, 18);
+        });
+    });
+
+    // 5. Grodan
+    if (!showStartScreen && !isGameOver) {
+        ctx.fillStyle = "#4ade80";
+        ctx.beginPath();
+        ctx.arc(frog.x + 12, frog.y + 12, 11, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Grodögon
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.arc(frog.x + 7, frog.y + 6, 4, 0, Math.PI * 2);
+        ctx.arc(frog.x + 17, frog.y + 6, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#000000";
+        ctx.beginPath();
+        ctx.arc(frog.x + 7, frog.y + 6, 2, 0, Math.PI * 2);
+        ctx.arc(frog.x + 17, frog.y + 6, 2, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // 6. HUD
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 13px monospace";
+    ctx.textAlign = "left";
+    ctx.fillText(fT("score") + ": " + score, 15, 22);
+
+    ctx.textAlign = "right";
+    let hearts = "❤️".repeat(Math.max(0, lives));
+    ctx.fillText(fT("lives") + ": " + hearts, canvas.width - 15, 22);
+
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "11px monospace";
+    ctx.textAlign = "center";
+    ctx.fillText(fT("backToHub"), canvas.width / 2, canvas.height - 10);
+
+    // 7. STARTSKÄRM
+    if (showStartScreen) {
+        ctx.fillStyle = "rgba(4, 15, 4, 0.94)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#4ade80";
+        ctx.font = "bold 32px 'Courier New', monospace";
+        ctx.fillText(fT("title"), canvas.width / 2, 140);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "13px monospace";
+        ctx.fillText(fT("instructions"), canvas.width / 2, 190);
+
+        ctx.fillStyle = "#ffeb3b";
+        ctx.font = "bold 14px monospace";
+        ctx.fillText(fT("startBtn"), canvas.width / 2, 270);
+        return;
+    }
+
+    // 8. GAME OVER-SKÄRM
+    if (isGameOver) {
+        ctx.fillStyle = "rgba(10, 0, 0, 0.92)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#ff1744";
+        ctx.font = "bold 36px 'Courier New', monospace";
+        ctx.fillText(fT("gameOver"), canvas.width / 2, 160);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "14px monospace";
+        ctx.fillText(deathMessage, canvas.width / 2, 210);
+
+        ctx.fillStyle = "#ffeb3b";
+        ctx.font = "bold 13px monospace";
+        ctx.fillText(fT("restart"), canvas.width / 2, 280);
+        return;
+    }
+
+    // 9. VINST-SKÄRM
+    if (isVictory) {
+        ctx.fillStyle = "rgba(0, 25, 5, 0.94)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#00ffcc";
+        ctx.font = "bold 26px 'Courier New', monospace";
+        ctx.fillText(fT("victory"), canvas.width / 2, 160);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "16px monospace";
+        ctx.fillText(fT("score") + ": " + score, canvas.width / 2, 210);
+
+        ctx.fillStyle = "#ffeb3b";
+        ctx.font = "bold 13px monospace";
+        ctx.fillText(fT("restart"), canvas.width / 2, 280);
+        return;
+    }
+}
+
+// Spelloop
+function mainLoop() {
+    update();
+    render();
+    requestAnimationFrame(mainLoop);
+}
+
+requestAnimationFrame(mainLoop);
+</script>
+</body>
+</html>

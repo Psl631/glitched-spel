@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POLAR PARTY - Turneringsregler & Admin Bracket</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #060814;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 204, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 204, 0.05) 1px, transparent 1px);
+            background-size: 32px 32px;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .launcher-box {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+        .action-btns {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .main-btn {
+            color: #fff;
+            font-family: 'Luckiest Guy', cursive, sans-serif;
+            font-size: 22px;
+            letter-spacing: 1px;
+            padding: 14px 28px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .btn-rules {
+            background: linear-gradient(180deg, #ff0055, #990033);
+            border: 3px solid #ffcc00;
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.6);
+        }
+        .btn-admin {
+            background: linear-gradient(180deg, #0284c7, #0369a1);
+            border: 3px solid #00ffcc;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
+        }
+        .main-btn:hover {
+            transform: scale(1.04);
+        }
+        .hint-subtext {
+            font-size: 13px;
+            color: #00ffcc;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Modal styling */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(4, 6, 12, 0.88);
+            backdrop-filter: blur(6px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            padding: 20px;
+        }
+        .rule-modal {
+            width: 100%;
+            max-width: 960px;
+            max-height: 92vh;
+            background: #0f1322;
+            border: 3px solid #00ffcc;
+            border-radius: 14px;
+            box-shadow: 0 0 40px rgba(0, 255, 204, 0.35);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            background: #181f38;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid #232d52;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .modal-title {
+            font-family: 'Luckiest Guy', cursive, sans-serif;
+            font-size: 22px;
+            letter-spacing: 1px;
+            color: #ffd600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .header-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .tab-btn, .lang-btn {
+            background: #090c17;
+            border: 2px solid #334155;
+            color: #94a3b8;
+            font-weight: bold;
+            font-size: 13px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .tab-btn.active, .lang-btn.active {
+            border-color: #00ffcc;
+            color: #00ffcc;
+            background: #112233;
+        }
+
+        .modal-content {
+            padding: 20px;
+            overflow-y: auto;
+            line-height: 1.55;
+            font-size: 14px;
+            color: #e2e8f0;
+        }
+
+        /* Rutor & sektioner */
+        .section-box {
+            background: #141a30;
+            border-left: 4px solid #00ffcc;
+            padding: 12px 16px;
+            margin-bottom: 14px;
+            border-radius: 0 8px 8px 0;
+        }
+        .warning-box {
+            background: #260a14;
+            border-left: 4px solid #ff0055;
+            border-right: 1px solid #ff0055;
+            padding: 14px 16px;
+            margin-bottom: 14px;
+            border-radius: 6px;
+        }
+        .warning-title {
+            color: #ff3366;
+            font-family: 'Luckiest Guy', cursive, sans-serif;
+            font-size: 17px;
+            margin: 0 0 6px 0;
+        }
+
+        .rule-list {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .rule-list li {
+            margin-bottom: 8px;
+        }
+        .rule-list strong {
+            color: #ffd600;
+        }
+        .preview-badge {
+            display: inline-block;
+            background: #000;
+            color: #ff0055;
+            font-family: monospace;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 1px 6px;
+            border: 1px solid #ff0055;
+            border-radius: 4px;
+        }
+
+        /* Admin-moduler */
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+        @media (max-width: 768px) {
+            .admin-grid { grid-template-columns: 1fr; }
+        }
+        .admin-card {
+            background: #131b33;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 14px;
+        }
+        .card-header {
+            font-family: 'Luckiest Guy', cursive;
+            color: #38bdf8;
+            font-size: 16px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .bracket-container {
+            background: #080c18;
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            padding: 12px;
+            overflow-x: auto;
+        }
+        .bracket-round {
+            display: inline-block;
+            vertical-align: top;
+            width: 170px;
+            margin-right: 14px;
+        }
+        .match-card {
+            background: #1e293b;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            padding: 6px 8px;
+            font-size: 12px;
+        }
+        .match-badge {
+            font-weight: bold;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+        .badge-15s { background: #0284c7; color: #fff; }
+        .badge-rand { background: #ea580c; color: #fff; }
+        .badge-blind { background: #b91c1c; color: #fff; }
+
+        .modal-footer {
+            background: #181f38;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 2px solid #232d52;
+        }
+        .close-btn {
+            background: #00ffcc;
+            color: #060814;
+            font-family: 'Luckiest Guy', cursive, sans-serif;
+            font-size: 15px;
+            padding: 6px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-grid"></div>
+
+    <div class="launcher-box">
+        <div class="action-btns">
+            <button class="main-btn btn-rules" onclick="openModal('rules')">
+                📖 TURNERINGSREGLER (BOMB)
+            </button>
+            <button class="main-btn btn-admin" onclick="openModal('admin')">
+                🛠️ CREW & BRACKET-LATHUND
+            </button>
+        </div>
+        <div class="hint-subtext">
+            TRYCK <strong>[ F1 ]</strong> NÄR SOM HELST FÖR ATT VÄXLA DOKUMENTET
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div id="ruleModalOverlay" class="modal-overlay" onclick="onOverlayClick(event)">
+        <div class="rule-modal" onclick="event.stopPropagation()">
+            
+            <div class="modal-header">
+                <h2 class="modal-title" id="mTitle">💣 TURNERINGSREGLER: PASS THE BOMB</h2>
+                <div class="header-controls">
+                    <!-- Flikar för Regler vs Admin -->
+                    <button class="tab-btn active" id="tab-rules" onclick="switchView('rules')">REGLER</button>
+                    <button class="tab-btn" id="tab-admin" onclick="switchView('admin')">🛠️ ADMIN & BRACKETS</button>
+                    <!-- Språkväljare för regeldelen -->
+                    <div id="langBtnGroup" style="display:flex; gap:4px; margin-left:8px;">
+                        <button class="lang-btn active" id="btn-sv" onclick="setRuleLang('sv')">🇸🇪 SV</button>
+                        <button class="lang-btn" id="btn-no" onclick="setRuleLang('no')">🇳🇴 NO</button>
+                        <button class="lang-btn" id="btn-en" onclick="setRuleLang('en')">🇬🇧 EN</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-content" id="mBody">
+                <!-- Dynamiskt innehåll -->
+            </div>
+
+            <div class="modal-footer">
+                <span style="font-size: 12px; color: #64748b;">Tryck [ ESC ] eller [ F1 ] för att stänga</span>
+                <button class="close-btn" onclick="closeModal()" id="mCloseBtn">STÄNG</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let currentView = "rules"; // "rules" eller "admin"
+        let currentRuleLang = "sv";
+        function detectBrowserLanguage() {
+    // 1. Kontrollera URL-parameter (?lang=no eller ?tournament=true)
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('tournament') === 'true' || params.get('lang') === 'no') {
+        return 'no';
+    }
+
+    // 2. Läs av språkinställningarna i användarens operativsystem/webbläsare
+    const browserLangs = navigator.languages || [navigator.language || navigator.userLanguage || ''];
+    for (let raw of browserLangs) {
+        const l = raw.toLowerCase();
+        // Norska (Bokmål, Nynorsk, generisk)
+        if (l.startsWith('no') || l.startsWith('nb') || l.startsWith('nn')) return 'no';
+        // Svenska
+        if (l.startsWith('sv')) return 'sv';
+        // Engelska
+        if (l.startsWith('en')) return 'en';
+    }
+
+    // Standard fallback om datorn kör t.ex. finska, tyska eller annat
+    return 'no';
+}
+
+// Körs automatiskt vid sidstart
+document.addEventListener('DOMContentLoaded', () => {
+    const initialLang = detectBrowserLanguage();
+    setRuleLang(initialLang);
+});
+
+        const RULE_I18N = {
+            sv: {
+                title: "💣 TURNERINGSREGLER: PASS THE BOMB (POLAR PARTY)",
+                closeBtn: "FATTAT! TILLBAKA",
+                escHint: "Tryck [ ESC ] eller [ F1 ] för att stänga",
+                body: `
+                    <div class="warning-box">
+                        <div class="warning-title">🧠 STRIKT REGEL: ENDAST HJÄRNAN FÅR ANVÄNDAS!</div>
+                        Detta är en ren kunskapsduell på scen. Det är <strong>STRÄNGT FÖRBJUDET</strong> att använda mobiltelefoner, smartklockor, flikbyten, AI-verktyg, källkodsgranskning (F12) eller ta emot hjälp från publiken.
+                        <br><br>
+                        <em>Upptäckt fusk leder till omedelbar diskvalificering (DQ) via Crew-skanning och Kamek-hån!</em>
+                    </div>
+
+                    <div class="section-box">
+                        <h3 style="margin-top:0; color:#00ffcc;">🎯 GRUNDREGLER & FORMAT</h3>
+                        <ul class="rule-list">
+                            <li><strong>3 LIV PER SPELARE:</strong> Alla deltagare startar med exakt 3 liv (hjärtan). Inga fler, inga färre.</li>
+                            <li><strong>BOMBINNEHAVAREN MÅSTE SVARA:</strong> Endast den som håller i bomben svarar via sin kontroller.</li>
+                            <li><strong>SKICKA VIDARE:</strong> Rätt svar kastar bomben till nästa levande spelare. Vid fel svar stannar bomben kvar och tickar vidare!</li>
+                            <li><strong>💥 BOOM:</strong> Når klockan 0 exploderar bomben. Innehavaren förlorar 1 hjärta. Förlorar man 3 hjärtan förlorar man matchen.</li>
+                        </ul>
+                    </div>
+
+                    <div class="section-box" style="border-left-color: #f59e0b;">
+                        <h3 style="margin-top:0; color:#f59e0b;">⚖️ ELIMINERING: DUBBEL VS SINGEL</h3>
+                        <ul class="rule-list">
+                            <li><strong>SINGELELIMINERING:</strong> 1 matchförlust = Direkt utslagen ur turneringen ("Vinn eller försvinn"). Används vid många deltagare eller tight schema.</li>
+                            <li><strong>DUBBELELIMINERING (2 FÖRLUSTER = UTE):</strong>
+                                <ul>
+                                    <li>Första förlusten: Du flyttas ned till <strong>Losers Bracket</strong> och får en andra chans.</li>
+                                    <li>Andra förlusten: Du är permanent utslagen ur turneringen!</li>
+                                </ul>
+                            </li>
+                            <li><strong>🔥 BRACKET RESET I STORFINALEN:</strong> 
+                                Vinnaren från <em>Winners Bracket</em> (0 förluster) möter vinnaren från <em>Losers Bracket</em> (1 förlust).
+                                Om spelaren från Losers vinner första finalmatchen sker en <strong>"RESET BRACKET"</strong>. Båda spelarna har då 1 förlust och en helt avgörande finalmatch måste köras om vem som tar guldet!
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="section-box">
+                        <h3 style="margin-top:0; color:#ffd600;">⏱️ FASERNAS TIDSINSTÄLLNINGAR</h3>
+                        <ul class="rule-list">
+                            <li><strong>FRAM TILL KVARTSFINAL:</strong> Fast tid: <strong>15 SEK</strong>.</li>
+                            <li><strong>SEMIFINAL:</strong> <strong>SLUMPAD TID (15–30 SEK)</strong> vid varje överlämning.</li>
+                            <li><strong>STORFINAL / BRACKET RESET:</strong> <strong>BLIND-LÄGE (<span class="preview-badge">??</span>)</strong>. Displayen släcks med frågetecken och timern exploderar helt oförutsägbart mellan 15 och 30 sekunder!</li>
+                        </ul>
+                    </div>
+                `
+            },
+            no: {
+                title: "💣 TURNERINGSREGLER: PASS THE BOMB (POLAR PARTY)",
+                closeBtn: "FORSTÅTT! TILBAKE",
+                escHint: "Trykk [ ESC ] eller [ F1 ] for å lukke",
+                body: `
+                    <div class="warning-box">
+                        <div class="warning-title">🧠 STRENG REGEL: KUN EGEN HJERNE ER TILLATT!</div>
+                        Dette er en ren kunnskapsduell på scenen. Det er <strong>STRENGT FORBUDT</strong> å bruke mobiltelefoner, smartklokker, fanebytte, AI-tjenester, kildekode-inspeksjon (F12) eller motta hjelp fra publikum.
+                        <br><br>
+                        <em>Juks fører til øyeblikkelig diskvalifikasjon (DQ) via Crew-skanning og Kamek-roast!</em>
+                    </div>
+
+                    <div class="section-box">
+                        <h3 style="margin-top:0; color:#00ffcc;">🎯 GRUNNREGLER & FORMAT</h3>
+                        <ul class="rule-list">
+                            <li><strong>3 LIV PER SPILLER:</strong> Alle deltakere starter med nøyaktig 3 liv (hjerter). Verken mer eller mindre.</li>
+                            <li><strong>BOMBEHOLDER MÅ SVARE:</strong> Kun spilleren som holder bomben kan svare på sin kontroller.</li>
+                            <li><strong>SEND VIDERE:</strong> Riktig svar kaster bomben videre. Feil svar betyr at bomben blir værende mens lunten brenner videre!</li>
+                            <li><strong>💥 BOOM:</strong> Når klokken når 0 eksploderer bomben og du mister et liv. Mister du 3 liv taper du kampen.</li>
+                        </ul>
+                    </div>
+
+                    <div class="section-box" style="border-left-color: #f59e0b;">
+                        <h3 style="margin-top:0; color:#f59e0b;">⚖️ ELIMINASJON: DOBBEL VS ENKEL</h3>
+                        <ul class="rule-list">
+                            <li><strong>ENKELTELIMINASJON:</strong> 1 tap = Rett ut av turneringen ("Vinn eller forsvinn").</li>
+                            <li><strong>DOBBELTELIMINASJON (2 TAP = UTE):</strong>
+                                <ul>
+                                    <li>Første tap: Du rykker ned til <strong>Losers Bracket</strong> og beholder sjansen til å vinne.</li>
+                                    <li>Andre tap: Du er permanent slått ut av turneringen!</li>
+                                </ul>
+                            </li>
+                            <li><strong>🔥 BRACKET RESET I FINALEN:</strong>
+                                Vinneren av <em>Winners Bracket</em> (0 tap) møter vinneren av <em>Losers Bracket</em> (1 tap).
+                                Vinner Losers-spilleren den første finalekampen, utløses <strong>"RESET BRACKET"</strong>. Da har begge 1 tap hver, og det spilles en siste, avgjørende kamp om pokalen!
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="section-box">
+                        <h3 style="margin-top:0; color:#ffd600;">⏱️ FASENES TIDSREGLER</h3>
+                        <ul class="rule-list">
+                            <li><strong>FREM TIL KVARTSFINALE:</strong> Fast tid: <strong>15 SEK</strong>.</li>
+                            <li><strong>SEMIFINALE:</strong> <strong>TILFELDIG TID (15–30 SEK)</strong> ved hver overlevering.</li>
+                            <li><strong>FINALE / BRACKET RESET:</strong> <strong>BLIND-MODUS (<span class="preview-badge">??</span>)</strong>. Displayet viser kun spørsmålstegn og lunten smeller uventet mellom 15 og 30 sekunder!</li>
+                        </ul>
+                    </div>
+                `
+            },
+            en: {
+                title: "💣 TOURNAMENT RULES: PASS THE BOMB (POLAR PARTY)",
+                closeBtn: "GOT IT! RETURN",
+                escHint: "Press [ ESC ] or [ F1 ] to close",
+                body: `
+                    <div class="warning-box">
+                        <div class="warning-title">🧠 STRICT RULE: USE YOUR OWN BRAIN ONLY!</div>
+                        This is an authentic stage trivia showdown. It is <strong>STRICTLY FORBIDDEN</strong> to use mobile phones, smartwatches, browser tab switching, AI chatbots, DevTools (F12) or receive hints from the crowd.
+                        <br><br>
+                        <em>Any cheating attempt results in immediate Disqualification (DQ) via Crew Badge scanning!</em>
+                    </div>
+
+                    <div class="section-box">
+                        <h3 style="margin-top:0; color:#00ffcc;">🎯 CORE RULES & FORMAT</h3>
+                        <ul class="rule-list">
+                            <li><strong>3 LIVES PER PLAYER:</strong> All contestants begin with exactly 3 hearts.</li>
+                            <li><strong>BOMB HOLDER MUST ANSWER:</strong> Only the active bomb holder can input answers.</li>
+                            <li><strong>PASS THE BOMB:</strong> Correct answer passes the bomb. Wrong answer keeps it ticking!</li>
+                            <li><strong>💥 BOOM:</strong> At 0, the bomb detonates and holder loses 1 heart. Losing 3 hearts means match loss.</li>
+                        </ul>
+                    </div>
+
+                    <div class="section-box" style="border-left-color: #f59e0b;">
+                        <h3 style="margin-top:0; color:#f59e0b;">⚖️ ELIMINATION: DOUBLE VS SINGLE</h3>
+                        <ul class="rule-list">
+                            <li><strong>SINGLE ELIMINATION:</strong> 1 match loss = Immediately eliminated.</li>
+                            <li><strong>DOUBLE ELIMINATION (2 LOSSES = OUT):</strong>
+                                <ul>
+                                    <li>First loss: Relegated to the <strong>Losers Bracket</strong> with tournament life intact.</li>
+                                    <li>Second loss: Completely eliminated from the tournament!</li>
+                                </ul>
+                            </li>
+                            <li><strong>🔥 GRAND FINALS BRACKET RESET:</strong>
+                                The <em>Winners Bracket</em> finalist (0 losses) plays the <em>Losers Bracket</em> finalist (1 loss).
+                                If the Losers finalist wins match 1, a <strong>"RESET BRACKET"</strong> occurs! Both finalists now have 1 loss, forcing an ultimate tie-breaker match!
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="section-box">
+                        <h3 style="margin-top:0; color:#ffd600;">⏱️ STAGE TIMER MODES</h3>
+                        <ul class="rule-list">
+                            <li><strong>UP TO QUARTERFINALS:</strong> Fixed <strong>15 SEC</strong> fuse.</li>
+                            <li><strong>SEMIFINALS:</strong> <strong>RANDOM TIMER (15–30 SEC)</strong> on every handoff.</li>
+                            <li><strong>FINALS / BRACKET RESET:</strong> <strong>BLIND MODE (<span class="preview-badge">??</span>)</strong>. Clock is completely hidden behind question marks with an unpredictable 15–30s fuse!</li>
+                        </ul>
+                    </div>
+                `
+            }
+        };
+
+        const ADMIN_HTML = `
+            <div class="admin-grid">
+                <!-- Turneringsregler per fas -->
+                <div class="admin-card">
+                    <div class="card-header">
+                        <span>🏁 FAS-STRUKTUR & TIDSINSTÄLLNING</span>
+                    </div>
+                    <ul class="rule-list" style="font-size: 13px;">
+                        <li><strong>Kval & Kvartsfinal:</strong> Välj <span class="match-badge badge-15s">15 SEK</span> i menyn. Stabil grundomgång.</li>
+                        <li><strong>Semifinaler:</strong> Välj <span class="match-badge badge-rand">RANDOM_15_30</span>. Ökar stressen avsevärt.</li>
+                        <li><strong>Stora Finalen:</strong> Välj <span class="match-badge badge-blind">BLIND (?)</span>. Displayen släcks till frågetecken!</li>
+                    </ul>
+                </div>
+
+                <!-- Formatval & Eliminering -->
+                <div class="admin-card">
+                    <div class="card-header">
+                        <span>⚖️ FORMAT: SINGEL VS DUBBEL</span>
+                    </div>
+                    <div style="font-size: 13px; line-height: 1.5;">
+                        <strong>Vid ≤ 8 spelare/bord:</strong> Kör <em>Dubbeleliminering (Winners & Losers bracket)</em> så alla får minst två chanser.<br><br>
+                        <strong>Vid &gt; 8 spelare eller tight tidsschema:</strong> Kör <em>Singeleliminering</em> där sista man per bord går direkt vidare.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interaktiv Bracket Generator -->
+            <div class="admin-card" style="margin-bottom: 16px;">
+                <div class="card-header">
+                    <span>🏆 SCHEMATISK BRACKET (4 TILL 16 SPELARE)</span>
+                    <div>
+                        <button class="tab-btn" onclick="renderBracket(4)">4 SPELARE</button>
+                        <button class="tab-btn" onclick="renderBracket(8)">8 SPELARE</button>
+                        <button class="tab-btn" onclick="renderBracket(16)">16 SPELARE</button>
+                    </div>
+                </div>
+                <div class="bracket-container" id="bracketCanvas">
+                    <!-- Renderas via script -->
+                </div>
+            </div>
+
+            <!-- Domarlathund & Crew Genvägar -->
+            <div class="section-box" style="border-left-color: #ffd600;">
+                <h3 style="margin-top:0; color:#ffd600;">📋 DOMARLATHUND (CREW KONTROLL)</h3>
+                <ul class="rule-list" style="font-size: 13px;">
+                    <li><strong>DISKKVALIFICERING:</strong> Håll <code>Shift + 1..4</code> under match för att öppna Crew-skannern för aktuell stol.</li>
+                    <li><strong>CREW BADGE / PIN:</strong> Skanna årets badge eller ange PIN <code>2026</code> om kameran saknas.</li>
+                    <li><strong>PAUS:</strong> Öppning av Crew-verktyg pausar automatiskt spelet utan att trigga Kameks anti-cheat.</li>
+                </ul>
+            </div>
+        `;
+
+        function switchView(view) {
+            currentView = view;
+            document.getElementById('tab-rules').classList.toggle('active', view === 'rules');
+            document.getElementById('tab-admin').classList.toggle('active', view === 'admin');
+            document.getElementById('langBtnGroup').style.display = view === 'rules' ? 'flex' : 'none';
+
+            if (view === 'rules') {
+                setRuleLang(currentRuleLang);
+            } else {
+                document.getElementById('mTitle').innerText = "🛠️ CREW ADMIN & BRACKET-LATHUND";
+                document.getElementById('mBody').innerHTML = ADMIN_HTML;
+                document.getElementById('mCloseBtn').innerText = "TILLBAKA";
+                renderBracket(8);
+            }
+        }
+
+        function setRuleLang(lang) {
+            currentRuleLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            const btn = document.getElementById('btn-' + lang);
+            if (btn) btn.classList.add('active');
+
+            const data = RULE_I18N[lang] || RULE_I18N.sv;
+            document.getElementById('mTitle').innerText = data.title;
+            document.getElementById('mBody').innerHTML = data.body;
+            document.getElementById('mCloseBtn').innerText = data.closeBtn;
+        }
+
+        function renderBracket(count) {
+            const container = document.getElementById('bracketCanvas');
+            if (!container) return;
+
+            let html = "";
+            if (count === 4) {
+                html = `
+                    <div class="bracket-round">
+                        <strong style="color:#38bdf8;">SEMIFINAL <span class="match-badge badge-rand">SLUMP</span></strong>
+                        <div class="match-card">Match W1: Spelare 1 vs 2</div>
+                        <div class="match-card">Match W2: Spelare 3 vs 4</div>
+                        <div class="match-card" style="border-color:#f59e0b;">Match L1: Förlorare W1 vs W2<br><small style="color:#f59e0b;">(Losers: 1 förlust = UTE)</small></div>
+                    </div>
+                    <div class="bracket-round">
+                        <strong style="color:#ff0055;">STORFINAL <span class="match-badge badge-blind">BLIND ??</span></strong>
+                        <div class="match-card" style="border-color:#ff0055;">Vinnare Winners vs Vinnare Losers</div>
+                        <div class="match-card" style="border-color:#ef4444; background:#2a0812;">
+                            <strong>🔥 RESET BRACKET</strong><br>
+                            Körs om Losers vinner Match 1!
+                        </div>
+                    </div>
+                `;
+            } else if (count === 8) {
+                html = `
+                    <div class="bracket-round">
+                        <strong style="color:#00ffcc;">KVARTSFINAL <span class="match-badge badge-15s">15s</span></strong>
+                        <div class="match-card">Bord 1 (4 Spelare)</div>
+                        <div class="match-card">Bord 2 (4 Spelare)</div>
+                    </div>
+                    <div class="bracket-round">
+                        <strong style="color:#38bdf8;">SEMIFINAL <span class="match-badge badge-rand">SLUMP</span></strong>
+                        <div class="match-card">Winners: Top 2 Bord 1 & 2</div>
+                        <div class="match-card" style="border-color:#f59e0b;">Losers Bracket: 2:a chansen</div>
+                    </div>
+                    <div class="bracket-round">
+                        <strong style="color:#ff0055;">STORFINAL <span class="match-badge badge-blind">BLIND ??</span></strong>
+                        <div class="match-card" style="border-color:#ff0055;">Winners Champ vs Losers Champ</div>
+                        <div class="match-card" style="border-color:#ef4444; background:#2a0812;">
+                            <strong>🔥 RESET MATCH</strong><br>
+                            Avgörande match om Losers vinner!
+                        </div>
+                    </div>
+                `;
+            } else {
+                html = `
+                    <div class="bracket-round">
+                        <strong style="color:#00ffcc;">OMGÅNG 1 <span class="match-badge badge-15s">15s</span></strong>
+                        <div class="match-card">Bord A, B, C, D (4p/bord)</div>
+                    </div>
+                    <div class="bracket-round">
+                        <strong style="color:#00ffcc;">KVARTSFINAL <span class="match-badge badge-15s">15s</span></strong>
+                        <div class="match-card">Winners Bord 1 & 2</div>
+                        <div class="match-card" style="border-color:#f59e0b;">Losers Omgång 1 & 2</div>
+                    </div>
+                    <div class="bracket-round">
+                        <strong style="color:#38bdf8;">SEMIFINAL <span class="match-badge badge-rand">SLUMP</span></strong>
+                        <div class="match-card">Winners Final & Losers Final</div>
+                    </div>
+                    <div class="bracket-round">
+                        <strong style="color:#ff0055;">STORFINAL <span class="match-badge badge-blind">BLIND ??</span></strong>
+                        <div class="match-card" style="border-color:#ff0055;">Grand Finals + Eventuell Reset</div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+        function openModal(defaultView = 'rules') {
+            const savedLang = localStorage.getItem('trivia_lang') || 'sv';
+            currentRuleLang = ['sv', 'no', 'en'].includes(savedLang) ? savedLang : 'sv';
+            document.getElementById('ruleModalOverlay').style.display = 'flex';
+            switchView(defaultView);
+        }
+
+        function closeModal() {
+            document.getElementById('ruleModalOverlay').style.display = 'none';
+        }
+
+        function onOverlayClick(e) {
+            if (e.target.id === 'ruleModalOverlay') closeModal();
+        }
+
+        // F1 & ESC tangentstöd
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'F1') {
+                e.preventDefault();
+                const modal = document.getElementById('ruleModalOverlay');
+                if (modal.style.display === 'flex') {
+                    closeModal();
+                } else {
+                    openModal('rules');
+                }
+            } else if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

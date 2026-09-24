@@ -1,0 +1,6 @@
+// 🛑 1. DETEKTERA TRACKPAD / STYRPLATTA PÅ LAPTOP (Gäller ALLA spel)
+            window.addEventListener('wheel', function(e) {
+                if (Math.abs(e.deltaY) < 10 && !Number.isInteger(e.deltaY)) {
+                    triggerKamekLock("🧙‍♂️ KAMEK SKRIKER I RASERI: 'VAD I HELA HELVETE HÅLLER DU PÅ MED?! Sitter du på en laptop och smetar med ett svettigt pekfinger på en liten fyrkantig plastplatta och tror att du spelar arkadspel?! Varför använder du en plastplatta för gaming din totala klåpare?! Det är ett verktyg för att skrolla i PDF-filer på ett kontor, inte för att skjuta, hoppa och rejsa! Du har noll precision, noll känsla och du ser fullständigt patetisk ut! Koppla in en riktig datormus med sladd eller en hederlig handkontroll innan jag förvandlar din laptop till en tegelsten! UT HÄRIFRÅN!'");
+                }
+            }, { passive: true });
