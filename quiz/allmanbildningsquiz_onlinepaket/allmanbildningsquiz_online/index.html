@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Allmänbildningsquiz – onlinetävling</title>
+<style>
+:root{color-scheme:dark;--bg:#101827;--panel:#1b2940;--panel2:#263852;--text:#f5f7fb;--muted:#b9c5d6;--accent:#79e0c1;--green:#9be6b3;--red:#ffaaaa}
+*{box-sizing:border-box}body{margin:0;padding:24px 14px;min-height:100vh;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:var(--text);background:radial-gradient(circle at top,#294566,var(--bg) 58%)}
+main{width:min(780px,100%);margin:auto}header{text-align:center;margin-bottom:20px}.eyebrow{color:var(--accent);text-transform:uppercase;font-weight:800;letter-spacing:.13em;font-size:.78rem}h1{font-size:clamp(2rem,6vw,3rem);margin:8px 0}header p,.muted,.note{color:var(--muted)}
+.card{background:var(--panel);border:1px solid #3a4d68;border-radius:22px;padding:clamp(18px,4vw,30px);box-shadow:0 18px 50px #0004;margin-bottom:16px}
+label{display:block;font-weight:700;margin:12px 0 7px}input{width:100%;padding:13px 14px;border-radius:11px;border:1px solid #60718b;background:#101a2a;color:var(--text);font:inherit}
+button{cursor:pointer;font:inherit;font-weight:800;border:0;border-radius:12px;padding:13px 17px}button:focus-visible,input:focus-visible{outline:3px solid white;outline-offset:3px}.primary{background:var(--accent);color:#10231f}.secondary{background:#344761;color:var(--text)}button:disabled{cursor:default;opacity:.78}
+.topline{display:flex;justify-content:space-between;gap:12px;color:var(--muted);margin-bottom:12px;font-size:.94rem}.bar{height:8px;background:#0d1522;border-radius:99px;overflow:hidden;margin-bottom:22px}.bar div{height:100%;width:0;background:var(--accent);transition:width .2s}
+.category{display:inline-block;padding:6px 11px;border-radius:99px;color:var(--accent);background:#153d3a;font-size:.83rem;font-weight:800;margin-bottom:12px}h2{line-height:1.35;margin:0 0 20px;font-size:clamp(1.25rem,4vw,1.7rem)}
+.answers{display:grid;gap:10px}.answer{width:100%;text-align:left;display:flex;align-items:center;gap:12px;background:var(--panel2);color:var(--text);border:2px solid transparent}.answer:hover:not(:disabled){border-color:var(--accent)}.letter{display:grid;place-items:center;flex:0 0 30px;height:30px;border-radius:9px;background:#101a2a}.answer.correct{background:#183c32;border-color:var(--green)}.answer.incorrect{background:#432b36;border-color:var(--red)}
+#feedback{min-height:28px;line-height:1.5;color:var(--muted);margin:15px 0 4px}.good{color:var(--green)!important}.bad{color:var(--red)!important}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.hidden{display:none!important}.score{color:var(--accent);font-size:clamp(3rem,12vw,5rem);font-weight:900;margin:8px 0;line-height:1.1}
+.resultrow{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0}.pill{background:#101a2a;padding:10px 13px;border-radius:12px}table{width:100%;border-collapse:collapse;margin-top:12px;font-size:.93rem}th,td{padding:10px 7px;text-align:left;border-bottom:1px solid #3a4d68}th{color:var(--muted)}.note{font-size:.9rem;line-height:1.55}.review{display:grid;gap:9px;margin-top:20px}.review div{padding:12px;border-radius:10px;background:#101a2a;line-height:1.5}footer{text-align:center;color:#9aabc1;font-size:.82rem;padding:4px 0 20px}.status{min-height:1.3em;color:var(--muted);font-size:.9rem}
+</style>
+</head>
+<body>
+<main>
+<header><div class="eyebrow">20 frågor · gemensam onlinetävling</div><h1>Allmänbildningsquiz</h1><p>Ingen nedräkning. Ta den tid du behöver – flest rätt vinner.</p></header>
+
+<section class="card" id="setupCard">
+<h2>Inställningar</h2>
+<p class="muted">Administratören behöver först koppla quizet till Supabase. Följ instruktionerna i README-filen.</p>
+<label for="playerName">Ditt spelarnamn</label><input id="playerName" maxlength="24" autocomplete="nickname" placeholder="Exempel: Quizmästaren">
+<div class="actions"><button class="primary" id="startBtn">Starta quizet →</button></div><p id="setupStatus" class="status" role="status"></p>
+</section>
+
+<section class="card hidden" id="quizCard" aria-live="polite">
+<div class="topline"><span id="count">Fråga 1 av 20</span><span id="points">Poäng: 0</span></div><div class="bar"><div id="progress"></div></div>
+<span class="category" id="category"></span><h2 id="question"></h2><div class="answers" id="answers"></div><p id="feedback" role="status"></p>
+<div class="actions"><button class="primary hidden" id="nextBtn">Nästa fråga →</button></div>
+</section>
+
+<section class="card hidden" id="resultCard" aria-live="polite">
+<div class="eyebrow">Ditt resultat</div><h2 id="resultTitle">Quiz klart!</h2><div class="score" id="finalScore">0/20</div><p id="resultMessage"></p>
+<div class="resultrow"><div class="pill">⏱ Sluttid: <strong id="elapsed"></strong></div><div class="pill">🎯 Rätt: <strong id="percentage"></strong></div></div>
+<p class="note">Resultatet har sparats på servern och visas på den gemensamma topplistan.</p>
+<div class="actions"><button class="primary" id="againBtn">Spela igen</button></div><div class="review" id="review"></div>
+</section>
+
+<section class="card" id="leaderboardCard"><h2>🏆 Gemensam topplista</h2><p class="note">Visar de bästa resultaten från alla besökare. Sortering: flest rätt, därefter kortast tid.</p><div id="leaderboard"><p class="muted">Laddar topplistan …</p></div><div class="actions"><button class="secondary" id="refreshBtn">Uppdatera topplistan</button></div><p id="boardStatus" class="status" role="status"></p></section>
+<footer>Prisvinnare bekräftas manuellt av arrangören. Spela schysst!</footer>
+</main>
+<script>
+"use strict";
+
+/*
+  Fyll i dessa två värden från Supabase → Project Settings → API.
+  Använd Project URL och publishable/anon key. ALDRIG service_role key här.
+*/
+const SUPABASE_URL = "KLIStra_INN_DITT_SUPABASE_PROJECT_URL";
+const SUPABASE_ANON_KEY = "KLIStra_INN_DIN_SUPABASE_PUBLISHABLE_KEY";
+const API_URL = () => `${SUPABASE_URL.replace(/\/+$/,"")}/functions/v1/quiz-api`;
+
+const $ = id => document.getElementById(id);
+let sessionId = null, questions = [], index = 0, score = 0, locked = false, log = [], player = "", currentQuestionId = null;
+
+function configured() {
+  return SUPABASE_URL.startsWith("https://") &&
+    !SUPABASE_URL.includes("KLIStra_") &&
+    SUPABASE_ANON_KEY.length > 20 &&
+    !SUPABASE_ANON_KEY.includes("KLIStra_");
+}
+async function api(action, payload={}) {
+  if (!configured()) throw new Error("Quizet är inte kopplat till Supabase ännu. Följ README-installationen och fyll i projektets URL och publishable key i index.html.");
+  const response = await fetch(API_URL(), {
+    method:"POST",
+    headers:{"Content-Type":"application/json","apikey":SUPABASE_ANON_KEY,"Authorization":`Bearer ${SUPABASE_ANON_KEY}`},
+    body:JSON.stringify({action,...payload})
+  });
+  let data;
+  try { data = await response.json(); } catch { throw new Error("Servern returnerade ett svar som inte kunde läsas."); }
+  if (!response.ok || data.error) throw new Error(data.error || `Serverfel (${response.status}).`);
+  return data;
+}
+function txt(tag,value) { const el=document.createElement(tag); el.textContent=value; return el; }
+function formatTime(ms) { const s=Math.max(0,Math.floor(ms/1000)); return `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`; }
+
+async function renderBoard() {
+  $("boardStatus").textContent = "Hämtar resultat …";
+  try {
+    const data = await api("leaderboard");
+    const board = $("leaderboard"); board.replaceChildren();
+    if (!data.results?.length) { board.appendChild(txt("p","Ingen har slutfört quizet ännu. Bli först!")); }
+    else {
+      const table=document.createElement("table"), thead=document.createElement("thead"), tr=document.createElement("tr");
+      ["Plats","Spelare","Poäng","Tid"].forEach(v=>tr.appendChild(txt("th",v)));
+      thead.appendChild(tr); table.appendChild(thead);
+      const tbody=document.createElement("tbody");
+      data.results.forEach((r,i)=>{
+        const row=document.createElement("tr");
+        [String(i+1),r.player_name,`${r.score}/20`,formatTime(r.elapsed_ms)].forEach(v=>row.appendChild(txt("td",v)));
+        tbody.appendChild(row);
+      });
+      table.appendChild(tbody); board.appendChild(table);
+    }
+    $("boardStatus").textContent = "Topplistan är uppdaterad.";
+  } catch(e) {
+    $("leaderboard").replaceChildren(txt("p",e.message));
+    $("boardStatus").textContent = "Kunde inte ladda topplistan.";
+  }
+}
+function renderQuestion() {
+  locked=false;
+  const q=questions[index]; currentQuestionId=q.id;
+  $("count").textContent=`Fråga ${index+1} av ${questions.length}`;
+  $("points").textContent=`Poäng: ${score}`;
+  $("progress").style.width=`${index/questions.length*100}%`;
+  $("category").textContent=q.category; $("question").textContent=q.question;
+  $("feedback").textContent=""; $("feedback").className="";
+  $("nextBtn").classList.add("hidden");
+  const host=$("answers"); host.replaceChildren();
+  q.options.forEach((answer,i)=>{
+    const btn=document.createElement("button"); btn.type="button"; btn.className="answer";
+    btn.append(txt("span",String.fromCharCode(65+i)),txt("span",answer)); btn.querySelector("span").className="letter";
+    btn.addEventListener("click",()=>chooseAnswer(i,btn)); host.appendChild(btn);
+  });
+}
+async function chooseAnswer(choice, clickedButton) {
+  if(locked)return;
+  locked=true;
+  const buttons=[...$("answers").querySelectorAll("button")]; buttons.forEach(b=>b.disabled=true);
+  $("feedback").textContent="Kontrollerar svaret …";
+  try {
+    const result=await api("answer",{session_id:sessionId,question_id:currentQuestionId,selected_index:choice});
+    if(result.is_correct) score++;
+    $("points").textContent=`Poäng: ${score}`;
+    buttons.forEach((b,i)=>{
+      if(i===choice && result.is_correct)b.classList.add("correct");
+      if(i===choice && !result.is_correct)b.classList.add("incorrect");
+    });
+    log.push({question:questions[index].question,chosen:questions[index].options[choice],correct:result.correct_answer,isCorrect:result.is_correct,explain:result.explanation});
+    $("feedback").textContent=(result.is_correct?"Rätt svar! ":"Inte riktigt. Rätt svar är "+result.correct_answer+". ")+result.explanation;
+    $("feedback").classList.add(result.is_correct?"good":"bad");
+    $("nextBtn").textContent=index===questions.length-1?"Visa resultat →":"Nästa fråga →";
+    $("nextBtn").classList.remove("hidden"); $("nextBtn").focus();
+  } catch(e) {
+    locked=false; buttons.forEach(b=>b.disabled=false);
+    $("feedback").textContent=e.message; $("feedback").className="bad";
+  }
+}
+async function finishQuiz() {
+  $("nextBtn").disabled=true; $("feedback").textContent="Sparar slutresultatet …";
+  try {
+    const result=await api("finish",{session_id:sessionId});
+    score=result.score;
+    $("quizCard").classList.add("hidden"); $("resultCard").classList.remove("hidden");
+    $("finalScore").textContent=`${result.score}/20`;
+    $("elapsed").textContent=formatTime(result.elapsed_ms);
+    $("percentage").textContent=`${Math.round(result.score/20*100)} %`;
+    $("resultTitle").textContent=result.score===20?"Full pott – fantastiskt!":result.score>=15?"Riktigt bra jobbat!":result.score>=10?"Bra kämpat!":"Tack för att du spelade!";
+    $("resultMessage").textContent=`${player}, ditt resultat är registrerat på servern. Arrangören kontrollerar vinnaren manuellt.`;
+    const review=$("review"); review.replaceChildren(txt("h3","Dina svar"));
+    log.forEach((entry,i)=>{const d=document.createElement("div");d.appendChild(txt("strong",`${i+1}. ${entry.isCorrect?"✓":"✗"} ${entry.question}`));d.appendChild(txt("p",`Ditt svar: ${entry.chosen} · Rätt svar: ${entry.correct}. ${entry.explain}`));review.appendChild(d);});
+    await renderBoard(); window.scrollTo({top:0,behavior:"smooth"});
+  } catch(e) {
+    $("feedback").textContent=e.message; $("feedback").className="bad"; $("nextBtn").disabled=false;
+  }
+}
+$("startBtn").addEventListener("click",async()=>{
+  player=$("playerName").value.trim();
+  if(!player){$("setupStatus").textContent="Skriv ett spelarnamn först."; $("playerName").focus();return;}
+  if(player.length>24)player=player.slice(0,24);
+  $("startBtn").disabled=true; $("setupStatus").textContent="Startar quizet …";
+  try{
+    const data=await api("start",{player_name:player});
+    sessionId=data.session_id; questions=data.questions; index=0; score=0; log=[];
+    $("setupCard").classList.add("hidden"); $("resultCard").classList.add("hidden"); $("quizCard").classList.remove("hidden");
+    renderQuestion(); window.scrollTo({top:0,behavior:"smooth"});
+  }catch(e){$("setupStatus").textContent=e.message;}
+  finally{$("startBtn").disabled=false;}
+});
+$("nextBtn").addEventListener("click",async()=>{
+  if(!locked)return;
+  if(index===questions.length-1){await finishQuiz();return;}
+  index++;renderQuestion();
+});
+$("againBtn").addEventListener("click",()=>{
+  sessionId=null;questions=[];index=0;score=0;locked=false;log=[];
+  $("resultCard").classList.add("hidden");$("setupCard").classList.remove("hidden");$("playerName").value=player;$("playerName").focus();window.scrollTo({top:0,behavior:"smooth"});
+});
+$("refreshBtn").addEventListener("click",renderBoard);
+renderBoard();
+</script>
+</body>
+</html>

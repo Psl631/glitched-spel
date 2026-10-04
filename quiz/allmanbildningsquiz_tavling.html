@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Allmänbildningsquiz – tävling</title>
+<style>
+  :root { color-scheme: dark; --bg:#101827; --panel:#1b2940; --panel2:#263852; --text:#f5f7fb; --muted:#b9c5d6; --accent:#79e0c1; --green:#9be6b3; --red:#ffaaaa; }
+  * { box-sizing:border-box }
+  body { margin:0; padding:24px 14px; min-height:100vh; font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif; color:var(--text); background:radial-gradient(circle at top,#294566,var(--bg) 58%); }
+  main { width:min(780px,100%); margin:auto }
+  header { text-align:center; margin:0 0 20px }
+  .eyebrow { color:var(--accent); text-transform:uppercase; font-weight:800; letter-spacing:.13em; font-size:.78rem }
+  h1 { font-size:clamp(2rem,6vw,3rem); margin:8px 0 }
+  header p,.muted { color:var(--muted) }
+  .card { background:var(--panel); border:1px solid #3a4d68; border-radius:22px; padding:clamp(18px,4vw,30px); box-shadow:0 18px 50px #0004; margin-bottom:16px }
+  label { display:block; font-weight:700; margin:12px 0 7px }
+  input { width:100%; padding:13px 14px; border-radius:11px; border:1px solid #60718b; background:#101a2a; color:var(--text); font:inherit }
+  button { cursor:pointer; font:inherit; font-weight:800; border:0; border-radius:12px; padding:13px 17px }
+  button:focus-visible,input:focus-visible { outline:3px solid white; outline-offset:3px }
+  .primary { background:var(--accent); color:#10231f }
+  .secondary { background:#344761; color:var(--text) }
+  button:disabled { cursor:default; opacity:.78 }
+  .topline { display:flex; justify-content:space-between; gap:12px; color:var(--muted); margin-bottom:12px; font-size:.94rem }
+  .bar { height:8px; background:#0d1522; border-radius:99px; overflow:hidden; margin-bottom:22px }
+  .bar div { height:100%; width:0; background:var(--accent); transition:width .2s }
+  .category { display:inline-block; padding:6px 11px; border-radius:99px; color:var(--accent); background:#153d3a; font-size:.83rem; font-weight:800; margin-bottom:12px }
+  h2 { line-height:1.35; margin:0 0 20px; font-size:clamp(1.25rem,4vw,1.7rem) }
+  .answers { display:grid; gap:10px }
+  .answer { width:100%; text-align:left; display:flex; align-items:center; gap:12px; background:var(--panel2); color:var(--text); border:2px solid transparent }
+  .answer:hover:not(:disabled) { border-color:var(--accent) }
+  .letter { display:grid; place-items:center; flex:0 0 30px; height:30px; border-radius:9px; background:#101a2a }
+  .answer.correct { background:#183c32; border-color:var(--green) }
+  .answer.incorrect { background:#432b36; border-color:var(--red) }
+  #feedback { min-height:28px; line-height:1.5; color:var(--muted); margin:15px 0 4px }
+  .good { color:var(--green)!important } .bad { color:var(--red)!important }
+  .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:16px }
+  .hidden { display:none!important }
+  .score { color:var(--accent); font-size:clamp(3rem,12vw,5rem); font-weight:900; margin:8px 0; line-height:1.1 }
+  .resultrow { display:flex; flex-wrap:wrap; gap:10px; margin:16px 0 }
+  .pill { background:#101a2a; padding:10px 13px; border-radius:12px }
+  table { width:100%; border-collapse:collapse; margin-top:12px; font-size:.93rem }
+  th,td { padding:10px 7px; text-align:left; border-bottom:1px solid #3a4d68 }
+  th { color:var(--muted) }
+  .note { font-size:.9rem; line-height:1.55; color:var(--muted) }
+  .review { display:grid; gap:9px; margin-top:20px }
+  .review div { padding:12px; border-radius:10px; background:#101a2a; line-height:1.5 }
+  footer { text-align:center; color:#9aabc1; font-size:.82rem; padding:4px 0 20px }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">20 frågor · blandade ämnen</div>
+    <h1>Allmänbildningsquiz</h1>
+    <p>Ingen nedräkning. Ta den tid du behöver – resultatet sparar både poäng och sluttid.</p>
+  </header>
+
+  <section class="card" id="startCard">
+    <h2>Redo att spela?</h2>
+    <p class="muted">Skriv ditt namn innan du börjar. Du får en poäng för varje rätt svar.</p>
+    <label for="playerName">Ditt namn eller spelarnamn</label>
+    <input id="playerName" maxlength="30" autocomplete="nickname" placeholder="Exempel: Quizmästaren">
+    <div class="actions"><button class="primary" id="startBtn">Starta quizet →</button></div>
+    <p class="note">Tiden börjar när du trycker på Starta quizet och slutar när du skickar in sista svaret. Det finns ingen tidsgräns.</p>
+  </section>
+
+  <section class="card hidden" id="quizCard" aria-live="polite">
+    <div class="topline"><span id="count">Fråga 1 av 20</span><span id="points">Poäng: 0</span></div>
+    <div class="bar"><div id="progress"></div></div>
+    <span class="category" id="category"></span>
+    <h2 id="question"></h2>
+    <div class="answers" id="answers"></div>
+    <p id="feedback" role="status"></p>
+    <div class="actions"><button class="primary hidden" id="nextBtn">Nästa fråga →</button></div>
+  </section>
+
+  <section class="card hidden" id="resultCard" aria-live="polite">
+    <div class="eyebrow">Ditt resultat</div>
+    <h2 id="resultTitle">Quiz klart!</h2>
+    <div class="score" id="finalScore">0/20</div>
+    <p id="resultMessage"></p>
+    <div class="resultrow">
+      <div class="pill">⏱ Sluttid: <strong id="elapsed"></strong></div>
+      <div class="pill">🎯 Rätt: <strong id="percentage"></strong></div>
+    </div>
+    <p class="note">Resultatet har sparats i den här webbläsaren. Se topplistan nedan.</p>
+    <div class="actions"><button class="primary" id="againBtn">Spela igen</button><button class="secondary" id="exportBtn">Exportera resultat (CSV)</button></div>
+    <div class="review" id="review"></div>
+  </section>
+
+  <section class="card" id="leaderboardCard">
+    <h2>🏆 Topplista på den här enheten</h2>
+    <p class="note">Sortering: flest rätt först. Vid lika poäng vinner den snabbaste sluttiden. Den här topplistan lagras lokalt i webbläsaren och delas inte automatiskt mellan besökare.</p>
+    <div id="leaderboard"></div>
+    <div class="actions"><button class="secondary" id="clearBoardBtn">Rensa lokal topplista</button></div>
+  </section>
+  <footer>Ha kul, lär dig något nytt och spela schysst!</footer>
+</main>
+<script>
+"use strict";
+
+const questions = [
+  {c:"Geografi",q:"Vilket land har flest invånare enligt aktuella uppskattningar?",a:["Indien","Kina","USA","Indonesien"],k:0,e:"Indien gick om Kina i befolkningsstorlek under 2023."},
+  {c:"Rymden",q:"Vilken planet ligger närmast solen?",a:["Venus","Jorden","Merkurius","Mars"],k:2,e:"Merkurius är den innersta planeten i solsystemet."},
+  {c:"Historia",q:"Vilket år föll Berlinmuren?",a:["1985","1989","1991","1995"],k:1,e:"Berlinmuren öppnades den 9 november 1989."},
+  {c:"Naturvetenskap",q:"Vilken gas tar växter upp vid fotosyntesen?",a:["Syre","Kväve","Koldioxid","Helium"],k:2,e:"Växter använder koldioxid, vatten och ljus i fotosyntesen."},
+  {c:"Litteratur",q:"Vem skrev böckerna om Pippi Långstrump?",a:["Tove Jansson","Astrid Lindgren","Selma Lagerlöf","Maria Gripe"],k:1,e:"Astrid Lindgren skapade Pippi Långstrump."},
+  {c:"Kroppen",q:"Vilket organ pumpar runt blodet i kroppen?",a:["Lungan","Levern","Hjärtat","Njuren"],k:2,e:"Hjärtat fungerar som kroppens pump."},
+  {c:"Geografi",q:"Vad heter huvudstaden i Kanada?",a:["Toronto","Vancouver","Montreal","Ottawa"],k:3,e:"Ottawa är Kanadas huvudstad."},
+  {c:"Djur",q:"Vilket är det största nu levande djuret?",a:["Afrikansk elefant","Blåval","Giraff","Valhaj"],k:1,e:"Blåvalen är det största kända nu levande djuret."},
+  {c:"Matematik",q:"Vad är 12 × 8?",a:["86","92","96","108"],k:2,e:"12 multiplicerat med 8 är 96."},
+  {c:"Musik",q:"Vilket instrument har vanligtvis 88 tangenter?",a:["Gitarr","Piano","Flöjt","Trumpet"],k:1,e:"Ett standardpiano har vanligtvis 88 tangenter."},
+  {c:"Sverige",q:"Vilket är Sveriges största landskap till ytan?",a:["Dalarna","Lappland","Skåne","Jämtland"],k:1,e:"Lappland är Sveriges största landskap till ytan."},
+  {c:"Teknik",q:"Vad står förkortningen WWW för?",a:["World Wide Web","Web World Window","Wide World Wire","World Web Watch"],k:0,e:"WWW står för World Wide Web."},
+  {c:"Hav",q:"Vilket är världens största hav?",a:["Atlanten","Indiska oceanen","Stilla havet","Norra ishavet"],k:2,e:"Stilla havet är störst till yta och volym."},
+  {c:"Konst",q:"Vem målade Mona Lisa?",a:["Vincent van Gogh","Claude Monet","Pablo Picasso","Leonardo da Vinci"],k:3,e:"Mona Lisa målades av Leonardo da Vinci."},
+  {c:"Sport",q:"Hur många spelare från ett lag är normalt på planen i fotboll?",a:["9","10","11","12"],k:2,e:"Ett lag har normalt 11 spelare på planen, inklusive målvakten."},
+  {c:"Kemi",q:"Vilken kemisk beteckning har guld?",a:["Ag","Au","Fe","Gd"],k:1,e:"Guld har beteckningen Au, från latinets aurum."},
+  {c:"Världen",q:"På vilken kontinent ligger Egypten huvudsakligen?",a:["Asien","Europa","Afrika","Sydamerika"],k:2,e:"Större delen av Egypten ligger i Afrika."},
+  {c:"Språk",q:"Vilket språk har flest modersmålstalare?",a:["Engelska","Spanska","Hindi","Mandarin-kinesiska"],k:3,e:"Mandarin-kinesiska brukar anges som språket med flest modersmålstalare."},
+  {c:"Väder",q:"Vad mäter en termometer?",a:["Lufttryck","Temperatur","Vindhastighet","Luftfuktighet"],k:1,e:"En termometer mäter temperatur."},
+  {c:"Historia",q:"Vilken civilisation byggde Machu Picchu?",a:["Romarna","Maya","Inka","Forntida Egypten"],k:2,e:"Machu Picchu byggdes av inka-civilisationen i nuvarande Peru."}
+];
+
+const $ = id => document.getElementById(id);
+const STORAGE_KEY = "allmanbildningsquiz_leaderboard_v1";
+let player = "", index = 0, score = 0, startedAt = 0, locked = false, log = [], latestResult = null;
+
+function readBoard() {
+  try {
+    const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    return Array.isArray(data) ? data : [];
+  } catch { return []; }
+}
+function saveBoard(board) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(board)); }
+  catch { alert("Kunde inte spara topplistan i webbläsaren."); }
+}
+function formatTime(ms) {
+  const total = Math.max(0, Math.floor(ms / 1000));
+  const min = Math.floor(total / 60), sec = total % 60;
+  return `${min}:${String(sec).padStart(2,"0")}`;
+}
+function safeText(tag, value) {
+  const el = document.createElement(tag);
+  el.textContent = value;
+  return el;
+}
+function renderBoard() {
+  const board = readBoard().sort((a,b) => b.score-a.score || a.timeMs-b.timeMs || a.finishedAt-b.finishedAt).slice(0,10);
+  const host = $("leaderboard");
+  host.replaceChildren();
+  if (!board.length) {
+    host.appendChild(safeText("p","Ingen har spelat ännu. Bli den första på topplistan!"));
+    return;
+  }
+  const table = document.createElement("table");
+  const thead = document.createElement("thead"), headRow = document.createElement("tr");
+  ["Plats","Spelare","Poäng","Tid"].forEach(t => headRow.appendChild(safeText("th",t)));
+  thead.appendChild(headRow); table.appendChild(thead);
+  const tbody = document.createElement("tbody");
+  board.forEach((entry,i) => {
+    const tr = document.createElement("tr");
+    [String(i+1),entry.name,`${entry.score}/20`,formatTime(entry.timeMs)].forEach(v => tr.appendChild(safeText("td",v)));
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody); host.appendChild(table);
+}
+function renderQuestion() {
+  locked = false;
+  const item = questions[index];
+  $("count").textContent = `Fråga ${index+1} av ${questions.length}`;
+  $("points").textContent = `Poäng: ${score}`;
+  $("progress").style.width = `${index/questions.length*100}%`;
+  $("category").textContent = item.c;
+  $("question").textContent = item.q;
+  $("feedback").textContent = "";
+  $("feedback").className = "";
+  $("nextBtn").classList.add("hidden");
+  const host = $("answers"); host.replaceChildren();
+  item.a.forEach((answer,i) => {
+    const btn = document.createElement("button");
+    btn.type = "button"; btn.className = "answer";
+    btn.append(safeText("span",String.fromCharCode(65+i)),safeText("span",answer));
+    btn.querySelector("span").className = "letter";
+    btn.addEventListener("click",() => chooseAnswer(i));
+    host.appendChild(btn);
+  });
+}
+function chooseAnswer(choice) {
+  if (locked) return;
+  locked = true;
+  const item = questions[index], correct = choice === item.k;
+  if (correct) score++;
+  log.push({question:item.q,chosen:item.a[choice],correct:item.a[item.k],isCorrect:correct,explain:item.e});
+  [...$("answers").querySelectorAll("button")].forEach((btn,i) => {
+    btn.disabled = true;
+    if (i === item.k) btn.classList.add("correct");
+    if (i === choice && !correct) btn.classList.add("incorrect");
+  });
+  $("points").textContent = `Poäng: ${score}`;
+  $("feedback").textContent = (correct ? "Rätt svar! " : `Inte riktigt. Rätt svar är ${item.a[item.k]}. `) + item.e;
+  $("feedback").classList.add(correct ? "good" : "bad");
+  $("nextBtn").textContent = index === questions.length-1 ? "Visa resultat →" : "Nästa fråga →";
+  $("nextBtn").classList.remove("hidden");
+}
+function finishQuiz() {
+  const timeMs = Date.now()-startedAt;
+  latestResult = {name:player,score,timeMs,finishedAt:Date.now(),total:questions.length};
+  const board = readBoard();
+  board.push(latestResult);
+  board.sort((a,b) => b.score-a.score || a.timeMs-b.timeMs || a.finishedAt-b.finishedAt);
+  saveBoard(board.slice(0,100));
+  $("quizCard").classList.add("hidden");
+  $("resultCard").classList.remove("hidden");
+  $("finalScore").textContent = `${score}/${questions.length}`;
+  $("elapsed").textContent = formatTime(timeMs);
+  $("percentage").textContent = `${Math.round(score/questions.length*100)} %`;
+  $("resultTitle").textContent = score === 20 ? "Full pott – fantastiskt!" : score >= 15 ? "Riktigt bra jobbat!" : score >= 10 ? "Bra kämpat!" : "Tack för att du spelade!";
+  $("resultMessage").textContent = `${player}, ditt resultat har lagts till i den lokala topplistan. Vid lika poäng rankas kortare sluttid högre.`;
+  const review = $("review"); review.replaceChildren(safeText("h3","Dina svar"));
+  log.forEach((entry,i) => {
+    const div = document.createElement("div");
+    div.appendChild(safeText("strong",`${i+1}. ${entry.isCorrect ? "✓" : "✗"} ${entry.question}`));
+    div.appendChild(safeText("p",`Ditt svar: ${entry.chosen} · Rätt svar: ${entry.correct}. ${entry.explain}`));
+    review.appendChild(div);
+  });
+  renderBoard();
+}
+$("startBtn").addEventListener("click",() => {
+  const name = $("playerName").value.trim();
+  if (!name) { $("playerName").focus(); alert("Skriv ett spelarnamn först."); return; }
+  player = name.slice(0,30); index = 0; score = 0; log = []; latestResult = null;
+  startedAt = Date.now();
+  $("startCard").classList.add("hidden"); $("resultCard").classList.add("hidden"); $("quizCard").classList.remove("hidden");
+  renderQuestion(); window.scrollTo({top:0,behavior:"smooth"});
+});
+$("nextBtn").addEventListener("click",() => {
+  if (!locked) return;
+  index++;
+  if (index >= questions.length) finishQuiz(); else renderQuestion();
+});
+$("againBtn").addEventListener("click",() => {
+  $("resultCard").classList.add("hidden"); $("startCard").classList.remove("hidden");
+  $("playerName").value = player; $("playerName").focus(); window.scrollTo({top:0,behavior:"smooth"});
+});
+$("exportBtn").addEventListener("click",() => {
+  if (!latestResult) return;
+  const csv = [["Spelare","Poäng","Av frågor","Tid sekunder","Datum"],
+    [latestResult.name,latestResult.score,latestResult.total,(latestResult.timeMs/1000).toFixed(2),new Date(latestResult.finishedAt).toISOString()]
+  ].map(row => row.map(v => `"${String(v).replace(/"/g,'""')}"`).join(";")).join("\r\n");
+  const blob = new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob), a = document.createElement("a");
+  a.href = url; a.download = "quizresultat.csv"; a.click(); URL.revokeObjectURL(url);
+});
+$("clearBoardBtn").addEventListener("click",() => {
+  if (confirm("Vill du rensa topplistan i den här webbläsaren?")) { localStorage.removeItem(STORAGE_KEY); renderBoard(); }
+});
+renderBoard();
+</script>
+</body>
+</html>

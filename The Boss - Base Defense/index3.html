@@ -8,6 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=VT323&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
+        @font-face {
+font-family: 'BankGothic';
+src: url('./BankGothicMediumBT.ttf') format('truetype');
+font-display: swap;
+}
         /* ==========================================================================
            1. GRUNDLÄGGANDE STYLING & STRÖM-DESIGN
            ========================================================================== */
@@ -18,6 +23,15 @@
             --danger: #ff0033;
         }
 
+        :root {
+--game-font:
+'BankGothic',
+'Luckiest Guy',
+Arial,
+Helvetica,
+sans-serif;
+}
+
         body, html {
             margin: 0;
             padding: 0;
@@ -25,9 +39,18 @@
             height: 100%;
             overflow: hidden;
             background-color: #05000a;
-            font-family: 'Luckiest Guy', cursive;
             user-select: none;
         }
+
+        body,
+html {
+font-family:
+'BankGothic',
+'Luckiest Guy',
+Arial,
+Helvetica,
+sans-serif;
+}
 
         body {
             background-image: radial-gradient(circle, #110022 0%, #05000a 100%);
@@ -79,6 +102,68 @@
             border-color: #00ff00;
             box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
         }
+
+#reload-overlay {
+position: fixed;
+inset: 0;
+z-index: 99999;
+
+display: none;
+align-items: center;
+justify-content: center;
+flex-direction: column;
+
+pointer-events: none;
+
+font-family: var(--game-font);
+text-align: center;
+}
+
+#reload-overlay.active {
+display: flex;
+}
+
+#reload-text {
+font-size: 110px;
+color: #ff0000;
+
+text-shadow:
+0 0 10px #ff0000,
+0 0 20px #ff0000,
+0 0 40px #ff0000,
+0 0 80px #ff0000;
+
+animation: reloadFlash 0.25s infinite;
+}
+
+#reload-key {
+font-size: 60px;
+color: yellow;
+margin-top: 10px;
+
+animation: reloadFlash 0.25s infinite;
+}
+
+@keyframes reloadFlash {
+
+0% {
+opacity: 1;
+transform: scale(1);
+color: #ff0000;
+}
+
+50% {
+opacity: 0.15;
+transform: scale(1.2);
+color: white;
+}
+
+100% {
+opacity: 1;
+transform: scale(1);
+color: #ff0000;
+}
+}
 
         /* ==========================================================================
            PLAYLIST SELECTION SYSTEM SWITCHES
@@ -200,7 +285,7 @@
             color: var(--gold);
             font-size: 13px;
             font-weight: bold;
-            font-family: 'Luckiest Guy', sans-serif;
+            font-family: var(--game-font);
         }
 
         .flag-button:hover {
@@ -219,6 +304,14 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
 
+        @keyframes reloadShake {
+0% { transform: translate(3px,0); }
+25% { transform: translate(-3px,0); }
+50% { transform: translate(3px,0); }
+75% { transform: translate(-3px,0); }
+100% { transform: translate(3px,0); }
+}
+
         /* INPUT & KNAPPAR */
         input#playerName {
             padding: 12px;
@@ -229,7 +322,7 @@
             width: 80%;
             background: #120024;
             color: white;
-            font-family: 'Luckiest Guy';
+            font-family: var(--game-font);
             margin-top: 5px;
         }
 
@@ -240,7 +333,7 @@
         }
 
         .btn-start, .btn-info, .open-settings-btn {
-            font-family: 'Luckiest Guy', cursive;
+            font-family: var(--game-font);
             border: 4px solid black;
             border-radius: 15px;
             cursor: pointer;
@@ -374,7 +467,7 @@
         }
 
         .modal-content h1, .modal-content h3 {
-            font-family: 'Luckiest Guy', cursive;
+            font-family: var(--game-font);
         }
 
         /* Purple Scrollbar */
@@ -435,7 +528,7 @@
             color: var(--gold);
             font-size: 24px;
             cursor: pointer;
-            font-family: 'Luckiest Guy', cursive;
+            font-family: var(--game-font);
         }
 
         .toggle-container {
@@ -446,7 +539,7 @@
         }
 
         .btn-toggle {
-            font-family: 'Luckiest Guy', cursive;
+            font-family: var(--game-font);
             font-size: 18px;
             padding: 12px 20px;
             border: 3px solid #333;
@@ -474,7 +567,7 @@
             width: 100%;
             background: var(--gold);
             color: black;
-            font-family: 'Luckiest Guy';
+            font-family: var(--game-font);
             font-size: 26px;
             padding: 15px;
             border: none;
@@ -606,7 +699,7 @@
         #lockdown-overlay button {
             margin-top: 25px;
             padding: 15px 40px;
-            font-family: 'Luckiest Guy', cursive;
+            font-family: var(--game-font);
             background: var(--gold);
             color: black;
             font-size: 24px;
@@ -926,9 +1019,20 @@ fi: {
             <div class="power-pulse"></div>
             <span id="power-label" style="color: #00ff00; font-family: 'VT323', monospace; font-size: 22px;">⚡ EXTERN STRÖM: OK (UPS REDO)</span>
         </div>
-        <div class="stat-box" style="border-color: #00ccff;">
-            <span id="mag-label">MAG</span>: <span id="ammo-display">10 / 40</span>
-        </div>
+        <div class="stat-box" id="ammo-widget" style="border-color:#00ccff;">
+<span id="mag-label">MAG</span>
+<div id="ammo-display">10 / 40</div>
+ 
+<div id="ammo-bar-bg"
+style="margin-top:6px;height:12px;background:#111;border-radius:4px;overflow:hidden;">
+<div id="ammo-bar-fill"
+style="width:100%;height:100%;background:#00ff00;"></div>
+</div>
+ 
+<div id="ammo-warning"
+style="margin-top:4px;font-size:14px;color:#ff0033;font-weight:bold;">
+</div>
+</div>
         <div id="wave-display" class="stat-box">
             <span id="wave-label">WAVE</span> 1
         </div>
@@ -1315,6 +1419,8 @@ fi: {
                 ups_warning: "⚠️ STRÖMAVBROTT / GLAPP! Datorn körs på nödström (UPS)! Koppla in extern laddare omedelbart!",
                 power_status: "⚡ EXTERN STRÖM: OK (UPS SÄKRAD)",
                 power_battery: "🔋 UPS-RESERV (VARNING: INGEN EXTERN STRÖM!)",
+                reload_warning: "LADDA OM!",
+reload_key: "(R)",
                 
                 camera_off_label: "KAMERA AVSTÄNGD",
                 integrity: "🛡️ INTEGRITET",
@@ -1354,6 +1460,8 @@ fi: {
                 retry_btn: "FÖRSÖK IGEN",
                 nuke_explosion: "☢️ NUKE DETONERAD! \n Kamek skrattar åt din aska: 'NYEHEHEHE!'",
                 cheat_detected: "FUSK UPPTÄCKT!",
+                low_ammo: "⚠️ LÅG AMMO!",
+reload_warning: "🔄 LADDA OM!",
 
                 mock_legendary: "SUPER (STJÄRNVINSTEN) - LEGENDARISK STATUS!",
                 mock_0: "USELT - Var du ens vaken?",
@@ -1455,6 +1563,8 @@ fi: {
                 ups_warning: "⚠️ POWER FAULT! Laptop running on UPS reservoir! Connect external power immediately!",
                 power_status: "⚡ EXTERNAL POWER: OK (UPS ARMED)",
                 power_battery: "🔋 UPS-RESERVE (WARNING: NO EXTERNAL POWER!)",
+                low_ammo: "⚠️ LOW AMMO!",
+reload_warning: "🔄 RELOAD!",
                 
                 camera_off_label: "CAMERA DEACTIVATED",
                 integrity: "🛡️ INTEGRITY",
@@ -1483,6 +1593,8 @@ fi: {
                 power_star: "⭐ Star: Invincible",
                 power_gold: "💰 Gold: X2 Points",
                 confirm_btn: "CONFIRM RULES & START!",
+                reload_warning: "RELOAD!",
+reload_key: "(R)",
 
                 trackpad_lockdown: "STOP STROKING YOUR LAPTOP! 🚫\n\nKamek laughs at your clumsy trackpad: 'NYEHEHEHE!'\nYour fingers are not worthy of the Station 24 Protocol.\n\n⚠️ RECOMMENDATION: Connect a real MOUSE for precision!",
                 thermal_throttle: "THERMAL_THROTTLE_DETECTED: \n Your PC is melting under the pressure! Play on a stable rig with external power!",
@@ -1582,6 +1694,8 @@ fi: {
     name: "NIMI",
     score_col: "PISTEET",
     on: "PÄÄLLÄ",
+    low_ammo: "⚠️ VÄHÄN AMMUKSIA!",
+reload_warning: "🔄 LATAA!",
     off: "POIS",
     no_media_confirm: "Haluatko jatkaa ilman kameraa ja mikrofonia?",
     right_click_forbidden: "OIKEA PAINIKE KIELLETTY! Terminaali lukittu.",
@@ -1654,6 +1768,8 @@ fi: {
     online_mode: "✅ Online - yhdistetty Station 24:ään",
     ammo_added: "+20 VARA-AMMUSTA!",
     invincible_on: "🌟 KUOLEMATON! (7 SEK)",
+    reload_warning: "LATAA!",
+reload_key: "(R)",
     invincible_off: "✨ Kuolemattomuus päättyi",
     double_points_on: "💰 TUPLAPISTEET! (10 SEK)",
     double_points_off: "💰 Pisteet palautettu",
@@ -1759,6 +1875,8 @@ fi: {
                 power_star: "⭐ Stjerne: Uovervindelig",
                 power_gold: "💰 Guld: X2 Point",
                 confirm_btn: "BEKRÆFT REGLER & START!",
+                low_ammo: "⚠️ LAV AMMO!",
+reload_warning: "🔄 GENLAD!",
 
                 trackpad_lockdown: "STOP MED AT AE DIN BÆRBARE! 🚫\n\nKamek griner af din klumpede berøringsplade: 'NYEHEHEHE!'\nDine fingre er ikke egnede til Station 24-protokollen.\n\n⚠️ ANBEFALING: Tilslut en rigtig MUS for præcision!",
                 thermal_throttle: "THERMAL_THROTTLE_DETECTED: \n Din computer smelter under presset! Spil på en stabil maskine med ekstern strømforsyning!",
@@ -1778,6 +1896,8 @@ fi: {
                 mock_3: "GODT - Nu ligner det noget!",
                 mock_4: "BEDST - En sand forsvarer av basen!",
                 mock_5: "SUPER (STJERNEGEVINST) - DU ER USTOPPELIG!",
+                reload_warning: "GENLAD!",
+reload_key: "(R)",
 
                 // Nya lokaliserade toast-nycklar
                 lang_changed: "🌐 SPROG: DANSK DETEKTERET!",
@@ -1894,11 +2014,15 @@ fi: {
                 repair_system_title: "🛡️ REPARASJONSSYSTEM",
                 repair_system_desc_html: "• Muren din starter på <strong>100 HP</strong>.<br>• Skyt hjerter for å reparere muren med <strong>+25 HP</strong>.<br>• 0 HP = Total kollaps og spill slutt.",
                 powerups_title: "💎 POWER-UPS",
+                reload_warning: "LAD OM!",
+reload_key: "(R)",
                 power_heart: "❤️ Hjerte: +25 HP",
                 power_clock: "🕒 Klokke: Slow-Mo",
                 power_star: "⭐ Stjerne: Uovervinnelig",
                 power_gold: "💰 Gull: X2 Poeng",
                 confirm_btn: "BEKREFT REGLER & START!",
+                low_ammo: "⚠️ LITE AMMO IGJEN!",
+reload_warning: "🔄 LAD OM!",
 
                 trackpad_lockdown: "SLUTT Å STRYKE LAPTOPPEN DIN! 🚫\n\nKamek ler av den klumpete styreflaten din: 'NYEHEHEHE!'\nFingrene dine duger ikke til Station 24-protokollen.\n\n⚠️ ANBEFALING: Koble til en ekte MUS for presisjon!",
                 thermal_throttle: "THERMAL_THROTTLE_DETECTED: \n Datamaskinen din smelter under spenningen! Spill på en stabil maskin med ekstern strømforsyning!",
@@ -2476,6 +2600,30 @@ fi: {
             }
         }
 
+        function updateReloadOverlay() {
+ 
+const overlay =
+document.getElementById("reload-overlay");
+ 
+const text =
+document.getElementById("reload-text");
+ 
+if (!overlay || !text) return;
+ 
+if (ammoInMag <= 0 && !isReloading) {
+ 
+overlay.classList.add("active");
+ 
+text.textContent =
+t("reload_warning");
+ 
+} else {
+ 
+overlay.classList.remove("active");
+ 
+}
+}
+
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -2679,9 +2827,15 @@ fi: {
                 return; 
             }
             if (ammoInMag <= 0) {
-                playSnd(sndClick);
-                return; 
-            }
+playSnd(sndClick);
+ 
+showToast(
+t('reload_warning'),
+"#ff0000"
+);
+ 
+return;
+}
 
             ammoInMag--;
             playSnd(sndPang);
@@ -2756,11 +2910,61 @@ fi: {
         }
 
         function updateAmmoUI() {
-            const ammoEl = document.getElementById('ammo-display');
-            if (ammoEl) {
-                ammoEl.innerText = `${ammoInMag} / ${ammoReserve} | 📦: ${emergencyAmmoBoxes}`;
-            }
-        }
+ 
+const ammoEl = document.getElementById('ammo-display');
+const fill = document.getElementById('ammo-bar-fill');
+const warning = document.getElementById('ammo-warning');
+ 
+if (!ammoEl) return;
+ 
+ammoEl.innerText =
+`${ammoInMag} / ${ammoReserve} | 📦:${emergencyAmmoBoxes}`;
+ 
+const percent = (ammoInMag / magSize) * 100;
+ 
+if (fill) {
+fill.style.width = percent + "%";
+ 
+if (percent > 60) {
+fill.style.background = "#00ff00";
+}
+else if (percent > 30) {
+fill.style.background = "#ffcc00";
+}
+else {
+fill.style.background = "#ff3300";
+}
+}
+ 
+if (warning) {
+ 
+if (ammoInMag === 0) {
+ 
+warning.textContent = t('reload_warning');
+warning.style.color = "#ff0000";
+ 
+} else if (ammoInMag <= 3) {
+ 
+warning.textContent = t('low_ammo');
+warning.style.color = "#ff9900";
+ 
+} else {
+ 
+warning.textContent = '';
+}
+}
+updateReloadOverlay();
+}
+
+if (ammoInMag <= 0) {
+ 
+document.body.style.animation =
+"reloadShake 0.15s infinite";
+ 
+} else {
+ 
+document.body.style.animation = "";
+}
 
         function activateInvincibility() {
             isInvincible = true;
@@ -2784,7 +2988,7 @@ fi: {
 
         function reload() {
             if (isReloading || ammoInMag === magSize || ammoReserve <= 0) return;
-
+            updateReloadOverlay();
             isReloading = true;
             showToast(t('reloading'), "#ffffff");
             
@@ -2796,6 +3000,8 @@ fi: {
                 ammoReserve -= toReload;
                 
                 isReloading = false;
+                updateAmmoUI();
+updateReloadOverlay();
                 showToast(t('reloaded_ready'), "#00ff00");
             }, 1500);
         }
@@ -3749,5 +3955,12 @@ fi: {
             draw();
         };
     </script>
+    <div id="reload-overlay">
+ 
+<div id="reload-text">RELOAD!</div>
+ 
+<div id="reload-key">(R)</div>
+ 
+</div>
 </body>
 </html>

@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pass The Bomb - Turneringsläge (Stafettkö)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #06070e;
+            font-family: 'Inter', sans-serif;
+            color: #ffffff;
+        }
+        #stageCanvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+            background-color: #090b14;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="stageCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('stageCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let audioCtx = null;
+        function getAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            return audioCtx;
+        }
+
+        function playDing() {
+            try {
+                const actx = getAudio();
+                const osc = actx.createOscillator();
+                const gain = actx.createGain();
+                osc.type = "sine";
+                osc.frequency.setValueAtTime(1046.50, actx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1318.51, actx.currentTime + 0.12);
+                gain.gain.setValueAtTime(0.3, actx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + 0.4);
+                osc.connect(gain);
+                gain.connect(actx.destination);
+                osc.start();
+                osc.stop(actx.currentTime + 0.4);
+            } catch(e) {}
+        }
+
+        function playBoooop() {
+            try {
+                const actx = getAudio();
+                const osc = actx.createOscillator();
+                const gain = actx.createGain();
+                osc.type = "sawtooth";
+                osc.frequency.setValueAtTime(120, actx.currentTime);
+                osc.frequency.linearRampToValueAtTime(70, actx.currentTime + 0.35);
+                gain.gain.setValueAtTime(0.35, actx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + 0.35);
+                osc.connect(gain);
+                gain.connect(actx.destination);
+                osc.start();
+                osc.stop(actx.currentTime + 0.35);
+            } catch(e) {}
+        }
+
+        function playTick() {
+            try {
+                const actx = getAudio();
+                const osc = actx.createOscillator();
+                const gain = actx.createGain();
+                osc.type = "triangle";
+                osc.frequency.setValueAtTime(800, actx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(300, actx.currentTime + 0.03);
+                gain.gain.setValueAtTime(0.2, actx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + 0.03);
+                osc.connect(gain);
+                gain.connect(actx.destination);
+                osc.start();
+                osc.stop(actx.currentTime + 0.03);
+            } catch(e) {}
+        }
+
+        function playKamekLaugh() {
+            try {
+                const actx = getAudio();
+                for (let i = 0; i < 5; i++) {
+                    const osc = actx.createOscillator();
+                    const gain = actx.createGain();
+                    osc.type = "triangle";
+                    const startTime = actx.currentTime + (i * 0.09);
+                    osc.frequency.setValueAtTime(580 + (i % 2 === 0 ? 160 : -40), startTime);
+                    osc.frequency.exponentialRampToValueAtTime(280, startTime + 0.08);
+                    gain.gain.setValueAtTime(0.25, startTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.08);
+                    osc.connect(gain);
+                    gain.connect(actx.destination);
+                    osc.start(startTime);
+                    osc.stop(startTime + 0.08);
+                }
+            } catch(e) {}
+        }
+
+        const QUESTIONS = [
+            // (frågor här)
+            {
+                q: "Vilket retrospel introducerade Bowser för första gången?",
+                answers: ["Super Mario Bros", "Super Mario World", "Super Mario 64", "Mario Kart"],
+                correct: 0
+            },
+            {
+                q: "Vilket material bryter man vanligtvis först i Minecraft för att bygga enkla verktyg?",
+                answers: ["Sten", "Trä", "Järn", "Diamant"],
+                correct: 1
+            },
+            {
+                q: "Hur många knappar har en standard NES-kontroll (exklusive Start och Select)?",
+                answers: ["2 knappar", "4 knappar", "6 knappar", "8 knappar"],
+                correct: 0
+            },
+            {
+                q: "Vilken färg har den mittersta ringen på den officiella olympiska flaggan?",
+                answers: ["Röd", "Svart", "Gul", "Grön"],
+                correct: 1
+            },
+            {
+                q: "Vad heter Norges huvudstad?",
+                answers: ["Bergen", "Trondheim", "Oslo", "Stavanger"],
+                correct: 2
+            },
+            {
+                q: "Vilket djur är Sonic the Hedgehogs lojala sidekick Tails?",
+                answers: ["Räv", "Igelkott", "Hund", "Ekorre"],
+                correct: 0
+            },
+            {
+                q: "Vilken spelstudio utvecklade det ursprungliga Crash Bandicoot till PS1?",
+                answers: ["Insomniac Games", "Naughty Dog", "Sucker Punch", "Capcom"],
+                correct: 1
+            },
+            {
+                q: "Vad heter Master Chiefs AI-kompanjon i Halo-serien?",
+                answers: ["Cortana", "Siri", "Alexa", "Glados"],
+                correct: 0
+            }
+        ];
+
+        let gameState = "PLAYING"; // "PLAYING", "GAMEOVER"
+        let currentQuestionIdx = 0;
+        const BOMB_START_TIME = 15.0;
+        let bombTimer = BOMB_START_TIME;
+        let lastTimeTick = -1;
+        let lastTimestamp = performance.now();
+        let lastAnswerTimestamp = performance.now();
+        let screenShake = 0;
+
+        // 4 Spelare som står i kö vid scenen
+        let players = [
+            { id: 0, name: "SPELARE 1", lives: 3, score: 0, isEliminated: false, color: "#38bdf8" },
+            { id: 1, name: "SPELARE 2", lives: 3, score: 0, isEliminated: false, color: "#f43f5e" },
+            { id: 2, name: "SPELARE 3", lives: 3, score: 0, isEliminated: false, color: "#22c55e" },
+            { id: 3, name: "SPELARE 4", lives: 3, score: 0, isEliminated: false, color: "#facc15" }
+        ];
+
+        // Kösystem: array med index på de som är kvar i spelet. Index 0 står först i kön!
+        let stageQueue = [0, 1, 2, 3];
+        let spamStrikes = {};
+        let eliminatedOrder = [];
+        let particles = [];
+
+        let bannerNotice = {
+            active: false,
+            title: "",
+            sub: "",
+            timer: 0,
+            color: "#ff1744"
+        };
+
+        function spawnBombExplosion(cx, cy, isSmoke = false) {
+            const count = isSmoke ? 45 : 75;
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = (isSmoke ? 1.5 : 3) + Math.random() * (isSmoke ? 4 : 8);
+                particles.push({
+                    x: cx,
+                    y: cy,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed - (isSmoke ? 2.5 : 1.5),
+                    size: (isSmoke ? 6 : 4) + Math.random() * 6,
+                    color: isSmoke 
+                        ? ["#1e293b", "#334155", "#475569", "#64748b"][Math.floor(Math.random() * 4)]
+                        : ["#ff1744", "#ff9100", "#ffd600", "#ffffff"][Math.floor(Math.random() * 4)],
+                    alpha: 1.0,
+                    decay: isSmoke ? 0.012 : (0.018 + Math.random() * 0.02)
+                });
+            }
+        }
+
+        function loadNextQuestion() {
+            currentQuestionIdx = (currentQuestionIdx + 1) % QUESTIONS.length;
+            lastAnswerTimestamp = performance.now();
+        }
+
+        function handleBombExplosion() {
+            if (stageQueue.length === 0) return;
+            const frontPlayerId = stageQueue[0];
+            const curP = players[frontPlayerId];
+            if (!curP || curP.isEliminated) return;
+
+            playBoooop();
+            screenShake = 22;
+            spawnBombExplosion(canvas.width / 2, canvas.height * 0.45);
+
+            curP.lives--;
+
+            if (curP.lives <= 0) {
+                // Spelaren har 0 liv kvar: ELIMINERAD! Lämnar kön och scenen.
+                curP.isEliminated = true;
+                eliminatedOrder.push(curP);
+                stageQueue.shift(); // Plockas bort ur kön helt!
+
+                bannerNotice = {
+                    active: true,
+                    title: "💀 " + curP.name + " ÄR UTSLAGEN!",
+                    sub: "LÄMNA QUIZOMRÅDET OMEDELBART! NÄSTA SPELARE KAN SVARA!",
+                    timer: 240,
+                    color: "#ff1744"
+                };
+                playKamekLaugh();
+
+                if (stageQueue.length <= 1) {
+                    gameState = "GAMEOVER";
+                    return;
+                }
+            } else {
+                // Har liv kvar men bomben sprängdes: tappar 1 liv och ställer sig sist
+                const punishedPlayer = stageQueue.shift();
+                stageQueue.push(punishedPlayer);
+
+                bannerNotice = {
+                    active: true,
+                    title: "💥 BOOOOM! BOMBEN DETONERADE!",
+                    sub: curP.name + " TAPPADE ETT LIV OCH FÅR GÅ SIST I KÖN!",
+                    timer: 160,
+                    color: "#ff9100"
+                };
+            }
+
+            // Ny bomb med full tid ges till nästa spelare som nu står först
+            bombTimer = BOMB_START_TIME;
+            loadNextQuestion();
+        }
+
+        function handleStageAnswer(ansIdx) {
+            if (gameState !== "PLAYING" || stageQueue.length === 0) return;
+
+            const frontPlayerId = stageQueue[0];
+            const curP = players[frontPlayerId];
+            if (!curP || curP.isEliminated) return;
+
+            const q = QUESTIONS[currentQuestionIdx];
+            if (!q) return;
+
+            const now = performance.now();
+
+            // -------------------------------------------------------------
+            // 🛑 SPAMSKYDD: MINST 1 SEKUND BETÄNKETID MELLAN FÖRSÖK
+            // -------------------------------------------------------------
+            if (lastAnswerTimestamp > 0 && (now - lastAnswerTimestamp) < 1000) {
+                if (!spamStrikes[curP.id]) spamStrikes[curP.id] = 0;
+                spamStrikes[curP.id]++;
+
+                playBoooop();
+
+                if (spamStrikes[curP.id] >= 2) {
+                    // 2:A FÖRSÖKET -> DISKAD AV ANTI-CHEAT!
+                    curP.isEliminated = true;
+                    curP.lives = 0;
+                    eliminatedOrder.push(curP);
+                    stageQueue.shift(); // Bort ur kön
+
+                    bannerNotice = {
+                        active: true,
+                        title: "🛑 DISKVALIFICERAD: " + curP.name,
+                        sub: "ANTI-CHEAT: SPAM UTAN BETÄNKETID! LÄMNA SCENEN!",
+                        timer: 240,
+                        color: "#ff1744"
+                    };
+                    playKamekLaugh();
+
+                    if (stageQueue.length <= 1) {
+                        gameState = "GAMEOVER";
+                        return;
+                    }
+
+                    bombTimer = BOMB_START_TIME;
+                    loadNextQuestion();
+                    return;
+                } else {
+                    bannerNotice = {
+                        active: true,
+                        title: "⚠️ VARNING 1/2: INGET KNAPPSPAM!",
+                        sub: "MINST 1 SEKUND BETÄNKETID KRÄVS! SLUTA GISSAPANA!",
+                        timer: 110,
+                        color: "#ffd600"
+                    };
+                    return;
+                }
+            }
+
+            lastAnswerTimestamp = now;
+
+            // -------------------------------------------------------------
+            // 🎯 SVARSBEDÖMNING
+            // -------------------------------------------------------------
+            if (ansIdx === q.correct) {
+                // RÄTT SVAR:
+                // 1. Pling
+                // 2. Poäng delas ut
+                // 3. Spelaren ställs sist i kön (roteras)
+                // 4. Bomben behåller exakt samma återstående tid!
+                playDing();
+                curP.score += 100;
+                if (spamStrikes[curP.id]) spamStrikes[curP.id] = 0;
+
+                const runner = stageQueue.shift();
+                stageQueue.push(runner);
+
+                bannerNotice = {
+                    active: true,
+                    title: "✔ RÄTT SVAR! BOMBEN SKICKAD VIDARE!",
+                    sub: curP.name + " GÅR SIST I KÖN! NÄSTA KAN SVARA DIREKT!",
+                    timer: 90,
+                    color: "#00ffcc"
+                };
+
+                loadNextQuestion();
+            } else {
+                // FEL SVAR:
+                // 1. Bööööp
+                // 2. Tid dras av (-3 sekunder), inte liv!
+                // 3. Bomben stannar kvar hos samma spelare som står kvar längst fram!
+                playBoooop();
+                bombTimer = Math.max(0, bombTimer - 3.0);
+                screenShake = 10;
+
+                bannerNotice = {
+                    active: true,
+                    title: "✖ FEL SVAR! -3 SEKUNDER PÅ BOMBEN!",
+                    sub: curP.name + " STÅR KVAR LÄNGST FRAM MED BOMBEN!",
+                    timer: 90,
+                    color: "#ff5252"
+                };
+
+                if (bombTimer <= 0) {
+                    handleBombExplosion();
+                }
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            const fKeys = { 'F1': 0, 'F2': 1, 'F3': 2, 'F4': 3 };
+
+            if (fKeys.hasOwnProperty(e.key)) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (gameState === "PLAYING") {
+                    handleStageAnswer(fKeys[e.key]);
+                }
+            } else if (e.key === "Enter" && gameState === "GAMEOVER") {
+                // Återställ hela turneringen
+                players.forEach(p => {
+                    p.lives = 3;
+                    p.score = 0;
+                    p.isEliminated = false;
+                });
+                stageQueue = [0, 1, 2, 3];
+                eliminatedOrder = [];
+                spamStrikes = {};
+                bombTimer = BOMB_START_TIME;
+                gameState = "PLAYING";
+                loadNextQuestion();
+            }
+        }, true);
+
+        function drawQueueHUD() {
+            const w = canvas.width;
+            const h = canvas.height;
+
+            // Rita kö-status upptill
+            ctx.save();
+            ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
+            ctx.fillRect(0, 0, w, 110);
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(0, 0, w, 110);
+
+            const cardW = Math.min(220, (w - 60) / 4);
+            const cardH = 80;
+            const startX = (w - (cardW * 4 + 20 * 3)) / 2;
+
+            for (let i = 0; i < 4; i++) {
+                const p = players[i];
+                const x = startX + i * (cardW + 20);
+                const y = 15;
+
+                // Position i kön
+                const queuePos = stageQueue.indexOf(p.id);
+                const isFront = (queuePos === 0);
+
+                ctx.save();
+                if (p.isEliminated) {
+                    ctx.fillStyle = "rgba(20, 24, 38, 0.6)";
+                    ctx.strokeStyle = "#475569";
+                } else if (isFront) {
+                    ctx.fillStyle = p.color;
+                    ctx.strokeStyle = "#ffffff";
+                    ctx.lineWidth = 4;
+                } else {
+                    ctx.fillStyle = "rgba(30, 41, 59, 0.9)";
+                    ctx.strokeStyle = p.color;
+                    ctx.lineWidth = 2;
+                }
+
+                ctx.beginPath();
+                ctx.roundRect(x, y, cardW, cardH, 8);
+                ctx.fill();
+                ctx.stroke();
+
+                // Spelarnamn & Köläge
+                ctx.textAlign = "center";
+                ctx.fillStyle = isFront ? "#000000" : "#ffffff";
+                ctx.font = "bold 15px 'Luckiest Guy', sans-serif";
+                ctx.fillText(p.name, x + cardW / 2, y + 26);
+
+                if (p.isEliminated) {
+                    ctx.fillStyle = "#ff1744";
+                    ctx.font = "bold 13px 'Luckiest Guy', sans-serif";
+                    ctx.fillText("💀 UTSLAGEN", x + cardW / 2, y + 54);
+                } else {
+                    // Hjärtan
+                    let hearts = "";
+                    for (let hIdx = 0; hIdx < p.lives; hIdx++) hearts += "❤️ ";
+                    ctx.font = "14px Arial";
+                    ctx.fillText(hearts.trim(), x + cardW / 2, y + 48);
+
+                    // Köposition
+                    ctx.font = "bold 12px sans-serif";
+                    ctx.fillStyle = isFront ? "#000000" : "#ffd600";
+                    ctx.fillText(isFront ? "👉 STÅR FÖRST (SVARAR NU!)" : `I KÖ (PLATS ${queuePos + 1})`, x + cardW / 2, y + 68);
+                }
+
+                ctx.restore();
+            }
+
+            // Central stor bombtimer för den som står framme
+            if (stageQueue.length > 0) {
+                const frontPlayer = players[stageQueue[0]];
+                const timerY = 160;
+
+                ctx.textAlign = "center";
+                ctx.font = "bold 26px 'Luckiest Guy', sans-serif";
+                ctx.fillStyle = frontPlayer ? frontPlayer.color : "#ffffff";
+                ctx.fillText(`💣 ${frontPlayer.name} HÅLLER BOMBEN!`, w / 2, timerY);
+
+                // Cirkulär timer-indikator
+                const timerRatio = Math.max(0, bombTimer / BOMB_START_TIME);
+                ctx.beginPath();
+                ctx.arc(w / 2, timerY + 50, 36, 0, Math.PI * 2);
+                ctx.fillStyle = "#11162b";
+                ctx.fill();
+                ctx.lineWidth = 7;
+                ctx.strokeStyle = timerRatio < 0.25 ? "#ff1744" : (timerRatio < 0.55 ? "#ffd600" : "#00ffcc");
+                ctx.beginPath();
+                ctx.arc(w / 2, timerY + 50, 36, -Math.PI / 2, -Math.PI / 2 + (Math.PI * 2 * timerRatio));
+                ctx.stroke();
+
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "bold 22px 'Luckiest Guy', sans-serif";
+                ctx.textBaseline = "middle";
+                ctx.fillText(Math.ceil(bombTimer) + "s", w / 2, timerY + 50);
+                ctx.textBaseline = "alphabetic";
+            }
+            ctx.restore();
+        }
+
+        function drawQuestionPanel() {
+            const w = canvas.width;
+            const h = canvas.height;
+            const q = QUESTIONS[currentQuestionIdx];
+            if (!q) return;
+
+            ctx.save();
+
+            // Frågeruta
+            const qBoxW = Math.min(w - 60, 880);
+            const qBoxH = 100;
+            const qBoxX = (w - qBoxW) / 2;
+            const qBoxY = 275;
+
+            ctx.fillStyle = "#161b33";
+            ctx.strokeStyle = "#38bdf8";
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.roundRect(qBoxX, qBoxY, qBoxW, qBoxH, 12);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "bold 20px 'Inter', sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(q.q, w / 2, qBoxY + qBoxH / 2);
+
+            // Svarsknappar F1 - F4
+            const colors = ["#0284c7", "#ea580c", "#16a34a", "#ca8a04"];
+            const fKeys = ["F1", "F2", "F3", "F4"];
+            const btnW = Math.min((w - 80) / 2, 420);
+            const btnH = 80;
+            const startX = (w - (btnW * 2 + 24)) / 2;
+            const startY = 405;
+
+            for (let i = 0; i < 4; i++) {
+                const col = i % 2;
+                const row = Math.floor(i / 2);
+                const bx = startX + col * (btnW + 24);
+                const by = startY + row * (btnH + 18);
+
+                ctx.save();
+                ctx.fillStyle = colors[i];
+                ctx.beginPath();
+                ctx.roundRect(bx, by, btnW, btnH, 10);
+                ctx.fill();
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // F-tangent badge
+                ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+                ctx.fillRect(bx + 12, by + 16, 52, 48);
+                ctx.strokeStyle = "#ffffff";
+                ctx.lineWidth = 1.5;
+                ctx.strokeRect(bx + 12, by + 16, 52, 48);
+
+                ctx.fillStyle = "#ffd600";
+                ctx.font = "bold 18px 'Luckiest Guy', sans-serif";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(fKeys[i], bx + 38, by + 40);
+
+                // Svarstext
+                ctx.textAlign = "left";
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "bold 16px 'Inter', sans-serif";
+                ctx.fillText(q.answers[i], bx + 80, by + 40);
+                ctx.restore();
+            }
+
+            ctx.restore();
+        }
+
+        function drawNoticeBanner() {
+            if (!bannerNotice.active) return;
+            const w = canvas.width;
+            ctx.save();
+            ctx.textAlign = "center";
+
+            ctx.fillStyle = bannerNotice.color;
+            ctx.font = "bold 24px 'Luckiest Guy', sans-serif";
+            ctx.fillText(bannerNotice.title, w / 2, canvas.height - 75);
+
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "bold 15px 'Inter', sans-serif";
+            ctx.fillText(bannerNotice.sub, w / 2, canvas.height - 45);
+            ctx.restore();
+        }
+
+        function drawGameOverScreen() {
+            const w = canvas.width;
+            const h = canvas.height;
+            const winner = stageQueue.length > 0 ? players[stageQueue[0]] : players[0];
+
+            ctx.save();
+            ctx.fillStyle = "rgba(4, 6, 12, 0.96)";
+            ctx.fillRect(0, 0, w, h);
+
+            ctx.textAlign = "center";
+            ctx.fillStyle = "#ffd600";
+            ctx.font = "bold 44px 'Luckiest Guy', sans-serif";
+            ctx.fillText("👑 TURNERINGENS VINNARE 👑", w / 2, h * 0.28);
+
+            ctx.fillStyle = winner.color;
+            ctx.font = "bold 36px 'Luckiest Guy', sans-serif";
+            ctx.fillText(winner.name, w / 2, h * 0.38);
+
+            ctx.fillStyle = "#ffffff";
+            ctx.font = "bold 18px 'Inter', sans-serif";
+            ctx.fillText("Alla motståndare har sprängts ut ur kön och lämnat scenen!", w / 2, h * 0.46);
+
+            ctx.fillStyle = "#38bdf8";
+            ctx.font = "bold 16px 'Luckiest Guy', sans-serif";
+            ctx.fillText("[ TRYCK ENTER FÖR ATT STARTA OM EN NY TURNERING ]", w / 2, h * 0.62);
+
+            ctx.restore();
+        }
+
+        function update() {
+            const now = performance.now();
+            const dt = (now - lastTimestamp) / 1000;
+            lastTimestamp = now;
+
+            if (screenShake > 0) {
+                screenShake *= 0.9;
+                if (screenShake < 0.2) screenShake = 0;
+            }
+
+            if (gameState === "PLAYING") {
+                bombTimer -= dt;
+
+                // Tickande ljud när det är ont om tid
+                const currentSec = Math.floor(bombTimer);
+                if (currentSec !== lastTimeTick && bombTimer > 0 && bombTimer <= 6) {
+                    lastTimeTick = currentSec;
+                    playTick();
+                }
+
+                if (bombTimer <= 0) {
+                    bombTimer = 0;
+                    handleBombExplosion();
+                }
+            }
+
+            if (bannerNotice.active) {
+                bannerNotice.timer--;
+                if (bannerNotice.timer <= 0) bannerNotice.active = false;
+            }
+
+            // Uppdatera partiklar
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.alpha -= p.decay;
+                if (p.alpha <= 0) particles.splice(i, 1);
+            }
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.save();
+            if (screenShake > 0) {
+                const sx = (Math.random() - 0.5) * screenShake;
+                const sy = (Math.random() - 0.5) * screenShake;
+                ctx.translate(sx, sy);
+            }
+
+            if (gameState === "PLAYING") {
+                drawQueueHUD();
+                drawQuestionPanel();
+                drawNoticeBanner();
+            } else if (gameState === "GAMEOVER") {
+                drawGameOverScreen();
+            }
+
+            // Rita partiklar
+            for (let p of particles) {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, p.alpha);
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            ctx.restore();
+        }
+
+        function gameLoop() {
+            update();
+            render();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Starta första frågan och loopen
+        loadNextQuestion();
+        requestAnimationFrame(gameLoop);
+    </script>
+</body>
+</html>
