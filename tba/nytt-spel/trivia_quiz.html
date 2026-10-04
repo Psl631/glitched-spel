@@ -5210,7 +5210,7 @@ const VALID_BADGE_CODE = "POLARPARTY-CREW-2026"; // Värdet som krävs på brick
 // =========================================================================
 function startBadgeScanner(playerIndex) {
     targetDqIndex = playerIndex;
-    isTournamentPaused = true; // Pausar spelet och skyddar mot Kameks fokusspärr[cite: 3]
+    isTournamentPaused = true; // Pausar spelet och skyddar mot Kameks fokusspärr// // [cite: 3]
     pauseReason = "DOMMERPAUSE: SKANNER CREW-BADGE";
 
     const modal = document.getElementById('crewBadgeModal');
@@ -5296,19 +5296,19 @@ async function requestCameraAccess() {
 
 // Låser upp adminverktyget först när brickan eller PIN-koden verifierats
 function badgeApproved() {
-    stopCamera(); //[cite: 2]
+    stopCamera(); //// // [cite: 2]
     if (typeof playBombDing === "function") playBombDing();
 
     // Växla vy från skanning till adminverktyg
-    document.getElementById('badgeScanStep').style.display = 'none'; //[cite: 2]
-    document.getElementById('badgeActionStep').style.display = 'block'; //[cite: 2]
+    document.getElementById('badgeScanStep').style.display = 'none'; //// // [cite: 2]
+    document.getElementById('badgeActionStep').style.display = 'block'; //// // [cite: 2]
 
-    const p = players[targetDqIndex]; //[cite: 2]
+    const p = players[targetDqIndex]; //// // [cite: 2]
     if (p) {
         document.getElementById('badgeTargetName').innerText = `${p.name} (Stol ${targetDqIndex + 1})`;
     }
-    document.getElementById('simpleReasonSelect').selectedIndex = 0; //[cite: 2]
-    document.getElementById('simpleReasonCustom').style.display = 'none'; //[cite: 2]
+    document.getElementById('simpleReasonSelect').selectedIndex = 0; //// // [cite: 2]
+    document.getElementById('simpleReasonCustom').style.display = 'none'; //// // [cite: 2]
 }
 
 // Manuell PIN-kodskontroll som reserv (t.ex. vid trasig webbkamera)
@@ -6488,6 +6488,8 @@ async function startQuiz() {
     cluesLeft = 3;
     activeClueText = "";
     eliminatedAnswers = [];
+    lastTime = Date.now();
+accumulator = 0;
     lifelines = { fiftyFifty: true, phoneAFriend: true, askAudience: true };
     if (typeof lifelineModal !== "undefined") lifelineModal.active = false;
 
@@ -6628,11 +6630,13 @@ function confirmNameAndBeginQuiz() {
     }
 }
 
-mobileInput.addEventListener('input', (e) => {
-    if (isNamePromptOpen) {
-        nameInputDraft = mobileInput.value.toUpperCase().slice(0, 12);
-    }
-});
+if (mobileInput) {
+    mobileInput.addEventListener('input', () => {
+        if (isNamePromptOpen) {
+            nameInputDraft = mobileInput.value.toUpperCase().slice(0, 12);
+        }
+    });
+}
 
 mobileInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && isNamePromptOpen) {
@@ -6643,25 +6647,36 @@ mobileInput.addEventListener('keydown', (e) => {
 window.addEventListener('keydown', (e) => {
     if (KamekAntiCheat.isTriggered()) return;
 
-    if (isNamePromptOpen) {
-        if (e.key === 'Enter') {
-            confirmNameAndBeginQuiz();
-            return;
-        } else if (e.key === 'Backspace') {
-            nameInputDraft = nameInputDraft.slice(0, -1);
-            mobileInput.value = nameInputDraft;
-            return;
-        } else if (e.key.length === 1 && nameInputDraft.length < 12) {
-            nameInputDraft += e.key.toUpperCase();
-            mobileInput.value = nameInputDraft;
-            return;
-        } else if (e.key === 'Escape') {
-            isNamePromptOpen = false;
-            mobileInput.blur();
-            return;
-        }
+    // 2. Ersätt namn-blocket inuti window.addEventListener('keydown', (e) => { ... }):
+if (isNamePromptOpen) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        confirmNameAndBeginQuiz();
+        return;
+    } else if (e.key === 'Escape') {
+        e.preventDefault();
+        isNamePromptOpen = false;
+        if (mobileInput) mobileInput.blur();
         return;
     }
+
+    // Om mobileInput redan har fokus sköter webbläsaren inmatningen (hindrar dubbla bokstäver)
+    if (document.activeElement === mobileInput) {
+        return;
+    }
+
+    // Fallback om tangentbordet trycks utanför input-rutan
+    if (e.key === 'Backspace') {
+        e.preventDefault();
+        nameInputDraft = nameInputDraft.slice(0, -1);
+        if (mobileInput) mobileInput.value = nameInputDraft;
+    } else if (e.key.length === 1 && nameInputDraft.length < 12 && !e.ctrlKey && !e.altKey && !e.metaKey) {
+        e.preventDefault();
+        nameInputDraft += e.key.toUpperCase();
+        if (mobileInput) mobileInput.value = nameInputDraft;
+    }
+    return;
+}
 
     // Övriga tangenter i menyer...
     if (gameState === "GAMEOVER") {
@@ -7577,27 +7592,27 @@ function handleUniversalAccessoryInput(type, eventKind, val) {
         // 1. BUZZ!-KONTROLLER
         if (type === "BUZZ") {
             if (val === 1) selectAnswer(0); // Blå
-            if (val === 2) selectAnswer(1); // Orange[cite: 1]
-            if (val === 3) selectAnswer(2); // Grön[cite: 1]
-            if (val === 4) selectAnswer(3); // Gul[cite: 1]
+            if (val === 2) selectAnswer(1); // Orange// // [cite: 1]
+            if (val === 3) selectAnswer(2); // Grön// // [cite: 1]
+            if (val === 4) selectAnswer(3); // Gul// // [cite: 1]
             return;
         }
 
         // 2. DANS-MATTOR (DDR / Pump It Up)
         if (type === "DANCE_MAT") {
-            if (val === "LEFT" || val === 0)  selectAnswer(0); // Vänsterpil = A (Blå)[cite: 1]
-            if (val === "UP" || val === 1)    selectAnswer(1); // Uppil = B (Orange)[cite: 1]
-            if (val === "DOWN" || val === 2)  selectAnswer(2); // Nedpil = C (Grön)[cite: 1]
-            if (val === "RIGHT" || val === 3) selectAnswer(3); // Högerpil = D (Gul)[cite: 1]
+            if (val === "LEFT" || val === 0)  selectAnswer(0); // Vänsterpil = A (Blå)// // [cite: 1]
+            if (val === "UP" || val === 1)    selectAnswer(1); // Uppil = B (Orange)// // [cite: 1]
+            if (val === "DOWN" || val === 2)  selectAnswer(2); // Nedpil = C (Grön)// // [cite: 1]
+            if (val === "RIGHT" || val === 3) selectAnswer(3); // Högerpil = D (Gul)// // [cite: 1]
             return;
         }
 
         // 3. GUITAR HERO / ROCK BAND PLASTGITARRER
         if (type === "GUITAR") {
-            if (val === 0) selectAnswer(0); // Grön bandknapp = A (Blå)[cite: 1]
-            if (val === 1) selectAnswer(1); // Röd bandknapp = B (Orange)[cite: 1]
-            if (val === 2) selectAnswer(2); // Gul bandknapp = C (Grön)[cite: 1]
-            if (val === 3) selectAnswer(3); // Blå bandknapp = D (Gul)[cite: 1]
+            if (val === 0) selectAnswer(0); // Grön bandknapp = A (Blå)// // [cite: 1]
+            if (val === 1) selectAnswer(1); // Röd bandknapp = B (Orange)// // [cite: 1]
+            if (val === 2) selectAnswer(2); // Gul bandknapp = C (Grön)// // [cite: 1]
+            if (val === 3) selectAnswer(3); // Blå bandknapp = D (Gul)// // [cite: 1]
             if (val === 4 || val === "UP") {
                 // Orange knapp eller tilt-sensor begär Google-ledtråd
                 if (typeof requestGoogleClue === 'function') requestGoogleClue();
@@ -7607,10 +7622,10 @@ function handleUniversalAccessoryInput(type, eventKind, val) {
 
         // 4. RACINGRATTAR & PEDALSTÄLL
         if (type === "WHEEL") {
-            if (val === 4 || val === "LEFT")  selectAnswer(0); // Vänster växelpaddel = A (Blå)[cite: 1]
-            if (val === 5 || val === "RIGHT") selectAnswer(1); // Höger växelpaddel = B (Orange)[cite: 1]
-            if (val === 1 || val === "DOWN")  selectAnswer(2); // Bromspedal = C (Grön)[cite: 1]
-            if (val === 2 || val === "UP")    selectAnswer(3); // Gaspedal = D (Gul)[cite: 1]
+            if (val === 4 || val === "LEFT")  selectAnswer(0); // Vänster växelpaddel = A (Blå)// // [cite: 1]
+            if (val === 5 || val === "RIGHT") selectAnswer(1); // Höger växelpaddel = B (Orange)// // [cite: 1]
+            if (val === 1 || val === "DOWN")  selectAnswer(2); // Bromspedal = C (Grön)// // [cite: 1]
+            if (val === 2 || val === "UP")    selectAnswer(3); // Gaspedal = D (Gul)// // [cite: 1]
             if (val === 0) {
                 // Tuta på ratten begär ledtråd
                 if (typeof requestGoogleClue === 'function') requestGoogleClue();
@@ -7654,20 +7669,20 @@ function handleUniversalAccessoryInput(type, eventKind, val) {
         // 9. COMMODORE AMIGA & CD32
         if (type === "AMIGA") {
             // CD32 4-färgsknappar: Röd(0)=A, Blå(1)=B, Grön(2)=C, Gul(3)=D
-            if (val === 0) selectAnswer(0); // A[cite: 1]
-            if (val === 1) selectAnswer(1); // B[cite: 1]
-            if (val === 2) selectAnswer(2); // C[cite: 1]
-            if (val === 3) selectAnswer(3); // D[cite: 1]
+            if (val === 0) selectAnswer(0); // A// // [cite: 1]
+            if (val === 1) selectAnswer(1); // B// // [cite: 1]
+            if (val === 2) selectAnswer(2); // C// // [cite: 1]
+            if (val === 3) selectAnswer(3); // D// // [cite: 1]
 
             // Klassisk DB9 1-knapps Amiga-joystick (Riktning sätter svar, knapp bekräftar)
-            if (val === "LEFT")  selectAnswer(0); //[cite: 1]
-            if (val === "UP")    selectAnswer(1); //[cite: 1]
-            if (val === "DOWN")  selectAnswer(2); //[cite: 1]
-            if (val === "RIGHT") selectAnswer(3); //[cite: 1]
+            if (val === "LEFT")  selectAnswer(0); //// // [cite: 1]
+            if (val === "UP")    selectAnswer(1); //// // [cite: 1]
+            if (val === "DOWN")  selectAnswer(2); //// // [cite: 1]
+            if (val === "RIGHT") selectAnswer(3); //// // [cite: 1]
 
             // CD32 Shoulder / Trigger för ledtråd
             if (val === 4 || val === 5 || val === "SELECT") {
-                if (typeof requestGoogleClue === 'function') requestGoogleClue();//[cite: 1]
+                if (typeof requestGoogleClue === 'function') requestGoogleClue();//// // [cite: 1]
             }
             return;
         }
@@ -7722,14 +7737,14 @@ function handleUniversalAccessoryInput(type, eventKind, val) {
 
         // 10. PHILIPS CD-I (1, 2, 3-knappskontroller)
         if (type === "PHILIPS_CDI") {
-            if (val === 0 || val === "LEFT")  selectAnswer(0); // Knapp 1 / Vänster = A[cite: 1]
-            if (val === 1 || val === "UP")    selectAnswer(1); // Knapp 2 / Upp = B[cite: 1]
-            if (val === 2 || val === "DOWN")  selectAnswer(2); // Knapp 3 / Ned = C[cite: 1]
-            if (val === 3 || val === "RIGHT") selectAnswer(3); // Knapp 4 / Höger = D[cite: 1]
+            if (val === 0 || val === "LEFT")  selectAnswer(0); // Knapp 1 / Vänster = A// // [cite: 1]
+            if (val === 1 || val === "UP")    selectAnswer(1); // Knapp 2 / Upp = B// // [cite: 1]
+            if (val === 2 || val === "DOWN")  selectAnswer(2); // Knapp 3 / Ned = C// // [cite: 1]
+            if (val === 3 || val === "RIGHT") selectAnswer(3); // Knapp 4 / Höger = D// // [cite: 1]
 
             // Extraklick för ledtråd
             if (val === 6 || val === "SELECT") {
-                if (typeof requestGoogleClue === 'function') requestGoogleClue();//[cite: 1]
+                if (typeof requestGoogleClue === 'function') requestGoogleClue();//// // [cite: 1]
             }
             return;
         }
@@ -7768,9 +7783,9 @@ function handleUniversalAccessoryInput(type, eventKind, val) {
         if (type === "JOYCON") {
             // A/B/X/Y eller piltangenter / spakriktning
             if (val === 0 || val === "LEFT")  selectAnswer(0); // B / Vänster = A
-            if (val === 1 || val === "UP")    selectAnswer(1); // A / Upp = B[cite: 1]
-            if (val === 2 || val === "DOWN")  selectAnswer(2); // Y / Ner = C[cite: 1]
-            if (val === 3 || val === "RIGHT") selectAnswer(3); // X / Höger = D[cite: 1]
+            if (val === 1 || val === "UP")    selectAnswer(1); // A / Upp = B// // [cite: 1]
+            if (val === 2 || val === "DOWN")  selectAnswer(2); // Y / Ner = C// // [cite: 1]
+            if (val === 3 || val === "RIGHT") selectAnswer(3); // X / Höger = D// // [cite: 1]
 
             // - / + (knappar 8 och 9) samt SL/SR (knappar 4 och 5) begär ledtråd
             if (val === 4 || val === 5 || val === 8 || val === 9 || val === "SELECT") {
@@ -7781,7 +7796,7 @@ function handleUniversalAccessoryInput(type, eventKind, val) {
 
         // 14. PLAYSTATION MOVE (Motion & Navigation)
         if (type === "PS_MOVE") {
-            // Move-knappar: Fyrkant(0)=A, Kryss(1)=B, Cirkel(2)=C, Triangel(3)=D[cite: 1]
+            // Move-knappar: Fyrkant(0)=A, Kryss(1)=B, Cirkel(2)=C, Triangel(3)=D// // [cite: 1]
             if (val === 0 || val === "LEFT")  selectAnswer(0);
             if (val === 1 || val === "UP")    selectAnswer(1);
             if (val === 2 || val === "DOWN")  selectAnswer(2);
@@ -7811,12 +7826,12 @@ window.addEventListener('contextmenu', (e) => {
     }
 });
 
-        // 5. ARKADSTICKOR & STANDARD-KONTROLLER[cite: 1]
+        // 5. ARKADSTICKOR & STANDARD-KONTROLLER// // [cite: 1]
         // Stöder både knappar 0–3 samt arkadspakens riktningar (Vänster/Upp/Ned/Höger)
-        if (val === 0 || val === "LEFT")  selectAnswer(0); // Knapp 1 el. Vänster = A[cite: 1]
-        if (val === 1 || val === "UP")    selectAnswer(1); // Knapp 2 el. Upp = B[cite: 1]
-        if (val === 2 || val === "DOWN")  selectAnswer(2); // Knapp 3 el. Ned = C[cite: 1]
-        if (val === 3 || val === "RIGHT") selectAnswer(3); // Knapp 4 el. Höger = D[cite: 1]
+        if (val === 0 || val === "LEFT")  selectAnswer(0); // Knapp 1 el. Vänster = A// // [cite: 1]
+        if (val === 1 || val === "UP")    selectAnswer(1); // Knapp 2 el. Upp = B// // [cite: 1]
+        if (val === 2 || val === "DOWN")  selectAnswer(2); // Knapp 3 el. Ned = C// // [cite: 1]
+        if (val === 3 || val === "RIGHT") selectAnswer(3); // Knapp 4 el. Höger = D// // [cite: 1]
         return;
     }
 
@@ -8830,6 +8845,55 @@ function playExplosionSound() {
     } catch (e) {}
 }
 
+// =========================================================================
+// 🎵 FÖRLADDADE LJUD & AUTOMATISKT UPPLÅSNING
+// =========================================================================
+
+const SOUNDS = {
+    wrong: new Audio("boooop.mp3"),
+    explode: new Audio("explosion.mp3"),
+    kamek: new Audio("kamek.mp3"),
+    yay: new Audio("win.mp3")
+};
+
+// Sätt volym på filerna (0.0 till 1.0)
+SOUNDS.wrong.volume = 0.9;
+SOUNDS.explode.volume = 1.0;
+SOUNDS.kamek.volume = 1.0;
+SOUNDS.yay.volume = 0.8;
+
+// Lås upp ljudet automatiskt vid första klick eller tangenttryck
+let audioUnlocked = false;
+function unlockAudioEngine() {
+    if (audioUnlocked) return;
+    audioUnlocked = true;
+
+    // Starta ljudkontexten om den fanns
+    if (typeof getAudioContext === "function") {
+        try { getAudioContext().resume(); } catch(e) {}
+    }
+
+    // Ta bort lyssnarna när det är upplåst
+    window.removeEventListener("pointerdown", unlockAudioEngine);
+    window.removeEventListener("keydown", unlockAudioEngine);
+}
+window.addEventListener("pointerdown", unlockAudioEngine);
+window.addEventListener("keydown", unlockAudioEngine);
+
+// Universell uppspelningsfunktion
+function playCustomSound(sndKey, fallbackFn) {
+    const snd = SOUNDS[sndKey];
+    if (snd) {
+        snd.currentTime = 0; // Spola tillbaka så ljudet kan spelas snabbt flera gånger
+        snd.play().catch(err => {
+            console.warn(`Kunde inte spela ${sndKey}.mp3, kör fallback:`, err);
+            if (typeof fallbackFn === "function") fallbackFn();
+        });
+    } else if (typeof fallbackFn === "function") {
+        fallbackFn();
+    }
+}
+
 function handleMistake(isTimeout = false) {
     try { new Audio('boooop.mp3').play().catch(() => {}); } catch(e) {}
     triggerHapticFeedback("WRONG");
@@ -9568,7 +9632,7 @@ function disqualifyPlayer(playerIndex, reason) {
     kamekBubble.isDQ = true;
     kamekBubble.text = "NYEHEHEHE! FERSKET AV CREW: " + reason.toUpperCase();
 
-    try { playBombBoooop(); } catch (e) {}
+    try { playCustomSound("wrong", playBombBoooop); } catch (e) {}
 
     // Skicka bomben vidare till nästa levande spelare
     passBombToNextPlayer();
@@ -9738,13 +9802,13 @@ window.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') startQuiz();
     } else // I spelets aktiva skede:
     if (gameState === "PLAYING" && gameMode !== "BOMB") {
-        // Alternativ A: 1, NumPad 1, A, Vänsterpil[cite: 1]
+        // Alternativ A: 1, NumPad 1, A, Vänsterpil// // [cite: 1]
         if (['1', 'a', 'A', 'ArrowLeft', 'Numpad1'].includes(e.key)) selectAnswer(0);
-        // Alternativ B: 2, NumPad 2, B, Uppil[cite: 1]
+        // Alternativ B: 2, NumPad 2, B, Uppil// // [cite: 1]
         if (['2', 'b', 'B', 'ArrowUp', 'Numpad2'].includes(e.key)) selectAnswer(1);
-        // Alternativ C: 3, NumPad 3, C, Nedpil[cite: 1]
+        // Alternativ C: 3, NumPad 3, C, Nedpil// // [cite: 1]
         if (['3', 'c', 'C', 'ArrowDown', 'Numpad3'].includes(e.key)) selectAnswer(2);
-        // Alternativ D: 4, NumPad 4, D, Högerpil[cite: 1]
+        // Alternativ D: 4, NumPad 4, D, Högerpil// // [cite: 1]
         if (['4', 'd', 'D', 'ArrowRight', 'Numpad4'].includes(e.key)) selectAnswer(3);
         
         // Mellanslag eller H: Begär Google-ledtråd
@@ -9752,63 +9816,27 @@ window.addEventListener('keydown', (e) => {
             if (typeof requestGoogleClue === 'function') requestGoogleClue();
         }
     }
-    else if (gameState === "PLAYING" && gameMode === "BOMB") {
-    // -------------------------------------------------------------
-    // SPELARE 1: F1 - F4 (Översta raden vänster)
-    // -------------------------------------------------------------
-    const p1FuncKeys = { "F1": 0, "F2": 1, "F3": 2, "F4": 3 };
-    if (p1FuncKeys[e.key] !== undefined) {
-        e.preventDefault(); // Hindrar t.ex. Windows/webbläsarens Hjälp-meny på F1
-        handleMultiplayerAnswer(p1FuncKeys[e.key], 0);
-        return;
-    }
+    const fKeys = { 'F1': 0, 'F2': 1, 'F3': 2, 'F4': 3 };
 
-    // -------------------------------------------------------------
-    // SPELARE 2: Sifferraden 1 - 4 (Mitten vänster)
-    // -------------------------------------------------------------
-    const p2NumberKeys = { "1": 0, "2": 1, "3": 2, "4": 3 };
-    if (p2NumberKeys[e.key] !== undefined && e.code.startsWith("Digit")) {
-        handleMultiplayerAnswer(p2NumberKeys[e.key], 1);
-        return;
-    }
+    if (fKeys.hasOwnProperty(e.key)) {
+        e.preventDefault();
+        e.stopPropagation();
 
-    // -------------------------------------------------------------
-    // SPELARE 3: Piltangenterna (Mitten / Navigationskluster)
-    // -------------------------------------------------------------
-    const p3ArrowKeys = { 
-        "ArrowLeft": 0,  // A / Blå
-        "ArrowUp": 1,    // B / Orange
-        "ArrowDown": 2,  // C / Grön
-        "ArrowRight": 3  // D / Gul
-    };
-    if (p3ArrowKeys[e.key] !== undefined) {
-        e.preventDefault(); // Hindrar sidan från att scrolla
-        handleMultiplayerAnswer(p3ArrowKeys[e.key], 2);
-        return;
-    }
+        if (gameState === "PLAYING" && !isTournamentPaused) {
+            // Om den som håller bomben är en bot körs return direkt så ingen människa kan svara
+            const currentHolder = players[activeBombPlayer];
+            if (currentHolder && currentHolder.isBot) {
+                return;
+            }
 
-    // -------------------------------------------------------------
-    // SPELARE 4: Numpad 1 - 4 ELLER F5 - F8 (Valfri högerzon)
-    // -------------------------------------------------------------
-    // Alternativ A: Numpad-siffrorna
-    const p4NumpadKeys = { 
-        "Numpad1": 0, 
-        "Numpad2": 1, 
-        "Numpad3": 2, 
-        "Numpad4": 3 
-    };
-    if (p4NumpadKeys[e.code] !== undefined) {
-        handleMultiplayerAnswer(p4NumpadKeys[e.code], 3);
-        return;
-    }
+            const ansIdx = fKeys[e.key];
 
-    // Alternativ B: F5 - F8
-    const p4FuncKeys = { "F5": 0, "F6": 1, "F7": 2, "F8": 3 };
-    if (p4FuncKeys[e.key] !== undefined) {
-        e.preventDefault(); // Hindrar F5 från att ladda om spelet!
-        handleMultiplayerAnswer(p4FuncKeys[e.key], 3);
-        return;
-    }
+            if (gameMode === "BOMB" || gameMode === "STEAL_SHIELD") {
+                handleMultiplayerAnswer(ansIdx, activeBombPlayer);
+            } else {
+                selectAnswer(ansIdx);
+            }
+        }
     }
     
     else if (gameState === "GAMEOVER") {
@@ -10603,67 +10631,56 @@ function passBombToNextPlayer() {
 }
 
 function handleBombExplosion() {
-    // 💥 Spela ljudfilen explosion.mp3 direkt vid detonation
-    playExplosionSound();
+    const curP = players[activeBombPlayer];// [cite: 3]
+    if (!curP || curP.isEliminated) return;// [cite: 3]
 
-    // Kraftig skärmskakning
-    screenShake = 18.0;
+    playCustomSound("explode", playBombBoooop);
+    curP.lives--; // ❤️ Liv dras av enbart vid explosion!// [cite: 3]
+    curP.lostHeartTimer = 60;// [cite: 3]
+    spawnBombExplosion(canvas.width / 2, canvas.height / 2, true);// [cite: 3]
 
-    const pBoxW = canvas.width / playerCount;
-    const pCenterX = activeBombPlayer * pBoxW + pBoxW / 2;
-    const pCenterY = 40;
-    spawnBombExplosion(pCenterX, pCenterY);
+    if (curP.lives <= 0) {
+        const trollAudio = new Audio('kamek.mp3');
+                    trollAudio.volume = 1.0;
+                    trollAudio.play().catch(() => {});
+        // Utslagen -> Måste lämna quizområdet// [cite: 3]
+        curP.isEliminated = true;// [cite: 3]
+        eliminatedOrder.push(curP);// [cite: 3]
 
-    const victim = players[activeBombPlayer];
-    victim.lives--;
-    screenShake = 18;
-    victim.lostHeartTimer = 45;
+        kamekBubble.active = true;// [cite: 3]
+        kamekBubble.playerIdx = activeBombPlayer;// [cite: 3]
+        kamekBubble.timer = 240;// [cite: 3]
+        kamekBubble.text = "💀 " + curP.name + " ÄR UTSLAGEN! LÄMNA QUIZOMRÅDET!";
+        kamekBubble.dqRoast = (currentLang === 'no')// [cite: 3]
+            ? "«GÅ NED FRA SCENEN! Forlat quizområdet nå!»"
+            : "«LÄMNA QUIZOMRÅDET! Tack för kaffet och hejdå!»";
 
-    if (victim.lives <= 0) {
-        victim.isEliminated = true;
-        eliminatedOrder.push(victim); // Sparar vem som åkte ut först/sist
-        const quotePool = KAMEK_ELIMINATION_QUOTES[currentLang] || KAMEK_ELIMINATION_QUOTES.en;
-            try {
-                const snd = new Audio('kamek.mp3');
-                snd.volume = 1.0;
-                snd.play().catch(() => {});
-            } catch (e) {}
+        if (typeof playKamekLaugh === "function") playKamekLaugh();// [cite: 3]
 
-            const targetP = (typeof players !== 'undefined' && players[activeBombPlayer]) ? players[activeBombPlayer] : null;
-const isPlayerDQ = Boolean(targetP && targetP.isDQ) || Boolean(kamekBubble && kamekBubble.isDQ);
-
-            // Starta pratbubblan
-            kamekBubble.active = true;
-            kamekBubble.timer = isPlayerDQ ? 900 : 420; // 900 frames (~15 sek) vid DQ, annars 420 (~7 sek)
-            kamekBubble.playerIdx = activeBombPlayer;
-            
-kamekBubble.text = quotePool[Math.floor(Math.random() * quotePool.length)];
-
+        // Kontrollera om bara en vinnare återstår
+        const alive = players.slice(0, playerCount).filter(p => !p.isEliminated && !p.isDQ);// [cite: 3]
+        if (alive.length <= 1) {
+            gameState = "GAMEOVER";// [cite: 3]
+            calculateEvaluation();// [cite: 3]
+            return;
+        }
     }
 
-    const alive = players.slice(0, playerCount).filter(p => !p.isEliminated);
-    if (alive.length <= 1) {
-        const winner = alive[0] || victim;
-        // Placering: Vinnaren först, därefter de utslagna i omvänd ordning (den som åkte ut sist blir 2:a osv)
-        finalStandings = [winner, ...eliminatedOrder.slice().reverse()];
-
-        deathSequence.active = false;
-        deathSequence.gameOverAlpha = 1.0;
-        deathSequence.reason = "BOMB_END";
-        gameState = "GAMEOVER";
-
-        calculateBombRankings(winner);
-        try { new Audio('win.mp3').play().catch(() => {}); } catch(e) {}
-        return;
+    // Efter smällen roterar turen till nästa spelare och en ny full stubin startas
+    let nextP = (activeBombPlayer + 1) % playerCount;// [cite: 3]
+    while (players[nextP].isEliminated || players[nextP].isDQ) {// [cite: 3]
+        nextP = (nextP + 1) % playerCount;// [cite: 3]
     }
+    activeBombPlayer = nextP;// [cite: 3]
+    bombTimer = bombStartTimeSetting || 15.0; // Ny bomb återställs först efter en detonation!// [cite: 3]
 
-    if (bombStartTimeSetting === "RANDOM_15_30" || bombStartTimeSetting === "BLIND") {
-        bombTimer = +(15 + Math.random() * 15).toFixed(1);
+    currentQuestionIdx++;// [cite: 3]
+    if (currentQuestionIdx >= activeQuestions.length) {// [cite: 3]
+        gameState = "GAMEOVER";// [cite: 3]
+        calculateEvaluation();// [cite: 3]
     } else {
-        bombTimer = typeof bombStartTimeSetting === "number" ? bombStartTimeSetting : 15.0;
+        loadQuestion(currentQuestionIdx);// [cite: 3]
     }
-    passBombToNextPlayer();
-    loadQuestion(currentQuestionIdx + 1);
 }
 
 
@@ -10766,76 +10783,132 @@ function calculateBombRankings(winner) {
     };
 }
 
+let lastAnswerTimestamp = 0; // Håller reda på senaste svarsförsök för 1 sek betänketid
+let spamAttemptStrikes = {}; // Håller koll på spam-varningar per spelare { playerIdx: count }// // [cite: 3]
+
 function handleMultiplayerAnswer(ansIdx, playerIdx) {
+    if (gameState !== "PLAYING" || isTournamentPaused) return;
+
+    // Trängselskydd: Endast spelaren som har bomben får svara
+    if (gameMode === "BOMB" && playerIdx !== activeBombPlayer) return;
+
+    const curP = players[playerIdx];
+    if (!curP || curP.isEliminated || curP.isDQ) return;
+
+    // Om det är en bot och anropet inte kommer från botens egen timer, avbryt
+    if (curP.isBot && playerIdx !== activeBombPlayer) return;
+
     const q = activeQuestions[currentQuestionIdx];
-    const isCorrect = (ansIdx === q.correct);
+    if (!q) return;
 
-    if (playStyle === "ONLINE_CLIENT") {
-        if (peerConnections[0] && peerConnections[0].open) {
-            peerConnections[0].send({ type: "ANSWER_SUBMITTED", answerIdx: ansIdx });
-        }
-        return;
-    }
+    const now = performance.now();
 
-    // =========================================================================
-    // 💣 LÄGE: PASS THE BOMB
-    // =========================================================================
-    if (gameMode === "BOMB") {
-        // Endast spelaren som håller i bomben får svara
-        if (playerIdx !== activeBombPlayer) return;
+    // -------------------------------------------------------------
+    // SPAMSKYDD: MINST 1 SEKUND BETÄNKETID (GÄLLER MÄNSKLIGA SPELARE)
+    // -------------------------------------------------------------
+    if (!curP.isBot && lastAnswerTimestamp > 0 && (now - lastAnswerTimestamp) < 1000) {
+        if (!spamAttemptStrikes[playerIdx]) spamAttemptStrikes[playerIdx] = 0;
+        spamAttemptStrikes[playerIdx]++;
 
-        if (isCorrect) {
-            playBombDing(); // 🔔 Ljus ding
-            passBombToNextPlayer();
-            loadQuestion(currentQuestionIdx + 1);
-        } else {
-            // Fel svar straffar timern med 2 sekunder
-            playBombBoooop(); // 🚨 Djup BÖÖÖÖP
-            bombTimer = Math.max(0.5, bombTimer - 2.0);
-            try { new Audio('boooop.mp3').play().catch(() => {}); } catch(e) {}
-            triggerHapticFeedback("WRONG");
-            loadQuestion(currentQuestionIdx + 1);
-        }
-        return;
-    }
+        playCustomSound("wrong", playBombBoooop);
+        triggerHapticFeedback("WRONG");
 
-    // =========================================================================
-    // 🛡️ LÄGE: STEAL & SHIELD
-    // =========================================================================
-    if (gameMode === "STEAL_SHIELD") {
-        const p = players[playerIdx];
-        if (p.isEliminated) return;
+        if (spamAttemptStrikes[playerIdx] >= 2) {
+            // 2:a försöket: Kamek diskar spelaren direkt via domslut
+            commitDisqualification(playerIdx, "Spam-fusk: Tryckte för snabbt utan betänketid");
+            const trollAudio = new Audio('kamek.mp3');
+                    trollAudio.volume = 1.0;
+                    trollAudio.play().catch(() => {});
 
-        if (isCorrect) {
-            try { new Audio('pling.mp3').play().catch(() => {}); } catch(e) {}
-            // Varje rätt svar ger val: Stjäl 50p från ledaren eller aktivera sköld
-            if (!p.shield) {
-                p.shield = true;
-                p.score += 50;
-            } else {
-                // Hitta ledaren och stjäl poäng om ledaren saknar sköld
-                const opponents = players.slice(0, playerCount).filter((_, idx) => idx !== playerIdx && !_.isEliminated);
-                opponents.sort((a, b) => b.score - a.score);
-                if (opponents.length > 0 && opponents[0].score > 0) {
-                    if (opponents[0].shield) {
-                        opponents[0].shield = false; // Knäck skölden!
-                    } else {
-                        opponents[0].score = Math.max(0, opponents[0].score - 50);
-                        p.score += 50;
-                    }
-                } else {
-                    p.score += 100;
-                }
+            bannerNotice = {
+                active: true,
+                title: "DISKVALIFICERAD: " + curP.name,
+                sub: "KAMEK: DU TRYCKTE FÖR SNABBT! LÄMNA QUIZOMRÅDET!",
+                timer: 240,
+                color: "#ff1744"
+            };
+            if (typeof playKamekLaugh === "function") playKamekLaugh();
+
+            // Kontrollera om bara en vinnare återstår
+            const alive = players.slice(0, playerCount).filter(p => !p.isEliminated && !p.isDQ);
+            if (alive.length <= 1) {
+                gameState = "GAMEOVER";
+                calculateEvaluation();
+                return;
             }
-            loadQuestion(currentQuestionIdx + 1);
+
+            // Gå vidare till nästa spelare och ladda ny fråga
+            let nextP = (activeBombPlayer + 1) % playerCount;
+            while (players[nextP].isEliminated || players[nextP].isDQ) {
+                nextP = (nextP + 1) % playerCount;
+            }
+            activeBombPlayer = nextP;
+            bombTimer = bombStartTimeSetting || 15.0;
+
+            currentQuestionIdx = (currentQuestionIdx + 1) % activeQuestions.length;
+            loadQuestion(currentQuestionIdx);
+            scheduleBotActions();
+            return;
         } else {
-            p.shield = false;
-            p.score = Math.max(0, p.score - 30);
-            try { new Audio('boooop.mp3').play().catch(() => {}); } catch(e) {}
+            // 1:a varningen
+            kamekBubble.active = true;
+            kamekBubble.playerIdx = playerIdx;
+            kamekBubble.timer = 90;
+            kamekBubble.text = "VARNING 1/2: MINST 1 SEKUND BETÄNKETID!";
+            kamekBubble.dqRoast = (currentLang === 'no')
+                ? "Slutt å trykke så fort i blinde! Neste gang disker Kamek deg!"
+                : "Tryck inte så snabbt i panik! En gång till och Kamek diskar dig!";
+            return;
         }
+    }
+
+    lastAnswerTimestamp = now;
+
+    // -------------------------------------------------------------
+    // SVARSBEDÖMNING: NY FRÅGA LADDAS ALLTID
+    // -------------------------------------------------------------
+    if (ansIdx === q.correct) {
+        // RÄTT SVAR: PLING, BOMBEN PASSAS VIDARE & SPELAREN GÅR SIST I KÖN
+        playBombDing();
+        curP.score += 100;
+        if (spamAttemptStrikes[playerIdx]) spamAttemptStrikes[playerIdx] = 0;
+
+        let nextP = (activeBombPlayer + 1) % playerCount;
+        while (players[nextP].isEliminated || players[nextP].isDQ) {
+            nextP = (nextP + 1) % playerCount;
+        }
+        activeBombPlayer = nextP;
+
+        // Ny fråga laddas omedelbart
+        currentQuestionIdx = (currentQuestionIdx + 1) % activeQuestions.length;
+        loadQuestion(currentQuestionIdx);
+        scheduleBotActions();
+    } else {
+        // FEL SVAR: BÖÖÖP, -3 SEK PÅ BOMBEN, BEHÅLL BOMBEN, NY FRÅGA LADDAS
+        playCustomSound("wrong", playBombBoooop);
+        triggerHapticFeedback("WRONG");
+
+        bombTimer = Math.max(0, bombTimer - 3.0);
+
+        if (bombTimer <= 0) {
+            handleBombExplosion();
+            return;
+        }
+
+        kamekBubble.active = true;
+        kamekBubble.playerIdx = playerIdx;
+        kamekBubble.timer = 80;
+        kamekBubble.text = "FEL SVAR! -3 SEK PÅ BOMBEN!";
+        kamekBubble.dqRoast = (currentLang === 'no')
+            ? "Feil! 3 sekunder borte, ny oppgave men du holder bomben!"
+            : "Fel svar! 3 sekunder rök, ny fråga men du håller bomben!";
+
+        // Ny fråga laddas omedelbart även vid fel svar
+        currentQuestionIdx = (currentQuestionIdx + 1) % activeQuestions.length;
+        loadQuestion(currentQuestionIdx);
+        scheduleBotActions();
     }
 }
-
 function renderAdminOverlays() {
     // 🛑 1. NØD-PAUSE BANNER PÅ STORBILDSKÄRMEN
     if (isTournamentPaused) {
@@ -11898,6 +11971,10 @@ if (bombStartTimeSetting === "RANDOM_15_30") {
         for (let i = 0; i < playerCount; i++) {
             const p = players[i];
             const px = i * pBoxW;
+    const cardWidth = Math.min(180, (canvas.width - 60) / playerCount);
+    const startX = (canvas.width - (cardWidth * playerCount + 20 * (playerCount - 1))) / 2;
+    const x = startX + i * (cardWidth + 20);
+    const y = 20;
 
             // Bakgrundsplatta per spelare
             ctx.fillStyle = (gameMode === "BOMB" && activeBombPlayer === i && !p.isEliminated) 
@@ -11951,10 +12028,37 @@ if (bombStartTimeSetting === "RANDOM_15_30") {
                     ctx.font = "13px sans-serif";
                     ctx.fillText(heartsText, px + pBoxW / 2, 44);
                 } else {
-                    ctx.fillStyle = "#ef4444";
-                    ctx.font = "bold 11px monospace";
-                    ctx.fillText(t("playerEliminatedHud"), px + pBoxW / 2, 44);
-                }
+                    // Rita ut fast elimineringsstatus för ALLA spelare som är ute
+const totalCount = playerCount || 4;
+const cardWidth = Math.min(180, (canvas.width - 60) / totalCount);
+const startX = (canvas.width - (cardWidth * totalCount + 20 * (totalCount - 1))) / 2;
+const cardY = 20;
+
+for (let i = 0; i < totalCount; i++) {
+    const p = players[i];
+    if (p && p.isEliminated) {
+        const cardX = startX + i * (cardWidth + 20);
+
+        ctx.save();
+        ctx.font = "bold 13px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        // Skarp svart kontur som står fast på kortet
+        ctx.strokeStyle = "#000000";
+        ctx.lineWidth = 3;
+        ctx.lineJoin = "round";
+        ctx.strokeText(t("playerEliminatedHud"), cardX + cardWidth / 2, cardY + 55);
+
+        // Textfärg
+        ctx.fillStyle = "#ff1744";
+        ctx.fillText(t("playerEliminatedHud"), cardX + cardWidth / 2, cardY + 55);
+        ctx.restore();
+    }
+}
+}
+
+
 
                 // Rita den pulserande bomben ovanför den aktiva spelaren
                 // Rita den pulserande bomben och 7-segments LED-timern
@@ -12697,22 +12801,22 @@ const optionColors = getOptionColors(); // ✅ Hämtar färgpaletten för A, B, 
 
     // 1. Sortera och beräkna rankings för Bombläget eller Poängläget
     let ranked = [];
-    const activeMatchPlayers = players.slice(0, playerCount); //[cite: 1]
+    const activeMatchPlayers = players.slice(0, playerCount); //// // [cite: 1]
 
-    if (gameMode === "BOMB") { //[cite: 1]
-        const survivor = activeMatchPlayers.find(p => !p.isEliminated); //[cite: 1]
-        if (survivor) ranked.push(survivor); //[cite: 1]
+    if (gameMode === "BOMB") { //// // [cite: 1]
+        const survivor = activeMatchPlayers.find(p => !p.isEliminated); //// // [cite: 1]
+        if (survivor) ranked.push(survivor); //// // [cite: 1]
 
-        const revElim = [...eliminatedOrder].reverse(); //[cite: 1]
+        const revElim = [...eliminatedOrder].reverse(); //// // [cite: 1]
         revElim.forEach(p => {
-            if (!ranked.some(r => r.id === p.id)) ranked.push(p); //[cite: 1]
+            if (!ranked.some(r => r.id === p.id)) ranked.push(p); //// // [cite: 1]
         });
 
         activeMatchPlayers.forEach(p => {
-            if (!ranked.some(r => r.id === p.id)) ranked.push(p); //[cite: 1]
+            if (!ranked.some(r => r.id === p.id)) ranked.push(p); //// // [cite: 1]
         });
     } else {
-        ranked = [...activeMatchPlayers].sort((a, b) => b.score - a.score); //[cite: 1]
+        ranked = [...activeMatchPlayers].sort((a, b) => b.score - a.score); //// // [cite: 1]
     }
 
     const total = ranked.length;
@@ -12723,30 +12827,30 @@ const optionColors = getOptionColors(); // ✅ Hämtar färgpaletten för A, B, 
     const startY = isPortrait ? h * 0.22 : h * 0.24;
     const gap = isPortrait ? 62 : 56;
 
-    if (typeof spawnBombExplosion === "function" && bombExplosionParticles.length < 90) { //[cite: 1]
+    if (typeof spawnBombExplosion === "function" && bombExplosionParticles.length < 90) { //// // [cite: 1]
         const lastIdx = total - 1;
         const lastY = startY + lastIdx * gap + cardH / 2;
         const winY = startY + cardH / 2;
 
         // Skapa sot/aska på förloraren
         if (Math.random() < 0.12) {
-            spawnBombExplosion(w / 2, lastY, true); //[cite: 1]
+            spawnBombExplosion(w / 2, lastY, true); //// // [cite: 1]
         }
         // Skapa guld/eldgnistor på vinnaren
         if (Math.random() < 0.08) {
-            spawnBombExplosion(w / 2, winY, false); //[cite: 1]
+            spawnBombExplosion(w / 2, winY, false); //// // [cite: 1]
         }
     }
 
     // 3. Rubriker
     ctx.textAlign = "center";
-    ctx.fillStyle = "#ff1744"; //[cite: 1]
+    ctx.fillStyle = "#ff1744"; //// // [cite: 1]
     ctx.font = "bold 26px 'Luckiest Guy', sans-serif";
-    ctx.fillText("💣 " + t("finalStandingsTitle"), w / 2, isPortrait ? h * 0.12 : h * 0.14); //[cite: 1]
+    ctx.fillText("💣 " + t("finalStandingsTitle"), w / 2, isPortrait ? h * 0.12 : h * 0.14); //// // [cite: 1]
 
-    ctx.fillStyle = "#94a3b8"; //[cite: 1]
+    ctx.fillStyle = "#94a3b8"; //// // [cite: 1]
     ctx.font = "bold 13px sans-serif";
-    ctx.fillText(t("bombSummarySub"), w / 2, isPortrait ? h * 0.16 : h * 0.19); //[cite: 1]
+    ctx.fillText(t("bombSummarySub"), w / 2, isPortrait ? h * 0.16 : h * 0.19); //// // [cite: 1]
 
     // 4. Rita resultatraderna
     ranked.forEach((p, idx) => {
@@ -12759,12 +12863,12 @@ const optionColors = getOptionColors(); // ✅ Hämtar färgpaletten för A, B, 
             : (isLast ? "rgba(239, 68, 68, 0.16)" : "rgba(30, 41, 59, 0.75)");
         ctx.fillRect((w - cardW) / 2, cy, cardW, cardH);
 
-        ctx.strokeStyle = isFirst ? "#ffd700" : (isLast ? "#ef4444" : p.color); //[cite: 1]
+        ctx.strokeStyle = isFirst ? "#ffd700" : (isLast ? "#ef4444" : p.color); //// // [cite: 1]
         ctx.lineWidth = (isFirst || isLast) ? 2.5 : 1.5;
         ctx.strokeRect((w - cardW) / 2, cy, cardW, cardH);
 
         const rankText = typeof getPodiumRankLabel === "function" 
-            ? getPodiumRankLabel(idx, total) //[cite: 1]
+            ? getPodiumRankLabel(idx, total) //// // [cite: 1]
             : `#${idx + 1}`;
 
         ctx.textAlign = "left";
@@ -12772,7 +12876,7 @@ const optionColors = getOptionColors(); // ✅ Hämtar färgpaletten för A, B, 
         ctx.font = "bold 15px sans-serif";
         ctx.fillText(rankText, (w - cardW) / 2 + 16, cy + cardH / 2 + 5);
 
-        ctx.fillStyle = p.color; //[cite: 1]
+        ctx.fillStyle = p.color; //// // [cite: 1]
         ctx.font = "bold 16px sans-serif";
         ctx.fillText(p.name, (w - cardW) / 2 + 140, cy + cardH / 2 + 5);
 
@@ -12782,11 +12886,11 @@ const optionColors = getOptionColors(); // ✅ Hämtar färgpaletten för A, B, 
     });
 
     // 5. UPP DATERA OCH RITA UT ALLA BOMB-PARTIKLAR (Detta saknades!)
-    for (let i = bombExplosionParticles.length - 1; i >= 0; i--) { //[cite: 1]
-        const pt = bombExplosionParticles[i]; //[cite: 1]
-        pt.x += pt.vx; //[cite: 1]
-        pt.y += pt.vy; //[cite: 1]
-        pt.alpha -= pt.decay; //[cite: 1]
+    for (let i = bombExplosionParticles.length - 1; i >= 0; i--) { //// // [cite: 1]
+        const pt = bombExplosionParticles[i]; //// // [cite: 1]
+        pt.x += pt.vx; //// // [cite: 1]
+        pt.y += pt.vy; //// // [cite: 1]
+        pt.alpha -= pt.decay; //// // [cite: 1]
 
         if (pt.alpha <= 0) {
             bombExplosionParticles.splice(i, 1);
@@ -12794,19 +12898,19 @@ const optionColors = getOptionColors(); // ✅ Hämtar färgpaletten för A, B, 
         }
 
         ctx.save();
-        ctx.globalAlpha = Math.max(0, pt.alpha); //[cite: 1]
-        ctx.fillStyle = pt.color; //[cite: 1]
+        ctx.globalAlpha = Math.max(0, pt.alpha); //// // [cite: 1]
+        ctx.fillStyle = pt.color; //// // [cite: 1]
         ctx.beginPath();
-        ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2); //[cite: 1]
+        ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2); //// // [cite: 1]
         ctx.fill();
         ctx.restore();
     }
 
     // 6. Återvändsprompt längst ner
     ctx.textAlign = "center";
-    ctx.fillStyle = "#38bdf8"; //[cite: 1]
+    ctx.fillStyle = "#38bdf8"; //// // [cite: 1]
     ctx.font = "bold 13px sans-serif";
-    ctx.fillText(t("returnPromptDesktop"), w / 2, h - 35); //[cite: 1]
+    ctx.fillText(t("returnPromptDesktop"), w / 2, h - 35); //// // [cite: 1]
 
     ctx.restore();
 }
@@ -13539,8 +13643,26 @@ function renderSinglePlayerGameOver(ctx, w, h, isPortrait) {
     ctx.restore();
 }
 
+let lastTime = Date.now();
+let accumulator = 0;
+
 function mainLoop() {
-    update();
+    const now = Date.now();
+    let elapsed = now - lastTime;
+    lastTime = now;
+
+    // Förhindra lagg-spikar om fliken minimerats
+    if (elapsed > 250) elapsed = 250;
+    if (elapsed < 0) elapsed = 0;
+
+    accumulator += elapsed;
+
+    // Kör befintliga update() i exakt 60 FPS-steg (1000 / 60 ≈ 16.67 ms)
+    while (accumulator >= 1000 / 60) {
+        update();
+        accumulator -= 1000 / 60;
+    }
+
     render();
     requestAnimationFrame(mainLoop);
 }

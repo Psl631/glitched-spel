@@ -3982,14 +3982,27 @@ checkOrientationNotice(ctx, canvas);
 drawCornerUIButtons();
     }
 
-    function gameLoop() {
-        update();
-        render();
-        requestAnimationFrame(gameLoop);
+    var lastRenderTime = performance.now();
+    var fpsInterval = 1000 / 60; // Max 60 FPS (ca 16.67 ms per frame)
+
+    function gameLoop(currentTime) {
+        requestAnimationFrame(gameLoop); // Begär nästa frame direkt
+
+        var elapsed = currentTime - lastRenderTime;
+
+        // Uppdatera endast om det gått minst 16.67 millisekunder
+        if (elapsed >= fpsInterval) {
+            // Justera lastRenderTime så den inte driver iväg (kompenserar för missade frames)
+            lastRenderTime = currentTime - (elapsed % fpsInterval);
+            
+            update();
+            render();
+        }
     }
 
     initScenery();
-    gameLoop();
+    // Starta loopen med en initial tidsstämpel
+    requestAnimationFrame(gameLoop);
 
     // Fallbacks för hörnknappar och kontroller så inget kastar ReferenceError
 if (typeof window.handleCornerButtonTouches !== "function") {
