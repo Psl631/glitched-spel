@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ByteFest SpookyMaze - Station 24 Halloween Special</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'VT323', monospace;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .pixel-font {
+            font-family: 'Press Start 2P', monospace;
+        }
+        .scanline {
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+        }
+        .crt-glow {
+            box-shadow: 0 0 25px rgba(255, 107, 0, 0.25), inset 0 0 20px rgba(0,0,0,0.8);
+        }
+    </style>
+</head>
+<body class="bg-neutral-950 text-neutral-100 min-h-screen flex flex-col items-center justify-between p-2 sm:p-4 selection:bg-orange-600">
+
+    <!-- Top Header -->
+    <header class="w-full max-w-4xl flex items-center justify-between border-b-2 border-orange-600/60 pb-2 mb-2">
+        <div class="flex items-center space-x-2">
+            <span class="text-2xl sm:text-3xl">🎃</span>
+            <div>
+                <h1 class="pixel-font text-xs sm:text-sm text-orange-500 tracking-wider">BYTEFEST '26 SPOOKYMAZE</h1>
+                <p class="text-xs text-neutral-400">Rådahallen Edition • Station 24 Arcade</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2 text-xs">
+            <button id="audio-toggle-btn" class="bg-neutral-800 hover:bg-neutral-700 text-orange-400 border border-orange-500/50 px-2 py-1 rounded transition">
+                🔊 LJUD: <span id="audio-status">PÅ</span>
+            </button>
+            <button id="restart-btn" class="bg-orange-700 hover:bg-orange-600 text-white font-bold px-2 py-1 rounded transition pixel-font text-[9px]">
+                RESTART
+            </button>
+        </div>
+    </header>
+
+    <!-- Game HUD -->
+    <div class="w-full max-w-4xl grid grid-cols-4 gap-2 text-center mb-2 text-sm sm:text-lg">
+        <div class="bg-neutral-900/90 border border-neutral-700 rounded p-1">
+            <span class="text-xs text-neutral-400 block">BATTERI</span>
+            <div class="w-full bg-neutral-800 h-3 rounded overflow-hidden mt-1 border border-neutral-700">
+                <div id="battery-bar" class="bg-emerald-500 h-full w-full transition-all duration-200"></div>
+            </div>
+        </div>
+        <div class="bg-neutral-900/90 border border-neutral-700 rounded p-1">
+            <span class="text-xs text-neutral-400 block">TID KVAR</span>
+            <span id="timer-display" class="pixel-font text-xs sm:text-sm text-yellow-400">01:30</span>
+        </div>
+        <div class="bg-neutral-900/90 border border-neutral-700 rounded p-1">
+            <span class="text-xs text-neutral-400 block">FÖREMÅL</span>
+            <div id="items-display" class="flex justify-center space-x-2 text-base sm:text-lg">
+                <span id="item-pumpkin" class="opacity-20 transition">🎃</span>
+                <span id="item-key" class="opacity-20 transition">🗝️</span>
+                <span id="item-crystal" class="opacity-20 transition">💎</span>
+            </div>
+        </div>
+        <div class="bg-neutral-900/90 border border-neutral-700 rounded p-1">
+            <span class="text-xs text-neutral-400 block">POÄNG</span>
+            <span id="score-display" class="pixel-font text-xs sm:text-sm text-orange-400">0000</span>
+        </div>
+    </div>
+
+    <!-- Canvas Container -->
+    <main class="relative w-full max-w-4xl flex-1 flex items-center justify-center">
+        <div id="canvas-wrapper" class="relative w-full aspect-[4/3] max-h-[68vh] border-2 border-orange-900/80 rounded-lg overflow-hidden crt-glow bg-black">
+            <canvas id="gameCanvas" class="w-full h-full block"></canvas>
+            <div class="scanline absolute inset-0"></div>
+
+            <!-- Jumpscare Flash Overlay -->
+            <div id="flash-overlay" class="absolute inset-0 bg-red-600/80 opacity-0 pointer-events-none transition-opacity duration-100 flex items-center justify-center">
+                <span class="text-7xl font-bold text-white drop-shadow-lg">👻 BUU!</span>
+            </div>
+
+            <!-- Start / Game Over / Win Overlay -->
+            <div id="modal-screen" class="absolute inset-0 bg-neutral-950/90 flex flex-col items-center justify-center text-center p-4">
+                <div class="max-w-md bg-neutral-900 border-2 border-orange-500 rounded-lg p-5 shadow-2xl">
+                    <h2 id="modal-title" class="pixel-font text-base sm:text-xl text-orange-500 mb-2">BYTEFEST SPOOKYMAZE</h2>
+                    <p id="modal-desc" class="text-base sm:text-lg text-neutral-300 mb-4 leading-snug">
+                        Hitta alla 3 relikerna (🎃, 🗝️, 💎) i den mörka labyrinten och ta dig till nödutgången 🚪 innan ficklampans batteri eller tiden tar slut. Se upp för spöken!
+                    </p>
+                    <div class="text-xs text-neutral-400 mb-4">
+                        Styrning: <strong>WASD / Piltangenter</strong> eller touch-styrkorset nedanför.
+                    </div>
+                    <button id="modal-action-btn" class="pixel-font text-xs sm:text-sm bg-orange-600 hover:bg-orange-500 text-white font-bold py-3 px-6 rounded shadow-lg transition transform active:scale-95">
+                        STARTA BANAN
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Virtual On-screen D-Pad for Touch/Mobile -->
+    <section class="w-full max-w-xs grid grid-cols-3 gap-2 my-2 sm:hidden">
+        <div></div>
+        <button id="btn-up" class="bg-neutral-800 border border-neutral-600 active:bg-orange-600 text-xl py-3 rounded text-white flex items-center justify-center">▲</button>
+        <div></div>
+        <button id="btn-left" class="bg-neutral-800 border border-neutral-600 active:bg-orange-600 text-xl py-3 rounded text-white flex items-center justify-center">◀</button>
+        <button id="btn-down" class="bg-neutral-800 border border-neutral-600 active:bg-orange-600 text-xl py-3 rounded text-white flex items-center justify-center">▼</button>
+        <button id="btn-right" class="bg-neutral-800 border border-neutral-600 active:bg-orange-600 text-xl py-3 rounded text-white flex items-center justify-center">▶</button>
+    </section>
+
+    <!-- Footer Status -->
+    <footer class="w-full max-w-4xl text-center text-xs text-neutral-500 py-1">
+        ByteFest 2026 • Rådahallen D/E & A-hallen • Håll utrymningsvägarna fria!
+    </footer>
+
+    <script>
+        /* ----------------------------------------------------
+           1. Web Audio API Sound Synthesizer (Zero External Audio)
+        ---------------------------------------------------- */
+        let audioCtx = null;
+        let soundEnabled = true;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        const SFX = {
+            step() {
+                if (!soundEnabled || !audioCtx) return;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(75, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.06);
+                gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.06);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.06);
+            },
+            pickup() {
+                if (!soundEnabled || !audioCtx) return;
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+                osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+                osc.frequency.setValueAtTime(1046.50, now + 0.24); // C6
+                gain.gain.setValueAtTime(0.12, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(now + 0.4);
+            },
+            ghostSpook() {
+                if (!soundEnabled || !audioCtx) return;
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, now);
+                osc.frequency.exponentialRampToValueAtTime(60, now + 0.35);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(now + 0.36);
+            },
+            win() {
+                if (!soundEnabled || !audioCtx) return;
+                const notes = [440, 554, 659, 880];
+                notes.forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    const t = audioCtx.currentTime + idx * 0.12;
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(freq, t);
+                    gain.gain.setValueAtTime(0.1, t);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(t);
+                    osc.stop(t + 0.26);
+                });
+            },
+            lose() {
+                if (!soundEnabled || !audioCtx) return;
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(40, now + 0.6);
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.linearRampToValueAtTime(0.001, now + 0.65);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(now + 0.66);
+            }
+        };
+
+        /* ----------------------------------------------------
+           2. Maze Grid Map (1 = Wall, 0 = Hallway)
+           Dimensions: 21 cols x 15 rows
+        ---------------------------------------------------- */
+        const COLS = 21;
+        const ROWS = 15;
+        const MAZE = [
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,1],
+            [1,0,1,0,1,0,1,1,1,0,1,0,1,1,1,0,1,0,1,0,1],
+            [1,0,1,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,1],
+            [1,0,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,0,1],
+            [1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,1],
+            [1,1,1,1,0,1,1,1,1,0,1,1,1,0,1,1,1,0,1,1,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1],
+            [1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,0,1,0,1],
+            [1,0,1,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,1,0,1],
+            [1,0,1,0,1,1,1,0,1,0,1,1,1,0,1,0,1,0,1,0,1],
+            [1,0,0,0,1,0,0,0,1,0,0,0,1,0,1,0,0,0,1,0,1],
+            [1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,0,1,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+        ];
+
+        /* ----------------------------------------------------
+           3. Game State & Entities
+        ---------------------------------------------------- */
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let tileW = 32;
+        let tileH = 32;
+
+        let gameState = 'START'; // 'START', 'PLAYING', 'GAMEOVER', 'WIN'
+        let battery = 100;
+        let timeLeft = 90;
+        let score = 0;
+        let timerInterval = null;
+        let lastStepSoundTime = 0;
+
+        // Player object
+        const player = {
+            x: 1.5,
+            y: 1.5,
+            angle: 0,
+            speed: 3.2,
+            radius: 0.35,
+            items: {
+                pumpkin: false,
+                key: false,
+                crystal: false
+            }
+        };
+
+        // Collectibles
+        let items = [
+            { id: 'pumpkin', x: 19.5, y: 1.5, emoji: '🎃', name: 'Pumpka' },
+            { id: 'key',     x: 1.5,  y: 13.5, emoji: '🗝️', name: 'Nyckel' },
+            { id: 'crystal', x: 10.5, y: 7.5,  emoji: '💎', name: 'Kristall' }
+        ];
+
+        // Exit door
+        const exitDoor = { x: 19.5, y: 13.5, open: false };
+
+        // Ghosts
+        let ghosts = [
+            { x: 9.5, y: 3.5, vx: 1.2, vy: 0, dirTimer: 0 },
+            { x: 5.5, y: 7.5, vx: 0, vy: 1.2, dirTimer: 0 },
+            { x: 15.5, y: 9.5, vx: -1.2, vy: 0, dirTimer: 0 },
+            { x: 11.5, y: 13.5, vx: 1.2, vy: 0, dirTimer: 0 }
+        ];
+
+        // Input tracking
+        const keys = {
+            ArrowUp: false,
+            ArrowDown: false,
+            ArrowLeft: false,
+            ArrowRight: false,
+            w: false,
+            a: false,
+            s: false,
+            d: false
+        };
+
+        /* ----------------------------------------------------
+           4. Responsive Canvas Resizing
+        ---------------------------------------------------- */
+        function resizeCanvas() {
+            const wrapper = document.getElementById('canvas-wrapper');
+            const rect = wrapper.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            tileW = canvas.width / COLS;
+            tileH = canvas.height / ROWS;
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        /* ----------------------------------------------------
+           5. Collision & Math Helpers
+        ---------------------------------------------------- */
+        function isWall(gx, gy) {
+            const ix = Math.floor(gx);
+            const iy = Math.floor(gy);
+            if (ix < 0 || ix >= COLS || iy < 0 || iy >= ROWS) return true;
+            return MAZE[iy][ix] === 1;
+        }
+
+        function checkCircleWallCollision(px, py, radius) {
+            const minX = Math.floor(px - radius);
+            const maxX = Math.floor(px + radius);
+            const minY = Math.floor(py - radius);
+            const maxY = Math.floor(py + radius);
+
+            for (let y = minY; y <= maxY; y++) {
+                for (let x = minX; x <= maxX; x++) {
+                    if (isWall(x, y)) {
+                        // Closest point on wall rect
+                        const closestX = Math.max(x, Math.min(px, x + 1));
+                        const closestY = Math.max(y, Math.min(py, y + 1));
+                        const dx = px - closestX;
+                        const dy = py - closestY;
+                        if ((dx * dx + dy * dy) < (radius * radius)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        /* ----------------------------------------------------
+           6. Game Logic & Updates
+        ---------------------------------------------------- */
+        let lastTimestamp = 0;
+
+        function update(dt) {
+            if (gameState !== 'PLAYING') return;
+
+            // Movement vector
+            let dx = 0;
+            let dy = 0;
+            if (keys.ArrowUp || keys.w) dy -= 1;
+            if (keys.ArrowDown || keys.s) dy += 1;
+            if (keys.ArrowLeft || keys.a) dx -= 1;
+            if (keys.ArrowRight || keys.d) dx += 1;
+
+            if (dx !== 0 || dy !== 0) {
+                const len = Math.hypot(dx, dy);
+                dx /= len;
+                dy /= len;
+
+                player.angle = Math.atan2(dy, dx);
+
+                const moveDist = player.speed * dt;
+                const nextX = player.x + dx * moveDist;
+                const nextY = player.y + dy * moveDist;
+
+                // Move X with slide
+                if (!checkCircleWallCollision(nextX, player.y, player.radius)) {
+                    player.x = nextX;
+                }
+                // Move Y with slide
+                if (!checkCircleWallCollision(player.x, nextY, player.radius)) {
+                    player.y = nextY;
+                }
+
+                // Footstep audio throttle
+                const nowTime = performance.now();
+                if (nowTime - lastStepSoundTime > 320) {
+                    SFX.step();
+                    lastStepSoundTime = nowTime;
+                }
+            }
+
+            // Drain battery slowly over time
+            battery = Math.max(0, battery - (dt * 1.1));
+            updateBatteryDisplay();
+
+            if (battery <= 0) {
+                endGame(false, "Ficklampans batteri dog! Mörkret slukade dig.");
+                return;
+            }
+
+            // Item collection
+            items.forEach(item => {
+                if (!player.items[item.id]) {
+                    const dist = Math.hypot(player.x - item.x, player.y - item.y);
+                    if (dist < 0.7) {
+                        player.items[item.id] = true;
+                        score += 350;
+                        battery = Math.min(100, battery + 15); // Bonus power
+                        document.getElementById(`item-${item.id}`).classList.remove('opacity-20');
+                        document.getElementById(`item-${item.id}`).classList.add('opacity-100', 'scale-125');
+                        SFX.pickup();
+                    }
+                }
+            });
+
+            // Unlock Exit when all 3 found
+            const hasAll = player.items.pumpkin && player.items.key && player.items.crystal;
+            exitDoor.open = hasAll;
+
+            // Check Exit Reach
+            const distExit = Math.hypot(player.x - exitDoor.x, player.y - exitDoor.y);
+            if (distExit < 0.75) {
+                if (exitDoor.open) {
+                    score += Math.round(timeLeft * 10 + battery * 5);
+                    endGame(true, "Du fann vägen ut till säkerheten vid parkeringen!");
+                    return;
+                }
+            }
+
+            // Update Ghosts
+            ghosts.forEach(g => {
+                g.dirTimer -= dt;
+                if (g.dirTimer <= 0) {
+                    g.dirTimer = 1.5 + Math.random() * 2;
+                    const dirs = [
+                        { vx: 1.2, vy: 0 },
+                        { vx: -1.2, vy: 0 },
+                        { vx: 0, vy: 1.2 },
+                        { vx: 0, vy: -1.2 }
+                    ];
+                    const chosen = dirs[Math.floor(Math.random() * dirs.length)];
+                    g.vx = chosen.vx;
+                    g.vy = chosen.vy;
+                }
+
+                const gxNext = g.x + g.vx * dt;
+                const gyNext = g.y + g.vy * dt;
+
+                if (!checkCircleWallCollision(gxNext, gyNext, 0.3)) {
+                    g.x = gxNext;
+                    g.y = gyNext;
+                } else {
+                    g.vx = -g.vx;
+                    g.vy = -g.vy;
+                    g.dirTimer = 0.8;
+                }
+
+                // Check collision with player
+                const dGhost = Math.hypot(player.x - g.x, player.y - g.y);
+                if (dGhost < 0.65) {
+                    triggerJumpscare();
+                }
+            });
+
+            // Update Score HUD
+            document.getElementById('score-display').innerText = String(score).padStart(4, '0');
+        }
+
+        /* ----------------------------------------------------
+           7. Jumpscare Flash & Penalty
+        ---------------------------------------------------- */
+        let isFlashing = false;
+        function triggerJumpscare() {
+            if (isFlashing) return;
+            isFlashing = true;
+            battery = Math.max(0, battery - 18);
+            SFX.ghostSpook();
+
+            const flash = document.getElementById('flash-overlay');
+            flash.style.opacity = '1';
+            setTimeout(() => {
+                flash.style.opacity = '0';
+                setTimeout(() => {
+                    isFlashing = false;
+                }, 400);
+            }, 180);
+        }
+
+        /* ----------------------------------------------------
+           8. Rendering: Maze, Fog of War, Flashlight Cone
+        ---------------------------------------------------- */
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. Draw Maze Floor & Walls
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < COLS; c++) {
+                    const px = c * tileW;
+                    const py = r * tileH;
+                    if (MAZE[r][c] === 1) {
+                        // Wall block (dark brick look)
+                        ctx.fillStyle = '#261a15';
+                        ctx.fillRect(px, py, tileW, tileH);
+                        ctx.strokeStyle = '#3d2b22';
+                        ctx.lineWidth = 1;
+                        ctx.strokeRect(px + 1, py + 1, tileW - 2, tileH - 2);
+                    } else {
+                        // Floor tile
+                        ctx.fillStyle = '#0f0e13';
+                        ctx.fillRect(px, py, tileW, tileH);
+                        ctx.strokeStyle = '#181622';
+                        ctx.lineWidth = 0.5;
+                        ctx.strokeRect(px, py, tileW, tileH);
+                    }
+                }
+            }
+
+            // 2. Draw Exit Door
+            const exPx = exitDoor.x * tileW;
+            const exPy = exitDoor.y * tileH;
+            ctx.save();
+            ctx.font = `${Math.floor(tileH * 0.8)}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(exitDoor.open ? '🚪' : '🔒', exPx, exPy);
+            ctx.restore();
+
+            // 3. Draw Collectibles
+            items.forEach(item => {
+                if (!player.items[item.id]) {
+                    const ipx = item.x * tileW;
+                    const ipy = item.y * tileH;
+                    ctx.save();
+                    ctx.font = `${Math.floor(tileH * 0.75)}px sans-serif`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    // gentle hover bounce
+                    const bounce = Math.sin(performance.now() * 0.005) * 3;
+                    ctx.fillText(item.emoji, ipx, ipy + bounce);
+                    ctx.restore();
+                }
+            });
+
+            // 4. Draw Ghosts
+            ghosts.forEach(g => {
+                const gx = g.x * tileW;
+                const gy = g.y * tileH;
+                ctx.save();
+                ctx.font = `${Math.floor(tileH * 0.8)}px sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('👻', gx, gy);
+                ctx.restore();
+            });
+
+            // 5. Draw Player
+            const plPx = player.x * tileW;
+            const plPy = player.y * tileH;
+            ctx.save();
+            ctx.translate(plPx, plPy);
+            ctx.font = `${Math.floor(tileH * 0.75)}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('🧙', 0, 0);
+            ctx.restore();
+
+            // 6. Dynamic Fog of War / Flashlight Lighting Mask
+            renderFogOfWar(plPx, plPy);
+        }
+
+        function renderFogOfWar(px, py) {
+            ctx.save();
+            // Flashlight radius depends on battery level
+            const baseRadius = Math.max(70, (battery / 100) * (canvas.width * 0.28));
+
+            // Create offscreen-like darkness overlay
+            ctx.globalCompositeOperation = 'source-over';
+            
+            // Mask layer
+            const darkCanvas = document.createElement('canvas');
+            darkCanvas.width = canvas.width;
+            darkCanvas.height = canvas.height;
+            const dCtx = darkCanvas.getContext('2d');
+
+            // Fill solid deep blackness
+            dCtx.fillStyle = 'rgba(2, 2, 5, 0.96)';
+            dCtx.fillRect(0, 0, darkCanvas.width, darkCanvas.height);
+
+            // Cut out flashlight illumination
+            dCtx.globalCompositeOperation = 'destination-out';
+
+            // Radial flashlight falloff
+            const radGrad = dCtx.createRadialGradient(px, py, baseRadius * 0.15, px, py, baseRadius);
+            radGrad.addColorStop(0, 'rgba(0,0,0,1)');
+            radGrad.addColorStop(0.65, 'rgba(0,0,0,0.85)');
+            radGrad.addColorStop(1, 'rgba(0,0,0,0)');
+
+            dCtx.beginPath();
+            dCtx.arc(px, py, baseRadius, 0, Math.PI * 2);
+            dCtx.fillStyle = radGrad;
+            dCtx.fill();
+
+            // Additional flashlight cone in facing direction
+            const coneAngle = Math.PI * 0.38;
+            dCtx.beginPath();
+            dCtx.moveTo(px, py);
+            dCtx.arc(px, py, baseRadius * 1.45, player.angle - coneAngle / 2, player.angle + coneAngle / 2);
+            dCtx.closePath();
+            dCtx.fillStyle = 'rgba(0,0,0,0.7)';
+            dCtx.fill();
+
+            // Draw shadow map over the main canvas
+            ctx.drawImage(darkCanvas, 0, 0);
+            ctx.restore();
+        }
+
+        /* ----------------------------------------------------
+           9. Game Loop
+        ---------------------------------------------------- */
+        function gameLoop(timestamp) {
+            if (!lastTimestamp) lastTimestamp = timestamp;
+            const dt = Math.min((timestamp - lastTimestamp) / 1000, 0.1);
+            lastTimestamp = timestamp;
+
+            update(dt);
+            render();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        /* ----------------------------------------------------
+           10. UI & Control Handlers
+        ---------------------------------------------------- */
+        function updateBatteryDisplay() {
+            const bar = document.getElementById('battery-bar');
+            bar.style.width = `${Math.max(0, Math.min(100, battery))}%`;
+            if (battery < 25) {
+                bar.className = 'bg-red-500 h-full transition-all duration-200 animate-pulse';
+            } else if (battery < 55) {
+                bar.className = 'bg-yellow-500 h-full transition-all duration-200';
+            } else {
+                bar.className = 'bg-emerald-500 h-full transition-all duration-200';
+            }
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (gameState === 'PLAYING') {
+                    timeLeft--;
+                    const mins = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+                    const secs = String(timeLeft % 60).padStart(2, '0');
+                    document.getElementById('timer-display').innerText = `${mins}:${secs}`;
+
+                    if (timeLeft <= 0) {
+                        endGame(false, "Tiden tog slut innan du fann utrymningsvägen!");
+                    }
+                }
+            }, 1000);
+        }
+
+        function resetGame() {
+            player.x = 1.5;
+            player.y = 1.5;
+            player.angle = 0;
+            player.items = { pumpkin: false, key: false, crystal: false };
+
+            battery = 100;
+            timeLeft = 90;
+            score = 0;
+            exitDoor.open = false;
+
+            document.getElementById('item-pumpkin').className = 'opacity-20 transition';
+            document.getElementById('item-key').className = 'opacity-20 transition';
+            document.getElementById('item-crystal').className = 'opacity-20 transition';
+            document.getElementById('timer-display').innerText = '01:30';
+            document.getElementById('score-display').innerText = '0000';
+            updateBatteryDisplay();
+
+            ghosts = [
+                { x: 9.5, y: 3.5, vx: 1.2, vy: 0, dirTimer: 0 },
+                { x: 5.5, y: 7.5, vx: 0, vy: 1.2, dirTimer: 0 },
+                { x: 15.5, y: 9.5, vx: -1.2, vy: 0, dirTimer: 0 },
+                { x: 11.5, y: 13.5, vx: 1.2, vy: 0, dirTimer: 0 }
+            ];
+        }
+
+        function startGame() {
+            initAudio();
+            resetGame();
+            gameState = 'PLAYING';
+            document.getElementById('modal-screen').classList.add('hidden');
+            startTimer();
+        }
+
+        function endGame(won, message) {
+            gameState = won ? 'WIN' : 'GAMEOVER';
+            clearInterval(timerInterval);
+
+            const modal = document.getElementById('modal-screen');
+            const title = document.getElementById('modal-title');
+            const desc = document.getElementById('modal-desc');
+            const btn = document.getElementById('modal-action-btn');
+
+            if (won) {
+                SFX.win();
+                title.innerText = '🏆 UTBROMSTAD & RÄDDAD!';
+                title.className = 'pixel-font text-base sm:text-xl text-emerald-400 mb-2';
+                desc.innerHTML = `${message}<br><br><span class="text-orange-400 font-bold">TOTAL POÄNG: ${score}</span>`;
+                btn.innerText = 'SPELA IGEN';
+            } else {
+                SFX.lose();
+                title.innerText = '☠️ GAME OVER';
+                title.className = 'pixel-font text-base sm:text-xl text-red-500 mb-2';
+                desc.innerText = message;
+                btn.innerText = 'FÖRSÖK IGEN';
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        // Keyboard Event Listeners
+        window.addEventListener('keydown', (e) => {
+            if (keys.hasOwnProperty(e.key)) {
+                keys[e.key] = true;
+                // prevent browser scroll on arrows
+                if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                    e.preventDefault();
+                }
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (keys.hasOwnProperty(e.key)) {
+                keys[e.key] = false;
+            }
+        });
+
+        // Virtual Touch D-Pad setup
+        function bindTouchBtn(btnId, keyName) {
+            const btn = document.getElementById(btnId);
+            if (!btn) return;
+            const startPress = (e) => {
+                e.preventDefault();
+                initAudio();
+                keys[keyName] = true;
+            };
+            const endPress = (e) => {
+                e.preventDefault();
+                keys[keyName] = false;
+            };
+            btn.addEventListener('touchstart', startPress);
+            btn.addEventListener('touchend', endPress);
+            btn.addEventListener('mousedown', startPress);
+            btn.addEventListener('mouseup', endPress);
+            btn.addEventListener('mouseleave', endPress);
+        }
+
+        bindTouchBtn('btn-up', 'ArrowUp');
+        bindTouchBtn('btn-down', 'ArrowDown');
+        bindTouchBtn('btn-left', 'ArrowLeft');
+        bindTouchBtn('btn-right', 'ArrowRight');
+
+        // Audio Toggle
+        document.getElementById('audio-toggle-btn').addEventListener('click', () => {
+            initAudio();
+            soundEnabled = !soundEnabled;
+            document.getElementById('audio-status').innerText = soundEnabled ? 'PÅ' : 'AV';
+        });
+
+        // Restart and Modal Actions
+        document.getElementById('restart-btn').addEventListener('click', () => {
+            startGame();
+        });
+        document.getElementById('modal-action-btn').addEventListener('click', () => {
+            startGame();
+        });
+
+        // Bootstrap on Load
+        window.onload = function () {
+            resizeCanvas();
+            requestAnimationFrame(gameLoop);
+        };
+    </script>
+</body>
+</html>
